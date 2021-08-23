@@ -1,0 +1,66 @@
+from django.db import models
+
+
+class Users(models.Model):
+    
+    email = models.CharField(max_length=100)
+    password = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'users'
+        verbose_name = '사용자 테이블'
+
+
+class Profiles(models.Model):
+    
+    name = models.CharField(max_length=100)
+    user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'profiles'
+        verbose_name = '내 일정 테이블'
+
+
+class ClubEntries(models.Model):
+    
+    name = models.CharField(max_length=100)
+    user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'club_entries'
+        verbose_name = '내 일정과 모임 간의 관계 테이블'
+
+
+class Clubs(models.Model):
+    
+    name = models.CharField(max_length=100)
+    uri = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'clubs'
+        verbose_name = '내 일정과 모임 간의 관계 테이블'
+
+
+# 읽기 전용 일자 테이블
+class Dates(models.Model):
+    
+    day = models.CharField(max_length=100)
+    hour = models.CharField(max_length=100)
+    minute = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'dates'
+        verbose_name = '일자 테이블'
+
+
+class ProfileDates(models.Model):
+    
+    is_temporary_reserved = models.BooleanField()
+    user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
+    date_id = models.ForeignKey(Dates, on_delete=models.CASCADE)
+    club_id = models.ForeignKey(Clubs, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'profile_dates'
+        verbose_name = '내 일정과 모임 간의 관계 테이블'
