@@ -2,3 +2,4 @@ venv
 *.json
 db.sqlite3
 __cache__
+.DS_Store
