@@ -1,0 +1,4 @@
+venv
+*.json
+db.sqlite3
+__cache__
