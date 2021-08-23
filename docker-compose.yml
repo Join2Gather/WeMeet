@@ -1,0 +1,26 @@
+version: "3.3"
+
+services:
+  django_app:
+    build:
+      context: ./backend
+    networks:
+      - app-tier
+    restart: always
+    volumes:
+      - ./backend/:/backend/
+    depends_on:
+      - everytime_parser
+
+  everytime_parser:
+    build:
+      context: ./everytime-parse-api
+    ports:
+      - 8009:8009
+    networks:
+      - app-tier
+    restart: always
+
+networks:
+  app-tier:
+    driver: bridge
