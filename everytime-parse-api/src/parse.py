@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import math
 import pprint
-from typing import Union, BinaryIO
+from typing import BinaryIO
 
 def normal_round(n):
     if n - math.floor(n) < 0.5:
@@ -13,9 +13,12 @@ def normal_round(n):
 def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = False):
     if img_url:
         img: np.ndarray = cv2.imread(img_url)
-    if img_file:
-        file_bytes = np.asarray(bytearray(img_file.read()), dtype=np.uint8)
+    elif img_file:
+        file_bytes = np.fromstring(img_file.read(), dtype=np.uint8)
         img: np.ndarray = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    else:
+        return []
     img_x, img_y, _ = img.shape
     reshaped: np.ndarray = np.reshape(img, (-1, 3)) # 2d rgb to 1d rgb
     colors: np.ndarray = np.unique(reshaped, axis=0)
@@ -29,7 +32,7 @@ def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = False)
     one_hour_y = 180.0
     one_day_x = 177
 
-    week = ['월', '화', '수', '목', '금']
+    week = ['일', '월', '화', '수', '목', '금', '토']
 
     initial_hour = 9.0
 
@@ -67,7 +70,7 @@ def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = False)
                     end_minutes = 0
             
             
-            day_num = int((x - padding_x) // one_day_x)
+            day_num = int((x - padding_x) // one_day_x) + 1
             day = week[day_num]
             
             result.append({
