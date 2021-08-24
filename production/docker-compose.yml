@@ -2,26 +2,30 @@ version: "3.3"
 
 services:
   django_app:
-    build:
-      context: ./backend
+    image: a891/join2gather_backend:latest
     networks:
       - app-tier
     ports:
       - 8000:8000
     restart: always
     volumes:
-      - ./backend/:/backend/
+      - ./secrets.json:/backend/secrets.json:ro
     depends_on:
       - everytime_parser
 
   everytime_parser:
-    build:
-      context: ./everytime-parse-api
+    image: a891/join2gather_everytime:latest
     ports:
       - 8009:8009
     networks:
       - app-tier
     restart: always
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30
 
 networks:
   app-tier:
