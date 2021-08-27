@@ -5,3 +5,12 @@ djangorestframework==3.12.4
 Markdown==3.3.4
 pytz==2021.1
 sqlparse==0.4.1
+uvicorn
+gunicorn
+dj-rest-auth
+django-allauth
+djangorestframework
+djangorestframework-simplejwt
+dj-rest-auth
+django-allauth
+requests
