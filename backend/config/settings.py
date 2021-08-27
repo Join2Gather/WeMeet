@@ -22,7 +22,8 @@ SECRET_KEY = get_secret("SECRET_KEY")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# 환경 변수에 따라서 DEBUG 변수를 조절할 수 있게 설계
+DEBUG = True if get_secret("DEBUG") else False
 
 ALLOWED_HOSTS = ['*']
 
@@ -41,8 +42,24 @@ INSTALLED_APPS = [
     # My Apps
 
     # Third Party Apps
-    'rest_framework'
+    # my app
+    'accounts',
+    # django-rest-framework
+    'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
+    # dj-rest-auth
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    # django-allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.google',
 ]
+
+AUTH_USER_MODEL = 'config.Users'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -80,12 +97,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 if DEBUG is True:
     DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': DB_DIR / 'db.sqlite3',
+        }
     }
-}
 else:
+    # AuroraDB, Mysql 등으로 마이그레이션?
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
