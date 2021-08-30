@@ -14,3 +14,4 @@ djangorestframework-simplejwt
 dj-rest-auth
 django-allauth
 requests
+drf-yasg
