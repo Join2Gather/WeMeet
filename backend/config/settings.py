@@ -16,14 +16,14 @@ from .environment import get_secret
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DB_DIR = Path.joinpath(BASE_DIR, 'db') # Docker Volume 연동을 위함
+DB_DIR = Path.joinpath(BASE_DIR, 'db')  # Docker Volume 연동을 위함
 
 SECRET_KEY = get_secret("SECRET_KEY")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # 환경 변수에 따라서 DEBUG 변수를 조절할 수 있게 설계
-DEBUG = True if get_secret("DEBUG") else False
+DEBUG = get_secret("DEBUG") if get_secret("DEBUG") else False
 
 ALLOWED_HOSTS = ['*']
 
@@ -65,7 +65,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
