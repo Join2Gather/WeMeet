@@ -14,4 +14,4 @@ dj-rest-auth
 django-allauth
 requests
 drf-yasg
-ruamel
+ruamel.yaml
