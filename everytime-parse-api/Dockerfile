@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM python:3.8
 
 WORKDIR /backend
 COPY . .
@@ -6,9 +6,7 @@ COPY . .
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y && \
-    apt-get install -y python3-pip python3-dev \
-    build-essential libssl-dev libffi-dev python3-setuptools \
-    python3-venv mongodb-clients bash-completion libglib2.0-0 libgl1-mesa-glx
+    apt-get install -y libglib2.0-0 libgl1-mesa-glx
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1

@@ -1,10 +1,7 @@
-FROM ubuntu:20.04
+FROM python:3.8
 
 WORKDIR /backend
 COPY . .
-
-RUN apt-get update -y && \
-    apt-get install -y python3-pip python3 python3-setuptools python3-venv
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
