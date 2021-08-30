@@ -1,19 +1,12 @@
 from django.db import models
+from django.contrib.auth.models import User as UserModel
+from . import settings
 
-
-class Users(models.Model):
-    
-    email = models.CharField(max_length=100)
-    password = models.CharField(max_length=100)
-    name = models.CharField(max_length=100)
-
-    class Meta:
-        db_table = 'users'
-        verbose_name = '사용자 테이블'
+Users = settings.AUTH_USER_MODEL
 
 
 class Profiles(models.Model):
-    
+
     name = models.CharField(max_length=100)
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
 
@@ -23,7 +16,7 @@ class Profiles(models.Model):
 
 
 class ClubEntries(models.Model):
-    
+
     name = models.CharField(max_length=100)
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
 
@@ -33,7 +26,7 @@ class ClubEntries(models.Model):
 
 
 class Clubs(models.Model):
-    
+
     name = models.CharField(max_length=100)
     uri = models.CharField(max_length=100)
 
@@ -44,7 +37,7 @@ class Clubs(models.Model):
 
 # 읽기 전용 일자 테이블
 class Dates(models.Model):
-    
+
     day = models.CharField(max_length=100)
     hour = models.CharField(max_length=100)
     minute = models.CharField(max_length=100)
@@ -55,7 +48,7 @@ class Dates(models.Model):
 
 
 class ProfileDates(models.Model):
-    
+
     is_temporary_reserved = models.BooleanField()
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
     date_id = models.ForeignKey(Dates, on_delete=models.CASCADE)
