@@ -24,13 +24,17 @@ class Constants:
 
 # original code from @Chanjongp (https://github.com/Chanjongp/Django_Social_Login)
 # https://medium.com/chanjongs-programming-diary/django-rest-framework%EB%A1%9C-%EC%86%8C%EC%85%9C-%EB%A1%9C%EA%B7%B8%EC%9D%B8-api-%EA%B5%AC%ED%98%84%ED%95%B4%EB%B3%B4%EA%B8%B0-google-kakao-github-2ccc4d49a781
-
+# 로그인 성공 시, Callback 함수로 Code 값 전달받음
 class KakaoLoginView(APIView):
     def get(request):
         return redirect(
             f"https://kauth.kakao.com/oauth/authorize?client_id={Constants.rest_api_key}&redirect_uri={Constants.KAKAO_CALLBACK_URI}&response_type=code"
         )
 
+
+# 받은 Code로 Kakao에 access token request
+# access token으로 Kakao에 email 값을 request 
+# 전달받은 Email, Access Token, Code를 바탕으로 회원가입/로그인 진행
 class KakaoCallbackView(APIView):
     def get(request):
         rest_api_key = getattr(settings, 'KAKAO_REST_API_KEY')
