@@ -1,19 +1,20 @@
 # Create your views here.
 
 from django.conf import settings
-from accounts.models import User
+from config.models import Users as User
 from allauth.socialaccount.models import SocialAccount
 from django.conf import settings
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from rest_framework.views import APIView
 from django.http import JsonResponse
 import requests
 from rest_framework import status
 from json.decoder import JSONDecodeError
 from django.shortcuts import redirect
 from django.http import HttpRequest, HttpResponse
-from settings.environment import get_secret
+from config.environment import get_secret
 
 # Data class for shorthand notation
 class Constants:
@@ -26,9 +27,9 @@ class Constants:
 # https://medium.com/chanjongs-programming-diary/django-rest-framework%EB%A1%9C-%EC%86%8C%EC%85%9C-%EB%A1%9C%EA%B7%B8%EC%9D%B8-api-%EA%B5%AC%ED%98%84%ED%95%B4%EB%B3%B4%EA%B8%B0-google-kakao-github-2ccc4d49a781
 # 로그인 성공 시, Callback 함수로 Code 값 전달받음
 class KakaoLoginView(APIView):
-    def get(request):
+    def get(self, request):
         return redirect(
-            f"https://kauth.kakao.com/oauth/authorize?client_id={Constants.rest_api_key}&redirect_uri={Constants.KAKAO_CALLBACK_URI}&response_type=code"
+            f"https://kauth.kakao.com/oauth/authorize?client_id={Constants.REST_API_KEY}&redirect_uri={Constants.KAKAO_CALLBACK_URI}&response_type=code"
         )
 
 
@@ -36,8 +37,8 @@ class KakaoLoginView(APIView):
 # access token으로 Kakao에 email 값을 request 
 # 전달받은 Email, Access Token, Code를 바탕으로 회원가입/로그인 진행
 class KakaoCallbackView(APIView):
-    def get(request):
-        rest_api_key = getattr(settings, 'KAKAO_REST_API_KEY')
+    def get(self, request):
+        REST_API_KEY = getattr(settings, 'KAKAO_REST_API_KEY')
         code = request.GET.get("code")
         redirect_uri = Constants.KAKAO_CALLBACK_URI
         BASE_URL = Constants.BASE_URL
@@ -45,7 +46,7 @@ class KakaoCallbackView(APIView):
         Access Token Request
         """
         token_req = requests.get(
-            f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={rest_api_key}&redirect_uri={redirect_uri}&code={code}")
+            f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={REST_API_KEY}&redirect_uri={redirect_uri}&code={code}")
         token_req_json = token_req.json()
         error = token_req_json.get("error")
         if error is not None:
@@ -101,7 +102,7 @@ class KakaoCallbackView(APIView):
             return JsonResponse(accept_json)
 
 
-class KakaoLogin(SocialLoginView):
+class KakaoLoginToDjango(SocialLoginView):
     adapter_class = kakao_view.KakaoOAuth2Adapter
     client_class = OAuth2Client
     callback_url = Constants.KAKAO_CALLBACK_URI
