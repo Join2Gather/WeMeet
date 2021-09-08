@@ -1,7 +1,7 @@
 # Create your views here.
 
 from django.conf import settings
-from config.models import Users as User
+from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from django.conf import settings
 from dj_rest_auth.registration.views import SocialLoginView

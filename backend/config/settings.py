@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     # django-rest-framework
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'rest_framework.authtoken',
     # dj-rest-auth
     'dj_rest_auth',
     'dj_rest_auth.registration',
@@ -64,7 +65,7 @@ INSTALLED_APPS = [
     'config'
 ]
 
-SITE_ID = 1
+SITE_ID = 2
 
 AUTH_USER_MODEL = 'auth.User'
 # On settings.py
@@ -123,6 +124,19 @@ else:
         }
     }
 
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'kakao': {
+        'APP': {
+            'key': get_secret('KAKAO_REST_API_KEY')
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
