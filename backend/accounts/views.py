@@ -38,8 +38,8 @@ class KakaoLoginView(APIView):
 # 전달받은 Email, Access Token, Code를 바탕으로 회원가입/로그인 진행
 class KakaoCallbackView(APIView):
     def get(self, request):
-        REST_API_KEY = getattr(settings, 'KAKAO_REST_API_KEY')
         code = request.GET.get("code")
+        REST_API_KEY = Constants.REST_API_KEY
         redirect_uri = Constants.KAKAO_CALLBACK_URI
         BASE_URL = Constants.BASE_URL
         """
