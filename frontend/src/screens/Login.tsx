@@ -28,7 +28,6 @@ export default function Login() {
 	// )
 	// prettier-ignore
 	const goTabNavigator = useCallback(() => navigation.navigate('TabNavigator'), []);
-	const goSignUp = useCallback(() => navigation.navigate('SignUp'), []);
 
 	const onPressSocial = useCallback(async (social: any) => {
 		setSocialModalVisible(true);
