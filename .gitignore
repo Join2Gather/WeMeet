@@ -1,5 +1,5 @@
 venv
-*.json
+secrets.json
 db.sqlite3
 __cache__
 .DS_Store

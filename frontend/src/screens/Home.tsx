@@ -1,76 +1,76 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable dot-notation */
-import React from 'react';
-import {
-  Text,
-  View,
-  StyleSheet,
-  SafeAreaView,
-  ImageBackground,
-} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import {getPost, getUsers} from '../store/sample';
-import {useEffect} from 'react';
-import {RootState} from '../store';
-const Home: React.FC = () => {
-  const {post, users, loadingPost, loadingUsers} = useSelector(
-    ({sample, loading}: RootState) => ({
-      post: sample.post,
-      users: sample.users,
-      loadingPost: loading['sample/GET_POST'],
-      loadingUsers: loading['sample/GET_USERS'],
-    }),
-  );
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(getPost(1));
-    dispatch(getUsers());
-  }, [dispatch]);
-  return (
-    <SafeAreaView style={styles.flex}>
-      <ImageBackground
-        style={{flex: 1, opacity: 1}}
-        resizeMode="cover"
-        blurRadius={5}
-        source={require('../assets/images/news.jpg')}>
-        <View style={styles.ItemSeparator}>
-          {loadingPost && <Text style={styles.title}>Loading</Text>}
-          {!loadingPost && post && (
-            <>
-              <Text style={styles.title}>Article</Text>
-              <View>
-                <Text style={styles.text}>{post.title}</Text>
-                <Text style={styles.text}>{post.body}</Text>
-              </View>
-            </>
-          )}
-        </View>
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { StyleSheet, FlatList } from 'react-native';
+import { useNavigation, DrawerActions } from '@react-navigation/native';
+// prettier-ignore
+import {SafeAreaView, View, UnderlineText,TopBar,
+NavigationHeader, MaterialCommunityIcon as Icon} from '../theme';
+import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
+import { LeftRightNavigation } from '../components';
+import type { LeftRightNavigationMethods } from '../components';
 
-        <View style={styles.ItemSeparator}>
-          {loadingUsers && <Text style={styles.title}>로딩중...</Text>}
-          {!loadingUsers && users && (
-            <>
-              <Text style={styles.title}>User List</Text>
-              <Text style={styles.text}>
-                {users.map(user => (
-                  <Text key={user.id}>
-                    {user.id} : [{user.email}]{'\n'}
-                  </Text>
-                ))}
-              </Text>
-            </>
-          )}
-        </View>
-      </ImageBackground>
-    </SafeAreaView>
-  );
-};
+export default function Home() {
+	// navigation
+	const navigation = useNavigation();
+	const goLeft = useCallback(() => navigation.navigate('HomeLeft'), []);
+	const goRight = useCallback(
+		() => navigation.navigate('HomeRight', { name: 'Jack', age: 32 }),
+		[]
+	);
+	const open = useCallback(() => {
+		navigation.dispatch(DrawerActions.openDrawer());
+	}, []);
+	const logout = useCallback(() => {
+		navigation.navigate('Login');
+	}, []);
+	// for people
+	const [scrollEnabled] = useScrollEnabled();
+	const [people, setPeople] = useState([]);
+	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
+	const addPerson = useCallback(() => {}, []);
+	const removeAllPersons = useCallback(() => {
+		setPeople((notUsed) => []);
+		leftRef.current?.resetOffset();
+	}, []);
+	const deletePerson = useCallback(
+		(id: string) => () => {
+			leftRef.current?.resetOffset();
+			flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
+		},
+		[]
+	);
+	const flatListRef = useRef<FlatList | null>(null);
 
+	return (
+		<SafeAreaView>
+			<ScrollEnabledProvider>
+				<View style={[styles.view]}>
+					<NavigationHeader
+						title="Home"
+						Left={() => <Icon name="menu" size={30} onPress={open} />}
+						Right={() => <Icon name="logout" size={30} onPress={logout} />}
+					/>
+					<TopBar noSwitch>
+						<UnderlineText onPress={addPerson} style={styles.text}>
+							add
+						</UnderlineText>
+						<UnderlineText onPress={removeAllPersons} style={styles.text}>
+							remove all
+						</UnderlineText>
+					</TopBar>
+					<LeftRightNavigation
+						ref={leftRef}
+						distance={40}
+						flatListRef={flatListRef}
+						onLeftToRight={goLeft}
+						onRightToLeft={goRight}
+					></LeftRightNavigation>
+				</View>
+			</ScrollEnabledProvider>
+		</SafeAreaView>
+	);
+}
 const styles = StyleSheet.create({
-  flex: {flex: 1},
-  text: {fontSize: 17, color: 'black'},
-  ItemSeparator: {borderBottomWidth: 4, borderColor: 'black'},
-  title: {fontWeight: '800', fontSize: 25, color: 'black'},
+	view: { flex: 1 },
+	text: { marginRight: 10, fontSize: 20 },
 });
-
-export default Home;
