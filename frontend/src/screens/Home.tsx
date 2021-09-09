@@ -6,7 +6,6 @@ import { useNavigation, DrawerActions } from '@react-navigation/native';
 import {SafeAreaView, View, UnderlineText,TopBar,
 NavigationHeader, MaterialCommunityIcon as Icon} from '../theme';
 import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
-import Person from './Person';
 import { LeftRightNavigation } from '../components';
 import type { LeftRightNavigationMethods } from '../components';
 
@@ -65,17 +64,7 @@ export default function Home() {
 						flatListRef={flatListRef}
 						onLeftToRight={goLeft}
 						onRightToLeft={goRight}
-					>
-						<FlatList
-							ref={flatListRef}
-							scrollEnabled={scrollEnabled}
-							data={people}
-							renderItem={({ item }) => (
-								<Person person={item} deletePressed={deletePerson(item.id)} />
-							)}
-							keyExtractor={(item) => item.id}
-						/>
-					</LeftRightNavigation>
+					></LeftRightNavigation>
 				</View>
 			</ScrollEnabledProvider>
 		</SafeAreaView>
