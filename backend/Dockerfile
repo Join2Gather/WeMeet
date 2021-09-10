@@ -15,4 +15,4 @@ RUN pip3 install -r requirements.txt
 EXPOSE 8000
 # CMD tail -f /dev/null
 
-CMD [ "./run.sh" ]
+CMD [ "python3", "manage.py", "runserver" ]
