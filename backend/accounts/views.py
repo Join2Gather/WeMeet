@@ -43,7 +43,7 @@ class KakaoCallbackView(APIView):
         redirect_uri = Constants.KAKAO_CALLBACK_URI
         BASE_URL = Constants.BASE_URL
         """
-        Access Token Request
+            Access Token Request
         """
         token_req = requests.get(
             f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={REST_API_KEY}&redirect_uri={redirect_uri}&code={code}")
@@ -53,21 +53,20 @@ class KakaoCallbackView(APIView):
             raise JSONDecodeError(error)
         access_token = token_req_json.get("access_token")
         """
-        Email Request
+            Email Request
         """
         profile_request = requests.get(
             "https://kapi.kakao.com/v2/user/me", headers={"Authorization": f"Bearer {access_token}"})
         profile_json = profile_request.json()
         kakao_account = profile_json.get('kakao_account')
         """
-        kakao_account에서 이메일 외에
-        카카오톡 프로필 이미지, 배경 이미지 url 가져올 수 있음
-        print(kakao_account) 참고
+            kakao_account에서 이메일 외에
+            카카오톡 프로필 이미지, 배경 이미지 url 가져올 수 있음
+            print(kakao_account) 참고
         """
-        # print(kakao_account)
         email = kakao_account.get('email')
         """
-        Signup or Signin Request
+            Signup or Signin Request
         """
         try:
             user = User.objects.get(email=email)
@@ -78,28 +77,25 @@ class KakaoCallbackView(APIView):
                 return JsonResponse({'err_msg': 'email exists but not social user'}, status=status.HTTP_400_BAD_REQUEST)
             if social_user.provider != 'kakao':
                 return JsonResponse({'err_msg': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
-            # 기존에 Google로 가입된 유저
-            data = {'access_token': access_token, 'code': code}
-            accept = requests.post(
-                f"{BASE_URL}accounts/kakao/login/finish/", data=data)
-            accept_status = accept.status_code
-            if accept_status != 200:
-                return JsonResponse({'err_msg': 'failed to signin'}, status=accept_status)
-            accept_json = accept.json()
-            accept_json.pop('user', None)
-            return JsonResponse(accept_json)
+            is_sign_in = True
         except User.DoesNotExist:
-            # 기존에 가입된 유저가 없으면 새로 가입
+            is_sign_in = False
+        finally:
+            # 로그인 / 가입 로직
             data = {'access_token': access_token, 'code': code}
             accept = requests.post(
                 f"{BASE_URL}accounts/kakao/login/finish/", data=data)
             accept_status = accept.status_code
+            sign_type = 'signin' if is_sign_in else 'signup'
             if accept_status != 200:
-                return JsonResponse({'err_msg': 'failed to signup'}, status=accept_status)
-            # user의 pk, email, first name, last name과 Access Token, Refresh token 가져옴
+                return JsonResponse({'err_msg': f'failed to {sign_type}'}, status=accept_status)
+            
+            # accept의 Response body는 DRF 미들웨어 authtoken 값을 담고 있다.
+            # DB에 자동으로 저장되는 변수이고, Request에서 Authorization 헤더에 Token으로 보내면 되는 값임.
+            # 다만 'key' 라는 키값은 이해하기 힘드므로 access_token으로 이름을 변경함.
             accept_json = accept.json()
-            accept_json.pop('user', None)
-            return JsonResponse(accept_json)
+            permanent_token = accept_json.get('key')
+            return JsonResponse({'access_token': permanent_token})
 
 
 class KakaoLoginToDjango(SocialLoginView):
