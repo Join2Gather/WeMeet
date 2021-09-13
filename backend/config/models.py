@@ -15,16 +15,6 @@ class Profiles(models.Model):
         verbose_name = '내 일정 테이블'
 
 
-class ClubEntries(models.Model):
-
-    name = models.CharField(max_length=100)
-    profile_id = models.ForeignKey(Profiles, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'club_entries'
-        verbose_name = '내 일정과 모임 간의 관계 테이블'
-
-
 class Clubs(models.Model):
 
     name = models.CharField(max_length=100)
@@ -34,6 +24,16 @@ class Clubs(models.Model):
         db_table = 'clubs'
         verbose_name = '내 일정과 모임 간의 관계 테이블'
 
+
+
+class ClubEntries(models.Model):
+
+    profile_id = models.ForeignKey(Profiles, on_delete=models.CASCADE)
+    club_id = models.ForeignKey(Clubs, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'club_entries'
+        verbose_name = '내 일정과 모임 간의 관계 테이블'
 
 # 읽기 전용 일자 테이블
 class Dates(models.Model):
