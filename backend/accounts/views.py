@@ -1,6 +1,4 @@
-# Create your views here.
-
-from django.conf import settings
+from config.models import ClubEntries
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from django.conf import settings
@@ -13,10 +11,13 @@ import requests
 from rest_framework import status
 from json.decoder import JSONDecodeError
 from django.shortcuts import redirect
-from django.http import HttpRequest, HttpResponse
+from rest_framework.authtoken.models import Token
 from config.environment import get_secret
+from config.models import Profiles, ProfileDates, Dates
 
 # Data class for shorthand notation
+
+
 class Constants:
     KAKAO_CALLBACK_URI: str = get_secret('KAKAO_CALLBACK_URI')
     REST_API_KEY: str = get_secret('KAKAO_REST_API_KEY')
@@ -34,7 +35,7 @@ class KakaoLoginView(APIView):
 
 
 # 받은 Code로 Kakao에 access token request
-# access token으로 Kakao에 email 값을 request 
+# access token으로 Kakao에 email 값을 request
 # 전달받은 Email, Access Token, Code를 바탕으로 회원가입/로그인 진행
 class KakaoCallbackView(APIView):
     def get(self, request):
@@ -89,13 +90,36 @@ class KakaoCallbackView(APIView):
             sign_type = 'signin' if is_sign_in else 'signup'
             if accept_status != 200:
                 return JsonResponse({'err_msg': f'failed to {sign_type}'}, status=accept_status)
-            
+
             # accept의 Response body는 DRF 미들웨어 authtoken 값을 담고 있다.
             # DB에 자동으로 저장되는 변수이고, Request에서 Authorization 헤더에 Token으로 보내면 되는 값임.
             # 다만 'key' 라는 키값은 이해하기 힘드므로 access_token으로 이름을 변경함.
             accept_json = accept.json()
             permanent_token = accept_json.get('key')
-            return JsonResponse({'access_token': permanent_token})
+
+            token_object: Token = Token.objects.get(key=permanent_token)
+            user = token_object.user
+
+            profiles = Profiles.objects.filter(user_id=user)
+
+            if profiles.exists():
+                profiles = list(profiles)
+                profiles = [
+                    {**profile,
+                     'clubs': [entry.club_id
+                               for entry in ClubEntries.objects.filter(profile_id=profile)
+                               ]
+                     } for profile in profiles]
+                profiles = [
+                    {**profile,
+                     'profile_dates': [profile_date
+                                       for profile_date in ProfileDates.objects.filter(profile_id=profile)
+                                       ]
+                     } for profile in profiles]
+            else:
+                profiles = []
+
+            return JsonResponse({'access_token': permanent_token, 'profiles': profiles})
 
 
 class KakaoLoginToDjango(SocialLoginView):
