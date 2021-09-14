@@ -1,9 +1,7 @@
-# Create your views here.
-
-from django.conf import settings
+from typing import Optional
+from config.models import ClubEntries
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
-from django.conf import settings
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
@@ -13,10 +11,14 @@ import requests
 from rest_framework import status
 from json.decoder import JSONDecodeError
 from django.shortcuts import redirect
-from django.http import HttpRequest, HttpResponse
+from rest_framework.authtoken.models import Token
 from config.environment import get_secret
+from config.models import Profiles, ProfileDates
+import json
 
 # Data class for shorthand notation
+
+
 class Constants:
     KAKAO_CALLBACK_URI: str = get_secret('KAKAO_CALLBACK_URI')
     REST_API_KEY: str = get_secret('KAKAO_REST_API_KEY')
@@ -34,7 +36,7 @@ class KakaoLoginView(APIView):
 
 
 # 받은 Code로 Kakao에 access token request
-# access token으로 Kakao에 email 값을 request 
+# access token으로 Kakao에 email 값을 request
 # 전달받은 Email, Access Token, Code를 바탕으로 회원가입/로그인 진행
 class KakaoCallbackView(APIView):
     def get(self, request):
@@ -68,11 +70,13 @@ class KakaoCallbackView(APIView):
         """
             Signup or Signin Request
         """
+        is_sign_in = False
         try:
-            user = User.objects.get(email=email)
+            user: User = User.objects.get(email=email)
             # 기존에 가입된 유저의 Provider가 kakao가 아니면 에러 발생, 맞으면 로그인
             # 다른 SNS로 가입된 유저
-            social_user = SocialAccount.objects.get(user=user)
+            social_user: Optional[SocialAccount] = SocialAccount.objects.get(
+                user=user)
             if social_user is None:
                 return JsonResponse({'err_msg': 'email exists but not social user'}, status=status.HTTP_400_BAD_REQUEST)
             if social_user.provider != 'kakao':
@@ -80,22 +84,52 @@ class KakaoCallbackView(APIView):
             is_sign_in = True
         except User.DoesNotExist:
             is_sign_in = False
-        finally:
-            # 로그인 / 가입 로직
-            data = {'access_token': access_token, 'code': code}
-            accept = requests.post(
-                f"{BASE_URL}accounts/kakao/login/finish/", data=data)
-            accept_status = accept.status_code
-            sign_type = 'signin' if is_sign_in else 'signup'
-            if accept_status != 200:
-                return JsonResponse({'err_msg': f'failed to {sign_type}'}, status=accept_status)
-            
-            # accept의 Response body는 DRF 미들웨어 authtoken 값을 담고 있다.
-            # DB에 자동으로 저장되는 변수이고, Request에서 Authorization 헤더에 Token으로 보내면 되는 값임.
-            # 다만 'key' 라는 키값은 이해하기 힘드므로 access_token으로 이름을 변경함.
-            accept_json = accept.json()
-            permanent_token = accept_json.get('key')
-            return JsonResponse({'access_token': permanent_token})
+        # 로그인 / 가입 로직
+        data = {'access_token': access_token, 'code': code}
+        accept = requests.post(
+            f"{BASE_URL}accounts/kakao/login/finish/", data=data)
+        accept_status = accept.status_code
+        sign_type = 'signin' if is_sign_in else 'signup'
+        if accept_status != 200:
+            return JsonResponse({'err_msg': f'failed to {sign_type}'}, status=accept_status)
+
+        # accept의 Response body는 DRF 미들웨어 authtoken 값을 담고 있다.
+        # DB에 자동으로 저장되는 변수이고, Request에서 Authorization 헤더에 Token으로 보내면 되는 값임.
+        # 다만 'key' 라는 키값은 이해하기 힘드므로 access_token으로 이름을 변경함.
+        accept_json = accept.json()
+        permanent_token = accept_json.get('key')
+
+        # profile 값 찾기
+
+        token_object: Token = Token.objects.get(key=permanent_token)
+
+        if not is_sign_in:
+            # 회원가입 되었으므로 다시 Find
+            user: User = token_object.user
+            social_user: SocialAccount = SocialAccount.objects.get(user=user)
+
+        profiles = Profiles.objects.filter(user=user)
+
+        if not profiles.exists():
+            username = social_user.extra_data.get(
+                'properties', {}).get('nickname', '')
+            Profiles.objects.create(name=username, user=user)
+            profiles = Profiles.objects.filter(user=user)
+
+        profiles = profiles.values()
+        profiles = [
+            {**profile,
+                'clubs': [entry.club_id
+                          for entry in ClubEntries.objects.filter(profile=profile.get('id'))
+                          ]
+             } for profile in profiles]
+        profiles = [
+            {**profile,
+                'dates': [profile_date
+                          for profile_date in ProfileDates.objects.filter(profile=profile.get('id'))
+                          ]
+             } for profile in profiles]
+        return JsonResponse({'access_token': permanent_token, 'profiles': profiles})
 
 
 class KakaoLoginToDjango(SocialLoginView):
