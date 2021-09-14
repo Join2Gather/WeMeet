@@ -43,4 +43,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('accounts/', include('allauth.urls'), name='socialaccount_signup'),
+    path('users/', include('profiles.urls'), name='profiles'),
+    path('users/', include('clubs.urls'), name='clubs'),
 ] + staticfiles_urlpatterns()
