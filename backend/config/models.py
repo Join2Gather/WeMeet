@@ -8,7 +8,7 @@ Users = settings.AUTH_USER_MODEL
 class Profiles(models.Model):
 
     name = models.CharField(max_length=100)
-    user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'profiles'
@@ -28,8 +28,8 @@ class Clubs(models.Model):
 
 class ClubEntries(models.Model):
 
-    profile_id = models.ForeignKey(Profiles, on_delete=models.CASCADE)
-    club_id = models.ForeignKey(Clubs, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profiles, on_delete=models.CASCADE)
+    club = models.ForeignKey(Clubs, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'club_entries'
@@ -50,9 +50,9 @@ class Dates(models.Model):
 class ProfileDates(models.Model):
 
     is_temporary_reserved = models.BooleanField()
-    profile_id = models.ForeignKey(Profiles, on_delete=models.CASCADE)
-    date_id = models.ForeignKey(Dates, on_delete=models.CASCADE)
-    club_id = models.ForeignKey(Clubs, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profiles, on_delete=models.CASCADE)
+    date = models.ForeignKey(Dates, on_delete=models.CASCADE)
+    club = models.ForeignKey(Clubs, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'profile_dates'
