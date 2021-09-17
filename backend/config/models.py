@@ -38,9 +38,9 @@ class ClubEntries(models.Model):
 # 읽기 전용 일자 테이블
 class Dates(models.Model):
 
-    day = models.CharField(max_length=100)
-    hour = models.CharField(max_length=100)
-    minute = models.CharField(max_length=100)
+    day = models.IntegerField()
+    hour = models.IntegerField()
+    minute = models.IntegerField()
 
     class Meta:
         db_table = 'dates'
