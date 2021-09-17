@@ -24,15 +24,18 @@ def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = False)
     colors: np.ndarray = np.unique(reshaped, axis=0)
 
     result_img = img.copy()
-    result = []
+    result = {}
+
+    week = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+
+    for day in week:
+        result[day] = []
 
     padding_y = 80.0
     padding_x = 70.0
 
     one_hour_y = 180.0
     one_day_x = 177
-
-    week = ['일', '월', '화', '수', '목', '금', '토']
 
     initial_hour = 9.0
 
@@ -68,32 +71,30 @@ def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = False)
                 if end_minutes >= 59: # avoid IEEE 754 error
                     end_hour += 1
                     end_minutes = 0
-            
-            
+
             day_num = int((x - padding_x) // one_day_x) + 1
             day = week[day_num]
-            
-            result.append({
-                'day': day_num,
-                'starting_hour': starting_hour,
-                'starting_minutes': starting_minutes,
-                'end_hour': end_hour,
-                'end_minutes': end_minutes
-            })
+
+            # 30분마다 시작점 찍어주는 로직
+            # 20분 시작일 때는 어떻게? - 회의 TODO
+
+            idx = starting_hour + starting_minutes / 60
+            while idx <= end_hour + end_minutes / 60 - 0.5:
+                result[day].append(idx)
+                idx += 0.5
 
             result_img = cv2.rectangle(
                 result_img, (x, y), (x+w, y+h), (0, 0, 255), 2)
             
-    result.sort(key=lambda x: tuple(x.values()))
+    for day in week:
+        result[day].sort()
 
     if debug:
         printer = pprint.PrettyPrinter(2)
         printer.pprint(result)
-        for dic in result:
-            day, starting_hour, starting_minutes, end_hour, end_minutes = dic.values()
-            day = week[day] # because day is int, convert index to match value
+        for day, idx in result.items():
             print(
-                f"{day}요일 수업 시작 시간: {starting_hour}시간 {starting_minutes}분, 끝 시간: {end_hour}시간 {end_minutes}분")
+                f"{day}요일 수업 시작 시간: {idx}")
     
         cv2.imshow('img', result_img)
         cv2.waitKey()
