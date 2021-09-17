@@ -11,7 +11,7 @@ class ProfilesSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def get_clubs(self, obj):
-        return [DatesSerializer(Clubs.objects.get(id=entry.club_id)).data for entry in ClubEntries.objects.filter(profile=obj.id)]
+        return [ClubsSerializer(entry.club).data for entry in ClubEntries.objects.filter(profile=obj.id)]
 
     def get_dates(self, obj):
         week = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
