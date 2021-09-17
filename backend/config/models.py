@@ -52,7 +52,7 @@ class ProfileDates(models.Model):
     is_temporary_reserved = models.BooleanField()
     profile = models.ForeignKey(Profiles, on_delete=models.CASCADE)
     date = models.ForeignKey(Dates, on_delete=models.CASCADE)
-    club = models.ForeignKey(Clubs, on_delete=models.CASCADE)
+    club = models.ForeignKey(Clubs, on_delete=models.CASCADE, null=True)
 
     class Meta:
         db_table = 'profile_dates'
