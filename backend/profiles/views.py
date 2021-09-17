@@ -40,7 +40,7 @@ class EverytimeCalendarView(APIView):
             print(starting_times)
             for time in starting_times:
                 hour = int(time)
-                minute = int((time - hour) * 60)
+                minute = int((time - hour) * 100)
                 date = Dates.objects.filter(day=idx, hour=hour, minute=minute)
                 if not date.exists():
                     date = Dates.objects.create(day=idx, hour=hour, minute=minute)

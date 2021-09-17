@@ -27,7 +27,7 @@ class ProfilesSerializer(serializers.ModelSerializer):
                     dates[club][day] = []
                 dates[club]['club'] = club
                 dates[club]['is_temporary_reserved'] = is_temporary_reserved
-            time = date.hour + date.minute / 60
+            time = date.hour + date.minute / 100    
             dates[club][week[date.day]].append(time)
         
         for club in dates.keys():

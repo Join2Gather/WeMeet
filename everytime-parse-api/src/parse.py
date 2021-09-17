@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import math
 import pprint
-from typing import BinaryIO
+from typing import BinaryIO, List, Tuple, Union
 
 def normal_round(n):
     if n - math.floor(n) < 0.5:
@@ -75,13 +75,25 @@ def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = False)
             day_num = int((x - padding_x) // one_day_x) + 1
             day = week[day_num]
 
-            # 30분마다 시작점 찍어주는 로직
-            # 20분 시작일 때는 어떻게? - 회의 TODO
+            # 15분마다 시간 찍어주는 로직
 
-            idx = starting_hour + starting_minutes / 60
-            while idx <= end_hour + end_minutes / 60 - 0.5:
-                result[day].append(idx)
-                idx += 0.5
+            def min_dist(e, cmps: List[Union[float, int]]):
+                cmps.sort(key=lambda x: abs(e - x))
+                return cmps[0]
+
+            idx = starting_hour * 100 + starting_minutes
+            idx = min_dist(idx, 
+                [x
+                    for x in 
+                        list(range(idx - 100, idx, -15)) +
+                        list(range(idx, idx + 100, 15))
+                            if x % 100 < 60])
+            while idx <= end_hour * 100 + end_minutes - 30:
+                result[day].append(idx / 100)
+                idx += 15
+                if idx % 100 >= 60:
+                    idx -= idx % 100
+                    idx += 100
 
             result_img = cv2.rectangle(
                 result_img, (x, y), (x+w, y+h), (0, 0, 255), 2)
