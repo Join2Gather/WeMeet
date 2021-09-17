@@ -20,11 +20,13 @@ class ProfilesSerializer(serializers.ModelSerializer):
         for pd in ProfileDates.objects.filter(profile=obj.id):
             date = pd.date
             club = pd.club
+            is_temporary_reserved = pd.is_temporary_reserved
             if not dates.get(club):
                 dates[club] = {}
                 for day in week:
                     dates[club][day] = []
                 dates[club]['club'] = club
+                dates[club]['is_temporary_reserved'] = is_temporary_reserved
             time = date.hour + date.minute / 60
             dates[club][week[date.day]].append(time)
         
