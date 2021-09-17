@@ -14,7 +14,7 @@ from django.shortcuts import redirect
 from rest_framework.authtoken.models import Token
 from config.environment import get_secret
 from config.models import Profiles, ProfileDates
-import json
+from config.serializers import ProfilesSerializer
 
 # Data class for shorthand notation
 
@@ -116,19 +116,7 @@ class KakaoCallbackView(APIView):
             Profiles.objects.create(name=username, user=user)
             profiles = Profiles.objects.filter(user=user)
 
-        profiles = profiles.values()
-        profiles = [
-            {**profile,
-                'clubs': [entry.club_id
-                          for entry in ClubEntries.objects.filter(profile=profile.get('id'))
-                          ]
-             } for profile in profiles]
-        profiles = [
-            {**profile,
-                'dates': [profile_date
-                          for profile_date in ProfileDates.objects.filter(profile=profile.get('id'))
-                          ]
-             } for profile in profiles]
+        profiles = [ProfilesSerializer(profile).data for profile in profiles]
         return JsonResponse({'access_token': permanent_token, 'profiles': profiles})
 
 
