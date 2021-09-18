@@ -1,3 +1,4 @@
+from config.serializers import ClubsWithDateSerializer
 from config.models import Clubs, Profiles
 from django.http.response import JsonResponse
 from config.serializers import ClubsSerializer
@@ -13,7 +14,7 @@ from drf_yasg import openapi
 
 class ClubView(APIView):
     @swagger_auto_schema(responses={
-        status.HTTP_200_OK: ClubsSerializer(many=True)
+        status.HTTP_200_OK: ClubsWithDateSerializer(many=True)
     })
     def get(self, request: Request, user: int, profile: int):
         profile_object = Profiles.objects.filter(id=profile, user=user)
@@ -21,8 +22,8 @@ class ClubView(APIView):
             return JsonResponse({'error': 'profile not found'}, status=status.HTTP_400_BAD_REQUEST)
 
         club_entries = ClubEntries.objects.select_related('club').filter(profile=profile)
-        clubs = [ClubsSerializer(entry.club).data for entry in club_entries]
-        return JsonResponse(clubs)
+        clubs = [ClubsWithDateSerializer(entry.club).data for entry in club_entries]
+        return JsonResponse(clubs, safe=False)
     
 
     @swagger_auto_schema(request_body=openapi.Schema(
@@ -32,7 +33,7 @@ class ClubView(APIView):
         }
     ),
     responses={
-        status.HTTP_200_OK: ClubsSerializer
+        status.HTTP_200_OK: ClubsWithDateSerializer
     })
     def post(self, request: Request, user: int, profile: int):
         profile_object = Profiles.objects.filter(id=profile, user=user)
@@ -50,5 +51,5 @@ class ClubView(APIView):
 
         ClubEntries.objects.create(profile=profile_object, club=club)
 
-        serialized_club = ClubsSerializer(club).data
+        serialized_club = ClubsWithDateSerializer(club).data
         return JsonResponse(serialized_club)

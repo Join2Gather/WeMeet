@@ -36,6 +36,28 @@ class ProfilesSerializer(serializers.ModelSerializer):
         
         return list(dates.values())
 
+class ClubsWithDateSerializer(serializers.ModelSerializer):
+    dates = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Clubs
+        fields = '__all__'
+
+    def get_dates(self, obj):
+        week = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+        dates = {key: [] for key in week}  
+        for pd in ProfileDates.objects.filter(club=obj.id):
+            date = pd.date
+            is_temporary_reserved = pd.is_temporary_reserved
+            dates['is_temporary_reserved'] = is_temporary_reserved
+            time = date.hour + date.minute / 100    
+            dates[week[date.day]].append(time)
+        
+        for day in week:
+            dates[day].sort()
+        
+        return dates
+
 
 class ClubsSerializer(serializers.ModelSerializer):
     class Meta:
