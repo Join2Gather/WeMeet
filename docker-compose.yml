@@ -22,7 +22,7 @@ services:
     depends_on:
       - everytime_parser
     environment:
-      - VIRTUAL_HOST=api.dps0340.xyz.com
+      - VIRTUAL_HOST=api.dps0340.xyz
 
   everytime_parser:
     build:
@@ -31,7 +31,7 @@ services:
       - app-tier
     restart: always
     environment:
-      - VIRTUAL_HOST=everytime.dps0340.xyz.com
+      - VIRTUAL_HOST=everytime.dps0340.xyz
 
 networks:
   app-tier:
