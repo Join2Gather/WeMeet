@@ -65,7 +65,13 @@ INSTALLED_APPS = [
     'config'
 ]
 
-SITE_ID = 2
+
+# Bearer Token 인증을 위해 추가
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
 
 AUTH_USER_MODEL = 'auth.User'
 # On settings.py
