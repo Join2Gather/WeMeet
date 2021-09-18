@@ -23,6 +23,7 @@ services:
       - everytime_parser
     environment:
       - VIRTUAL_HOST=api.dps0340.xyz
+      - VIRTUAL_PORT=8000
 
   everytime_parser:
     build:
@@ -32,6 +33,7 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=everytime.dps0340.xyz
+      - VIRTUAL_PORT=8009
 
 networks:
   app-tier:
