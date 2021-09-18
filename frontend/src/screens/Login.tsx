@@ -31,7 +31,7 @@ export default function Login() {
 
 	const onPressSocial = useCallback(async (social: any) => {
 		setSocialModalVisible(true);
-		setSource(`http://wemeet.dps0340.xyz:8000/accounts/kakao/login`);
+		setSource(`http://api.dps0340.xyz/accounts/kakao/login`);
 	}, []);
 	const onCloseSocial = useCallback(async () => {
 		setSocialModalVisible(false);
