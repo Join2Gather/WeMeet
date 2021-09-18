@@ -31,8 +31,6 @@ class MyProfileView(APIView):
 
 class EverytimeCalendarView(APIView):
     def post(self, request: Request, user: int, profile: int):
-
-
         profile = Profiles.objects.filter(id=profile, user=user)
         if not profile.exists():
             return JsonResponse({'error': 'profile not found'}, status=status.HTTP_400_BAD_REQUEST)
