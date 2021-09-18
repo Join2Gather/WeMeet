@@ -14,7 +14,7 @@ from pathlib import Path
 from .environment import get_secret
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 DB_DIR = Path.joinpath(BASE_DIR, 'db')  # Docker Volume 연동을 위함
 

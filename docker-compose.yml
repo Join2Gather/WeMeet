@@ -10,7 +10,8 @@ services:
       - 8000:8000
     restart: always
     volumes:
-      - ./backend/db:/backend/db
+      - ./db:/db
+      - ./backend:/backend:ro
       - ./production/secrets.json:/backend/secrets.json:ro
     depends_on:
       - everytime_parser

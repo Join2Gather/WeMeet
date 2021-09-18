@@ -15,3 +15,4 @@ django-allauth
 requests
 drf-yasg
 ruamel.yaml
+gevent
