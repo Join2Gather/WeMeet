@@ -10,7 +10,10 @@ from config.models import Dates
 # Create your views here.
 class ProfileView(APIView):
     def get(self, request: Request, user: int, profile: int):
-        profile = Profiles.objects.filter(id=profile, user=user)
+        return self.get_profile(id=profile, user=user)
+    
+    def get_profile(self, **kwargs):
+        profile = Profiles.objects.filter(**kwargs)
         if not profile.exists():
             return JsonResponse({})
         profile = profile.first()
@@ -19,6 +22,12 @@ class ProfileView(APIView):
 
     # Create는 TODO
     # 최초 소셜 로그인시 자동으로 Profile 생성 하므로 지금은 필요 없어보임
+
+class MyProfileView(APIView):
+    def get(self, request: Request):
+        profile_view = ProfileView()
+        user = request.user.id
+        return profile_view.get_profile(user=user)
 
 class EverytimeCalendarView(APIView):
     def post(self, request: Request, user: int, profile: int):
