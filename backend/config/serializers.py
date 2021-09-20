@@ -3,6 +3,8 @@ from rest_framework import serializers
 from abc import ABC, abstractmethod
 
 
+# 파일 분리 TODO
+
 """
     문제 정의: Date를 계산하는 로직이 여러 클래스에 있어 일부 비슷한 반면, 여러 코드가 반복되는 문제가 있다. 
 
