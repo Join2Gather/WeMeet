@@ -42,10 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # My Apps
+    'accounts',
+    'config',
+    'profiles'
 
     # Third Party Apps
-    # my app
-    'accounts',
     # django-rest-framework
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
@@ -61,8 +62,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.google',
     'django.contrib.sites',
-    'drf_yasg',
-    'config'
+    'drf_yasg'
 ]
 
 
