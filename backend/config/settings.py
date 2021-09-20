@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     # My Apps
     'accounts',
     'config',
-    'profiles'
+    'profiles',
 
     # Third Party Apps
     # django-rest-framework
