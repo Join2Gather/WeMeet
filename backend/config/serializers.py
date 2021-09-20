@@ -33,9 +33,17 @@ class DateCalculator(ABC):
         return self.dates
 
     def calculate(self):
+        """
+            왜 select_related를 사용하였는가?
+            N + 1 문제를 피하기 위해. Django ORM은 기본적으로 Foreign key에 대해서는 id값만 가져온다.
+            실제로 FK 객체가 가져와지는 시점은 attribute를 사용할 때에 쿼리가 실행된다.
+            이런 반복 작업을 예방하기 위해 select_related를 사용하였다.
+            비슷한 메소드로 prefetch_related가 있는데 이것은 쿼리를 원래 테이블과 외래 키 테이블로 나눠서 실행시키고 장고에서 합쳐주는 방식이다.
+            상황마다 성능 비교가 다르다고 하는데 우리의 요구사항 기준으로는 지금은 select_related만 써도 충분한 것 같다.
+        """
         for pd in ProfileDates.objects \
                     .filter(profile=self.obj.id) \
-                    .prefetch_related('date', 'club'):
+                    .select_related('date', 'club'):
             date = pd.date
             club = pd.club
             is_temporary_reserved = pd.is_temporary_reserved
