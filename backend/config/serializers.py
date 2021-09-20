@@ -117,7 +117,6 @@ class ProfilesSerializer(serializers.ModelSerializer):
     
     def get_clubs(self, obj):
         entries = ClubEntries.objects.filter(profile=obj.id).select_related('club')
-        print(entries.query.__str__())
         return [ClubsSerializer(entry.club).data for entry in entries]
 
     def get_dates(self, obj):
