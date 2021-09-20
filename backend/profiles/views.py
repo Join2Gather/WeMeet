@@ -1,4 +1,5 @@
 from config.serializers import ProfilesSerializer
+from config.constants import week
 from django.http.response import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.request import Request
@@ -44,7 +45,7 @@ class EverytimeCalendarView(APIView):
         type=openapi.TYPE_OBJECT, 
         properties={
             key: openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_NUMBER))
-            for key in ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+            for key in week
         }
     ))
     def post(self, request: Request, user: int, profile: int):
@@ -58,7 +59,6 @@ class EverytimeCalendarView(APIView):
         # 기존에 생성된 튜플은 지워주는게 사용에 용이
         ProfileDates.objects.filter(profile=profile, club=None, is_temporary_reserved=False).delete()
 
-        week = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
         for idx, day in enumerate(week):
             starting_times = request.data.get(day) or []
             print(starting_times)

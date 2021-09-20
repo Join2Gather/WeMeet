@@ -1,4 +1,5 @@
 from config.models import ClubEntries, Clubs, Dates, ProfileDates, Profiles
+from config import constants
 from rest_framework import serializers
 from abc import ABC, abstractmethod
 
@@ -23,7 +24,7 @@ from abc import ABC, abstractmethod
 """
 class DateCalculator(ABC):
     obj = None
-    week = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+    week = constants.week
     dates = {}
 
     def __init__(self, obj) -> None:
