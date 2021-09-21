@@ -55,7 +55,7 @@ class DateCalculator(ABC):
 
         self.sort_date()
 
-        return self.dates
+        return self.result
 
     @abstractmethod
     def append_date(self, date, club, is_temporary_reserved):
@@ -78,7 +78,9 @@ class ProfilesDateCalculator(DateCalculator):
             dates[club] = {}
             for day in week:
                 dates[club][day] = []
-            dates[club]['club'] = club
+            dates[club]['club'] = {}
+            dates[club]['club']['id'] = club.id
+            dates[club]['club']['name'] = club.name
             dates[club]['is_temporary_reserved'] = is_temporary_reserved
         time = date.hour + date.minute / 100
         dates[club][week[date.day]].append(time)
@@ -93,7 +95,7 @@ class ProfilesDateCalculator(DateCalculator):
 class ClubsWithDateCalculator(DateCalculator):
     def __init__(self, obj) -> None:
         super().__init__(obj)
-        self.dates = {key: [] for key in self.week}
+        self.dates = {day: [] for day in self.week}
 
     def append_date(self, date, club, is_temporary_reserved):
         dates = self.dates
@@ -107,6 +109,41 @@ class ClubsWithDateCalculator(DateCalculator):
         week = self.week
         for day in week:
             dates[day].sort()
+
+class ClubAvailableTimeSerializer(serializers.ModelSerializer):
+    intersection = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Clubs
+        fields = ('intersection', )
+    
+    def get_intersection(self, obj):
+        result = {day: {
+            'avail_time': [],
+            'count': [],
+            'avail_people': []
+        } for day in constants.week}
+
+        profile_dates = ProfileDates.objects.filter(club=obj.id).select_related('date', 'profile')
+        dates = profile_dates.values_list('date__id', 'date__day', 'date__hour', 'date__minute').distinct()
+        for date in dates:
+            date_id, date_day, hour, minute = date
+            day = constants.week[date_day]
+            time = float(f"{hour}.{minute}")
+
+            result[day]['avail_time'].append(time)
+
+            profiles = profile_dates.filter(date=date_id).values_list('profile__name')
+            result[day]['count'].append(len(profiles))
+
+            avail_people = [profile[0] for profile in profiles]
+
+            result[day]['avail_people'].append(avail_people)
+        
+        return result
+
+
+
 
 class ProfilesSerializer(serializers.ModelSerializer):
     clubs = serializers.SerializerMethodField()
