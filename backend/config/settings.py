@@ -61,9 +61,11 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.kakao',
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.google',
-    'django.contrib.sites',
+    'django.contrib.sites', # Admin 페이지를 위해 추가
     'drf_yasg'
 ]
+
+SITE_ID=1 # Admin 페이지를 위해 추가
 
 
 # Bearer Token 인증을 위해 추가
