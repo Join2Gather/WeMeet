@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User as UserModel
 from . import settings
+from config.constants import week
 
 Users = settings.AUTH_USER_MODEL
 
@@ -15,6 +16,9 @@ class Profiles(models.Model):
         db_table = 'profiles'
         verbose_name = 'Profile'
 
+    def __str__(self):
+        return self.name
+
 
 # 모임 테이블
 class Clubs(models.Model):
@@ -25,6 +29,9 @@ class Clubs(models.Model):
     class Meta:
         db_table = 'clubs'
         verbose_name = 'Club'
+
+    def __str__(self):
+        return self.name
 
 
 # 내 일정과 모임 간의 관계 테이블
@@ -37,6 +44,9 @@ class ClubEntries(models.Model):
         db_table = 'club_entries'
         verbose_name = 'Club entrie'
 
+    def __str__(self):
+        return f"{self.profile} -> {self.club}"
+
 # 읽기 전용 시간 테이블
 class Dates(models.Model):
 
@@ -47,6 +57,10 @@ class Dates(models.Model):
     class Meta:
         db_table = 'dates'
         verbose_name = 'Date'
+
+    def __str__(self):
+        week_day = week[self.day]
+        return f"{week_day} {self.hour}:{self.minute}"
 
 
 # 프로필, 날짜, 모임관의 연관 테이블
@@ -60,3 +74,6 @@ class ProfileDates(models.Model):
     class Meta:
         db_table = 'profile_dates'
         verbose_name = 'Profile date'
+
+    def __str__(self):
+        return f"{self.profile} -> {self.club} ({self.date})"
