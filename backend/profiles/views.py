@@ -64,14 +64,8 @@ class EverytimeCalendarView(APIView):
             for time in starting_times:
                 hour = int(time)
                 minute = int((time - hour) * 100)
-                date = Dates.objects.filter(day=idx, hour=hour, minute=minute)
-                if not date.exists():
-                    date = Dates.objects.create(day=idx, hour=hour, minute=minute)
-                else:
-                    date = date.first()
-                profile_dates = ProfileDates.objects.filter(profile=profile, date=date, club=None, is_temporary_reserved=False)
-                if not profile_dates.exists():
-                    ProfileDates.objects.create(profile=profile, date=date, club=None, is_temporary_reserved=False)
+                date = Dates.objects.get_or_create(day=idx, hour=hour, minute=minute)[0]
+                ProfileDates.objects.get_or_create(profile=profile, date=date, club=None, is_temporary_reserved=False)
         
         profile = Profiles.objects.get(id=profile.id)
         result = ProfilesSerializer(profile).data
