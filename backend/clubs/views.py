@@ -73,7 +73,6 @@ class ClubDateView(APIView):
         profile = profile.get()
 
         is_group = request.query_params.get('group')
-        print(is_group)
 
         if is_group is None:
             is_group = False

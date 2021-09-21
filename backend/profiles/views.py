@@ -61,7 +61,6 @@ class EverytimeCalendarView(APIView):
 
         for idx, day in enumerate(week):
             starting_times = request.data.get(day) or []
-            print(starting_times)
             for time in starting_times:
                 hour = int(time)
                 minute = int((time - hour) * 100)
