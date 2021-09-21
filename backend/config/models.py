@@ -5,6 +5,7 @@ from . import settings
 Users = settings.AUTH_USER_MODEL
 
 
+# 프로필 테이블
 class Profiles(models.Model):
 
     name = models.CharField(max_length=100)
@@ -12,9 +13,10 @@ class Profiles(models.Model):
 
     class Meta:
         db_table = 'profiles'
-        verbose_name = '내 일정 테이블'
+        verbose_name = 'Profile'
 
 
+# 모임 테이블
 class Clubs(models.Model):
 
     name = models.CharField(max_length=100)
@@ -22,10 +24,10 @@ class Clubs(models.Model):
 
     class Meta:
         db_table = 'clubs'
-        verbose_name = '내 일정과 모임 간의 관계 테이블'
+        verbose_name = 'Club'
 
 
-
+# 내 일정과 모임 간의 관계 테이블
 class ClubEntries(models.Model):
 
     profile = models.ForeignKey(Profiles, on_delete=models.CASCADE)
@@ -33,9 +35,9 @@ class ClubEntries(models.Model):
 
     class Meta:
         db_table = 'club_entries'
-        verbose_name = '내 일정과 모임 간의 관계 테이블'
+        verbose_name = 'Club entrie'
 
-# 읽기 전용 일자 테이블
+# 읽기 전용 시간 테이블
 class Dates(models.Model):
 
     day = models.IntegerField()
@@ -44,9 +46,10 @@ class Dates(models.Model):
 
     class Meta:
         db_table = 'dates'
-        verbose_name = '일자 테이블'
+        verbose_name = 'Date'
 
 
+# 프로필, 날짜, 모임관의 연관 테이블
 class ProfileDates(models.Model):
 
     is_temporary_reserved = models.BooleanField()
@@ -56,4 +59,4 @@ class ProfileDates(models.Model):
 
     class Meta:
         db_table = 'profile_dates'
-        verbose_name = '내 일정과 모임 간의 관계 테이블'
+        verbose_name = 'Profile date'
