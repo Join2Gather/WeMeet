@@ -34,8 +34,9 @@ class DateCalculator(ABC):
     @property
     def result(self):
         return self.dates
-    
-    
+
+    # 반드시 @property decorator를 붙여서 override 할 것.    
+    @property
     def filter_expression(self):
         return {'profile': self.obj.id}
 
@@ -49,7 +50,7 @@ class DateCalculator(ABC):
             상황마다 성능 비교가 다르다고 하는데 우리의 요구사항 기준으로는 지금은 select_related만 써도 충분한 것 같다.
         """
         for pd in ProfileDates.objects \
-                    .filter(**self.filter_expression()) \
+                    .filter(**self.filter_expression) \
                     .select_related('date', 'club'):
             date = pd.date
             club = pd.club
@@ -101,7 +102,7 @@ class ClubsWithDateCalculator(DateCalculator):
         super().__init__(obj)
         self.dates = {day: [] for day in self.week}
 
-    
+    @property
     def filter_expression(self):
         return {'club': self.obj.id}
 
