@@ -26,9 +26,13 @@ from drf_yasg.utils import swagger_serializer_method
 # property method등으로 decorator를 처리할 방법이 딱히 보이지 않아 class 외부에 선언해둠.
 
 
-class DateCalculatorChildType(serializers.Serializer):
+class ClubType(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
+
+
+class DateCalculatorChildType(serializers.Serializer):
+    club = ClubType()
     is_temporary_reserved = serializers.BooleanField()
 
 
