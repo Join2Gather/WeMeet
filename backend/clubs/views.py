@@ -16,6 +16,7 @@ from drf_yasg import openapi
 
 # Create your views here.
 
+
 class ClubView(APIView):
     @swagger_auto_schema(responses={
         status.HTTP_200_OK: ClubsWithDateSerializer(many=True)
@@ -25,18 +26,19 @@ class ClubView(APIView):
         if not profile_object.exists():
             return JsonResponse({'error': 'profile not found'}, status=status.HTTP_400_BAD_REQUEST)
 
-        club_entries = ClubEntries.objects.select_related('club').filter(profile=profile)
-        clubs = [ClubsWithDateSerializer(entry.club).data for entry in club_entries]
+        club_entries = ClubEntries.objects.select_related(
+            'club').filter(profile=profile)
+        clubs = [ClubsWithDateSerializer(
+            entry.club).data for entry in club_entries]
         return JsonResponse(clubs, safe=False)
-    
 
     @swagger_auto_schema(request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT, 
+        type=openapi.TYPE_OBJECT,
         properties={
             'name': openapi.Schema(type=openapi.TYPE_STRING, description='name of club'),
         }
     ),
-    responses={
+        responses={
         status.HTTP_200_OK: ClubsWithDateSerializer
     })
     def post(self, request: Request, user: int, profile: int):
@@ -63,7 +65,7 @@ class ClubDateView(APIView):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter('group', openapi.IN_QUERY,
-                type='bool', default=False),
+                              type='bool', default=False),
         ],
     )
     def get(self, request: Request, user: int, profile: int, uri: str):
@@ -91,7 +93,8 @@ class ClubDateView(APIView):
             result = serializer.data['intersection']
         else:
             serializer = ProfilesSerializer(profile)
-            result = [selected_club for selected_club in serializer.data['dates'] if selected_club['club']['id'] == club.id]
+            result = [selected_club for selected_club in serializer.data['dates']
+                      if selected_club['club']['id'] == club.id]
             if result == []:
                 result = {
                     day: [] for day in constants.week
@@ -99,17 +102,18 @@ class ClubDateView(APIView):
             else:
                 result = result[0]
 
-
         return JsonResponse(result, safe=False)
 
-    
     @swagger_auto_schema(request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT, 
+        type=openapi.TYPE_OBJECT,
         properties={
-            key: openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_NUMBER))
+            key: openapi.Schema(type=openapi.TYPE_ARRAY,
+                                items=openapi.Items(type=openapi.TYPE_NUMBER))
             for key in constants.week
         }
-    ))
+    ),
+        operation_id="users_profiles_clubs_dates"
+    )
     def post(self, request: Request, user: int, profile: int, uri: str):
         profile = Profiles.objects.filter(id=profile, user=user)
         if not profile.exists():
@@ -134,10 +138,12 @@ class ClubDateView(APIView):
                 hour = int(time)
                 minute = int(str(time).split('.')[1])
 
-                date = Dates.objects.get_or_create(day=day_idx, hour=hour, minute=minute)[0]
+                date = Dates.objects.get_or_create(
+                    day=day_idx, hour=hour, minute=minute)[0]
 
                 # 임시 시간표이므로 True로 둔다.
-                ProfileDates.objects.create(profile=profile, date=date, club=club, is_temporary_reserved=True)
+                ProfileDates.objects.create(
+                    profile=profile, date=date, club=club, is_temporary_reserved=True)
 
         serializer = ClubAvailableTimeSerializer(club)
 
