@@ -32,6 +32,8 @@ class ClubType(serializers.Serializer):
 
 
 class DateCalculatorChildType(serializers.Serializer):
+    exec(
+        '\n'.join([f'{day} = serializers.ListField(child=serializers.FloatField())' for day in constants.week]))
     club = ClubType()
     is_temporary_reserved = serializers.BooleanField()
 
@@ -54,12 +56,12 @@ class DateCalculator(ABC):
         super().__init__()
         self.obj = obj
 
-    @property
+    @ property
     def result(self):
         return self.dates
 
     # 반드시 @property decorator를 붙여서 override 할 것.
-    @property
+    @ property
     def filter_expression(self):
         return {'profile': self.obj.id}
 
@@ -85,18 +87,18 @@ class DateCalculator(ABC):
 
         return self.result
 
-    @abstractmethod
+    @ abstractmethod
     def append_date(self, date, club, is_temporary_reserved):
         pass
 
-    @abstractmethod
+    @ abstractmethod
     def sort_date(self):
         pass
 
 
 class ProfilesDateCalculator(DateCalculator):
 
-    @property
+    @ property
     def result(self):
         return list(self.dates.values())
 
@@ -127,7 +129,7 @@ class ClubsWithDateCalculator(DateCalculator):
         super().__init__(obj)
         self.dates = {day: [] for day in self.week}
 
-    @property
+    @ property
     def filter_expression(self):
         return {'club': self.obj.id}
 
@@ -164,7 +166,7 @@ class ClubAvailableTimeSerializer(serializers.ModelSerializer):
         exec(
             '\n'.join([f'{day} = DaySerializer()' for day in constants.week]))
 
-    @swagger_serializer_method(serializer_or_field=InterSectionSerializer)
+    @ swagger_serializer_method(serializer_or_field=InterSectionSerializer)
     def get_intersection(self, obj):
         result = {day: {
             'avail_time': [],
