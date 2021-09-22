@@ -96,6 +96,8 @@ class ClubDateView(APIView):
                 result = {
                     day: [] for day in constants.week
                 }
+            else:
+                result = result[0]
 
 
         return JsonResponse(result, safe=False)
