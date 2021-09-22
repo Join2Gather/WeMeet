@@ -1,7 +1,7 @@
 FROM python:3.8
 
 WORKDIR /backend
-COPY ./requirements.txt ./
+COPY ./ ./
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
