@@ -2,12 +2,12 @@ from config.models import ClubEntries, Clubs, Dates, ProfileDates, Profiles
 from config import constants
 from rest_framework import serializers
 from abc import ABC, abstractmethod
-
+from drf_yasg.utils import swagger_serializer_method
 
 # 파일 분리 TODO
 
 """
-    문제 정의: Date를 계산하는 로직이 여러 클래스에 있어 일부 비슷한 반면, 여러 코드가 반복되는 문제가 있다. 
+    문제 정의: Date를 계산하는 로직이 여러 클래스에 있어 일부 비슷한 반면, 여러 코드가 반복되는 문제가 있다.
 
     비즈니스 로직이 비슷한 여러 서브루틴들의 복잡성을 줄이고, 하나의 함수와 파생된 로직들로 통일하는 방법으로는 여러가지가 있다.
     정확히는 프로그래밍 방법론에 따라 다른데, 크게 얘기하자면 네 가지가 있다.
@@ -15,13 +15,32 @@ from abc import ABC, abstractmethod
     객체 지향
     1. AOP
     2. 다형성 (상속 포함)
-    
+
     함수 - 불변 자료구조 지향
     3. 고차 함수
     4. 커링
 
     여기서는 다형성 방법론을 사용해 Date를 계산해서 반환하도록 작성했다.
 """
+
+# property method등으로 decorator를 처리할 방법이 딱히 보이지 않아 class 외부에 선언해둠.
+
+
+class DateCalculatorChildType(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    is_temporary_reserved = serializers.BooleanField()
+
+
+class ProfilesDateCalculatorType(serializers.ListField):
+    child = DateCalculatorChildType()
+
+
+class ClubsWithDateCalculatorType(serializers.Serializer):
+    exec(
+        '\n'.join([f'{day} = DateCalculatorChildType()' for day in constants.week]))
+
+
 class DateCalculator(ABC):
     obj = None
     week = constants.week
@@ -35,7 +54,7 @@ class DateCalculator(ABC):
     def result(self):
         return self.dates
 
-    # 반드시 @property decorator를 붙여서 override 할 것.    
+    # 반드시 @property decorator를 붙여서 override 할 것.
     @property
     def filter_expression(self):
         return {'profile': self.obj.id}
@@ -50,8 +69,8 @@ class DateCalculator(ABC):
             상황마다 성능 비교가 다르다고 하는데 우리의 요구사항 기준으로는 지금은 select_related만 써도 충분한 것 같다.
         """
         for pd in ProfileDates.objects \
-                    .filter(**self.filter_expression) \
-                    .select_related('date', 'club'):
+            .filter(**self.filter_expression) \
+                .select_related('date', 'club'):
             date = pd.date
             club = pd.club
             is_temporary_reserved = pd.is_temporary_reserved
@@ -69,6 +88,7 @@ class DateCalculator(ABC):
     @abstractmethod
     def sort_date(self):
         pass
+
 
 class ProfilesDateCalculator(DateCalculator):
 
@@ -97,6 +117,7 @@ class ProfilesDateCalculator(DateCalculator):
             for day in week:
                 dates[club][day].sort()
 
+
 class ClubsWithDateCalculator(DateCalculator):
     def __init__(self, obj) -> None:
         super().__init__(obj)
@@ -110,7 +131,7 @@ class ClubsWithDateCalculator(DateCalculator):
         dates = self.dates
         week = self.week
         dates['is_temporary_reserved'] = is_temporary_reserved
-        time = date.hour + date.minute / 100    
+        time = date.hour + date.minute / 100
         dates[week[date.day]].append(time)
 
     def sort_date(self):
@@ -119,13 +140,27 @@ class ClubsWithDateCalculator(DateCalculator):
         for day in week:
             dates[day].sort()
 
+
+class DaySerializer(serializers.Serializer):
+    avail_time = serializers.ListField(
+        child=serializers.IntegerField())
+    count = serializers.ListField(child=serializers.IntegerField())
+    avail_people = serializers.ListField(
+        child=serializers.CharField())
+
+
 class ClubAvailableTimeSerializer(serializers.ModelSerializer):
     intersection = serializers.SerializerMethodField()
 
     class Meta:
         model = Clubs
         fields = ('intersection', )
-    
+
+    class InterSectionSerializer(serializers.Serializer):
+        exec(
+            '\n'.join([f'{day} = DaySerializer()' for day in constants.week]))
+
+    @swagger_serializer_method(serializer_or_field=InterSectionSerializer)
     def get_intersection(self, obj):
         result = {day: {
             'avail_time': [],
@@ -133,8 +168,10 @@ class ClubAvailableTimeSerializer(serializers.ModelSerializer):
             'avail_people': []
         } for day in constants.week}
 
-        profile_dates = ProfileDates.objects.filter(club=obj.id).select_related('date', 'profile')
-        dates = profile_dates.values_list('date__id', 'date__day', 'date__hour', 'date__minute').distinct()
+        profile_dates = ProfileDates.objects.filter(
+            club=obj.id).select_related('date', 'profile')
+        dates = profile_dates.values_list(
+            'date__id', 'date__day', 'date__hour', 'date__minute').distinct()
         for date in dates:
             date_id, date_day, hour, minute = date
             day = constants.week[date_day]
@@ -142,16 +179,21 @@ class ClubAvailableTimeSerializer(serializers.ModelSerializer):
 
             result[day]['avail_time'].append(time)
 
-            profiles = profile_dates.filter(date=date_id).values_list('profile__name')
+            profiles = profile_dates.filter(
+                date=date_id).values_list('profile__name')
             result[day]['count'].append(len(profiles))
 
             avail_people = [profile[0] for profile in profiles]
 
             result[day]['avail_people'].append(avail_people)
-        
+
         return result
 
 
+class ClubsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Clubs
+        fields = '__all__'
 
 
 class ProfilesSerializer(serializers.ModelSerializer):
@@ -161,14 +203,18 @@ class ProfilesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profiles
         fields = '__all__'
-    
+
+    @ swagger_serializer_method(serializer_or_field=ClubsSerializer(many=True))
     def get_clubs(self, obj):
-        entries = ClubEntries.objects.filter(profile=obj.id).select_related('club')
+        entries = ClubEntries.objects.filter(
+            profile=obj.id).select_related('club')
         return [ClubsSerializer(entry.club).data for entry in entries]
 
+    @ swagger_serializer_method(serializer_or_field=ProfilesDateCalculatorType)
     def get_dates(self, obj):
         calculator = ProfilesDateCalculator(obj)
         return calculator.calculate()
+
 
 class ClubsWithDateSerializer(serializers.ModelSerializer):
     dates = serializers.SerializerMethodField()
@@ -177,21 +223,17 @@ class ClubsWithDateSerializer(serializers.ModelSerializer):
         model = Clubs
         fields = '__all__'
 
+    @ swagger_serializer_method(serializer_or_field=ClubsWithDateCalculatorType)
     def get_dates(self, obj):
         calculator = ClubsWithDateCalculator(obj)
         return calculator.calculate()
-
-
-class ClubsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Clubs
-        fields = '__all__'
 
 
 class DatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dates
         fields = '__all__'
+
 
 class ProfileDatesSerializer(serializers.ModelSerializer):
     class Meta:
