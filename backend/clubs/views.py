@@ -77,7 +77,7 @@ class ClubDateView(APIView):
         if is_group is None:
             is_group = False
         else:
-            is_group = is_group.lower() == 'True'
+            is_group = is_group.lower() == 'true'
 
         club = Clubs.objects.filter(uri=uri)
 
