@@ -20,7 +20,7 @@ services:
     image: a891/join2gather_backend:latest
     restart: always
     volumes:
-      - ./db:/db
+      - ../db:/db
       - ./secrets.json:/backend/secrets.json:ro
     depends_on:
       - everytime_parser
