@@ -1,3 +1,4 @@
+from typing import Any
 from config.serializers import ErrorSerializer, SuccessSerializer, DateCalculatorChildType, ShareSerializer
 from config.serializers import ProfilesSerializer
 from config.serializers import ClubAvailableTimeSerializer
@@ -14,8 +15,41 @@ from rest_framework import status
 import uuid
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from functools import wraps
 
 # Create your views here.
+
+
+def profile_guard(method):
+    @wraps(method)
+    def wrapped(*args, **kwargs):
+        user = kwargs['user']
+        profile_id = kwargs['profile']
+
+        # '파이썬 클린 코드' 책에 나온 대로, Easier to Ask Forgiveness than Permission 원칙을 지켜서 try / except 문을 사용함.
+        try:
+            profile = Profiles.objects.get(id=profile_id, user=user)
+        except Profiles.DoesNotExist:
+            return JsonResponse(ErrorSerializer({'error': 'profile not found'}).data, status=status.HTTP_400_BAD_REQUEST)
+
+        return method(*args, **{**kwargs, 'profile': profile})
+
+    return wrapped
+
+
+def club_guard(method):
+    @wraps(method)
+    def wrapped(*args, **kwargs):
+        uri = kwargs['uri']
+
+        try:
+            club = Clubs.objects.get(uri=uri)
+        except Clubs.DoesNotExist:
+            return JsonResponse(ErrorSerializer({'error': 'club not found'}).data, status=status.HTTP_400_BAD_REQUEST)
+
+        return method(*args, **{**kwargs, 'club': club})
+
+    return wrapped
 
 
 class ClubView(APIView):
@@ -23,13 +57,10 @@ class ClubView(APIView):
         status.HTTP_200_OK: ClubsWithDateSerializer(many=True),
         status.HTTP_404_NOT_FOUND: ErrorSerializer
     })
-    def get(self, request: Request, user: int, profile: int):
-        profile_object = Profiles.objects.filter(id=profile, user=user)
-        if not profile_object.exists():
-            return JsonResponse(ErrorSerializer({'error': 'profile not found'}).data, status=status.HTTP_400_BAD_REQUEST)
-
+    @profile_guard
+    def get(self, request: Request, user: int, profile: Any):
         club_entries = ClubEntries.objects.select_related(
-            'club').filter(profile=profile)
+            'club').filter(profile=profile.id)
         clubs = [ClubsWithDateSerializer(
             entry.club).data for entry in club_entries]
         return JsonResponse(clubs, safe=False)
@@ -44,11 +75,8 @@ class ClubView(APIView):
         status.HTTP_200_OK: ClubsWithDateSerializer,
         status.HTTP_404_NOT_FOUND: ErrorSerializer
     })
-    def post(self, request: Request, user: int, profile: int):
-        profile_object = Profiles.objects.filter(id=profile, user=user)
-        if not profile_object.exists():
-            return JsonResponse(ErrorSerializer({'error': 'profile not found'}).data, status=status.HTTP_404_NOT_FOUND)
-        profile_object = profile_object.first()
+    @profile_guard
+    def post(self, request: Request, user: int, profile: Any):
         name = request.data.get('name')
 
         if not name:
@@ -58,7 +86,7 @@ class ClubView(APIView):
 
         # 자신의 Profile과 Club 사이의 Entry는 기본적으로 생성
 
-        ClubEntries.objects.create(profile=profile_object, club=club)
+        ClubEntries.objects.create(profile=profile, club=club)
 
         serialized_club = ClubsWithDateSerializer(club).data
         return JsonResponse(serialized_club)
@@ -75,19 +103,11 @@ class ClubDateView(APIView):
     ),
         operation_id="users_profiles_clubs_dates"
     )
-    def post(self, request: Request, user: int, profile: int, uri: str):
-        profile = Profiles.objects.filter(id=profile, user=user)
-        if not profile.exists():
-            return JsonResponse(ErrorSerializer({'error': 'profile not found'}).data, status=status.HTTP_404_NOT_FOUND)
-        profile = profile.get()
+    @profile_guard
+    @club_guard
+    def post(self, request: Request, user: int, profile: Any, uri: str, club: Any):
 
         days = {day: request.data.get(day) or [] for day in constants.week}
-
-        club = Clubs.objects.filter(uri=uri)
-
-        if not club.exists():
-            return JsonResponse(ErrorSerializer({'error': 'club not exists'}).data, status=status.HTTP_404_NOT_FOUND)
-        club = club.get()
 
         # 기존에 있던 시간표는 delete
         ProfileDates.objects.filter(profile=profile.id, club=club.id).delete()
@@ -97,7 +117,8 @@ class ClubDateView(APIView):
 
             for time in times:
                 hour = int(time)
-                minute = int(str(time).split('.')[1])
+                splited = str(time).split('.')
+                minute = int(splited[1]) if len(splited) == 2 else 0
 
                 date = Dates.objects.get_or_create(
                     day=day_idx, hour=hour, minute=minute)[0]
@@ -118,17 +139,9 @@ class ClubGroupView(APIView):
             status.HTTP_404_NOT_FOUND: ErrorSerializer
         },
     )
-    def get(self, request: Request, user: int, profile: int, uri: str):
-        profile = Profiles.objects.filter(id=profile, user=user)
-        if not profile.exists():
-            return JsonResponse(ErrorSerializer({'error': 'profile not found'}).data, status=status.HTTP_404_NOT_FOUND)
-        profile = profile.get()
-
-        club = Clubs.objects.filter(uri=uri)
-
-        if not club.exists():
-            return JsonResponse(ErrorSerializer({'error': 'club not exists'}).data, status=status.HTTP_404_NOT_FOUND)
-        club = club.get()
+    @profile_guard
+    @club_guard
+    def get(self, request: Request, user: int, profile: Any, uri: str, club: Any):
 
         serializer = ClubAvailableTimeSerializer(club)
         result = ClubAvailableTimeSerializer.InterSectionSerializer(
@@ -144,17 +157,9 @@ class ClubIndividualView(APIView):
             status.HTTP_404_NOT_FOUND: ErrorSerializer
         },
     )
-    def get(self, request: Request, user: int, profile: int, uri: str):
-        profile = Profiles.objects.filter(id=profile, user=user)
-        if not profile.exists():
-            return JsonResponse(ErrorSerializer({'error': 'profile not found'}).data, status=status.HTTP_404_NOT_FOUND)
-        profile = profile.get()
-
-        club = Clubs.objects.filter(uri=uri)
-
-        if not club.exists():
-            return JsonResponse(ErrorSerializer({'error': 'club not exists'}).data, status=status.HTTP_404_NOT_FOUND)
-        club = club.get()
+    @profile_guard
+    @club_guard
+    def get(self, request: Request, user: int, profile: Any, uri: str, club: Any):
 
         serializer = ProfilesSerializer(profile)
         result = [selected_club for selected_club in serializer.data['dates']
@@ -182,18 +187,9 @@ class ClubJoinView(APIView):
             status.HTTP_404_NOT_FOUND: ErrorSerializer
         },
     )
-    def post(self, request: Request, user: int, profile: int, uri: str):
-        profile = Profiles.objects.filter(id=profile, user=user)
-        if not profile.exists():
-            return JsonResponse(ErrorSerializer({'error': 'profile not found'}).data, status=status.HTTP_404_NOT_FOUND)
-        profile = profile.get()
-
-        club = Clubs.objects.filter(uri=uri)
-
-        if not club.exists():
-            return JsonResponse(ErrorSerializer({'error': 'club not exists'}).data, status=status.HTTP_404_NOT_FOUND)
-        club = club.get()
-
+    @profile_guard
+    @club_guard
+    def post(self, request: Request, user: int, profile: Any, uri: str, club: Any):
         ClubEntries.objects.get_or_create(
             profile=profile, club=club)
 
@@ -207,16 +203,8 @@ class ClubShareView(APIView):
             status.HTTP_404_NOT_FOUND: ErrorSerializer
         },
     )
-    def post(self, request: Request, user: int, profile: int, uri: str):
-        profile = Profiles.objects.filter(id=profile, user=user)
-        if not profile.exists():
-            return JsonResponse(ErrorSerializer({'error': 'profile not found'}).data, status=status.HTTP_404_NOT_FOUND)
-        profile = profile.get()
-
-        club = Clubs.objects.filter(uri=uri)
-
-        if not club.exists():
-            return JsonResponse(ErrorSerializer({'error': 'club not exists'}).data, status=status.HTTP_404_NOT_FOUND)
-        club = club.get()
+    @profile_guard
+    @club_guard
+    def post(self, request: Request, user: int, profile: Any, uri: str, club: Any):
 
         return JsonResponse(ShareSerializer({'uri': club.uri}).data)
