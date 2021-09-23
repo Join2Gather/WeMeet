@@ -254,3 +254,7 @@ class SuccessSerializer(serializers.Serializer):
 
 class ErrorSerializer(serializers.Serializer):
     error = serializers.CharField()
+
+
+class ShareSerializer(serializers.Serializer):
+    uri = serializers.CharField()

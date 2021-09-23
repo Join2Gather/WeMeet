@@ -11,4 +11,6 @@ urlpatterns = [
          views.ClubIndividualView.as_view(), name='clubs_individual_view'),
     path('<int:user>/profiles/<int:profile>/clubs/<str:uri>/join',
          views.ClubJoinView.as_view(), name='clubs_join_view'),
+    path('<int:user>/profiles/<int:profile>/clubs/<str:uri>/share',
+         views.ClubShareView.as_view(), name='clubs_share_view'),
 ]

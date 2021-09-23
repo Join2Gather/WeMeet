@@ -1,4 +1,4 @@
-from config.serializers import ErrorSerializer, ProfilesDateCalculatorType, SuccessSerializer, DateCalculatorChildType
+from config.serializers import ErrorSerializer, SuccessSerializer, DateCalculatorChildType, ShareSerializer
 from config.serializers import ProfilesSerializer
 from config.serializers import ClubAvailableTimeSerializer
 from config.models import Dates, ProfileDates
@@ -198,3 +198,25 @@ class ClubJoinView(APIView):
             profile=profile, club=club)
 
         return JsonResponse(SuccessSerializer({'success': True}).data)
+
+
+class ClubShareView(APIView):
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: ShareSerializer,
+            status.HTTP_404_NOT_FOUND: ErrorSerializer
+        },
+    )
+    def post(self, request: Request, user: int, profile: int, uri: str):
+        profile = Profiles.objects.filter(id=profile, user=user)
+        if not profile.exists():
+            return JsonResponse(ErrorSerializer({'error': 'profile not found'}).data, status=status.HTTP_404_NOT_FOUND)
+        profile = profile.get()
+
+        club = Clubs.objects.filter(uri=uri)
+
+        if not club.exists():
+            return JsonResponse(ErrorSerializer({'error': 'club not exists'}).data, status=status.HTTP_404_NOT_FOUND)
+        club = club.get()
+
+        return JsonResponse(ShareSerializer({'uri': club.uri}).data)
