@@ -114,7 +114,7 @@ class ClubDateView(APIView):
 class ClubGroupView(APIView):
     @swagger_auto_schema(
         responses={
-            status.HTTP_200_OK: ClubAvailableTimeSerializer,
+            status.HTTP_200_OK: ClubAvailableTimeSerializer.InterSectionSerializer,
             status.HTTP_404_NOT_FOUND: ErrorSerializer
         },
     )
@@ -131,7 +131,8 @@ class ClubGroupView(APIView):
         club = club.get()
 
         serializer = ClubAvailableTimeSerializer(club)
-        result = serializer.data
+        result = ClubAvailableTimeSerializer.InterSectionSerializer(
+            serializer.data['intersection']).data
 
         return JsonResponse(result)
 
