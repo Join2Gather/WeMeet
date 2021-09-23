@@ -1,3 +1,4 @@
+from logging import error
 from config.models import ClubEntries, Clubs, Dates, ProfileDates, Profiles
 from config import constants
 from rest_framework import serializers
@@ -245,3 +246,11 @@ class ProfileDatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfileDates
         fields = '__all__'
+
+
+class SuccessSerializer(serializers.Serializer):
+    success = serializers.BooleanField()
+
+
+class ErrorSerializer(serializers.Serializer):
+    error = serializers.CharField()
