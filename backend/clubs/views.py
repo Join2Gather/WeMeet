@@ -44,12 +44,12 @@ class ClubView(APIView):
     def post(self, request: Request, user: int, profile: int):
         profile_object = Profiles.objects.filter(id=profile, user=user)
         if not profile_object.exists():
-            return JsonResponse({'error': 'profile not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': 'profile not found'}, status=status.HTTP_404_NOT_FOUND)
         profile_object = profile_object.first()
 
         name = request.data.get('name')
         if not name:
-            return JsonResponse({'error': 'name not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': 'name not found'}, status=status.HTTP_404_NOT_FOUND)
         uri = uuid.uuid4()
         club = Clubs.objects.create(name=name, uri=uri)
 
@@ -71,7 +71,7 @@ class ClubDateView(APIView):
     def get(self, request: Request, user: int, profile: int, uri: str):
         profile = Profiles.objects.filter(id=profile, user=user)
         if not profile.exists():
-            return JsonResponse({'error': 'profile not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': 'profile not found'}, status=status.HTTP_404_NOT_FOUND)
         profile = profile.get()
 
         is_group = request.query_params.get('group')
@@ -84,7 +84,7 @@ class ClubDateView(APIView):
         club = Clubs.objects.filter(uri=uri)
 
         if not club.exists():
-            return JsonResponse({'error': 'club not exists'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': 'club not exists'}, status=status.HTTP_404_NOT_FOUND)
 
         club = club.get()
 
@@ -117,7 +117,7 @@ class ClubDateView(APIView):
     def post(self, request: Request, user: int, profile: int, uri: str):
         profile = Profiles.objects.filter(id=profile, user=user)
         if not profile.exists():
-            return JsonResponse({'error': 'profile not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': 'profile not found'}, status=status.HTTP_404_NOT_FOUND)
         profile = profile.get()
 
         days = {day: request.data.get(day) or [] for day in constants.week}
@@ -125,7 +125,7 @@ class ClubDateView(APIView):
         club = Clubs.objects.filter(uri=uri)
 
         if not club.exists():
-            return JsonResponse({'error': 'club not exists'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': 'club not exists'}, status=status.HTTP_404_NOT_FOUND)
         club = club.get()
 
         # 기존에 있던 시간표는 delete
