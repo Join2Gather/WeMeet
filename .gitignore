@@ -6,3 +6,4 @@ __cache__
 __pycache__/*
 __pycache__
 openapi.json
+openapitools.json
