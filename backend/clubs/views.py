@@ -30,7 +30,7 @@ def profile_guard(method):
         try:
             profile = Profiles.objects.get(id=profile_id, user=user)
         except Profiles.DoesNotExist:
-            return JsonResponse(ErrorSerializer({'error': 'profile not found'}).data, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(ErrorSerializer({'error': 'profile not found'}).data, status=status.HTTP_404_NOT_FOUND)
 
         return method(*args, **{**kwargs, 'profile': profile})
 
@@ -45,7 +45,7 @@ def club_guard(method):
         try:
             club = Clubs.objects.get(uri=uri)
         except Clubs.DoesNotExist:
-            return JsonResponse(ErrorSerializer({'error': 'club not found'}).data, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(ErrorSerializer({'error': 'club not found'}).data, status=status.HTTP_404_NOT_FOUND)
 
         return method(*args, **{**kwargs, 'club': club})
 
@@ -93,14 +93,19 @@ class ClubView(APIView):
 
 
 class ClubDateView(APIView):
-    @swagger_auto_schema(request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            key: openapi.Schema(type=openapi.TYPE_ARRAY,
-                                items=openapi.Items(type=openapi.TYPE_NUMBER))
-            for key in constants.week
-        }
-    ),
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                key: openapi.Schema(type=openapi.TYPE_ARRAY,
+                                    items=openapi.Items(type=openapi.TYPE_NUMBER))
+                for key in constants.week
+            }
+        ),
+        responses={
+            status.HTTP_200_OK: ClubAvailableTimeSerializer.InterSectionSerializer,
+            status.HTTP_404_NOT_FOUND: ErrorSerializer
+        },
         operation_id="users_profiles_clubs_dates"
     )
     @profile_guard
@@ -128,8 +133,10 @@ class ClubDateView(APIView):
                     profile=profile, date=date, club=club, is_temporary_reserved=True)
 
         serializer = ClubAvailableTimeSerializer(club)
+        result = ClubAvailableTimeSerializer.InterSectionSerializer(
+            serializer.data['intersection']).data
 
-        return JsonResponse(serializer.data['intersection'])
+        return JsonResponse(result)
 
 
 class ClubGroupView(APIView):

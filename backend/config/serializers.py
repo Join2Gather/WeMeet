@@ -45,7 +45,8 @@ class ProfilesDateCalculatorType(serializers.ListField):
 
 class ClubsWithDateCalculatorType(serializers.Serializer):
     exec(
-        '\n'.join([f'{day} = DateCalculatorChildType()' for day in constants.week]))
+        '\n'.join([f'{day} = serializers.FloatField()' for day in constants.week]))
+    is_temporary_reserved = serializers.BooleanField()
 
 
 class DateCalculator(ABC):
