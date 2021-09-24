@@ -1,33 +1,34 @@
 version: "3.3"
 
 services:
-  django_app:
-    image: a891/join2gather_backend:latest
-    networks:
-      - app-tier
-    ports:
-      - 8000:8000
-    restart: always
-    volumes:
-      - ./secrets.json:/backend/secrets.json:ro
-      - ./db:/db
-    depends_on:
-      - everytime_parser
-
-  everytime_parser:
-    image: a891/join2gather_everytime:latest
-    ports:
-      - 8009:8009
-    networks:
-      - app-tier
-    restart: always
-
   watchtower:
     image: containrrr/watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --interval 30
 
-networks:
-  app-tier:
-    driver: bridge
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    ports:
+      - 80:80
+      - 443:443
+
+  django_app:
+    image: a891/join2gather_backend:latest
+    restart: always
+    volumes:
+      - ../db:/db
+      - ./secrets.json:/backend/secrets.json:ro
+    depends_on:
+      - everytime_parser
+    environment:
+      - VIRTUAL_HOST=api.dps0340.xyz
+
+  everytime_parser:
+    image: a891/join2gather_everytime:latest
+    restart: always
+    environment:
+      - VIRTUAL_HOST=everytime.dps0340.xyz
