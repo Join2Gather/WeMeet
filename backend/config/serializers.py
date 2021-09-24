@@ -78,9 +78,12 @@ class ProfilesDateCalculator(DateCalculator):
             dates[club] = {}
             for day in week:
                 dates[club][day] = []
-            dates[club]['club'] = {}
-            dates[club]['club']['id'] = club.id
-            dates[club]['club']['name'] = club.name
+            if club is None:
+                dates[club]['club'] = None
+            else:
+                dates[club]['club'] = {}
+                dates[club]['club']['id'] = club.id
+                dates[club]['club']['name'] = club.name
             dates[club]['is_temporary_reserved'] = is_temporary_reserved
         time = date.hour + date.minute / 100
         dates[club][week[date.day]].append(time)
