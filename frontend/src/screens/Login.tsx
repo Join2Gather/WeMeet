@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from 'react';
-import { Keyboard, StyleSheet } from 'react-native';
+import { Keyboard, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SocialWebviewModal } from './Login/SocialWebviewModal';
+import { LinearGradient } from 'expo-linear-gradient';
 // prettier-ignore
 import {
   SafeAreaView,
-  View,
   Text,
   UnderlineText,
   TextInput,
@@ -31,94 +31,95 @@ export default function Login() {
 
 	const onPressSocial = useCallback(async (social: any) => {
 		setSocialModalVisible(true);
-		setSource(`http://localhost:8000/accounts/`);
+		setSource(`http://localhost:8000/accounts/kakao/login`);
 	}, []);
 	const onCloseSocial = useCallback(async () => {
 		setSocialModalVisible(false);
 	}, []);
 
 	return (
-		<SafeAreaView
-			style={{ padding: 0, margin: 0, backgroundColor: Colors.blue500 }}
+		<LinearGradient
+			colors={['#33aafc', '#017bff']}
+			style={{ flex: 1 }}
+			end={{ x: 0.95, y: 0.95 }}
+			start={{ x: 0.01, y: 0.01 }}
 		>
-			<View
-				style={[
-					styles.view,
-					{ backgroundColor: Colors.blue500, margin: 0, padding: 0 },
-				]}
-			>
-				<AutoFocusProvider
-					contentContainerStyle={[styles.keyboardAwareFocus]}
-					contentInsetAdjustmentBehavior="never"
-					style={{ margin: 0, padding: 0 }}
-				>
-					{source !== '' && (
-						<SocialWebviewModal
-							visible={socialModalVisible}
-							source={source}
-							closeSocialModal={onCloseSocial}
-						/>
-					)}
-					{source === '' && (
-						<>
-							<View
-								style={[styles.textView, { backgroundColor: Colors.blue500 }]}
-							>
-								<Text style={styles.text}>WE MEET</Text>
-							</View>
-							<TouchableView
-								style={[
-									styles.touchableView,
-									{ backgroundColor: Colors.white },
-								]}
-								onPress={() => onPressSocial('')}
-							>
-								{/* <Icon
+			<SafeAreaView style={{ padding: 0, margin: 0 }}>
+				<View style={[styles.view, { margin: 0, padding: 0 }]}>
+					<AutoFocusProvider
+						contentContainerStyle={[styles.keyboardAwareFocus]}
+						contentInsetAdjustmentBehavior="never"
+						style={{ margin: 0, padding: 0 }}
+					>
+						{source !== '' && (
+							<SocialWebviewModal
+								visible={socialModalVisible}
+								source={source}
+								closeSocialModal={onCloseSocial}
+							/>
+						)}
+						{source === '' && (
+							<>
+								<View style={[styles.textView]}>
+									<Text style={styles.text}>WE MEET</Text>
+								</View>
+								<TouchableView
+									style={[
+										styles.touchableView,
+										{ backgroundColor: Colors.white },
+									]}
+									onPress={() => onPressSocial('')}
+								>
+									{/* <Icon
 									name="chat"
 									size={25}
 									// style={{ color: Colors.yellow800 }}
 								/> */}
+									<Text style={styles.loginText}>카카오 로그인</Text>
+								</TouchableView>
+								<Text style={styles.buttonUnderText}>
+									카카오 계정으로 간편로그인 하세요.
+								</Text>
 								<Text
 									style={{
-										fontSize: 20,
-										fontWeight: 'bold',
-										marginLeft: 10,
-										color: Colors.blue700,
+										position: 'absolute',
+										bottom: 0,
+										color: Colors.white,
+										fontSize: 11,
+										fontFamily: 'SCDream4',
 									}}
 								>
-									카카오 로그인
+									make your plan
 								</Text>
-							</TouchableView>
-							<Text style={styles.buttonUnderText}>
-								카카오 계정으로 간편로그인 하세요.
-							</Text>
-							<Text
-								style={{ position: 'absolute', bottom: 0, color: Colors.white }}
-							>
-								make your plan
-							</Text>
-						</>
-					)}
-				</AutoFocusProvider>
-			</View>
-		</SafeAreaView>
+							</>
+						)}
+					</AutoFocusProvider>
+				</View>
+			</SafeAreaView>
+		</LinearGradient>
 	);
 }
 const styles = StyleSheet.create({
 	view: { flex: 1, justifyContent: 'space-between', alignItems: 'center' },
 	text: {
-		fontSize: 65,
+		fontSize: 60,
 		textAlign: 'center',
 		marginBottom: 120,
-		fontWeight: '200',
+		letterSpacing: -3,
 		color: '#FFF',
+		fontFamily: 'SCDream2',
 	},
 	buttonUnderText: {
-		marginTop: 8,
-		fontSize: 15,
-		fontWeight: '300',
-		marginLeft: 10,
+		marginTop: 12,
+		fontSize: 12,
 		color: '#FFF',
+		fontFamily: 'SCDream4',
+	},
+	loginText: {
+		fontFamily: 'NanumSquareBold',
+		fontSize: 20,
+		marginLeft: 10,
+		color: Colors.blue700,
 	},
 	keyboardAwareFocus: {
 		flex: 1,
@@ -126,20 +127,20 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	textView: { width: '100%', padding: 5, marginBottom: 10 },
+	textView: { width: '100%', padding: 5, marginBottom: 30 },
 	textInput: { fontSize: 24, padding: 10 },
 	textInputView: { marginTop: 5, borderRadius: 10 },
 	touchableView: {
 		flexDirection: 'row',
-		height: 48,
+		height: 45,
 		borderRadius: 10,
-		width: '70%',
+		width: '65%',
 		justifyContent: 'center',
 		alignItems: 'center',
 		shadowColor: 'black',
 		shadowOffset: {
-			width: 2,
-			height: 2,
+			width: 1,
+			height: 1,
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
