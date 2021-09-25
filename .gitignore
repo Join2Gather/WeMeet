@@ -5,3 +5,5 @@ __cache__
 .DS_Store
 __pycache__/*
 __pycache__
+openapi.json
+openapitools.json

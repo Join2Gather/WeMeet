@@ -14,7 +14,7 @@ from pathlib import Path
 from .environment import get_secret
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 DB_DIR = Path.joinpath(BASE_DIR, 'db')  # Docker Volume 연동을 위함
 
@@ -42,10 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # My Apps
+    'accounts',
+    'config',
+    'profiles',
 
     # Third Party Apps
-    # my app
-    'accounts',
     # django-rest-framework
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
@@ -60,16 +61,25 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.kakao',
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.google',
-    'django.contrib.sites',
-    'drf_yasg',
-    'config'
+    'django.contrib.sites',  # Admin 페이지를 위해 추가
+    'drf_yasg'
 ]
 
-SITE_ID = 2
+SITE_ID = 1  # Admin 페이지를 위해 추가
+
+SWAGGER_SETTINGS = {
+    'DEFAULT_INFO': 'config.urls.api_info',
+}
+
+# Bearer Token 인증을 위해 추가
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
 
 AUTH_USER_MODEL = 'auth.User'
 # On settings.py
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'

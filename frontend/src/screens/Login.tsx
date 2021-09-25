@@ -31,7 +31,10 @@ export default function Login() {
 
 	const onPressSocial = useCallback(async (social: any) => {
 		setSocialModalVisible(true);
+
 		setSource(`http://localhost:8000/accounts/kakao/login`);
+
+
 	}, []);
 	const onCloseSocial = useCallback(async () => {
 		setSocialModalVisible(false);
