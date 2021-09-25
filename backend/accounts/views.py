@@ -1,3 +1,4 @@
+from config.settings import DEBUG
 from typing import Optional
 from config.models import ClubEntries
 from django.contrib.auth.models import User
@@ -52,7 +53,14 @@ class KakaoCallbackView(APIView):
         token_req_json = token_req.json()
         error = token_req_json.get("error")
         if error is not None:
-            raise JSONDecodeError(error)
+            if token_req_json.get('error_code') == 'KOE320':
+                # KOE320: Invalid grant면 code값이 무효화 됨.
+                # 간단하게 다시 login endpoint 호출해서 code 재발급 받도록 수정하였음.
+                return redirect(f"{BASE_URL}accounts/kakao/login")
+            if DEBUG:
+                return JsonResponse({'error': token_req_json}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return JsonResponse({'success': False}, status=status.HTTP_400_BAD_REQUEST)
         access_token = token_req_json.get("access_token")
         """
             Email Request
