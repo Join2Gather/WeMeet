@@ -38,9 +38,20 @@ export default function Login() {
 	}, []);
 
 	return (
-		<SafeAreaView>
-			<View style={[styles.view]}>
-				<AutoFocusProvider contentContainerStyle={[styles.keyboardAwareFocus]}>
+		<SafeAreaView
+			style={{ padding: 0, margin: 0, backgroundColor: Colors.blue500 }}
+		>
+			<View
+				style={[
+					styles.view,
+					{ backgroundColor: Colors.blue500, margin: 0, padding: 0 },
+				]}
+			>
+				<AutoFocusProvider
+					contentContainerStyle={[styles.keyboardAwareFocus]}
+					contentInsetAdjustmentBehavior="never"
+					style={{ margin: 0, padding: 0 }}
+				>
 					{source !== '' && (
 						<SocialWebviewModal
 							visible={socialModalVisible}
@@ -50,23 +61,42 @@ export default function Login() {
 					)}
 					{source === '' && (
 						<>
-							<View style={[styles.textView, {}]}>
-								<Text style={styles.text}>Make your Plan</Text>
+							<View
+								style={[styles.textView, { backgroundColor: Colors.blue500 }]}
+							>
+								<Text style={styles.text}>WE MEET</Text>
 							</View>
 							<TouchableView
 								style={[
 									styles.touchableView,
-									{ backgroundColor: Colors.yellow600 },
+									{ backgroundColor: Colors.white },
 								]}
 								onPress={() => onPressSocial('')}
 							>
-								<Icon name="chat" size={25} />
+								{/* <Icon
+									name="chat"
+									size={25}
+									// style={{ color: Colors.yellow800 }}
+								/> */}
 								<Text
-									style={{ fontSize: 20, fontWeight: 'bold', marginLeft: 10 }}
+									style={{
+										fontSize: 20,
+										fontWeight: 'bold',
+										marginLeft: 10,
+										color: Colors.blue700,
+									}}
 								>
 									카카오 로그인
 								</Text>
 							</TouchableView>
+							<Text style={styles.buttonUnderText}>
+								카카오 계정으로 간편로그인 하세요.
+							</Text>
+							<Text
+								style={{ position: 'absolute', bottom: 0, color: Colors.white }}
+							>
+								make your plan
+							</Text>
 						</>
 					)}
 				</AutoFocusProvider>
@@ -76,7 +106,20 @@ export default function Login() {
 }
 const styles = StyleSheet.create({
 	view: { flex: 1, justifyContent: 'space-between', alignItems: 'center' },
-	text: { fontSize: 30, textAlign: 'center', marginBottom: 20 },
+	text: {
+		fontSize: 65,
+		textAlign: 'center',
+		marginBottom: 120,
+		fontWeight: '200',
+		color: '#FFF',
+	},
+	buttonUnderText: {
+		marginTop: 8,
+		fontSize: 15,
+		fontWeight: '300',
+		marginLeft: 10,
+		color: '#FFF',
+	},
 	keyboardAwareFocus: {
 		flex: 1,
 		padding: 5,
@@ -88,9 +131,9 @@ const styles = StyleSheet.create({
 	textInputView: { marginTop: 5, borderRadius: 10 },
 	touchableView: {
 		flexDirection: 'row',
-		height: 50,
+		height: 48,
 		borderRadius: 10,
-		width: '90%',
+		width: '70%',
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
