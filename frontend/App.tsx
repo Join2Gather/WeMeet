@@ -35,6 +35,8 @@ import { ToggleThemeProvider } from './src/contexts';
 import { useEffect } from 'react';
 // import Loading from './src/screens/Loading';
 import * as ScreenOrientation from 'expo-screen-orientation';
+import * as Font from 'expo-font';
+
 enableScreens();
 sagaMiddleware.run(rootSaga);
 export default function App() {
@@ -45,12 +47,28 @@ export default function App() {
 	React.useEffect(() => {
 		lockOrientation();
 	}, []);
-
+	const [isLoading, onChangeLoading] = useState(false);
+	useEffect(() => {
+		loadAssetsAsync();
+	}, []);
+	const loadAssetsAsync = async () => {
+		await Font.loadAsync({
+			SCDream2: require('./assets/fonts/SCDream2.otf'),
+			SCDream4: require('./assets/fonts/SCDream4.otf'),
+			NanumSquareBold: require('./assets/fonts/NanumSquareBold.ttf'),
+		});
+		onChangeLoading(true);
+	};
 	const lockOrientation = async () => {
 		await ScreenOrientation.lockAsync(
 			ScreenOrientation.OrientationLock.PORTRAIT_UP
 		);
 	};
+	Font.loadAsync({
+		SCDream2: require('./assets/fonts/SCDream2.otf'),
+		SCDream4: require('./assets/fonts/SCDream4.otf'),
+		NanumSquareBold: require('./assets/fonts/NanumSquareBold.ttf'),
+	});
 	// const [loading, setLoading] = useState(true);
 	// useEffect(() => {
 	// 	setTimeout(() => {
@@ -70,7 +88,7 @@ export default function App() {
 						<SafeAreaProvider>
 							<NavigationContainer theme={theme}>
 								{/* {loading && <Loading />} */}
-								{<MainNavigator />}
+								{isLoading && <MainNavigator />}
 							</NavigationContainer>
 						</SafeAreaProvider>
 					</ToggleThemeProvider>
