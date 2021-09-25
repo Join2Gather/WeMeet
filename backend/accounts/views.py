@@ -54,7 +54,7 @@ class KakaoCallbackView(APIView):
         error = token_req_json.get("error")
         if error is not None:
             if token_req_json.get('error_code') == 'KOE320':
-                # KOE320: Invalid grant면 code값이 무효화 됨.
+                # KOE320: Invalid grant면 code값이 만료되었음을 의미함.
                 # 간단하게 다시 login endpoint 호출해서 code 재발급 받도록 수정하였음.
                 return redirect(f"{BASE_URL}accounts/kakao/login")
             if DEBUG:
