@@ -1,5 +1,8 @@
 export interface Login {
-	meetingID: number;
-	meetingName: string;
-	userToken: string;
+	id: number;
+	name: string;
+	user: number;
+	token: string;
+	clubs: Array<any>;
+	dates: Array<any>;
 }
