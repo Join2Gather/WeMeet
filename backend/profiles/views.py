@@ -1,3 +1,4 @@
+from typing import Any
 from clubs.views import profile_guard
 from config.serializers import ProfilesSerializer
 from config.constants import week
@@ -22,13 +23,8 @@ class ProfileView(APIView):
     @swagger_auto_schema(responses={
         status.HTTP_200_OK: ProfilesSerializer
     })
-    def get(self, request: Request, user: int, profile: int):
-        return self.get_profile(id=profile, user=user)
-
-    def get_profile(self, **kwargs):
-        profile = Profiles.objects.get(**kwargs)
-        result = ProfilesSerializer(profile).data
-        return JsonResponse(result)
+    def get(self, request: Request, user: int, profile: Any):
+        return JsonResponse(ProfilesSerializer(profile).data)
 
     # Create는 TODO
     # 최초 소셜 로그인시 자동으로 Profile 생성 하므로 지금은 필요 없어보임
@@ -41,9 +37,13 @@ class MyProfileView(APIView):
         status.HTTP_200_OK: ProfilesSerializer
     })
     def get(self, request: Request):
-        profile_view = ProfileView()
         user = request.user.id
-        return profile_view.get_profile(user=user)
+        return self.get_profile(user=user)
+
+    def get_profile(self, **kwargs):
+        profile = Profiles.objects.get(**kwargs)
+        result = ProfilesSerializer(profile).data
+        return JsonResponse(result)
 
 
 class EverytimeCalendarView(APIView):
@@ -58,7 +58,7 @@ class EverytimeCalendarView(APIView):
         }
     ))
     @profile_guard
-    def post(self, request: Request, profile: Profiles):
+    def post(self, request: Request, profile: Any):
 
         # club은 None!
 

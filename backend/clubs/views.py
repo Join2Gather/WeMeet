@@ -29,6 +29,9 @@ def profile_guard(method):
 
         current_user = args[1].user
 
+        if not current_user.is_authenticated:
+            return JsonResponse(ErrorSerializer({'error': 'Authentication credentials were not provided.'}).data, status=status.HTTP_401_UNAUTHORIZED)
+
         # '파이썬 클린 코드' 책에 나온 대로, Easier to Ask Forgiveness than Permission 원칙을 지켜서 try / except 문을 사용함.
         try:
             user = Users.objects.get(id=user)
@@ -39,7 +42,7 @@ def profile_guard(method):
             return JsonResponse(ErrorSerializer({'error': 'profile not found'}).data, status=status.HTTP_404_NOT_FOUND)
 
         if current_user != user:
-            return JsonResponse(ErrorSerializer({'error': 'user of token and user of argument does not match'}).data, status=status.HTTP_404_NOT_FOUND)
+            return JsonResponse(ErrorSerializer({'error': 'user of token and user of argument does not match'}).data, status=status.HTTP_400_BAD_REQUEST)
 
         return method(*args, **{**kwargs, 'profile': profile})
 
@@ -235,3 +238,59 @@ class ClubShareView(APIView):
     def post(self, request: Request, user: int, profile: Any, uri: str, club: Any):
 
         return JsonResponse(ShareSerializer({'uri': club.uri}).data)
+
+
+class ClubConfirmView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: SuccessSerializer,
+            status.HTTP_404_NOT_FOUND: ErrorSerializer
+        },
+    )
+    @profile_guard
+    @club_guard
+    def post(self, request: Request, user: int, profile: Any, uri: str, club: Any):
+
+        return JsonResponse(SuccessSerializer({'success': True}).data)
+
+
+class ClubConfirmOKView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                key: openapi.Schema(type=openapi.TYPE_ARRAY,
+                                    items=openapi.Items(type=openapi.TYPE_NUMBER))
+                for key in constants.week
+            }
+        ),
+        responses={
+            status.HTTP_200_OK: ProfilesSerializer,
+            status.HTTP_404_NOT_FOUND: ErrorSerializer
+        },
+    )
+    @profile_guard
+    @club_guard
+    def post(self, request: Request, user: int, profile: Any, uri: str, club: Any):
+        # 기존에 생성된 튜플은 지워줌
+        ProfileDates.objects.filter(
+            profile=profile, club=club).delete()
+
+        for idx, day in enumerate(constants.week):
+            starting_times = request.data.get(day) or []
+            for time in starting_times:
+                hour = int(time)
+                minute = int((time - hour) * 100)
+                date = Dates.objects.get_or_create(
+                    day=idx, hour=hour, minute=minute)[0]
+                ProfileDates.objects.get_or_create(
+                    profile=profile, date=date, club=club, is_temporary_reserved=False)
+
+        profile = Profiles.objects.get(id=profile.id)
+        result = ProfilesSerializer(profile).data
+
+        return JsonResponse(result)
