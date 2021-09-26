@@ -1,4 +1,4 @@
-from backend.clubs.views import profile_guard
+from clubs.views import profile_guard
 from config.serializers import ProfilesSerializer
 from config.constants import week
 from django.http.response import JsonResponse
