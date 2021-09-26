@@ -10,8 +10,6 @@ dj-rest-auth
 django-allauth
 djangorestframework
 djangorestframework-simplejwt
-dj-rest-auth
-django-allauth
 requests
 drf-yasg
 ruamel.yaml
