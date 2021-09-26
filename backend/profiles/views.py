@@ -1,3 +1,4 @@
+from backend.clubs.views import profile_guard
 from config.serializers import ProfilesSerializer
 from config.constants import week
 from django.http.response import JsonResponse
@@ -9,11 +10,15 @@ from config.models import ProfileDates
 from config.models import Dates
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 
 
 class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @profile_guard
     @swagger_auto_schema(responses={
         status.HTTP_200_OK: ProfilesSerializer
     })
@@ -21,10 +26,7 @@ class ProfileView(APIView):
         return self.get_profile(id=profile, user=user)
 
     def get_profile(self, **kwargs):
-        profile = Profiles.objects.filter(**kwargs)
-        if not profile.exists():
-            return JsonResponse({})
-        profile = profile.first()
+        profile = Profiles.objects.get(**kwargs)
         result = ProfilesSerializer(profile).data
         return JsonResponse(result)
 
@@ -33,6 +35,8 @@ class ProfileView(APIView):
 
 
 class MyProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(responses={
         status.HTTP_200_OK: ProfilesSerializer
     })
@@ -43,6 +47,7 @@ class MyProfileView(APIView):
 
 
 class EverytimeCalendarView(APIView):
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
@@ -52,11 +57,8 @@ class EverytimeCalendarView(APIView):
             for key in week
         }
     ))
-    def post(self, request: Request, user: int, profile: int):
-        profile = Profiles.objects.filter(id=profile, user=user)
-        if not profile.exists():
-            return JsonResponse({'error': 'profile not found'}, status=status.HTTP_404_NOT_FOUND)
-        profile = profile.first()
+    @profile_guard
+    def post(self, request: Request, profile: Profiles):
 
         # club은 None!
 

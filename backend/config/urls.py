@@ -21,12 +21,12 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 api_info = openapi.Info(
-    title="Snippets API",
-    default_version='v1',
-    description="Test description",
+    title="Join2Gather API",
+    default_version='v2',
+    description="Join2Gather API 문서입니다.\n토큰 인증을 하실 때는 Value에 'Token xxx' 형태로 토큰 접두사를 붙여주세요.",
     terms_of_service="https://www.google.com/policies/terms/",
     contact=openapi.Contact(email="contact@snippets.local"),
-    license=openapi.License(name="BSD License"),
+    license=openapi.License(name="MIT License"),
 )
 
 schema_view = get_schema_view(

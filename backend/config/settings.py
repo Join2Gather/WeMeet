@@ -69,6 +69,14 @@ SITE_ID = 1  # Admin 페이지를 위해 추가
 
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'config.urls.api_info',
+    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS': {
+        'Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    }
 }
 
 # Bearer Token 인증을 위해 추가

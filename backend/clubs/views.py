@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User as Users
 from typing import Any
 from config.serializers import ErrorSerializer, SuccessSerializer, DateCalculatorChildType, ShareSerializer
 from config.serializers import ProfilesSerializer
@@ -7,7 +8,6 @@ from config import constants
 from config.serializers import ClubsWithDateSerializer
 from config.models import Clubs, Profiles
 from django.http.response import JsonResponse
-from config.serializers import ClubsSerializer
 from config.models import ClubEntries
 from rest_framework.views import APIView
 from rest_framework.request import Request
@@ -16,6 +16,7 @@ import uuid
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from functools import wraps
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 
@@ -26,11 +27,21 @@ def profile_guard(method):
         user = kwargs['user']
         profile_id = kwargs['profile']
 
+        current_user = args[1].user
+
+        print(current_user)
+
         # '파이썬 클린 코드' 책에 나온 대로, Easier to Ask Forgiveness than Permission 원칙을 지켜서 try / except 문을 사용함.
         try:
-            profile = Profiles.objects.get(id=profile_id, user=user)
+            user = Users.objects.get(id=user)
+            profile = Profiles.objects.get(id=profile_id, user=user.id)
+        except Users.DoesNotExist:
+            return JsonResponse(ErrorSerializer({'error': 'user not found'}).data, status=status.HTTP_404_NOT_FOUND)
         except Profiles.DoesNotExist:
             return JsonResponse(ErrorSerializer({'error': 'profile not found'}).data, status=status.HTTP_404_NOT_FOUND)
+
+        if current_user != user:
+            return JsonResponse(ErrorSerializer({'error': 'user of token and user of argument does not match'}).data, status=status.HTTP_404_NOT_FOUND)
 
         return method(*args, **{**kwargs, 'profile': profile})
 
@@ -53,12 +64,15 @@ def club_guard(method):
 
 
 class ClubView(APIView):
+
     @swagger_auto_schema(responses={
         status.HTTP_200_OK: ClubsWithDateSerializer(many=True),
         status.HTTP_404_NOT_FOUND: ErrorSerializer
     })
     @profile_guard
     def get(self, request: Request, user: int, profile: Any):
+        print(request.user)
+
         club_entries = ClubEntries.objects.select_related(
             'club').filter(profile=profile.id)
         clubs = [ClubsWithDateSerializer(
@@ -93,6 +107,8 @@ class ClubView(APIView):
 
 
 class ClubDateView(APIView):
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -140,6 +156,8 @@ class ClubDateView(APIView):
 
 
 class ClubGroupView(APIView):
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         responses={
             status.HTTP_200_OK: ClubAvailableTimeSerializer.InterSectionSerializer,
@@ -158,6 +176,8 @@ class ClubGroupView(APIView):
 
 
 class ClubIndividualView(APIView):
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         responses={
             status.HTTP_200_OK: DateCalculatorChildType,
@@ -204,6 +224,8 @@ class ClubJoinView(APIView):
 
 
 class ClubShareView(APIView):
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         responses={
             status.HTTP_200_OK: ShareSerializer,
