@@ -29,8 +29,6 @@ def profile_guard(method):
 
         current_user = args[1].user
 
-        print(current_user)
-
         # '파이썬 클린 코드' 책에 나온 대로, Easier to Ask Forgiveness than Permission 원칙을 지켜서 try / except 문을 사용함.
         try:
             user = Users.objects.get(id=user)
