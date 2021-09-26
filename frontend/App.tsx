@@ -54,6 +54,7 @@ export default function App() {
 	const loadAssetsAsync = async () => {
 		await Font.loadAsync({
 			SCDream2: require('./assets/fonts/SCDream2.otf'),
+			SCDream3: require('./assets/fonts/SCDream3.otf'),
 			SCDream4: require('./assets/fonts/SCDream4.otf'),
 			NanumSquareBold: require('./assets/fonts/NanumSquareBold.ttf'),
 		});
@@ -66,6 +67,7 @@ export default function App() {
 	};
 	Font.loadAsync({
 		SCDream2: require('./assets/fonts/SCDream2.otf'),
+		SCDream3: require('./assets/fonts/SCDream3.otf'),
 		SCDream4: require('./assets/fonts/SCDream4.otf'),
 		NanumSquareBold: require('./assets/fonts/NanumSquareBold.ttf'),
 	});
