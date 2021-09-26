@@ -6,9 +6,12 @@ import { createAction } from 'redux-actions';
 import type { Login } from '../interface';
 
 const initialState: Login = {
-	meetingID: 0,
-	meetingName: '',
-	userToken: '',
+	id: 0,
+	name: '',
+	user: 0,
+	token: '',
+	clubs: [],
+	dates: [],
 };
 // const GET_POST = 'sample/GET_POST';
 // const GET_USERS = 'sample/GET_USERS';
@@ -35,8 +38,22 @@ export const loginSlice = createSlice({
 		// 	state.users = action.payload;
 		// },
 		getSocialLogin: (state, action: PayloadAction<Login>) => {
-			state.meetingID = action.payload.meetingID;
-			state.meetingName = action.payload.meetingName;
+			state.id = action.payload.id;
+			state.name = action.payload.name;
+			state.user = action.payload.user;
+			state.token = action.payload.token;
+			state.clubs = action.payload.clubs;
+			state.clubs.map((club) => {
+				console.log(decodeURI(club.name));
+				console.log(unescape(club.name));
+				console.log(escape(club.name));
+				console.log(encodeURIComponent(club.name));
+				console.log(encodeURI(club.name));
+				console.log(JSON.stringify(club.name));
+				// console.log(JSON.parse(club.name));
+				club.name = decodeURIComponent(club.name);
+			});
+			state.dates = action.payload.dates;
 		},
 	},
 	extraReducers: {},

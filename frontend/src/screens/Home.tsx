@@ -17,13 +17,6 @@ export default function Home() {
 		() => navigation.navigate('HomeRight', { name: 'Jack', age: 32 }),
 		[]
 	);
-	const open = useCallback(() => {
-		navigation.dispatch(DrawerActions.openDrawer());
-	}, []);
-	const logout = useCallback(() => {
-		navigation.navigate('Login');
-	}, []);
-	// for people
 	const [scrollEnabled] = useScrollEnabled();
 	const [people, setPeople] = useState([]);
 	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
@@ -45,11 +38,7 @@ export default function Home() {
 		<SafeAreaView>
 			<ScrollEnabledProvider>
 				<View style={[styles.view]}>
-					<NavigationHeader
-						title="Home"
-						Left={() => <Icon name="menu" size={30} onPress={open} />}
-						Right={() => <Icon name="logout" size={30} onPress={logout} />}
-					/>
+					<NavigationHeader title="Home" />
 					<TopBar noSwitch>
 						<UnderlineText onPress={addPerson} style={styles.text}>
 							add

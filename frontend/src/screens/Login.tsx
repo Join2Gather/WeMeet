@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Keyboard, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SocialWebviewModal } from './Login/SocialWebviewModal';
@@ -15,8 +15,13 @@ import {
 } from '../theme/navigation';
 import { useAutoFocus, AutoFocusProvider } from '../contexts';
 import { Colors } from 'react-native-paper';
+import { RootState } from '../store';
+import { useSelector } from 'react-redux';
 
 export default function Login() {
+	const { name } = useSelector(({ login }: RootState) => ({
+		name: login.name,
+	}));
 	const [person, setPerson] = useState('hi');
 	const [socialModalVisible, setSocialModalVisible] = useState(false);
 	const [source, setSource] = useState('');
@@ -28,13 +33,18 @@ export default function Login() {
 	// )
 	// prettier-ignore
 	const goTabNavigator = useCallback(() => navigation.navigate('TabNavigator'), []);
-
+	useEffect(() => {
+		if (name.length) {
+			console.log('hihi');
+			navigation.navigate('TabNavigator');
+		} else {
+			console.log('없음');
+		}
+	}, [name]);
 	const onPressSocial = useCallback(async (social: any) => {
 		setSocialModalVisible(true);
-
-		setSource(`http://localhost:8000/accounts/kakao/login`);
-
-
+		setSource('http://api.dps0340.xyz/accounts/kakao/login');
+		// setSource(`http://localhost:8000/accounts/kakao/login`);
 	}, []);
 	const onCloseSocial = useCallback(async () => {
 		setSocialModalVisible(false);
@@ -71,13 +81,11 @@ export default function Login() {
 										styles.touchableView,
 										{ backgroundColor: Colors.white },
 									]}
-									onPress={() => onPressSocial('')}
+									onPress={() => {
+										onPressSocial('');
+										// goTabNavigator();
+									}}
 								>
-									{/* <Icon
-									name="chat"
-									size={25}
-									// style={{ color: Colors.yellow800 }}
-								/> */}
 									<Text style={styles.loginText}>카카오 로그인</Text>
 								</TouchableView>
 								<Text style={styles.buttonUnderText}>
