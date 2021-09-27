@@ -1,3 +1,4 @@
+from config.serializers import ClubsWithDatePageSerializer
 from django.contrib.auth.models import User as Users
 from typing import Any
 from config.serializers import ErrorSerializer, SuccessSerializer, DateCalculatorChildType, ShareSerializer
@@ -17,6 +18,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from functools import wraps
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import LimitOffsetPagination
 
 # Create your views here.
 
@@ -67,18 +69,27 @@ def club_guard(method):
 class ClubView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(responses={
-        status.HTTP_200_OK: ClubsWithDateSerializer(many=True),
-        status.HTTP_404_NOT_FOUND: ErrorSerializer
-    })
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('limit', openapi.IN_QUERY, type=openapi.TYPE_INTEGER),
+                           openapi.Parameter('offset', openapi.IN_QUERY, type=openapi.TYPE_INTEGER)], responses={
+            status.HTTP_200_OK: ClubsWithDatePageSerializer,
+            status.HTTP_404_NOT_FOUND: ErrorSerializer
+        })
     @profile_guard
     def get(self, request: Request, user: int, profile: Any):
 
-        club_entries = ClubEntries.objects.select_related(
-            'club').filter(profile=profile.id)
-        clubs = [ClubsWithDateSerializer(
-            entry.club).data for entry in club_entries]
-        return JsonResponse(clubs, safe=False)
+        clubs = Clubs.objects.filter(clubentries__profile=profile.id)
+
+        if not request.query_params.get('limit'):
+            return JsonResponse({"count": len(clubs),
+                                 "next": None,
+                                 "previous": None, 'results': ClubsWithDateSerializer(clubs, many=True).data})
+
+        paginator = LimitOffsetPagination()
+        result_page = paginator.paginate_queryset(clubs, request)
+        serializer = ClubsWithDateSerializer(result_page, many=True)
+
+        return paginator.get_paginated_response(serializer.data)
 
     @swagger_auto_schema(request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,

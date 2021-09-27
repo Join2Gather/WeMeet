@@ -240,6 +240,13 @@ class ClubsWithDateSerializer(serializers.ModelSerializer):
         return calculator.calculate()
 
 
+class ClubsWithDatePageSerializer(serializers.Serializer):
+    count = serializers.IntegerField()
+    next = serializers.CharField(allow_null=True)
+    previous = serializers.CharField(allow_null=True)
+    results = ClubsWithDateSerializer(many=True)
+
+
 class DatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dates
