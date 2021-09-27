@@ -65,6 +65,7 @@ def club_guard(method):
 
 
 class ClubView(APIView):
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(responses={
         status.HTTP_200_OK: ClubsWithDateSerializer(many=True),
@@ -72,7 +73,6 @@ class ClubView(APIView):
     })
     @profile_guard
     def get(self, request: Request, user: int, profile: Any):
-        print(request.user)
 
         club_entries = ClubEntries.objects.select_related(
             'club').filter(profile=profile.id)
