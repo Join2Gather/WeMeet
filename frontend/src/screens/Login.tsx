@@ -43,8 +43,8 @@ export default function Login() {
 	}, [name]);
 	const onPressSocial = useCallback(async (social: any) => {
 		setSocialModalVisible(true);
-		setSource('http://api.dps0340.xyz/accounts/kakao/login');
-		// setSource(`http://localhost:8000/accounts/kakao/login`);
+		//setSource('http://api.dps0340.xyz/accounts/kakao/login');
+		setSource(`http://localhost:8000/accounts/kakao/login`);
 	}, []);
 	const onCloseSocial = useCallback(async () => {
 		setSocialModalVisible(false);
