@@ -1,5 +1,12 @@
-import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Text, FlatList, Platform } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import {
+	StyleSheet,
+	View,
+	Text,
+	FlatList,
+	Platform,
+	Dimensions,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import {
@@ -20,26 +27,31 @@ import { ModalInput } from '../components';
 import { NavigationHeader } from '../theme';
 import { useLayout } from '../hooks';
 
+const window = Dimensions.get('window');
+const screen = Dimensions.get('screen');
 export default function TeamList() {
-	const { user, id, clubs } = useSelector(({ login }: RootState) => ({
+	const { user, id, clubs, token } = useSelector(({ login }: RootState) => ({
 		user: login.user,
 		id: login.id,
 		clubs: login.clubs,
+		token: login.token,
 	}));
+	const [dimensions, setDimensions] = useState({ window, screen });
 	const [name, setName] = useState('');
-	const onPostClubName = useCallback(() => {
-		postTeamName({ user, id, name });
-	}, [name]);
-	const [modalVisible, setModalVisible] = useState(false);
-	const [layout, setLayout] = useLayout(); // -1-
 
+	const [modalVisible, setModalVisible] = useState(false);
+	const navigation = useNavigation();
+	const goTeamTime = useCallback(
+		(name) => navigation.navigate('TeamTime', { name: name }),
+		[name]
+	);
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }}>
-			<View onLayout={setLayout} style={styles.view}>
+			<View style={[styles.view, { opacity: modalVisible ? 0.2 : 1 }]}>
 				<NavigationHeader title="모임 목록" />
 				<Text style={styles.headerUnderText}>Plan list</Text>
 				{/* <View style={{ height: 50, flexGrow: 0 }}> */}
-				{!clubs[0].name && (
+				{!clubs && (
 					<TouchableView
 						style={[
 							styles.teamListTouchableView,
@@ -53,13 +65,14 @@ export default function TeamList() {
 				)}
 				<FlatList
 					style={{
-						height: layout.height * 0.8,
+						height: dimensions.screen.height * 0.55,
 						flexGrow: 0,
 						// paddingTop: '-20%',
 					}}
 					data={clubs}
 					renderItem={({ item }) => (
 						<TouchableView
+							onPress={() => goTeamTime(item.name)}
 							style={[
 								styles.teamListTouchableView,
 								{
@@ -67,7 +80,6 @@ export default function TeamList() {
 									justifyContent: 'space-between',
 									opacity: 1,
 								},
-								// { width: '120%', justifyContent: 'flex-start' },
 							]}
 						>
 							<View style={styles.rowCircle} />
@@ -76,32 +88,37 @@ export default function TeamList() {
 						</TouchableView>
 					)}
 					keyExtractor={(item, index) => String(item.id)}
-					// ItemSeparatorComponent={() => (
-					// 	<View style={{ borderBottomWidth: 1 }} />
-					// )}
 				/>
-				{/* </View> */}
-				<View
-					style={{
-						// paddingLeft: layout.width,
-						// paddingRight: layout.width,
-						// paddingBottom: layout.width,
-						// paddingTop: layout.width,
-						padding: layout.width,
-						paddingTop: 5,
-						paddingBottom: 10,
-						// alignItems: 'flex-start',
-						// justifyContent: 'flex-end',
-						opacity: 0.5,
-						backgroundColor: '#017bff',
-						// borderRadius: 20,
-						position: 'absolute',
-						bottom: 0,
-					}}
+
+				{/* <View
+					style={[
+						styles.blurView,
+						{
+							padding: dimensions.screen.width,
+							backgroundColor: Colors.grey200,
+							bottom: -10,
+						},
+					]}
 				></View>
+				<View
+					style={[
+						styles.blurView,
+						{
+							padding: dimensions.screen.width,
+							backgroundColor: Colors.grey300,
+							bottom: 0,
+						},
+					]}
+				></View> */}
+				{/* <View
+					style={[styles.blurView, { padding: dimensions.screen.width }]}
+				></View> */}
 				<ModalInput
 					modalVisible={modalVisible}
 					setModalVisible={setModalVisible}
+					user={user}
+					id={id}
+					token={token}
 				/>
 			</View>
 
@@ -118,7 +135,7 @@ export default function TeamList() {
 const styles = StyleSheet.create({
 	view: { justifyContent: 'center', backgroundColor: Colors.white },
 	headerUnderText: {
-		fontFamily: 'SCDream3',
+		fontFamily: 'NanumSquareR',
 		fontSize: 16,
 		marginTop: 13,
 		marginBottom: 39,
@@ -167,11 +184,11 @@ const styles = StyleSheet.create({
 	},
 	teamTitle: {
 		fontSize: 16,
-		fontFamily: 'SCDream3',
+		fontFamily: 'SCDream4',
 		color: '#000',
 		position: 'absolute',
 		letterSpacing: -0.5,
-		left: 75,
+		left: 70,
 	},
 	iconStyle: {
 		position: 'absolute',
@@ -216,5 +233,14 @@ const styles = StyleSheet.create({
 		// shadowOpacity: 0.21,
 		// shadowRadius: 1.0,
 		// marginBottom: 10,
+	},
+	blurView: {
+		paddingTop: 5,
+		paddingBottom: 10,
+		opacity: 0.5,
+		backgroundColor: Colors.grey200,
+		position: 'absolute',
+		bottom: 10,
+		height: 30,
 	},
 });

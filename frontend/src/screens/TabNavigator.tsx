@@ -3,14 +3,15 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Colors } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import HomeNavigator from './HomeNavigator';
+import Home from './Home';
 import TeamList from './TeamList';
 import type { RouteProp, ParamListBase } from '@react-navigation/native';
 
 type TabBarIconProps = { focused: boolean; color: string; size: number };
 
 const icons: Record<string, string[]> = {
-	HomeNavigator: ['calendar-check', 'calendar-blank-outline'],
-	TeamList: ['account-multiple', 'account-multiple-outline'],
+	Home: ['calendar-check', 'calendar-blank-outline'],
+	HomeNavigator: ['account-multiple', 'account-multiple-outline'],
 };
 
 const screenOptions = ({
@@ -36,13 +37,13 @@ export default function TabNavigator() {
 	return (
 		<Tab.Navigator screenOptions={screenOptions}>
 			<Tab.Screen
-				name="HomeNavigator"
-				component={HomeNavigator}
+				name="Home"
+				component={Home}
 				options={{ tabBarLabel: 'Home' }}
 			/>
 			<Tab.Screen
-				name="TeamList"
-				component={TeamList}
+				name="HomeNavigator"
+				component={HomeNavigator}
 				options={{ tabBarLabel: 'Team' }}
 			/>
 		</Tab.Navigator>

@@ -8,20 +8,34 @@ import {
 	View,
 	TextInput,
 } from 'react-native';
-import { MaterialCommunityIcon as Icon, TouchableView } from '../theme';
-import type { FC } from 'react';
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
-import { inputTeamName } from '../store/team';
-import { AutoFocusProvider, useAutoFocus } from '../contexts';
+import { inputTeamName, postTeamName } from '../store/team';
+import { useAutoFocus } from '../contexts';
+interface props {
+	modalVisible: boolean;
+	setModalVisible: any;
+	user: number;
+	id: number;
+	token: string;
+}
 
-export function ModalInput({ modalVisible, setModalVisible }) {
+export function ModalInput({
+	modalVisible,
+	setModalVisible,
+	user,
+	id,
+	token,
+}: props) {
 	const dispatch = useDispatch();
 	const [name, setName] = useState('');
 	const focus = useAutoFocus();
 
 	const onChangeInput = useCallback(() => {
 		dispatch(inputTeamName(name));
+		const data = {};
+		dispatch(postTeamName({ user, id, name, token }));
+		setName('');
 	}, [name]);
 
 	return (
@@ -62,6 +76,7 @@ export function ModalInput({ modalVisible, setModalVisible }) {
 							underlayColor={Colors.grey200}
 							style={styles.closeButtonStyle}
 							onPress={() => {
+								onChangeInput();
 								setModalVisible(false);
 							}}
 						>
@@ -109,12 +124,12 @@ const styles = StyleSheet.create({
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
-		elevation: 5,
+		// elevation: 5,
 		width: '85%',
 	},
 	titleText: {
 		textAlign: 'center',
-		fontFamily: 'SCDream2',
+		fontFamily: 'NanumSquareBold',
 		fontSize: 21,
 		marginBottom: 15,
 	},
@@ -125,9 +140,7 @@ const styles = StyleSheet.create({
 	textInput: {
 		fontSize: 19,
 		flex: 1,
-
-		// borderBottomWidth: 1,
-		fontFamily: 'SCDream2',
+		fontFamily: 'NanumSquareR',
 		marginLeft: '0%',
 	},
 	textInputView: {
@@ -136,15 +149,13 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 0.3,
 		width: '90%',
 		marginLeft: '5%',
-		// borderRadius: 10,
 		padding: 10,
 	},
 	buttonText: {
 		textAlign: 'center',
-		fontFamily: 'SCDream2',
+		fontFamily: 'NanumSquareR',
 	},
 	buttonRowView: {
-		// flex: 1,
 		flexDirection: 'row',
 		justifyContent: 'center',
 		alignContent: 'center',

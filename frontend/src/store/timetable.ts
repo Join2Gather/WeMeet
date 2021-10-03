@@ -25,24 +25,13 @@ const initialState: team = {
 	error: '',
 };
 
-export const teamSlice = createSlice({
-	name: 'team',
+export const timetableSlice = createSlice({
+	name: 'timetable',
 	initialState,
-	reducers: {
-		POST_TEAM_SUCCESS: (state, action: PayloadAction<responseTeamAPI>) => {
-			state.date = action.payload.date;
-			state.uri = action.payload.uri;
-		},
-		POST_TEAM_FAILURE: (state, action: PayloadAction<any>) => {
-			state.error = action.payload;
-		},
-		inputTeamName: (state, action: PayloadAction<string>) => {
-			state.name = action.payload;
-		},
-	},
+	reducers: {},
 	extraReducers: {},
 });
 
-export const { inputTeamName } = teamSlice.actions;
+export const {} = timetableSlice.actions;
 
-export default teamSlice.reducer;
+export default timetableSlice.reducer;

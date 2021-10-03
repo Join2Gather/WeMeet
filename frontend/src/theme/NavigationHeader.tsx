@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 		fontWeight: '300',
 		textAlign: 'center',
-		fontFamily: 'SCDream3',
+		fontFamily: 'NanumSquareBold',
 		letterSpacing: -2,
 		color: '#fff',
 	},

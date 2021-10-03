@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { StyleSheet, FlatList } from 'react-native';
+import { StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 // prettier-ignore
 import {SafeAreaView, View, UnderlineText,TopBar,
-NavigationHeader, MaterialCommunityIcon as Icon, Text} from '../theme';
+    TouchableView,
+NavigationHeader,  Text} from '../theme';
+import Icon from 'react-native-vector-icons/Fontisto';
 import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
 import { LeftRightNavigation, Timetable } from '../components';
 import type { LeftRightNavigationMethods } from '../components';
@@ -13,11 +15,11 @@ import { Colors } from 'react-native-paper';
 export default function Home() {
 	// navigation
 	const navigation = useNavigation();
-	const goLeft = useCallback(() => navigation.navigate('HomeLeft'), []);
-	const goRight = useCallback(
-		() => navigation.navigate('HomeRight', { name: 'Jack', age: 32 }),
-		[]
-	);
+	const goLeft = useCallback(() => navigation.navigate('TeamList'), []);
+	// const goRight = useCallback(
+	// 	() => navigation.navigate('HomeRight', { name: 'Jack', age: 32 }),
+	// 	[]
+	// );
 	const [scrollEnabled] = useScrollEnabled();
 	const [people, setPeople] = useState([]);
 	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
@@ -36,10 +38,22 @@ export default function Home() {
 	const flatListRef = useRef<FlatList | null>(null);
 
 	return (
-		<SafeAreaView style={{ backgroundColor: Colors.white }}>
+		<SafeAreaView style={{ backgroundColor: Colors.white, flex: 1 }}>
 			<ScrollEnabledProvider>
 				<View style={[styles.view]}>
-					<NavigationHeader title="내 일정 등록하기" />
+					<NavigationHeader
+						title="팀 일정표"
+						titleStyle={{ marginLeft: '-8%' }}
+						Left={() => (
+							<Icon
+								name="angle-left"
+								size={20}
+								onPress={goLeft}
+								color={Colors.white}
+								style={{ marginLeft: '3%' }}
+							/>
+						)}
+					/>
 					{/* <TopBar noSwitch>
 						<UnderlineText onPress={addPerson} style={styles.text}>
 							add
@@ -55,18 +69,29 @@ export default function Home() {
 						onLeftToRight={goLeft}
 						onRightToLeft={goRight}
 					></LeftRightNavigation> */}
-					<Text style={styles.titleText}>make your plan</Text>
-					<View style={styles.rowView}>
-						<View
-							style={[styles.boxView, { backgroundColor: Colors.blue400 }]}
-						/>
-						<Text style={styles.infoText}>모임 일정</Text>
-						<View
-							style={[styles.boxView, { backgroundColor: Colors.grey300 }]}
-						/>
-						<Text style={styles.infoText}>개인 일정</Text>
-						<View style={[styles.boxView, { backgroundColor: Colors.white }]} />
-						<Text style={styles.infoText}>비어있는 일정</Text>
+					<View style={styles.rowButtonView}>
+						<TouchableOpacity
+							style={{
+								flexDirection: 'column',
+							}}
+						>
+							<View
+								style={[
+									styles.boxButtonView,
+									{ backgroundColor: Colors.blue400 },
+								]}
+							/>
+							<Text style={styles.infoText}>그룹</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							style={{
+								flexDirection: 'column',
+								// marginLeft: 50,
+							}}
+						>
+							<View style={[styles.boxButtonView]} />
+							<Text style={styles.infoText}>개인</Text>
+						</TouchableOpacity>
 					</View>
 					<Timetable></Timetable>
 				</View>
@@ -77,18 +102,33 @@ export default function Home() {
 const styles = StyleSheet.create({
 	view: { flex: 1 },
 	text: { marginRight: 10, fontSize: 20 },
+	rowButtonView: {
+		width: '40%',
+		flexDirection: 'row',
+		// alignContent: 'center',
+		justifyContent: 'space-around',
+		// marginLeft: 20,
+		marginTop: 35,
+		marginLeft: '30%',
+		// backgroundColor: Colors.blue200,
+	},
 	rowView: {
 		flexDirection: 'row',
 		alignContent: 'center',
 		justifyContent: 'center',
-		// marginLeft: 20,
 		marginTop: 24,
 	},
 	infoText: {
 		fontFamily: 'NanumSquareR',
-		fontSize: 13,
-
+		fontSize: 16,
+		textAlign: 'center',
 		letterSpacing: -1,
+		marginTop: 3,
+	},
+	boxButtonView: {
+		width: 27,
+		height: 18,
+		borderWidth: 0.3,
 	},
 	boxView: {
 		width: 20,

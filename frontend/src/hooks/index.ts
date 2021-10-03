@@ -13,3 +13,5 @@ export * from './useMonitorAnimatedValueXY';
 export * from './useNavigationHorizontalInterpolator';
 //darkMode
 export * from './useIsDarkMode';
+
+export * from './useMakeTimetable';
