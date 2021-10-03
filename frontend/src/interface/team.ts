@@ -2,6 +2,7 @@ export interface requestTeamAPI {
 	user: number;
 	id: number;
 	name: string;
+	token: string;
 }
 
 interface days {}
@@ -17,4 +18,5 @@ export interface team {
 	uri: string;
 	date: Object;
 	name: string;
+	error: string;
 }
