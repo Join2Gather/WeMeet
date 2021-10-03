@@ -57,6 +57,8 @@ export default function App() {
 			SCDream3: require('./assets/fonts/SCDream3.otf'),
 			SCDream4: require('./assets/fonts/SCDream4.otf'),
 			NanumSquareBold: require('./assets/fonts/NanumSquareBold.ttf'),
+			NanumSquareR: require('./assets/fonts/NanumSquareR.ttf'),
+			NanumSquareL: require('./assets/fonts/NanumSquareL.ttf'),
 		});
 		onChangeLoading(true);
 	};
@@ -70,6 +72,8 @@ export default function App() {
 		SCDream3: require('./assets/fonts/SCDream3.otf'),
 		SCDream4: require('./assets/fonts/SCDream4.otf'),
 		NanumSquareBold: require('./assets/fonts/NanumSquareBold.ttf'),
+		NanumSquareR: require('./assets/fonts/NanumSquareR.ttf'),
+		NanumSquareL: require('./assets/fonts/NanumSquareL.ttf'),
 	});
 	// const [loading, setLoading] = useState(true);
 	// useEffect(() => {
