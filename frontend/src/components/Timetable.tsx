@@ -3,12 +3,12 @@ import { StyleSheet } from 'react-native';
 import { Colors } from 'react-native-paper';
 
 import { useMakeTimetable } from '../hooks';
+import { time } from '../interface';
 import { View, Text, TouchableView } from '../theme';
 
 const dayOfWeek = ['SUN', 'TUE', 'THU', 'WED', 'THU', 'FRI', 'SAT'];
 export function Timetable() {
 	const { defaultDates, timesText } = useMakeTimetable();
-	console.log(defaultDates);
 	return (
 		<View style={styles.view}>
 			<View style={styles.rowView}>
@@ -41,16 +41,21 @@ export function Timetable() {
 				<View style={styles.contentView}>
 					{defaultDates.map((day) => (
 						<View style={styles.columnView} key={day.day}>
-							{day.times.map((d: Number, idx) => (
+							{day.times.map((d, idx) => (
 								<TouchableView
-									onPress={() => console.log(d)}
-									key={Number(d)}
+									onPress={() => console.log(d.time)}
+									key={Number(d.time)}
 									style={[
 										styles.boxView,
 										{
-											borderBottomWidth: Number(d) === 24 ? 0.3 : 0,
+											borderBottomWidth: Number(d.time) === 24 ? 0.3 : 0,
 											borderTopWidth:
-												Number(d) === 24 ? 0 : Number(d) % 1 === 0 ? 0.3 : 0,
+												Number(d.time) === 24
+													? 0
+													: Number(d.time) % 1 === 0
+													? 0.3
+													: 0,
+											backgroundColor: d.color,
 										},
 									]}
 								></TouchableView>
