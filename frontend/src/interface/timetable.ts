@@ -1,5 +1,5 @@
 export interface timetable {
-	dates: days;
+	dates: default_days;
 }
 
 export interface days {
@@ -23,7 +23,17 @@ export interface default_days {
 	sat: make_days;
 }
 
+export interface time {
+	timeText: string;
+	time: number;
+	color: string;
+}
 export interface make_days {
 	day: string;
-	times: Array<Number>;
+	times: Array<time>;
+}
+
+export interface state_time {
+	time: number;
+	color: string;
 }
