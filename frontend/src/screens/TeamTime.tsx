@@ -23,18 +23,7 @@ export default function Home() {
 	const [scrollEnabled] = useScrollEnabled();
 	const [people, setPeople] = useState([]);
 	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
-	const addPerson = useCallback(() => {}, []);
-	const removeAllPersons = useCallback(() => {
-		setPeople((notUsed) => []);
-		leftRef.current?.resetOffset();
-	}, []);
-	const deletePerson = useCallback(
-		(id: string) => () => {
-			leftRef.current?.resetOffset();
-			flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
-		},
-		[]
-	);
+
 	const flatListRef = useRef<FlatList | null>(null);
 
 	return (
@@ -105,12 +94,9 @@ const styles = StyleSheet.create({
 	rowButtonView: {
 		width: '40%',
 		flexDirection: 'row',
-		// alignContent: 'center',
 		justifyContent: 'space-around',
-		// marginLeft: 20,
 		marginTop: 35,
 		marginLeft: '30%',
-		// backgroundColor: Colors.blue200,
 	},
 	rowView: {
 		flexDirection: 'row',
