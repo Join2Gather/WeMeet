@@ -32,11 +32,11 @@ export default function MainNavigator() {
 				component={TeamTime}
 				options={leftOptions}
 			/>
-			<Stack.Screen
+			{/* <Stack.Screen
 				name="HomeRight"
 				component={HomeRight}
 				options={rightOptions}
-			/>
+			/> */}
 		</Stack.Navigator>
 	);
 }

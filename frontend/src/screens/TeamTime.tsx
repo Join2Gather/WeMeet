@@ -15,7 +15,9 @@ import { Colors } from 'react-native-paper';
 export default function Home() {
 	// navigation
 	const navigation = useNavigation();
-	const goLeft = useCallback(() => navigation.navigate('TeamList'), []);
+	const goLeft = useCallback(() => {
+		navigation.goBack();
+	}, []);
 	// const goRight = useCallback(
 	// 	() => navigation.navigate('HomeRight', { name: 'Jack', age: 32 }),
 	// 	[]
@@ -32,14 +34,14 @@ export default function Home() {
 				<View style={[styles.view]}>
 					<NavigationHeader
 						title="팀 일정표"
-						titleStyle={{ marginLeft: '-8%' }}
+						titleStyle={{ paddingLeft: 0 }}
 						Left={() => (
 							<Icon
 								name="angle-left"
-								size={20}
+								size={25}
 								onPress={goLeft}
 								color={Colors.white}
-								style={{ marginLeft: '3%' }}
+								// style={{ marginLeft: '3%' }}
 							/>
 						)}
 					/>
