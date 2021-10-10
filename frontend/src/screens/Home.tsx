@@ -30,7 +30,11 @@ export default function Home() {
 	}, []);
 	// image picker
 	const [image, setImage] = useState(null);
-
+	const [mode, setMode] = useState('0');
+	const onPressPlus = useCallback(() => {
+		setMode('1');
+	}, []);
+	const [day, setDay] = useState('');
 	useEffect(() => {
 		(async () => {
 			if (Platform.OS !== 'web') {
@@ -64,13 +68,22 @@ export default function Home() {
 				<View style={[styles.view]}>
 					<NavigationHeader
 						title="내 일정 등록하기"
-						Right={() => (
+						Left={() => (
 							<Icon
 								name="timetable"
 								size={28}
 								color={Colors.black}
 								style={{ paddingTop: 1 }}
 								onPress={pickImage}
+							/>
+						)}
+						Right={() => (
+							<Icon
+								name="plus"
+								size={28}
+								color={Colors.black}
+								style={{ paddingTop: 1 }}
+								onPress={onPressPlus}
 							/>
 						)}
 					/>
@@ -97,18 +110,34 @@ export default function Home() {
 					></LeftRightNavigation> */}
 					<Text style={styles.titleText}>make your plan</Text>
 					<View style={styles.rowView}>
-						<View
-							style={[styles.boxView, { backgroundColor: Colors.blue400 }]}
-						/>
-						<Text style={styles.infoText}>모임 일정</Text>
-						<View
-							style={[styles.boxView, { backgroundColor: Colors.grey300 }]}
-						/>
-						<Text style={styles.infoText}>개인 일정</Text>
-						<View style={[styles.boxView, { backgroundColor: Colors.white }]} />
-						<Text style={styles.infoText}>비어있는 일정</Text>
+						{mode === '0' && (
+							<>
+								<View
+									style={[styles.boxView, { backgroundColor: Colors.blue400 }]}
+								/>
+								<Text style={styles.infoText}>모임 일정</Text>
+								<View
+									style={[styles.boxView, { backgroundColor: Colors.grey300 }]}
+								/>
+								<Text style={styles.infoText}>개인 일정</Text>
+								<View
+									style={[styles.boxView, { backgroundColor: Colors.white }]}
+								/>
+								<Text style={styles.infoText}>비어있는 일정</Text>
+							</>
+						)}
+						{mode === '1' && (
+							<>
+								<Text style={styles.stepText}>1. 시작 시간 터치</Text>
+							</>
+						)}
+						{mode === '3' && (
+							<>
+								<Text style={styles.stepText}>1. 종료 시간 터치</Text>
+							</>
+						)}
 					</View>
-					<Timetable></Timetable>
+					<Timetable mode={mode}></Timetable>
 				</View>
 			</ScrollEnabledProvider>
 		</SafeAreaView>
@@ -127,7 +156,11 @@ const styles = StyleSheet.create({
 	infoText: {
 		fontFamily: 'NanumSquareR',
 		fontSize: 13,
-
+		letterSpacing: -1,
+	},
+	stepText: {
+		fontFamily: 'NanumSquareBold',
+		fontSize: 15,
 		letterSpacing: -1,
 	},
 	boxView: {

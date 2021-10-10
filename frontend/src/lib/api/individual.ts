@@ -1,4 +1,5 @@
 import client from './client';
+import axios from 'axios';
 import type { postImageAPI } from '../../interface';
 import FormData from 'form-data';
 import { Platform } from 'react-native';
@@ -16,5 +17,7 @@ export const postImage = ({ image, token }: postImageAPI) => {
 		type: 'image/jpeg', // it may be necessary in Android.
 	});
 
-	return client.post(`/everytime/`, formData, { headers });
+	return axios.post(`http://everytime.dps0340.xyz/everytime`, formData, {
+		headers,
+	});
 };

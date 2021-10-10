@@ -11,7 +11,7 @@ import individual, { individualSaga } from './individual';
 const persistConfig = {
 	key: 'root',
 	storage: AsyncStorage,
-	blacklist: [],
+	blacklist: ['login', 'individual', 'team'],
 };
 const rootReducer = combineReducers({ loading, login, team, individual });
 export default persistReducer(persistConfig, rootReducer);

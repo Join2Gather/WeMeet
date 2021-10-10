@@ -7,6 +7,7 @@ import {SafeAreaView, View, UnderlineText,TopBar,
     TouchableView,
 NavigationHeader,  Text} from '../theme';
 import Icon from 'react-native-vector-icons/Fontisto';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
 import { LeftRightNavigation, Timetable } from '../components';
 import type { LeftRightNavigationMethods } from '../components';
@@ -18,16 +19,15 @@ export default function Home() {
 	const goLeft = useCallback(() => {
 		navigation.goBack();
 	}, []);
-	// const goRight = useCallback(
-	// 	() => navigation.navigate('HomeRight', { name: 'Jack', age: 32 }),
-	// 	[]
-	// );
-	const [scrollEnabled] = useScrollEnabled();
-	const [people, setPeople] = useState([]);
-	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
 
-	const flatListRef = useRef<FlatList | null>(null);
+	const [groupMode, setGroupMode] = useState('group');
 
+	//modal
+	const [modalVisible, setModalVisible] = useState(false);
+	const [mode, setMode] = useState('0');
+	const onPressPlus = useCallback(() => {
+		setMode('1');
+	}, []);
 	return (
 		<SafeAreaView style={{ backgroundColor: Colors.white, flex: 1 }}>
 			<ScrollEnabledProvider>
@@ -44,47 +44,75 @@ export default function Home() {
 								// style={{ marginLeft: '3%' }}
 							/>
 						)}
+						Right={() =>
+							groupMode === 'group' ? (
+								<MIcon
+									name="check-bold"
+									size={28}
+									color={Colors.white}
+									style={{ paddingTop: 1 }}
+									onPress={onPressPlus}
+								/>
+							) : (
+								<MIcon
+									name="plus"
+									size={28}
+									color={Colors.white}
+									style={{ paddingTop: 1 }}
+									onPress={() => setMode('1')}
+								/>
+							)
+						}
 					/>
-					{/* <TopBar noSwitch>
-						<UnderlineText onPress={addPerson} style={styles.text}>
-							add
-						</UnderlineText>
-						<UnderlineText onPress={removeAllPersons} style={styles.text}>
-							remove all
-						</UnderlineText>
-					</TopBar> */}
-					{/* <LeftRightNavigation
-						ref={leftRef}
-						distance={40}
-						flatListRef={flatListRef}
-						onLeftToRight={goLeft}
-						onRightToLeft={goRight}
-					></LeftRightNavigation> */}
 					<View style={styles.rowButtonView}>
-						<TouchableOpacity
-							style={{
-								flexDirection: 'column',
-							}}
-						>
-							<View
-								style={[
-									styles.boxButtonView,
-									{ backgroundColor: Colors.blue400 },
-								]}
-							/>
-							<Text style={styles.infoText}>그룹</Text>
-						</TouchableOpacity>
-						<TouchableOpacity
-							style={{
-								flexDirection: 'column',
-								// marginLeft: 50,
-							}}
-						>
-							<View style={[styles.boxButtonView]} />
-							<Text style={styles.infoText}>개인</Text>
-						</TouchableOpacity>
+						{mode === '0' && (
+							<>
+								<TouchableOpacity
+									style={{
+										flexDirection: 'column',
+									}}
+									onPress={() => setGroupMode('group')}
+								>
+									<View
+										style={[
+											styles.boxButtonView,
+											{
+												backgroundColor:
+													groupMode === 'group' ? Colors.blue400 : Colors.white,
+											},
+										]}
+									/>
+									<Text style={styles.infoText}>그룹</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									style={{
+										flexDirection: 'column',
+										// marginLeft: 50,
+									}}
+									onPress={() => setGroupMode('in')}
+								>
+									<View
+										style={[
+											styles.boxButtonView,
+											{
+												backgroundColor:
+													groupMode !== 'group' ? Colors.blue400 : Colors.white,
+											},
+										]}
+									/>
+									<Text style={styles.infoText}>개인</Text>
+								</TouchableOpacity>
+							</>
+						)}
+						{mode === '1' && (
+							<>
+								<Text style={styles.stepText}>
+									1. 시간과 요일을 터치해주세요
+								</Text>
+							</>
+						)}
 					</View>
-					<Timetable></Timetable>
+					<Timetable mode={mode}></Timetable>
 				</View>
 			</ScrollEnabledProvider>
 		</SafeAreaView>
@@ -131,6 +159,11 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		marginTop: 12,
+		letterSpacing: -1,
+	},
+	stepText: {
+		fontFamily: 'NanumSquareBold',
+		fontSize: 15,
 		letterSpacing: -1,
 	},
 });

@@ -17,28 +17,19 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 interface props {
 	modalVisible: boolean;
 	setModalVisible: any;
-	user: number;
-	id: number;
-	token: string;
 }
 
-export function ModalInput({
-	modalVisible,
-	setModalVisible,
-	user,
-	id,
-	token,
-}: props) {
+export function ModalMinute({ modalVisible, setModalVisible }: props) {
 	const dispatch = useDispatch();
 	const [name, setName] = useState('');
 	const focus = useAutoFocus();
 
-	const onChangeInput = useCallback(() => {
-		dispatch(inputTeamName(name));
-		const data = {};
-		dispatch(postTeamName({ user, id, name, token }));
-		setName('');
-	}, [name]);
+	// const onChangeInput = useCallback(() => {
+	// 	dispatch(inputTeamName(name));
+	// 	const data = {};
+	// 	dispatch(postTeamName({ user, id, name, token }));
+	// 	setName('');
+	// }, [name]);
 
 	return (
 		// <AutoFocusProvider contentContainerStyle={[styles.keyboardAwareFocus]}>
@@ -93,7 +84,7 @@ export function ModalInput({
 							underlayColor={Colors.grey200}
 							style={styles.closeButtonStyle}
 							onPress={() => {
-								onChangeInput();
+								// onChangeInput();
 								setModalVisible(false);
 							}}
 						>
@@ -101,6 +92,7 @@ export function ModalInput({
 						</TouchableHighlight>
 						{/* <View style={styles.verticalLine} /> */}
 					</View>
+					{/* <ModalMinute /> */}
 				</View>
 			</View>
 		</Modal>

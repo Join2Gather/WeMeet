@@ -5,9 +5,16 @@ import { Colors } from 'react-native-paper';
 import { useMakeTimetable } from '../hooks';
 import { time } from '../interface';
 import { View, Text, TouchableView } from '../theme';
-
+import { ModalMinute } from './ModalMinute';
 const dayOfWeek = ['SUN', 'TUE', 'THU', 'WED', 'THU', 'FRI', 'SAT'];
-export function Timetable() {
+
+interface props {
+	mode: string;
+	modalVisible?: boolean;
+	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function Timetable({ mode, modalVisible, setModalVisible }: props) {
 	const { defaultDates, timesText } = useMakeTimetable();
 	return (
 		<View style={styles.view}>
@@ -43,7 +50,7 @@ export function Timetable() {
 						<View style={styles.columnView} key={day.day}>
 							{day.times.map((d, idx) => (
 								<TouchableView
-									onPress={() => console.log(d.time)}
+									onPress={() => mode === ('1' || '3') && console.log('hi')}
 									key={Number(d.time)}
 									style={[
 										styles.boxView,
@@ -62,6 +69,7 @@ export function Timetable() {
 							))}
 						</View>
 					))}
+					{/* <ModalMinute /> */}
 				</View>
 			</View>
 		</View>
