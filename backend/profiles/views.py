@@ -20,9 +20,11 @@ class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     @profile_guard
-    @swagger_auto_schema(responses={
-        status.HTTP_200_OK: ProfilesSerializer
-    })
+    @swagger_auto_schema(
+        operation_id="개별 프로필 조회",
+        responses={
+            status.HTTP_200_OK: ProfilesSerializer
+        })
     def get(self, request: Request, user: int, profile: Any):
         return JsonResponse(ProfilesSerializer(profile).data)
 
@@ -33,9 +35,11 @@ class ProfileView(APIView):
 class MyProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(responses={
-        status.HTTP_200_OK: ProfilesSerializer
-    })
+    @swagger_auto_schema(
+        operation_id="자신의 프로필 조회",
+        responses={
+            status.HTTP_200_OK: ProfilesSerializer
+        })
     def get(self, request: Request):
         user = request.user.id
         return self.get_profile(user=user)
@@ -49,14 +53,16 @@ class MyProfileView(APIView):
 class EverytimeCalendarView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            key: openapi.Schema(type=openapi.TYPE_ARRAY,
-                                items=openapi.Items(type=openapi.TYPE_NUMBER))
-            for key in week
-        }
-    ))
+    @swagger_auto_schema(
+        operation_id="에브리타임 시간표 입력",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                key: openapi.Schema(type=openapi.TYPE_ARRAY,
+                                    items=openapi.Items(type=openapi.TYPE_NUMBER))
+                for key in week
+            }
+        ))
     @profile_guard
     def post(self, request: Request, profile: Any):
 

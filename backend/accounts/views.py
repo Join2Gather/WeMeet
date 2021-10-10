@@ -1,6 +1,5 @@
 from config.settings import DEBUG
 from typing import Optional
-from config.models import ClubEntries
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from dj_rest_auth.registration.views import SocialLoginView
@@ -10,12 +9,12 @@ from rest_framework.views import APIView
 from django.http import JsonResponse
 import requests
 from rest_framework import status
-from json.decoder import JSONDecodeError
 from django.shortcuts import redirect
 from rest_framework.authtoken.models import Token
 from config.environment import get_secret
-from config.models import Profiles, ProfileDates
+from config.models import Profiles
 from config.serializers import ProfilesSerializer
+from drf_yasg.utils import swagger_auto_schema
 
 # Data class for shorthand notation
 
@@ -30,6 +29,7 @@ class Constants:
 # https://medium.com/chanjongs-programming-diary/django-rest-framework%EB%A1%9C-%EC%86%8C%EC%85%9C-%EB%A1%9C%EA%B7%B8%EC%9D%B8-api-%EA%B5%AC%ED%98%84%ED%95%B4%EB%B3%B4%EA%B8%B0-google-kakao-github-2ccc4d49a781
 # 로그인 성공 시, Callback 함수로 Code 값 전달받음
 class KakaoLoginView(APIView):
+    @swagger_auto_schema(operation_id="카카오 로그인")
     def get(self, request):
         return redirect(
             f"https://kauth.kakao.com/oauth/authorize?client_id={Constants.REST_API_KEY}&redirect_uri={Constants.KAKAO_CALLBACK_URI}&response_type=code"
@@ -40,6 +40,7 @@ class KakaoLoginView(APIView):
 # access token으로 Kakao에 email 값을 request
 # 전달받은 Email, Access Token, Code를 바탕으로 회원가입/로그인 진행
 class KakaoCallbackView(APIView):
+    @swagger_auto_schema(operation_id="카카오 로그인 콜백")
     def get(self, request):
         code = request.GET.get("code")
         REST_API_KEY = Constants.REST_API_KEY
@@ -132,3 +133,7 @@ class KakaoLoginToDjango(SocialLoginView):
     adapter_class = kakao_view.KakaoOAuth2Adapter
     client_class = OAuth2Client
     callback_url = Constants.KAKAO_CALLBACK_URI
+
+    @swagger_auto_schema(operation_id="카카오 로그인 submit")
+    def post(self, *args, **kwargs):
+        super().post(*args, **kwargs)

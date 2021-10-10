@@ -70,6 +70,7 @@ class ClubView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        operation_id="모임 목록 조회",
         manual_parameters=[openapi.Parameter('limit', openapi.IN_QUERY, type=openapi.TYPE_INTEGER),
                            openapi.Parameter('offset', openapi.IN_QUERY, type=openapi.TYPE_INTEGER)], responses={
             status.HTTP_200_OK: ClubsWithDatePageSerializer,
@@ -91,16 +92,18 @@ class ClubView(APIView):
 
         return paginator.get_paginated_response(serializer.data)
 
-    @swagger_auto_schema(request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            'name': openapi.Schema(type=openapi.TYPE_STRING, description='name of club'),
-        }
-    ),
+    @swagger_auto_schema(
+        operation_id="모임 목록 생성",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'name': openapi.Schema(type=openapi.TYPE_STRING, description='name of club'),
+            }
+        ),
         responses={
-        status.HTTP_200_OK: ClubsWithDateSerializer,
-        status.HTTP_404_NOT_FOUND: ErrorSerializer
-    })
+            status.HTTP_200_OK: ClubsWithDateSerializer,
+            status.HTTP_404_NOT_FOUND: ErrorSerializer
+        })
     @profile_guard
     def post(self, request: Request, user: int, profile: Any):
         name = request.data.get('name')
@@ -122,6 +125,7 @@ class ClubDateView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        operation_id="개별 모임 조회",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
@@ -134,7 +138,6 @@ class ClubDateView(APIView):
             status.HTTP_200_OK: ClubAvailableTimeSerializer.InterSectionSerializer,
             status.HTTP_404_NOT_FOUND: ErrorSerializer
         },
-        operation_id="users_profiles_clubs_dates"
     )
     @profile_guard
     @club_guard
@@ -171,6 +174,7 @@ class ClubGroupView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        operation_id="그룹 일정 조회 - 그룹 교집합",
         responses={
             status.HTTP_200_OK: ClubAvailableTimeSerializer.InterSectionSerializer,
             status.HTTP_404_NOT_FOUND: ErrorSerializer
@@ -191,6 +195,7 @@ class ClubIndividualView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        operation_id="그룹 일정 조회 - 개별",
         responses={
             status.HTTP_200_OK: DateCalculatorChildType,
             status.HTTP_404_NOT_FOUND: ErrorSerializer
@@ -221,6 +226,7 @@ class ClubIndividualView(APIView):
 
 class ClubJoinView(APIView):
     @swagger_auto_schema(
+        operation_id="그룹 참여",
         responses={
             status.HTTP_200_OK: SuccessSerializer,
             status.HTTP_404_NOT_FOUND: ErrorSerializer
@@ -239,6 +245,7 @@ class ClubShareView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        operation_id="그룹 초대 코드 공유",
         responses={
             status.HTTP_200_OK: ShareSerializer,
             status.HTTP_404_NOT_FOUND: ErrorSerializer
@@ -255,6 +262,7 @@ class ClubConfirmView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        operation_id="그룹 일정 개별 확정",
         responses={
             status.HTTP_200_OK: SuccessSerializer,
             status.HTTP_404_NOT_FOUND: ErrorSerializer
@@ -271,6 +279,7 @@ class ClubConfirmOKView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        operation_id="그룹 일정 개별 확정 - OK",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
