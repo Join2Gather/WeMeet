@@ -12,6 +12,8 @@ import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import { inputTeamName, postTeamName } from '../store/team';
 import { useAutoFocus } from '../contexts';
+//import { MaterialCommunityIcon as Icon } from '../theme';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 interface props {
 	modalVisible: boolean;
 	setModalVisible: any;
@@ -58,6 +60,21 @@ export function ModalInput({
 							},
 						]}
 					>
+						<TouchableHighlight
+							activeOpacity={1}
+							underlayColor={Colors.grey200}
+							style={{
+								// position: 'absolute',
+								marginLeft: '90%',
+								width: '9%',
+								// backgroundColor: 'blue',
+							}}
+							onPress={() => {
+								setModalVisible(false);
+							}}
+						>
+							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={28} />
+						</TouchableHighlight>
 						<Text style={styles.titleText}>모임명을 입력하세요</Text>
 						<View style={[styles.textInputView]}>
 							<TextInput
@@ -82,17 +99,7 @@ export function ModalInput({
 						>
 							<Text style={styles.buttonText}>확인</Text>
 						</TouchableHighlight>
-						<View style={styles.verticalLine} />
-						<TouchableHighlight
-							activeOpacity={1}
-							underlayColor={Colors.grey200}
-							style={styles.acceptButtonStyle}
-							onPress={() => {
-								setModalVisible(false);
-							}}
-						>
-							<Text style={styles.buttonText}>취소</Text>
-						</TouchableHighlight>
+						{/* <View style={styles.verticalLine} /> */}
 					</View>
 				</View>
 			</View>
