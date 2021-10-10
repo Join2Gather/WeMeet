@@ -27,13 +27,13 @@ export function* teamSaga() {
 
 const initialState: timetable = {
 	dates: {
-		sun: { day: '', times: [] },
-		mon: { day: '', times: [] },
-		tue: { day: '', times: [] },
-		thu: { day: '', times: [] },
-		wed: { day: '', times: [] },
-		fri: { day: '', times: [] },
-		sat: { day: '', times: [] },
+		sun: { day: 'sun', times: [] },
+		mon: { day: 'mon', times: [] },
+		tue: { day: 'tue', times: [] },
+		thu: { day: 'thu', times: [] },
+		wed: { day: 'wed', times: [] },
+		fri: { day: 'fri', times: [] },
+		sat: { day: 'sat', times: [] },
 	},
 };
 
