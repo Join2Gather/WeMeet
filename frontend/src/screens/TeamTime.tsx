@@ -107,12 +107,27 @@ export default function Home() {
 						{mode === '1' && (
 							<>
 								<Text style={styles.stepText}>
-									1. 시간과 요일을 터치해주세요
+									[1] 일정 시작 시간을 터치해주세요
 								</Text>
 							</>
 						)}
+						{mode === '2' && (
+							<>
+								<Text style={styles.stepText}>[2] 일정 시작 분 설정</Text>
+							</>
+						)}
+						{mode === '3' && (
+							<>
+								<Text style={styles.stepText}>[3] 종료 시간 터치해주세요</Text>
+							</>
+						)}
 					</View>
-					<Timetable mode={mode}></Timetable>
+					<Timetable
+						mode={mode}
+						setMode={setMode}
+						modalVisible={modalVisible}
+						setModalVisible={setModalVisible}
+					></Timetable>
 				</View>
 			</ScrollEnabledProvider>
 		</SafeAreaView>
