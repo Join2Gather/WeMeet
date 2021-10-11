@@ -5,8 +5,8 @@ export function useMakeTimetable() {
 	const times: Array<state_time> = [];
 	const timesText: Array<string> = [];
 
-	for (let i = 8; i <= 24; i += 0.25) {
-		times.push({ time: i, color: Colors.white });
+	for (let i = 8; i <= 24; i += 1) {
+		times.push({ time: i, color: Colors.white, check: false });
 		if (i <= 12) {
 			if (i % 2 === 0) {
 				timesText.push(`${i} AM`);
@@ -15,6 +15,10 @@ export function useMakeTimetable() {
 			if (i % 2 === 0) {
 				timesText.push(`${i - 12} PM`);
 			}
+		}
+		if (i === 24) {
+			times.push({ time: 1, color: Colors.white, check: false });
+			timesText.push('2 AM');
 		}
 	}
 
