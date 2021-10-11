@@ -23,7 +23,7 @@ export default function Home() {
 	const [scrollEnabled] = useScrollEnabled();
 	const [people, setPeople] = useState([]);
 	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
-
+	const [modalVisible, setModalVisible] = useState(false);
 	const flatListRef = useRef<FlatList | null>(null);
 	const addTimetable = useCallback(() => {
 		// navigation.navigate('')
@@ -137,7 +137,11 @@ export default function Home() {
 							</>
 						)}
 					</View>
-					<Timetable mode={mode}></Timetable>
+					<Timetable
+						modalVisible={modalVisible}
+						setModalVisible={setModalVisible}
+						mode={mode}
+					></Timetable>
 				</View>
 			</ScrollEnabledProvider>
 		</SafeAreaView>

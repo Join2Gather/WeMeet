@@ -1,5 +1,26 @@
 export interface timetable {
 	dates: default_days;
+	startTime: number;
+	endTime: number;
+	// selectTimes: [selectDays, selectDays];
+	selectTime: selectDay;
+	day: string;
+}
+
+export interface selectDays {
+	[key: string]: Array<number>;
+}
+
+export interface selectDay {
+	sun: Array<any>;
+	mon: Array<any>;
+	tue: Array<any>;
+	wed: Array<any>;
+	thu: Array<any>;
+	fri: Array<any>;
+	sat: Array<any>;
+	// 인덱스 시그니처
+	[prop: string]: any;
 }
 
 export interface days {
@@ -36,4 +57,5 @@ export interface make_days {
 export interface state_time {
 	time: number;
 	color: string;
+	check: boolean;
 }

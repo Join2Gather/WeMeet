@@ -1,21 +1,39 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Colors } from 'react-native-paper';
-
-import { useMakeTimetable } from '../hooks';
-import { time } from '../interface';
-import { View, Text, TouchableView } from '../theme';
+import { useDispatch } from 'react-redux';
 import { ModalMinute } from './ModalMinute';
+import { useMakeTimetable } from '../hooks';
+import { setEndHour, setStartHour } from '../store/timetable';
+import { View, Text, TouchableView } from '../theme';
+
 const dayOfWeek = ['SUN', 'TUE', 'THU', 'WED', 'THU', 'FRI', 'SAT'];
 
 interface props {
 	mode: string;
-	modalVisible?: boolean;
-	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>>;
+	modalVisible: boolean;
+	setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	setMode: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export function Timetable({ mode, modalVisible, setModalVisible }: props) {
+export function Timetable({
+	mode,
+	modalVisible,
+	setModalVisible,
+	setMode,
+}: props) {
 	const { defaultDates, timesText } = useMakeTimetable();
+	const dispatch = useDispatch();
+	const onSetStartHour = useCallback((time: number) => {
+		dispatch(setStartHour(time));
+		setMode('2');
+		setModalVisible(true);
+	}, []);
+	const onSetEndHour = useCallback((time: number) => {
+		dispatch(setEndHour(time));
+	}, []);
+	const [start, setStart] = useState(0);
+	const [end, setEnd] = useState(0);
 	return (
 		<View style={styles.view}>
 			<View style={styles.rowView}>
@@ -50,26 +68,41 @@ export function Timetable({ mode, modalVisible, setModalVisible }: props) {
 						<View style={styles.columnView} key={day.day}>
 							{day.times.map((d, idx) => (
 								<TouchableView
-									onPress={() => mode === ('1' || '3') && console.log('hi')}
+									onPress={() => {
+										mode === '1' && onSetStartHour(Number(d.time)),
+											setStart(d.time);
+										mode === '3' && onSetEndHour(Number(d.time)),
+											setEnd(d.time);
+									}}
 									key={Number(d.time)}
 									style={[
 										styles.boxView,
 										{
-											borderBottomWidth: Number(d.time) === 24 ? 0.3 : 0,
-											borderTopWidth:
-												Number(d.time) === 24
-													? 0
-													: Number(d.time) % 1 === 0
-													? 0.3
-													: 0,
+											borderBottomWidth: Number(d.time) === 1 ? 0.3 : 0,
+											// borderTopWidth:
+											// 	Number(d.time) === 24
+											// 		? 0
+											// 		: Number(d.time) % 1 === 0
+											// 		? 0.3
+											// 		: 0,
 											backgroundColor: d.color,
 										},
 									]}
-								></TouchableView>
+								>
+									<View style={{}} />
+									<View style={{}} />
+								</TouchableView>
 							))}
 						</View>
 					))}
-					{/* <ModalMinute /> */}
+					<ModalMinute
+						modalVisible={modalVisible}
+						setModalVisible={setModalVisible}
+						start={start}
+						end={end}
+						mode={mode}
+						setMode={setMode}
+					/>
 				</View>
 			</View>
 		</View>
@@ -94,13 +127,14 @@ const styles = StyleSheet.create({
 		// height: 80,
 	},
 	timeView: {
-		top: '-11%',
+		top: '-10%',
 	},
 	timeText: {
 		fontSize: 10,
+		alignSelf: 'flex-end',
 		textAlign: 'right',
-		width: 30,
-		marginTop: 50.8,
+		width: '100%',
+		marginTop: 47.5,
 		fontFamily: 'NanumSquareR',
 	},
 	columnView: {
@@ -115,12 +149,12 @@ const styles = StyleSheet.create({
 		// textAlignVertical: 'center',
 	},
 	boxView: {
-		height: 7.75,
+		height: 29.6,
 		// marginLeft: 10,
 		width: 40,
 		borderWidth: 0.3,
-		borderTopWidth: 0,
-		borderBottomWidth: 0,
+		borderTopWidth: 0.3,
+		borderBottomWidth: 0.3,
 		// borderRightWidth: 1,
 	},
 });

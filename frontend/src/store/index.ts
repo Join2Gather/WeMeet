@@ -7,13 +7,20 @@ import loading from './loading';
 import login from './login';
 import team, { teamSaga } from './team';
 import individual, { individualSaga } from './individual';
+import timetable from './timetable';
 // import storageSession from 'redux-persist/lib/storage/session';
 const persistConfig = {
 	key: 'root',
 	storage: AsyncStorage,
 	blacklist: ['login', 'individual', 'team'],
 };
-const rootReducer = combineReducers({ loading, login, team, individual });
+const rootReducer = combineReducers({
+	loading,
+	login,
+	team,
+	individual,
+	timetable,
+});
 export default persistReducer(persistConfig, rootReducer);
 export type RootState = ReturnType<typeof rootReducer>;
 
