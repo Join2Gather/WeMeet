@@ -1,5 +1,8 @@
 import { Colors } from 'react-native-paper';
+import { useDispatch } from 'react-redux';
 import type { time, state_time } from '../interface';
+import { useEffect } from 'react';
+import { cloneDates } from '../store/timetable';
 
 export function useMakeTimetable() {
 	const times: Array<state_time> = [];
@@ -31,5 +34,9 @@ export function useMakeTimetable() {
 		{ day: 'fri', times: times },
 		{ day: 'sat', times: times },
 	];
+	const dispatch = useDispatch();
+	useEffect(() => {
+		dispatch(cloneDates(defaultDates));
+	}, []);
 	return { defaultDates, timesText };
 }

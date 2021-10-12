@@ -1,11 +1,19 @@
 import React, { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Colors } from 'react-native-paper';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ModalMinute } from './ModalMinute';
 import { useMakeTimetable } from '../hooks';
-import { setEndHour, setStartHour } from '../store/timetable';
+import {
+	changeAllColor,
+	changeColor,
+	pushSelectEnd,
+	setDay,
+	setEndHour,
+	setStartHour,
+} from '../store/timetable';
 import { View, Text, TouchableView } from '../theme';
+import { RootState } from '../store';
 
 const dayOfWeek = ['SUN', 'TUE', 'THU', 'WED', 'THU', 'FRI', 'SAT'];
 
@@ -22,18 +30,32 @@ export function Timetable({
 	setModalVisible,
 	setMode,
 }: props) {
-	const { defaultDates, timesText } = useMakeTimetable();
+	const { timesText } = useMakeTimetable();
+	const { dates } = useSelector(({ timetable }: RootState) => ({
+		dates: timetable.dates,
+	}));
 	const dispatch = useDispatch();
-	const onSetStartHour = useCallback((time: number) => {
-		dispatch(setStartHour(time));
-		setMode('2');
-		setModalVisible(true);
-	}, []);
-	const onSetEndHour = useCallback((time: number) => {
+	const onSetStartHour = useCallback(
+		(idx: number, time: number, day: string) => {
+			dispatch(setStartHour(time));
+			setMode('2');
+			setStart(time);
+			setModalVisible(true);
+			dispatch(changeColor({ idx: idx, time: time }));
+			dispatch(setDay(day));
+		},
+		[]
+	);
+	const onSetEndHour = useCallback((idx: number, time: number) => {
 		dispatch(setEndHour(time));
+		setMode('4');
+		setModalVisible(true);
+		dispatch(pushSelectEnd());
+		dispatch(changeAllColor());
 	}, []);
 	const [start, setStart] = useState(0);
 	const [end, setEnd] = useState(0);
+	const onChangeColor = useCallback((idx, time) => {}, []);
 	return (
 		<View style={styles.view}>
 			<View style={styles.rowView}>
@@ -64,15 +86,14 @@ export function Timetable({
 					))}
 				</View>
 				<View style={styles.contentView}>
-					{defaultDates.map((day) => (
+					{dates.map((day, idx) => (
 						<View style={styles.columnView} key={day.day}>
-							{day.times.map((d, idx) => (
+							{day.times.map((d) => (
 								<TouchableView
 									onPress={() => {
-										mode === '1' && onSetStartHour(Number(d.time)),
-											setStart(d.time);
-										mode === '3' && onSetEndHour(Number(d.time)),
-											setEnd(d.time);
+										mode === '1' &&
+											onSetStartHour(idx, Number(d.time), day.day);
+										mode === '3' && onSetEndHour(idx, Number(d.time));
 									}}
 									key={Number(d.time)}
 									style={[
