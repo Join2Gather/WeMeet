@@ -12,7 +12,7 @@ import timetable from './timetable';
 const persistConfig = {
 	key: 'root',
 	storage: AsyncStorage,
-	blacklist: ['login', 'individual', 'team'],
+	blacklist: ['individual', 'team', 'timetable'],
 };
 const rootReducer = combineReducers({
 	loading,
