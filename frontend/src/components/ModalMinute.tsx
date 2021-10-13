@@ -77,7 +77,11 @@ export function ModalMinute({
 						>
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={28} />
 						</TouchableHighlight>
-						<Text style={styles.titleText}>시작 시간의 분을 입력하세요</Text>
+						<Text style={styles.titleText}>
+							{mode === '2'
+								? '시작 시간의 분을 입력하세요'
+								: '종료 시간의 분을 입력하세요'}
+						</Text>
 						<View style={[styles.textInputView]}>
 							<Text style={styles.hourText}>
 								{start <= 12 ? `AM ${start}` : `PM ${end - 12}`} :{' '}
@@ -163,6 +167,7 @@ const styles = StyleSheet.create({
 		paddingLeft: 9,
 		borderWidth: 0.3,
 		padding: 0.5,
+		width: 30,
 		borderColor: Colors.blue300,
 		// alignContent: 'center',
 		// height: 20,
@@ -172,7 +177,7 @@ const styles = StyleSheet.create({
 		// paddingBottom: 0.7,
 		// borderBottomWidth: 0.3,
 		alignContent: 'center',
-		width: '44%',
+		width: '52%',
 		marginLeft: '30%',
 		padding: 10,
 	},

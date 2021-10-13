@@ -68,9 +68,7 @@ export default function Home() {
 						{mode === '0' && (
 							<>
 								<TouchableOpacity
-									style={{
-										flexDirection: 'column',
-									}}
+									style={styles.touchableBoxView}
 									onPress={() => setGroupMode('group')}
 								>
 									<View
@@ -85,10 +83,7 @@ export default function Home() {
 									<Text style={styles.infoText}>그룹</Text>
 								</TouchableOpacity>
 								<TouchableOpacity
-									style={{
-										flexDirection: 'column',
-										// marginLeft: 50,
-									}}
+									style={[styles.touchableBoxView, { marginLeft: 70 }]}
 									onPress={() => setGroupMode('in')}
 								>
 									<View
@@ -107,7 +102,7 @@ export default function Home() {
 						{mode === '1' && (
 							<>
 								<Text style={styles.stepText}>
-									[1] 일정 시작 시간을 터치해주세요
+									{'[1] 일정 시작 시간을 터치해주세요'}
 								</Text>
 							</>
 						)}
@@ -119,6 +114,11 @@ export default function Home() {
 						{mode === '3' && (
 							<>
 								<Text style={styles.stepText}>[3] 종료 시간 터치해주세요</Text>
+							</>
+						)}
+						{mode === '4' && (
+							<>
+								<Text style={styles.stepText}>[4] 일정 종료 분 설정</Text>
 							</>
 						)}
 					</View>
@@ -137,12 +137,25 @@ const styles = StyleSheet.create({
 	view: { flex: 1 },
 	text: { marginRight: 10, fontSize: 20 },
 	rowButtonView: {
-		width: '40%',
+		width: '100%',
+		flexDirection: 'row',
+		justifyContent: 'center',
+		marginTop: 35,
+		// backgroundColor: Colors.blue300,
+		// marginLeft: '30%',
+	},
+	touchableBoxView: {
+		flexDirection: 'column',
+		height: 40,
+	},
+	modeDescriptionText: {
+		width: '100%',
 		flexDirection: 'row',
 		justifyContent: 'space-around',
 		marginTop: 35,
 		marginLeft: '30%',
 	},
+
 	rowView: {
 		flexDirection: 'row',
 		alignContent: 'center',
@@ -180,5 +193,6 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareBold',
 		fontSize: 15,
 		letterSpacing: -1,
+		height: 40,
 	},
 });

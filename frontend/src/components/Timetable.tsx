@@ -55,7 +55,6 @@ export function Timetable({
 	}, []);
 	const [start, setStart] = useState(0);
 	const [end, setEnd] = useState(0);
-	const onChangeColor = useCallback((idx, time) => {}, []);
 	return (
 		<View style={styles.view}>
 			<View style={styles.rowView}>
@@ -100,18 +99,22 @@ export function Timetable({
 										styles.boxView,
 										{
 											borderBottomWidth: Number(d.time) === 1 ? 0.3 : 0,
-											// borderTopWidth:
-											// 	Number(d.time) === 24
-											// 		? 0
-											// 		: Number(d.time) % 1 === 0
-											// 		? 0.3
-											// 		: 0,
-											backgroundColor: d.color,
+											// backgroundColor: d.color,
 										},
 									]}
 								>
-									<View style={{}} />
-									<View style={{}} />
+									<View
+										style={{
+											height: '50%',
+											backgroundColor: d.time % 1 ? Colors.white : d.color,
+										}}
+									/>
+									<View
+										style={{
+											height: '50%',
+											backgroundColor: d.time % 1 ? Colors.white : d.color,
+										}}
+									/>
 								</TouchableView>
 							))}
 						</View>
