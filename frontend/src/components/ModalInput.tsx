@@ -11,7 +11,6 @@ import {
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import { inputTeamName, postTeamName } from '../store/team';
-import { useAutoFocus } from '../contexts';
 //import { MaterialCommunityIcon as Icon } from '../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 interface props {
@@ -31,11 +30,8 @@ export function ModalInput({
 }: props) {
 	const dispatch = useDispatch();
 	const [name, setName] = useState('');
-	const focus = useAutoFocus();
-
 	const onChangeInput = useCallback(() => {
 		dispatch(inputTeamName(name));
-		const data = {};
 		dispatch(postTeamName({ user, id, name, token }));
 		setName('');
 	}, [name]);
