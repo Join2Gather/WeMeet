@@ -133,7 +133,7 @@ export default function Home() {
 						)}
 						{mode === '3' && (
 							<>
-								<Text style={styles.stepText}>1. 종료 시간 터치</Text>
+								<Text style={styles.stepText}>3. 종료 시간 터치</Text>
 							</>
 						)}
 					</View>
