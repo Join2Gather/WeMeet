@@ -3,16 +3,7 @@ import createRequestSaga from '../hooks/createRequestSaga';
 import * as api from '../lib/api/team';
 import { takeLatest } from 'redux-saga/effects';
 import { createAction } from 'redux-actions';
-import type {
-	changeColorType,
-	default_dates,
-	requestTeamAPI,
-	responseTeamAPI,
-	selectDay,
-	state_time,
-	team,
-	timetable,
-} from '../interface';
+import type { changeColorType, team, timetable } from '../interface';
 import { Colors } from 'react-native-paper';
 
 // const POST_TEAM = 'team/POST_TEAM';
@@ -30,6 +21,15 @@ import { Colors } from 'react-native-paper';
 
 const initialState: timetable = {
 	dates: [
+		{ day: 'sun', times: [] },
+		{ day: 'mon', times: [] },
+		{ day: 'tue', times: [] },
+		{ day: 'thu', times: [] },
+		{ day: 'wed', times: [] },
+		{ day: 'fri', times: [] },
+		{ day: 'sat', times: [] },
+	],
+	teamDates: [
 		{ day: 'sun', times: [] },
 		{ day: 'mon', times: [] },
 		{ day: 'tue', times: [] },
@@ -59,6 +59,7 @@ export const timetableSlice = createSlice({
 	reducers: {
 		cloneDates: (state, action: PayloadAction<any>) => {
 			state.dates = action.payload;
+			state.teamDates = action.payload;
 		},
 		setStartHour: (state, action: PayloadAction<number>) => {
 			state.startTime = action.payload;
@@ -94,6 +95,7 @@ export const timetableSlice = createSlice({
 			);
 			if (find) {
 				find.color = Colors.blue200;
+				find.isFullTime = true;
 			}
 		},
 		changeAllColor: (state) => {
@@ -103,6 +105,9 @@ export const timetableSlice = createSlice({
 				i++
 			) {
 				state.dates[state.dayIdx].times[i - 8].color = Colors.blue200;
+				if (i === Math.floor(state.endTime) - 1) {
+					state.dates[state.dayIdx].times[i - 8].isFullTime = true;
+				}
 			}
 		},
 	},
