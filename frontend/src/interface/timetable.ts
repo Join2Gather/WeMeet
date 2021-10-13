@@ -1,5 +1,6 @@
 export interface timetable {
 	dates: make_days[];
+	teamDates: make_days[];
 	startTime: number;
 	endTime: number;
 	// selectTimes: [selectDays, selectDays];
@@ -51,5 +52,5 @@ export interface make_days {
 export interface state_time {
 	time: number;
 	color: string;
-	check: boolean;
+	isFullTime: boolean;
 }
