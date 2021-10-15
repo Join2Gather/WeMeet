@@ -11,30 +11,36 @@ import {
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import { inputTeamName, postTeamName } from '../store/team';
+import { useAutoFocus } from '../contexts';
 //import { MaterialCommunityIcon as Icon } from '../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { setEndMin, setStartMin } from '../store/timetable';
+import { min } from 'react-native-reanimated';
 interface props {
 	modalVisible: boolean;
 	setModalVisible: any;
-	user: number;
-	id: number;
-	token: string;
+	start: number;
+	end: number;
+	mode: string;
+	setMode: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export function ModalInput({
+export function ModalMinute({
 	modalVisible,
 	setModalVisible,
-	user,
-	id,
-	token,
+	start,
+	end,
+	mode,
+	setMode,
 }: props) {
 	const dispatch = useDispatch();
-	const [name, setName] = useState('');
-	const onChangeInput = useCallback(() => {
-		dispatch(inputTeamName(name));
-		dispatch(postTeamName({ user, id, name, token }));
-		setName('');
-	}, [name]);
+	const [minute, setMinute] = useState('');
+	const focus = useAutoFocus();
+	const onPressConfirm = useCallback(() => {
+		mode === '2'
+			? (dispatch(setStartMin(Number(minute))), setMode('3'))
+			: (dispatch(setEndMin(Number(minute))), setMode('0'));
+	}, [minute, mode]);
 
 	return (
 		// <AutoFocusProvider contentContainerStyle={[styles.keyboardAwareFocus]}>
@@ -71,14 +77,22 @@ export function ModalInput({
 						>
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={28} />
 						</TouchableHighlight>
-						<Text style={styles.titleText}>모임명을 입력하세요</Text>
+						<Text style={styles.titleText}>
+							{mode === '2'
+								? '시작 시간의 분을 입력하세요'
+								: '종료 시간의 분을 입력하세요'}
+						</Text>
 						<View style={[styles.textInputView]}>
+							<Text style={styles.hourText}>
+								{start <= 12 ? `AM ${start}` : `PM ${end - 12}`} :{' '}
+							</Text>
 							<TextInput
 								// onFocus={focus}
 								style={[styles.textInput, { color: Colors.black }]}
-								value={name}
-								onChangeText={(name) => setName((text) => name)}
-								placeholder="Enter your ID"
+								keyboardType={'number-pad'}
+								value={minute}
+								onChangeText={(min) => setMinute(min)}
+								placeholder="00"
 								placeholderTextColor={Colors.grey600}
 							/>
 						</View>
@@ -89,7 +103,7 @@ export function ModalInput({
 							underlayColor={Colors.grey200}
 							style={styles.closeButtonStyle}
 							onPress={() => {
-								onChangeInput();
+								onPressConfirm();
 								setModalVisible(false);
 							}}
 						>
@@ -97,6 +111,7 @@ export function ModalInput({
 						</TouchableHighlight>
 						{/* <View style={styles.verticalLine} /> */}
 					</View>
+					{/* <ModalMinute /> */}
 				</View>
 			</View>
 		</Modal>
@@ -140,18 +155,30 @@ const styles = StyleSheet.create({
 		width: '100%',
 		//
 	},
+	hourText: {
+		fontSize: 21,
+		fontFamily: 'NanumSquareR',
+	},
 	textInput: {
-		fontSize: 19,
+		fontSize: 23,
 		flex: 1,
 		fontFamily: 'NanumSquareR',
-		marginLeft: '0%',
+		marginTop: -2,
+		paddingLeft: 9,
+		borderWidth: 0.3,
+		padding: 0.5,
+		width: 30,
+		borderColor: Colors.blue300,
+		// alignContent: 'center',
+		// height: 20,
 	},
 	textInputView: {
 		flexDirection: 'row',
-		paddingBottom: 0.7,
-		borderBottomWidth: 0.3,
-		width: '90%',
-		marginLeft: '5%',
+		// paddingBottom: 0.7,
+		// borderBottomWidth: 0.3,
+		alignContent: 'center',
+		width: '52%',
+		marginLeft: '30%',
 		padding: 10,
 	},
 	buttonText: {
@@ -174,11 +201,11 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 	closeButtonStyle: {
-		padding: 15,
-		width: '50%',
+		padding: 13,
+		width: '80%',
 		height: '100%',
 		borderRadius: 13,
-		// backgroundColor: Colors.grey400,
+		backgroundColor: Colors.blue300,
 	},
 	acceptButtonStyle: {
 		padding: 15,

@@ -11,11 +11,12 @@ export function SocialWebview({ closeSocialModal, source }: any) {
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
 	const INJECTED_JAVASCRIPT =
-		'(function() {if(window.document.getElementsByTagName("pre").length>0){window.ReactNativeWebView.postMessage((window.document.getElementsByTagName("pre")[0].innerHTML));}})();';
+		'(function() {if(window.document.getElementsByTagName("pre").length>0){window.document.getElementsByTagName("pre")[0].style.display = "none";window.ReactNativeWebView.postMessage((window.document.getElementsByTagName("pre")[0].innerHTML));}})();';
 
 	const _handleMessage = async (event: any) => {
+		closeSocialModal();
+
 		let result = JSON.parse(event.nativeEvent.data);
-		console.log(typeof result);
 
 		const data = {
 			token: result.access_token,
@@ -34,7 +35,6 @@ export function SocialWebview({ closeSocialModal, source }: any) {
 			console.log(e);
 		}
 
-		closeSocialModal();
 		navigation.navigate('TabNavigator');
 	};
 

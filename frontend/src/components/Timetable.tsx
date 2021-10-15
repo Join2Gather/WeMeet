@@ -1,14 +1,60 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Colors } from 'react-native-paper';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { ModalMinute } from './ModalMinute';
 import { useMakeTimetable } from '../hooks';
+import {
+	changeAllColor,
+	changeColor,
+	pushSelectEnd,
+	setDay,
+	setEndHour,
+	setStartHour,
+} from '../store/timetable';
 import { View, Text, TouchableView } from '../theme';
+import { RootState } from '../store';
 
 const dayOfWeek = ['SUN', 'TUE', 'THU', 'WED', 'THU', 'FRI', 'SAT'];
-export function Timetable() {
-	const { defaultDates, timesText } = useMakeTimetable();
-	console.log(defaultDates);
+
+interface props {
+	mode: string;
+	modalVisible: boolean;
+	setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	setMode: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export function Timetable({
+	mode,
+	modalVisible,
+	setModalVisible,
+	setMode,
+}: props) {
+	const { timesText } = useMakeTimetable();
+	const { dates } = useSelector(({ timetable }: RootState) => ({
+		dates: timetable.dates,
+	}));
+	const dispatch = useDispatch();
+	const onSetStartHour = useCallback(
+		(idx: number, time: number, day: string) => {
+			dispatch(setStartHour(time));
+			setMode('2');
+			setStart(time);
+			setModalVisible(true);
+			dispatch(changeColor({ idx: idx, time: time }));
+			dispatch(setDay(day));
+		},
+		[]
+	);
+	const onSetEndHour = useCallback((idx: number, time: number) => {
+		dispatch(setEndHour(time));
+		setMode('4');
+		setModalVisible(true);
+		dispatch(pushSelectEnd());
+		dispatch(changeAllColor());
+	}, []);
+	const [start, setStart] = useState(0);
+	const [end, setEnd] = useState(0);
 	return (
 		<View style={styles.view}>
 			<View style={styles.rowView}>
@@ -39,24 +85,48 @@ export function Timetable() {
 					))}
 				</View>
 				<View style={styles.contentView}>
-					{defaultDates.map((day) => (
+					{dates.map((day, idx) => (
 						<View style={styles.columnView} key={day.day}>
-							{day.times.map((d: Number, idx) => (
+							{day.times.map((d) => (
 								<TouchableView
-									onPress={() => console.log(d)}
-									key={Number(d)}
+									onPress={() => {
+										mode === '1' &&
+											onSetStartHour(idx, Number(d.time), day.day);
+										mode === '3' && onSetEndHour(idx, Number(d.time));
+									}}
+									key={Number(d.time)}
 									style={[
 										styles.boxView,
 										{
-											borderBottomWidth: Number(d) === 24 ? 0.3 : 0,
-											borderTopWidth:
-												Number(d) === 24 ? 0 : Number(d) % 1 === 0 ? 0.3 : 0,
+											borderBottomWidth: Number(d.time) === 1 ? 0.3 : 0,
+											// backgroundColor: d.color,
 										},
 									]}
-								></TouchableView>
+								>
+									<View
+										style={{
+											height: '50%',
+											backgroundColor: d.time % 1 ? Colors.white : d.color,
+										}}
+									/>
+									<View
+										style={{
+											height: '50%',
+											backgroundColor: d.time % 1 ? Colors.white : d.color,
+										}}
+									/>
+								</TouchableView>
 							))}
 						</View>
 					))}
+					<ModalMinute
+						modalVisible={modalVisible}
+						setModalVisible={setModalVisible}
+						start={start}
+						end={end}
+						mode={mode}
+						setMode={setMode}
+					/>
 				</View>
 			</View>
 		</View>
@@ -81,13 +151,14 @@ const styles = StyleSheet.create({
 		// height: 80,
 	},
 	timeView: {
-		top: '-11%',
+		top: '-10%',
 	},
 	timeText: {
 		fontSize: 10,
+		alignSelf: 'flex-end',
 		textAlign: 'right',
-		width: 30,
-		marginTop: 50.8,
+		width: '100%',
+		marginTop: 47.5,
 		fontFamily: 'NanumSquareR',
 	},
 	columnView: {
@@ -102,12 +173,12 @@ const styles = StyleSheet.create({
 		// textAlignVertical: 'center',
 	},
 	boxView: {
-		height: 7.75,
+		height: 29.6,
 		// marginLeft: 10,
 		width: 40,
 		borderWidth: 0.3,
-		borderTopWidth: 0,
-		borderBottomWidth: 0,
+		borderTopWidth: 0.3,
+		borderBottomWidth: 0.3,
 		// borderRightWidth: 1,
 	},
 });

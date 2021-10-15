@@ -1,17 +1,27 @@
+import { Colors } from 'react-native-paper';
+import { useDispatch } from 'react-redux';
+import type { time, state_time } from '../interface';
+import { useEffect } from 'react';
+import { cloneDates } from '../store/timetable';
+
 export function useMakeTimetable() {
-	const times: Array<Number> = [];
+	const times: Array<state_time> = [];
 	const timesText: Array<string> = [];
 
-	for (let i = 8; i <= 24; i += 0.25) {
-		times.push(i);
+	for (let i = 8; i <= 24; i += 1) {
+		times.push({ time: i, color: Colors.white, isFullTime: false });
 		if (i <= 12) {
 			if (i % 2 === 0) {
-				timesText.push(`${i}AM`);
+				timesText.push(`${i} AM`);
 			}
 		} else {
 			if (i % 2 === 0) {
-				timesText.push(`${i - 12}PM`);
+				timesText.push(`${i - 12} PM`);
 			}
+		}
+		if (i === 24) {
+			times.push({ time: 1, color: Colors.white, isFullTime: false });
+			timesText.push('2 AM');
 		}
 	}
 
@@ -24,5 +34,9 @@ export function useMakeTimetable() {
 		{ day: 'fri', times: times },
 		{ day: 'sat', times: times },
 	];
+	const dispatch = useDispatch();
+	useEffect(() => {
+		dispatch(cloneDates(defaultDates));
+	}, []);
 	return { defaultDates, timesText };
 }

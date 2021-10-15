@@ -7,6 +7,7 @@ import {SafeAreaView, View, UnderlineText,TopBar,
     TouchableView,
 NavigationHeader,  Text} from '../theme';
 import Icon from 'react-native-vector-icons/Fontisto';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
 import { LeftRightNavigation, Timetable } from '../components';
 import type { LeftRightNavigationMethods } from '../components';
@@ -15,85 +16,118 @@ import { Colors } from 'react-native-paper';
 export default function Home() {
 	// navigation
 	const navigation = useNavigation();
-	const goLeft = useCallback(() => navigation.navigate('TeamList'), []);
-	// const goRight = useCallback(
-	// 	() => navigation.navigate('HomeRight', { name: 'Jack', age: 32 }),
-	// 	[]
-	// );
-	const [scrollEnabled] = useScrollEnabled();
-	const [people, setPeople] = useState([]);
-	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
-	const addPerson = useCallback(() => {}, []);
-	const removeAllPersons = useCallback(() => {
-		setPeople((notUsed) => []);
-		leftRef.current?.resetOffset();
+	const goLeft = useCallback(() => {
+		navigation.goBack();
 	}, []);
-	const deletePerson = useCallback(
-		(id: string) => () => {
-			leftRef.current?.resetOffset();
-			flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
-		},
-		[]
-	);
-	const flatListRef = useRef<FlatList | null>(null);
 
+	const [groupMode, setGroupMode] = useState('group');
+
+	//modal
+	const [modalVisible, setModalVisible] = useState(false);
+	const [mode, setMode] = useState('0');
+	const onPressPlus = useCallback(() => {
+		setMode('1');
+	}, []);
 	return (
 		<SafeAreaView style={{ backgroundColor: Colors.white, flex: 1 }}>
 			<ScrollEnabledProvider>
 				<View style={[styles.view]}>
 					<NavigationHeader
 						title="팀 일정표"
-						titleStyle={{ marginLeft: '-8%' }}
+						titleStyle={{ paddingLeft: 0 }}
 						Left={() => (
 							<Icon
 								name="angle-left"
-								size={20}
+								size={25}
 								onPress={goLeft}
 								color={Colors.white}
-								style={{ marginLeft: '3%' }}
+								// style={{ marginLeft: '3%' }}
 							/>
 						)}
+						Right={() =>
+							groupMode === 'group' ? (
+								<MIcon
+									name="check-bold"
+									size={28}
+									color={Colors.white}
+									style={{ paddingTop: 1 }}
+									onPress={onPressPlus}
+								/>
+							) : (
+								<MIcon
+									name="plus"
+									size={28}
+									color={Colors.white}
+									style={{ paddingTop: 1 }}
+									onPress={() => setMode('1')}
+								/>
+							)
+						}
 					/>
-					{/* <TopBar noSwitch>
-						<UnderlineText onPress={addPerson} style={styles.text}>
-							add
-						</UnderlineText>
-						<UnderlineText onPress={removeAllPersons} style={styles.text}>
-							remove all
-						</UnderlineText>
-					</TopBar> */}
-					{/* <LeftRightNavigation
-						ref={leftRef}
-						distance={40}
-						flatListRef={flatListRef}
-						onLeftToRight={goLeft}
-						onRightToLeft={goRight}
-					></LeftRightNavigation> */}
 					<View style={styles.rowButtonView}>
-						<TouchableOpacity
-							style={{
-								flexDirection: 'column',
-							}}
-						>
-							<View
-								style={[
-									styles.boxButtonView,
-									{ backgroundColor: Colors.blue400 },
-								]}
-							/>
-							<Text style={styles.infoText}>그룹</Text>
-						</TouchableOpacity>
-						<TouchableOpacity
-							style={{
-								flexDirection: 'column',
-								// marginLeft: 50,
-							}}
-						>
-							<View style={[styles.boxButtonView]} />
-							<Text style={styles.infoText}>개인</Text>
-						</TouchableOpacity>
+						{mode === '0' && (
+							<>
+								<TouchableOpacity
+									style={styles.touchableBoxView}
+									onPress={() => setGroupMode('group')}
+								>
+									<View
+										style={[
+											styles.boxButtonView,
+											{
+												backgroundColor:
+													groupMode === 'group' ? Colors.blue400 : Colors.white,
+											},
+										]}
+									/>
+									<Text style={styles.infoText}>그룹</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									style={[styles.touchableBoxView, { marginLeft: 70 }]}
+									onPress={() => setGroupMode('in')}
+								>
+									<View
+										style={[
+											styles.boxButtonView,
+											{
+												backgroundColor:
+													groupMode !== 'group' ? Colors.blue400 : Colors.white,
+											},
+										]}
+									/>
+									<Text style={styles.infoText}>개인</Text>
+								</TouchableOpacity>
+							</>
+						)}
+						{mode === '1' && (
+							<>
+								<Text style={styles.stepText}>
+									{'[1] 일정 시작 시간을 터치해주세요'}
+								</Text>
+							</>
+						)}
+						{mode === '2' && (
+							<>
+								<Text style={styles.stepText}>[2] 일정 시작 분 설정</Text>
+							</>
+						)}
+						{mode === '3' && (
+							<>
+								<Text style={styles.stepText}>[3] 종료 시간 터치해주세요</Text>
+							</>
+						)}
+						{mode === '4' && (
+							<>
+								<Text style={styles.stepText}>[4] 일정 종료 분 설정</Text>
+							</>
+						)}
 					</View>
-					<Timetable></Timetable>
+					<Timetable
+						mode={mode}
+						setMode={setMode}
+						modalVisible={modalVisible}
+						setModalVisible={setModalVisible}
+					></Timetable>
 				</View>
 			</ScrollEnabledProvider>
 		</SafeAreaView>
@@ -103,15 +137,25 @@ const styles = StyleSheet.create({
 	view: { flex: 1 },
 	text: { marginRight: 10, fontSize: 20 },
 	rowButtonView: {
-		width: '40%',
+		width: '100%',
 		flexDirection: 'row',
-		// alignContent: 'center',
+		justifyContent: 'center',
+		marginTop: 35,
+		// backgroundColor: Colors.blue300,
+		// marginLeft: '30%',
+	},
+	touchableBoxView: {
+		flexDirection: 'column',
+		height: 40,
+	},
+	modeDescriptionText: {
+		width: '100%',
+		flexDirection: 'row',
 		justifyContent: 'space-around',
-		// marginLeft: 20,
 		marginTop: 35,
 		marginLeft: '30%',
-		// backgroundColor: Colors.blue200,
 	},
+
 	rowView: {
 		flexDirection: 'row',
 		alignContent: 'center',
@@ -144,5 +188,11 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareR',
 		marginTop: 12,
 		letterSpacing: -1,
+	},
+	stepText: {
+		fontFamily: 'NanumSquareBold',
+		fontSize: 15,
+		letterSpacing: -1,
+		height: 40,
 	},
 });

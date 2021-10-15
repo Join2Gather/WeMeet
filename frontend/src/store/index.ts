@@ -6,16 +6,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import loading from './loading';
 import login from './login';
 import team, { teamSaga } from './team';
+import individual, { individualSaga } from './individual';
+import timetable from './timetable';
 // import storageSession from 'redux-persist/lib/storage/session';
 const persistConfig = {
 	key: 'root',
 	storage: AsyncStorage,
-	blacklist: [],
+	blacklist: ['individual', 'team', 'timetable'],
 };
-const rootReducer = combineReducers({ loading, login, team });
+const rootReducer = combineReducers({
+	loading,
+	login,
+	team,
+	individual,
+	timetable,
+});
 export default persistReducer(persistConfig, rootReducer);
 export type RootState = ReturnType<typeof rootReducer>;
 
 export function* rootSaga() {
-	yield all([teamSaga()]);
+	yield all([teamSaga(), individualSaga()]);
 }
