@@ -42,7 +42,6 @@ export const individualSlice = createSlice({
 	initialState,
 	reducers: {
 		POST_IMAGE_SUCCESS: (state, action: PayloadAction<responseImageAPI>) => {
-			console.log(action.payload);
 			state.dates.mon.time = action.payload.mon;
 			state.dates.tue.time = action.payload.tue;
 			state.dates.wed.time = action.payload.wed;
@@ -50,12 +49,9 @@ export const individualSlice = createSlice({
 			state.dates.fri.time = action.payload.fri;
 			state.dates.sat.time = action.payload.sat;
 			state.dates.sun.time = action.payload.sun;
-			console.log('hihi');
 		},
 		POST_IMAGE_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
-			console.log(action.payload);
-			console.log('byebye');
 		},
 	},
 	extraReducers: {},
