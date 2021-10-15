@@ -10,16 +10,19 @@ import { LeftRightNavigation, Timetable } from '../components';
 import type { LeftRightNavigationMethods } from '../components';
 import { Colors } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { postImage } from '../lib/api/individual';
+import { postImage } from '../store/individual';
+import * as FileSystem from 'expo-file-system';
+
 export default function Home() {
-	const { token } = useSelector(({ login }: RootState) => ({
+	const { token, dates } = useSelector(({ login, individual }: RootState) => ({
 		token: login.token,
+		dates: individual.dates,
 	}));
 	// navigation
 	const navigation = useNavigation();
-
+	const dispatch = useDispatch();
 	const [scrollEnabled] = useScrollEnabled();
 	const [people, setPeople] = useState([]);
 	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
@@ -41,25 +44,33 @@ export default function Home() {
 				const { status } =
 					await ImagePicker.requestMediaLibraryPermissionsAsync();
 				if (status !== 'granted') {
-					alert('Sorry, we need camera roll permissions to make this work!');
+					alert('카메라 권한을 승인해주세요');
 				}
 			}
 		})();
 	}, []);
 
+	useEffect(() => {
+		if (dates) {
+			console.log(dates);
+		}
+	}, [dates]);
 	const pickImage = async () => {
-		let result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.All,
-			allowsEditing: true,
+		const result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			allowsEditing: false,
 			aspect: [4, 3],
 			quality: 1,
+			// base64: true,
+			// exif: true,
 		});
-
-		console.log(result);
-
 		if (!result.cancelled) {
-			setImage(result.uri);
-			postImage({ image: result.uri, token: token });
+			console.log(result);
+			const imagePath = result.uri;
+			const imageExt = result.uri.split('.').pop();
+			const imageMime = `image/${imageExt}`;
+			// setImage(imagePath);
+			dispatch(postImage({ image: imagePath, token: token }));
 		}
 	};
 	return (

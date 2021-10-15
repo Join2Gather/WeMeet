@@ -44,13 +44,6 @@ export const loginSlice = createSlice({
 			state.token = action.payload.token;
 			state.clubs = action.payload.clubs;
 			state.clubs.map((club) => {
-				console.log(decodeURI(club.name));
-				console.log(unescape(club.name));
-				console.log(escape(club.name));
-				console.log(encodeURIComponent(club.name));
-				console.log(encodeURI(club.name));
-				console.log(JSON.stringify(club.name));
-				// console.log(JSON.parse(club.name));
 				club.name = decodeURIComponent(club.name);
 			});
 			state.dates = action.payload.dates;
