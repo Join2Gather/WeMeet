@@ -20,7 +20,7 @@ export default function Home() {
 		navigation.goBack();
 	}, []);
 
-	const [groupMode, setGroupMode] = useState('group');
+	const [isGroup, setGroupMode] = useState(true);
 
 	//modal
 	const [modalVisible, setModalVisible] = useState(false);
@@ -45,7 +45,7 @@ export default function Home() {
 							/>
 						)}
 						Right={() =>
-							groupMode === 'group' ? (
+							isGroup ? (
 								<MIcon
 									name="check-bold"
 									size={28}
@@ -69,14 +69,15 @@ export default function Home() {
 							<>
 								<TouchableOpacity
 									style={styles.touchableBoxView}
-									onPress={() => setGroupMode('group')}
+									onPress={() => setGroupMode(true)}
 								>
 									<View
 										style={[
 											styles.boxButtonView,
 											{
-												backgroundColor:
-													groupMode === 'group' ? Colors.blue400 : Colors.white,
+												backgroundColor: isGroup
+													? Colors.blue400
+													: Colors.white,
 											},
 										]}
 									/>
@@ -84,14 +85,15 @@ export default function Home() {
 								</TouchableOpacity>
 								<TouchableOpacity
 									style={[styles.touchableBoxView, { marginLeft: 70 }]}
-									onPress={() => setGroupMode('in')}
+									onPress={() => setGroupMode(false)}
 								>
 									<View
 										style={[
 											styles.boxButtonView,
 											{
-												backgroundColor:
-													groupMode !== 'group' ? Colors.blue400 : Colors.white,
+												backgroundColor: !isGroup
+													? Colors.blue400
+													: Colors.white,
 											},
 										]}
 									/>
@@ -127,6 +129,7 @@ export default function Home() {
 						setMode={setMode}
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
+						isGroup={isGroup}
 					></Timetable>
 				</View>
 			</ScrollEnabledProvider>
