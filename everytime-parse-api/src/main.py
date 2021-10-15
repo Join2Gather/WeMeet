@@ -12,9 +12,10 @@ import uvicorn
 
 app = FastAPI()
 
+
 @app.post("/everytime")
 async def parse_everytime(image: UploadFile = File(...)) -> Response:
-    if image.content_type != 'image/png':
+    if not image.content_type.startswith('image'):
         return JSONResponse(to_json({'error': 'file is not image file.'}), status_code=400)
     result = parse_img(img_file=image.file)
     return JSONResponse(to_json({'result': result}), status_code=200)
