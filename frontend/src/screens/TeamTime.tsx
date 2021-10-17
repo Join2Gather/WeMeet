@@ -12,9 +12,16 @@ import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
 import { LeftRightNavigation, Timetable } from '../components';
 import type { LeftRightNavigationMethods } from '../components';
 import { Colors } from 'react-native-paper';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+type TeamStackParamList = {
+	TeamTime: { name: string };
+};
 
-export default function Home() {
+type Props = NativeStackScreenProps<TeamStackParamList, 'TeamTime'>;
+
+export default function Home({ route }: Props) {
 	// navigation
+	const name = route.params.name;
 	const navigation = useNavigation();
 	const goLeft = useCallback(() => {
 		navigation.goBack();
@@ -33,7 +40,7 @@ export default function Home() {
 			<ScrollEnabledProvider>
 				<View style={[styles.view]}>
 					<NavigationHeader
-						title="팀 일정표"
+						title={name}
 						titleStyle={{ paddingLeft: 0 }}
 						Left={() => (
 							<Icon
