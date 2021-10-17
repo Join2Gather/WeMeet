@@ -38,8 +38,8 @@ export function ModalMinute({
 	const focus = useAutoFocus();
 	const onPressConfirm = useCallback(() => {
 		mode === '2'
-			? (dispatch(setStartMin(Number(minute))), setMode('3'))
-			: (dispatch(setEndMin(Number(minute))), setMode('0'));
+			? (dispatch(setStartMin(Number(minute))), setMode('3'), setMinute(''))
+			: (dispatch(setEndMin(Number(minute))), setMode('0'), setMinute(''));
 	}, [minute, mode]);
 
 	return (
