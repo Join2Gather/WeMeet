@@ -7,8 +7,8 @@ export function useIsDarkMode(): {
 	textColor: string;
 } {
 	const isDark = useTheme().dark;
-	const backgroundColor = isDark ? Colors.black : Colors.white;
-	const textColor = isDark ? Colors.white : Colors.grey800;
+	const backgroundColor = isDark ? Colors.white : Colors.white;
+	const textColor = isDark ? Colors.black : Colors.grey800;
 
 	return { isDark, backgroundColor, textColor };
 }

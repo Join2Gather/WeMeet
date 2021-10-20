@@ -19,6 +19,7 @@ interface props {
 	user: number;
 	id: number;
 	token: string;
+	goTeamTime: Function;
 }
 
 export function ModalInput({
@@ -27,6 +28,7 @@ export function ModalInput({
 	user,
 	id,
 	token,
+	goTeamTime,
 }: props) {
 	const dispatch = useDispatch();
 	const [name, setName] = useState('');
@@ -91,6 +93,7 @@ export function ModalInput({
 							onPress={() => {
 								onChangeInput();
 								setModalVisible(false);
+								goTeamTime(name);
 							}}
 						>
 							<Text style={styles.buttonText}>확인</Text>

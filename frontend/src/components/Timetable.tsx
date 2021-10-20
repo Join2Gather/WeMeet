@@ -22,6 +22,7 @@ interface props {
 	modalVisible: boolean;
 	setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 	setMode: React.Dispatch<React.SetStateAction<string>>;
+	isGroup: boolean;
 }
 
 export function Timetable({
@@ -29,10 +30,12 @@ export function Timetable({
 	modalVisible,
 	setModalVisible,
 	setMode,
+	isGroup,
 }: props) {
 	const { timesText } = useMakeTimetable();
-	const { dates } = useSelector(({ timetable }: RootState) => ({
+	const { dates, teamDates } = useSelector(({ timetable }: RootState) => ({
 		dates: timetable.dates,
+		teamDates: timetable.teamDates,
 	}));
 	const dispatch = useDispatch();
 	const onSetStartHour = useCallback(
@@ -85,40 +88,81 @@ export function Timetable({
 					))}
 				</View>
 				<View style={styles.contentView}>
-					{dates.map((day, idx) => (
-						<View style={styles.columnView} key={day.day}>
-							{day.times.map((d) => (
-								<TouchableView
-									onPress={() => {
-										mode === '1' &&
-											onSetStartHour(idx, Number(d.time), day.day);
-										mode === '3' && onSetEndHour(idx, Number(d.time));
-									}}
-									key={Number(d.time)}
-									style={[
-										styles.boxView,
-										{
-											borderBottomWidth: Number(d.time) === 1 ? 0.3 : 0,
-											// backgroundColor: d.color,
-										},
-									]}
-								>
-									<View
-										style={{
-											height: '50%',
-											backgroundColor: d.time % 1 ? Colors.white : d.color,
-										}}
-									/>
-									<View
-										style={{
-											height: '50%',
-											backgroundColor: d.time % 1 ? Colors.white : d.color,
-										}}
-									/>
-								</TouchableView>
+					{isGroup ? (
+						<>
+							{teamDates.map((day, idx) => (
+								<View style={styles.columnView} key={day.day}>
+									{day.times.map((d) => (
+										<TouchableView
+											onPress={() => {
+												mode === '1' &&
+													onSetStartHour(idx, Number(d.time), day.day);
+												mode === '3' && onSetEndHour(idx, Number(d.time));
+											}}
+											key={Number(d.time)}
+											style={[
+												styles.boxView,
+												{
+													borderBottomWidth: Number(d.time) === 1 ? 0.3 : 0,
+													// backgroundColor: d.color,
+												},
+											]}
+										>
+											<View
+												style={{
+													height: '50%',
+													backgroundColor: d.time % 1 ? Colors.white : d.color,
+												}}
+											/>
+											<View
+												style={{
+													height: '50%',
+													backgroundColor: d.time % 1 ? Colors.white : d.color,
+												}}
+											/>
+										</TouchableView>
+									))}
+								</View>
 							))}
-						</View>
-					))}
+						</>
+					) : (
+						<>
+							{dates.map((day, idx) => (
+								<View style={styles.columnView} key={day.day}>
+									{day.times.map((d) => (
+										<TouchableView
+											onPress={() => {
+												mode === '1' &&
+													onSetStartHour(idx, Number(d.time), day.day);
+												mode === '3' && onSetEndHour(idx, Number(d.time));
+											}}
+											key={Number(d.time)}
+											style={[
+												styles.boxView,
+												{
+													borderBottomWidth: Number(d.time) === 1 ? 0.3 : 0,
+													// backgroundColor: d.color,
+												},
+											]}
+										>
+											<View
+												style={{
+													height: '50%',
+													backgroundColor: d.time % 1 ? Colors.white : d.color,
+												}}
+											/>
+											<View
+												style={{
+													height: '50%',
+													backgroundColor: d.time % 1 ? Colors.white : d.color,
+												}}
+											/>
+										</TouchableView>
+									))}
+								</View>
+							))}
+						</>
+					)}
 					<ModalMinute
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
@@ -175,10 +219,10 @@ const styles = StyleSheet.create({
 	boxView: {
 		height: 29.6,
 		// marginLeft: 10,
-		width: 40,
+		width: 41,
 		borderWidth: 0.3,
 		borderTopWidth: 0.3,
-		borderBottomWidth: 0.3,
+		borderBottomWidth: 0.2,
 		// borderRightWidth: 1,
 	},
 });

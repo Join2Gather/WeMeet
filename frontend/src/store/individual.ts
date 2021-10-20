@@ -16,10 +16,7 @@ import type {
 
 const POST_IMAGE = 'individual/POST_IMAGE';
 
-export const postTeamName = createAction(
-	POST_IMAGE,
-	(data: postImageAPI) => data
-);
+export const postImage = createAction(POST_IMAGE, (data: postImageAPI) => data);
 
 const postImageSaga = createRequestSaga(POST_IMAGE, api.postImage);
 
