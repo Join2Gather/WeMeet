@@ -69,7 +69,7 @@ class EverytimeCalendarView(APIView):
             }
         ))
     @profile_guard
-    def post(self, request: Request, profile: Any):
+    def post(self, request: Request, profile: Any, user: Any):
 
         # club은 None!
 

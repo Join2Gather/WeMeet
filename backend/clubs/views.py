@@ -214,7 +214,7 @@ class ClubIndividualView(APIView):
 
         serializer = ProfilesSerializer(profile)
         result = [selected_club for selected_club in serializer.data['dates']
-                  if selected_club['club']['id'] == club.id]
+                  if selected_club['club'] and selected_club['club']['id'] == club.id]
         if result == []:
             result = {
                 day: [] for day in constants.week

@@ -118,7 +118,12 @@ class ProfilesDateCalculator(DateCalculator):
                 dates[club]['club']['id'] = club.id
                 dates[club]['club']['name'] = club.name
             dates[club]['is_temporary_reserved'] = is_temporary_reserved
-        time = date.hour + date.minute / 100
+        time = {
+            'starting_hours': date.starting_hours,
+            'starting_minutes': date.starting_minutes,
+            'end_hours': date.end_hours,
+            'end_minutes': date.end_minutes,
+        }
         dates[club][week[date.day]].append(time)
 
     def sort_date(self):
@@ -126,7 +131,7 @@ class ProfilesDateCalculator(DateCalculator):
         week = self.week
         for club in dates.keys():
             for day in week:
-                dates[club][day].sort()
+                dates[club][day].sort(key=lambda x: list(x.values()))
 
 
 class ClubsWithDateCalculator(DateCalculator):
@@ -142,7 +147,12 @@ class ClubsWithDateCalculator(DateCalculator):
         dates = self.dates
         week = self.week
         dates['is_temporary_reserved'] = is_temporary_reserved
-        time = date.hour + date.minute / 100
+        time = {
+            'starting_hours': date.starting_hours,
+            'starting_minutes': date.starting_minutes,
+            'end_hours': date.end_hours,
+            'end_minutes': date.end_minutes,
+        }
         dates[week[date.day]].append(time)
 
     def sort_date(self):
@@ -187,10 +197,10 @@ class ClubAvailableTimeSerializer(serializers.ModelSerializer):
 
         profile_dates = ProfileDates.objects.filter(
             club=obj.id).select_related('date', 'profile')
-        dates = list(profile_dates.distinct())
-        for date in dates:
+        profile_dates = profile_dates.distinct()
+        for profile_date in profile_dates:
+            date = profile_date.date
             day = constants.week[date.day]
-            # time = float(f"{hour}.{minute}")
 
             result[day]['avail_time'].append({
                 'starting_hours': date.starting_hours,
@@ -200,12 +210,12 @@ class ClubAvailableTimeSerializer(serializers.ModelSerializer):
             })
 
             profiles = profile_dates.filter(
-                date=date.id).values_list('profile__name')
+                date=date.id).values_list('profile__name', flat=True)
             result[day]['count'].append(len(profiles))
 
-            avail_people = [profile[0] for profile in profiles]
+            avail_people = list(profiles)
 
-            result[day]['avail_people'].append(avail_people)
+            result[day]['avail_people'] = avail_people
 
         return result
 
