@@ -1,15 +1,6 @@
 version: "3.3"
 
 services:
-  nginx-proxy:
-    image: jwilder/nginx-proxy
-    container_name: nginx-proxy
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-    ports:
-      - 80:80
-      - 443:443
-
   django_app:
     build:
       context: ./backend
@@ -19,12 +10,12 @@ services:
       - ./backend:/backend:ro
     depends_on:
       - everytime_parser
-    environment:
-      - VIRTUAL_HOST=api.dps0340.xyz
+    # environment:
+    #   - VIRTUAL_HOST=api.dps0340.xyz
 
   everytime_parser:
     build:
       context: ./everytime-parse-api
     restart: always
-    environment:
-      - VIRTUAL_HOST=everytime.dps0340.xyz
+    # environment:
+    #   - VIRTUAL_HOST=everytime.dps0340.xyz
