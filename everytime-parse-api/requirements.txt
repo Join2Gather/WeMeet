@@ -2,3 +2,6 @@ fastapi
 uvicorn
 aiohttp
 lxml
+numpy
+opencv-python
+python-multipart
