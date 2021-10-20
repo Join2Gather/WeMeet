@@ -153,7 +153,9 @@ class ClubsWithDateCalculator(DateCalculator):
 
 
 class DaySerializer(serializers.Serializer):
-    avail_time = serializers.ListField(
+    start_time = serializers.ListField(
+        child=serializers.IntegerField())
+    end_time = serializers.ListField(
         child=serializers.IntegerField())
     count = serializers.ListField(child=serializers.IntegerField())
     avail_people = serializers.ListField(
@@ -174,7 +176,9 @@ class ClubAvailableTimeSerializer(serializers.ModelSerializer):
     @ swagger_serializer_method(serializer_or_field=InterSectionSerializer)
     def get_intersection(self, obj):
         result = {day: {
-            'avail_time': [],
+            # 'avail_time': [],
+            'start_time': [],
+            'end_time': [],
             'count': [],
             'avail_people': []
         } for day in constants.week}
@@ -186,9 +190,10 @@ class ClubAvailableTimeSerializer(serializers.ModelSerializer):
         for date in dates:
             date_id, date_day, hour, minute = date
             day = constants.week[date_day]
-            time = float(f"{hour}.{minute}")
+            # time = float(f"{hour}.{minute}")
 
-            result[day]['avail_time'].append(time)
+            result[day]['start_time']['hour'].append(hour)
+            result[day]['start_time']['minute'].append(minute)
 
             profiles = profile_dates.filter(
                 date=date_id).values_list('profile__name')
