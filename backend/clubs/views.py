@@ -125,12 +125,17 @@ class ClubDateView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="개별 모임 조회",
+        operation_id="개별 모임 - 일정 예약",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
                 key: openapi.Schema(type=openapi.TYPE_ARRAY,
-                                    items=openapi.Items(type=openapi.TYPE_NUMBER))
+                                    items=openapi.Items(type=openapi.TYPE_OBJECT, properties={
+                                        key: openapi.Schema(
+                                            type=openapi.TYPE_INTEGER)
+                                        for key in ['starting_hours',
+                                                    'starting_minutes', 'end_hours', 'end_minutes']
+                                    }))
                 for key in constants.week
             }
         ),
@@ -152,12 +157,14 @@ class ClubDateView(APIView):
             day_idx = constants.week.index(day)
 
             for time in times:
-                hour = int(time)
-                splited = str(time).split('.')
-                minute = int(splited[1]) if len(splited) == 2 else 0
+                starting_hours = time.get('starting_hours')
+                starting_minutes = time.get('starting_minutes')
+                end_hours = time.get('end_hours')
+                end_minutes = time.get('end_minutes')
 
                 date = Dates.objects.get_or_create(
-                    day=day_idx, hour=hour, minute=minute)[0]
+                    day=day_idx, starting_hours=starting_hours,
+                    starting_minutes=starting_minutes, end_hours=end_hours, end_minutes=end_minutes)[0]
 
                 # 임시 시간표이므로 True로 둔다.
                 ProfileDates.objects.create(
@@ -284,7 +291,12 @@ class ClubConfirmOKView(APIView):
             type=openapi.TYPE_OBJECT,
             properties={
                 key: openapi.Schema(type=openapi.TYPE_ARRAY,
-                                    items=openapi.Items(type=openapi.TYPE_NUMBER))
+                                    items=openapi.Items(type=openapi.TYPE_OBJECT, properties={
+                                        key: openapi.Schema(
+                                            type=openapi.TYPE_INTEGER)
+                                        for key in ['starting_hours',
+                                                    'starting_minutes', 'end_hours', 'end_minutes']
+                                    }))
                 for key in constants.week
             }
         ),
@@ -301,12 +313,16 @@ class ClubConfirmOKView(APIView):
             profile=profile, club=club).delete()
 
         for idx, day in enumerate(constants.week):
-            starting_times = request.data.get(day) or []
-            for time in starting_times:
-                hour = int(time)
-                minute = int((time - hour) * 100)
+            times = request.data.get(day) or []
+            for time in times:
+                starting_hours = time.get('starting_hours')
+                starting_minutes = time.get('starting_minutes')
+                end_hours = time.get('end_hours')
+                end_minutes = time.get('end_minutes')
+
                 date = Dates.objects.get_or_create(
-                    day=idx, hour=hour, minute=minute)[0]
+                    day=idx, starting_hours=starting_hours,
+                    starting_minutes=starting_minutes, end_hours=end_hours, end_minutes=end_minutes)[0]
                 ProfileDates.objects.get_or_create(
                     profile=profile, date=date, club=club, is_temporary_reserved=False)
 

@@ -59,7 +59,12 @@ class EverytimeCalendarView(APIView):
             type=openapi.TYPE_OBJECT,
             properties={
                 key: openapi.Schema(type=openapi.TYPE_ARRAY,
-                                    items=openapi.Items(type=openapi.TYPE_NUMBER))
+                                    items=openapi.Items(type=openapi.TYPE_OBJECT, properties={
+                                        key: openapi.Schema(
+                                            type=openapi.TYPE_INTEGER)
+                                        for key in ['starting_hours',
+                                                    'starting_minutes', 'end_hours', 'end_minutes']
+                                    }))
                 for key in week
             }
         ))
@@ -73,12 +78,16 @@ class EverytimeCalendarView(APIView):
             profile=profile, club=None, is_temporary_reserved=False).delete()
 
         for idx, day in enumerate(week):
-            starting_times = request.data.get(day) or []
-            for time in starting_times:
-                hour = int(time)
-                minute = int((time - hour) * 100)
+            times = request.data.get(day) or []
+            for time in times:
+                starting_hours = time.get('starting_hours')
+                starting_minutes = time.get('starting_minutes')
+                end_hours = time.get('end_hours')
+                end_minutes = time.get('end_minutes')
+
                 date = Dates.objects.get_or_create(
-                    day=idx, hour=hour, minute=minute)[0]
+                    day=idx, starting_hours=starting_hours,
+                    starting_minutes=starting_minutes, end_hours=end_hours, end_minutes=end_minutes)[0]
                 ProfileDates.objects.get_or_create(
                     profile=profile, date=date, club=None, is_temporary_reserved=False)
 

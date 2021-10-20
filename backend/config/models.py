@@ -48,11 +48,15 @@ class ClubEntries(models.Model):
         return f"{self.profile} -> {self.club}"
 
 # 읽기 전용 시간 테이블
+
+
 class Dates(models.Model):
 
-    day = models.IntegerField()
-    hour = models.IntegerField()
-    minute = models.IntegerField()
+    day = models.IntegerField(default=0)
+    starting_hours = models.IntegerField(default=0)
+    starting_minutes = models.IntegerField(default=0)
+    end_hours = models.IntegerField(default=0)
+    end_minutes = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'dates'
