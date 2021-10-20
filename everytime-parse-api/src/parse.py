@@ -4,6 +4,7 @@ import math
 import pprint
 from typing import BinaryIO, List, Tuple, Union
 
+
 def normal_round(n):
     if n - math.floor(n) < 0.5:
         return math.floor(n)
@@ -20,7 +21,7 @@ def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = False)
     else:
         return []
     img_x, img_y, _ = img.shape
-    reshaped: np.ndarray = np.reshape(img, (-1, 3)) # 2d rgb to 1d rgb
+    reshaped: np.ndarray = np.reshape(img, (-1, 3))  # 2d rgb to 1d rgb
     colors: np.ndarray = np.unique(reshaped, axis=0)
 
     result_img = img.copy()
@@ -65,41 +66,25 @@ def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = False)
             end_minutes = 0
 
             if starting_time % 1.0:
-                starting_minutes = normal_round((starting_time % 1.0) * 60.0) # avoid banker's rounding
+                starting_minutes = normal_round(
+                    (starting_time % 1.0) * 60.0)  # avoid banker's rounding
             if end_time % 1.0:
                 end_minutes = normal_round((end_time % 1.0) * 60.0)
-                if end_minutes >= 59: # avoid IEEE 754 error
+                if end_minutes >= 59:  # avoid IEEE 754 error
                     end_hour += 1
                     end_minutes = 0
 
             day_num = int((x - padding_x) // one_day_x) + 1
             day = week[day_num]
 
-            # 15분마다 시간 찍어주는 로직
-
-            def min_dist(e, cmps: List[Union[float, int]]):
-                cmps.sort(key=lambda x: abs(e - x))
-                return cmps[0]
-
-            idx = starting_hour * 100 + starting_minutes
-            idx = min_dist(idx, 
-                [x
-                    for x in 
-                        list(range(idx - 100, idx, -15)) +
-                        list(range(idx, idx + 100, 15))
-                            if x % 100 < 60])
-            while idx <= end_hour * 100 + end_minutes - 30:
-                result[day].append(idx / 100)
-                idx += 15
-                if idx % 100 >= 60:
-                    idx -= idx % 100
-                    idx += 100
+            result[day].append({'starting_hour': starting_hour, 'starting_minutes': starting_minutes,
+                                'end_hour': end_hour, 'end_minutes': end_minutes})
 
             result_img = cv2.rectangle(
                 result_img, (x, y), (x+w, y+h), (0, 0, 255), 2)
-            
+
     for day in week:
-        result[day].sort()
+        result[day].sort(key=lambda x: [v for v in x.values()])
 
     if debug:
         printer = pprint.PrettyPrinter(2)
@@ -107,7 +92,7 @@ def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = False)
         for day, idx in result.items():
             print(
                 f"{day}요일 수업 시작 시간: {idx}")
-    
+
         cv2.imshow('img', result_img)
         cv2.waitKey()
         cv2.destroyAllWindows()
