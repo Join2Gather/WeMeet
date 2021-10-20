@@ -129,8 +129,8 @@ def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = False)
                 if end_minutes >= 59:  # avoid IEEE 754 error
                     end_hour += 1
                     end_minutes = 0
-            # starting_minutes, end_minutes = map(
-            #     smoothen_minutes, [starting_minutes, end_minutes])
+            starting_minutes, end_minutes = map(
+                smoothen_minutes, [starting_minutes, end_minutes])
 
             day_num = round((x - padding_x) / one_day_x) + 1
             day = week[day_num]
