@@ -5,7 +5,8 @@ if __name__ == '__main__':
 
 from fastapi.datastructures import UploadFile
 from fastapi.params import File
-from parse import get_result, parse_img
+from vision import parse_img
+from crawl import get_result
 from fastapi import FastAPI, Response
 from fastapi.encoders import jsonable_encoder as to_json
 from fastapi.responses import JSONResponse

@@ -12,14 +12,48 @@ def normal_round(n):
 
 
 def smoothen_minutes(minutes):
-    if (remainder := minutes % 10) == 9:
-        return minutes + 1
-    elif remainder == 1:
-        return minutes - 1
-    return minutes
+    if (remainder := minutes % 10) <= 3:
+        return minutes - remainder
+    elif remainder >= 7:
+        return minutes - remainder + 10
+    else:
+        return minutes - remainder + 5
 
 
-def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = True):
+def get_coords(img, colors, is_mobile_image=False):
+    coords = []
+    for color in colors:
+        if len(set(color.tolist())) != 1:
+            continue
+
+        mask_color = cv2.inRange(img, color, color)
+        contours, _ = cv2.findContours(
+            mask_color, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        for contour in contours:
+            x, y, w, h = map(int, cv2.boundingRect(contour))
+            if x <= 1 or y <= 1:
+                continue
+            if 50 > w or 50 > h:
+                continue
+            coords.append((x, y, w, h))
+
+    coords.sort()
+    padding_x, padding_y, _, _ = coords[0]
+    coords.sort(key=lambda x: x[3], reverse=True)
+
+    _, _, one_day_x, one_hour_y = coords[len(coords)//2]
+
+    # add border height
+    if is_mobile_image:
+        one_hour_y += 2
+    else:
+        one_hour_y += 1
+
+    return padding_x, padding_y, one_day_x, one_hour_y
+
+
+def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = False):
     if img_url:
         img: np.ndarray = cv2.imread(img_url)
     elif img_file:
@@ -56,20 +90,8 @@ def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = True):
     for day in week:
         result[day] = []
 
-    print(f'is_mobile_image: {is_mobile_image}')
-
-    if is_mobile_image:
-        padding_y = 40.0
-        padding_x = 40.0
-
-        one_hour_y = 140.0
-        one_day_x = 198.0
-    else:
-        padding_y = 80.0
-        padding_x = 70.0
-
-        one_hour_y = 180.0
-        one_day_x = 177.0
+    padding_x, padding_y, one_day_x, one_hour_y = get_coords(
+        img, colors, is_mobile_image)
 
     initial_hour = 9.0
 
@@ -82,6 +104,7 @@ def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = True):
 
         for contour in contours:
             x, y, w, h = map(int, cv2.boundingRect(contour))
+
             if x == 0 or y == 0:
                 continue
             if 50 > w or 50 > h:
@@ -106,24 +129,26 @@ def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = True):
                 if end_minutes >= 59:  # avoid IEEE 754 error
                     end_hour += 1
                     end_minutes = 0
-            starting_minutes, end_minutes = map(
-                smoothen_minutes, [starting_minutes, end_minutes])
+            # starting_minutes, end_minutes = map(
+            #     smoothen_minutes, [starting_minutes, end_minutes])
 
             day_num = round((x - padding_x) / one_day_x) + 1
             day = week[day_num]
 
             duplicate_list = [(idx, time) for idx, time in enumerate(result[day]) if
                               (time['starting_hour'] ==
-                               starting_hour and time['starting_minutes'] == starting_minutes) or
-                              (time['end_hour'] == end_hour and time['end_minutes'] == end_minutes)]
+                               starting_hour and abs(time['starting_minutes']-starting_minutes) <= 1) or
+                              (time['end_hour'] == end_hour and abs(time['end_minutes']-end_minutes) <= 1)]
 
             dic = {'starting_hour': starting_hour, 'starting_minutes': starting_minutes,
                    'end_hour': end_hour, 'end_minutes': end_minutes}
 
             if duplicate_list:
                 idx, duplicate = duplicate_list[0]
-                starting_equals = duplicate['starting_hour'] == starting_hour and duplicate['starting_minutes'] == starting_minutes
-                end_equals = duplicate['end_hour'] == end_hour and duplicate['end_minutes'] == end_minutes
+                starting_equals = duplicate['starting_hour'] == starting_hour and abs(
+                    duplicate['starting_minutes']-starting_minutes) <= 1
+                end_equals = duplicate['end_hour'] == end_hour and abs(
+                    duplicate['end_minutes']-end_minutes) <= 1
 
                 starting_includes = duplicate['starting_hour'] >= starting_hour and duplicate[
                     'starting_minutes'] >= starting_minutes
@@ -148,7 +173,6 @@ def parse_img(img_url: str = "", img_file: BinaryIO = None, debug: bool = True):
         for day, idx in result.items():
             print(
                 f"{day}요일 수업 시작 시간: {idx}")
-        cv2.imwrite('../assets/result.png', result_img)
 
         cv2.imshow('img', result_img)
         cv2.waitKey()
