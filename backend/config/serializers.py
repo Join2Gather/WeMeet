@@ -153,10 +153,14 @@ class ClubsWithDateCalculator(DateCalculator):
 
 
 class DaySerializer(serializers.Serializer):
-    start_time = serializers.ListField(
-        child=serializers.IntegerField())
-    end_time = serializers.ListField(
-        child=serializers.IntegerField())
+    class AvailableTimeSerializer(serializers.Serializer):
+        starting_hours = serializers.IntegerField()
+        starting_minutes = serializers.IntegerField()
+
+        end_hours = serializers.IntegerField()
+        end_minutes = serializers.IntegerField()
+    avail_time = serializers.ListField(
+        child=AvailableTimeSerializer())
     count = serializers.ListField(child=serializers.IntegerField())
     avail_people = serializers.ListField(
         child=serializers.CharField())
@@ -176,27 +180,27 @@ class ClubAvailableTimeSerializer(serializers.ModelSerializer):
     @ swagger_serializer_method(serializer_or_field=InterSectionSerializer)
     def get_intersection(self, obj):
         result = {day: {
-            # 'avail_time': [],
-            'start_time': [],
-            'end_time': [],
+            'avail_time': [],
             'count': [],
             'avail_people': []
         } for day in constants.week}
 
         profile_dates = ProfileDates.objects.filter(
             club=obj.id).select_related('date', 'profile')
-        dates = profile_dates.values_list(
-            'date__id', 'date__day', 'date__hour', 'date__minute').distinct()
+        dates = list(profile_dates.distinct())
         for date in dates:
-            date_id, date_day, hour, minute = date
-            day = constants.week[date_day]
+            day = constants.week[date.day]
             # time = float(f"{hour}.{minute}")
 
-            result[day]['start_time']['hour'].append(hour)
-            result[day]['start_time']['minute'].append(minute)
+            result[day]['avail_time'].append({
+                'starting_hours': date.starting_hours,
+                'starting_minutes': date.starting_hours,
+                'end_hours': date.end_hours,
+                'end_minutes': date.end_minutes,
+            })
 
             profiles = profile_dates.filter(
-                date=date_id).values_list('profile__name')
+                date=date.id).values_list('profile__name')
             result[day]['count'].append(len(profiles))
 
             avail_people = [profile[0] for profile in profiles]
