@@ -87,6 +87,5 @@ async def get_result(id: str, password: str) -> dict:
         if not login_result:
             return {'error': 'login failed'}
         year, semester = await get_year_semester(session)
-        semester = 1
         table_id = await get_table_id(session, year, semester)
         return await get_times(session, table_id)
