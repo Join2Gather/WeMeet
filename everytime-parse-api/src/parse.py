@@ -67,8 +67,8 @@ async def get_times(session: aiohttp.ClientSession, table_id: any):
     week = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
     days = [week[int(elem.attrib['day'])] for elem in data]
 
-    times = [{'starting_hour': e[0][0], 'starting_minutes': e[0][1],
-              'end_hour': e[1][0], 'end_minutes': e[1][1]} for e in times]
+    times = [{'starting_hours': e[0][0], 'starting_minutes': e[0][1],
+              'end_hours': e[1][0], 'end_minutes': e[1][1]} for e in times]
 
     week_result = {day: [] for day in week}
 
