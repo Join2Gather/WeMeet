@@ -1,5 +1,4 @@
 fastapi
 uvicorn
-numpy
-opencv-python
-python-multipart
+aiohttp
+lxml
