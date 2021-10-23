@@ -32,6 +32,9 @@ SWAGGER_SETTINGS = {
 }
 # Application definition
 
+NOSE_ARGS = ['--nocapture',
+             '--nologcapture', ]
+
 INSTALLED_APPS = [
     # Django Local Apps
     'django.contrib.admin',
