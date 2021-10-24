@@ -37,9 +37,11 @@ export function ModalMinute({
 	const [minute, setMinute] = useState('');
 	const focus = useAutoFocus();
 	const onPressConfirm = useCallback(() => {
-		mode === '2'
-			? (dispatch(setStartMin(Number(minute))), setMode('3'), setMinute(''))
-			: (dispatch(setEndMin(Number(minute))), setMode('0'), setMinute(''));
+		mode === 'startMinute'
+			? (dispatch(setStartMin(Number(minute))),
+			  setMode('endMode'),
+			  setMinute(''))
+			: (dispatch(setEndMin(Number(minute))), setMode('normal'), setMinute(''));
 	}, [minute, mode]);
 
 	return (
@@ -64,7 +66,7 @@ export function ModalMinute({
 					>
 						<TouchableHighlight
 							activeOpacity={1}
-							underlayColor={Colors.grey200}
+							underlayColor={Colors.white}
 							style={{
 								// position: 'absolute',
 								marginLeft: '90%',
@@ -78,13 +80,34 @@ export function ModalMinute({
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={28} />
 						</TouchableHighlight>
 						<Text style={styles.titleText}>
-							{mode === '2'
+							{mode === 'startMode'
 								? '시작 시간의 분을 입력하세요'
 								: '종료 시간의 분을 입력하세요'}
 						</Text>
 						<View style={[styles.textInputView]}>
-							<Text style={styles.hourText}>
-								{start <= 12 ? `AM ${start}` : `PM ${end - 12}`} :{' '}
+							<View style={styles.viewFlex1} />
+							<Text
+								style={[
+									styles.hourText,
+									{
+										flex:
+											start <= 12
+												? start - 9 < 0
+													? 0.75
+													: 1
+												: start - 21 < 0
+												? 0.75
+												: 1,
+									},
+								]}
+							>
+								{mode === '2'
+									? start <= 12
+										? `AM ${start} :`
+										: `PM ${start - 12} :`
+									: end <= 12
+									? `AM ${end} :`
+									: `PM ${end - 12} :`}
 							</Text>
 							<TextInput
 								// onFocus={focus}
@@ -95,6 +118,7 @@ export function ModalMinute({
 								placeholder="00"
 								placeholderTextColor={Colors.grey600}
 							/>
+							<View style={styles.viewFlex1} />
 						</View>
 					</View>
 					<View style={styles.buttonRowView}>
@@ -156,30 +180,32 @@ const styles = StyleSheet.create({
 		//
 	},
 	hourText: {
-		fontSize: 21,
+		fontSize: 20,
 		fontFamily: 'NanumSquareR',
+		// flex: 1,
+		// backgroundColor: Colors.red100,
 	},
 	textInput: {
 		fontSize: 23,
-		flex: 1,
+		flex: 0.6,
 		fontFamily: 'NanumSquareR',
-		marginTop: -2,
-		paddingLeft: 9,
+		// marginTop: -2,
+		alignSelf: 'center',
 		borderWidth: 0.3,
-		padding: 0.5,
-		width: 30,
+		padding: 2,
+		marginTop: -4,
+		marginLeft: -3,
+		marginRight: -3,
+		textAlign: 'center',
+
 		borderColor: Colors.blue300,
-		// alignContent: 'center',
-		// height: 20,
+		borderRadius: 8,
 	},
 	textInputView: {
 		flexDirection: 'row',
-		// paddingBottom: 0.7,
-		// borderBottomWidth: 0.3,
 		alignContent: 'center',
-		width: '52%',
-		marginLeft: '30%',
-		padding: 10,
+		justifyContent: 'center',
+		alignSelf: 'center',
 	},
 	buttonText: {
 		textAlign: 'center',
@@ -191,9 +217,7 @@ const styles = StyleSheet.create({
 		alignContent: 'center',
 		alignSelf: 'center',
 		marginTop: 10,
-		// justifyContent: 'center',
-		// alignContent: 'center',
-		marginBottom: -13,
+		marginBottom: 0,
 	},
 	textStyle: {
 		color: 'white',
@@ -202,9 +226,9 @@ const styles = StyleSheet.create({
 	},
 	closeButtonStyle: {
 		padding: 13,
-		width: '80%',
+		width: '40%',
 		height: '100%',
-		borderRadius: 13,
+		borderRadius: 8,
 		backgroundColor: Colors.blue300,
 	},
 	acceptButtonStyle: {
@@ -222,5 +246,8 @@ const styles = StyleSheet.create({
 		height: '50%',
 		borderLeftWidth: 0.16,
 		width: 1,
+	},
+	viewFlex1: {
+		flex: 1,
 	},
 });
