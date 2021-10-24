@@ -17,7 +17,7 @@ import { useAutoFocus, AutoFocusProvider } from '../contexts';
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
 import { useSelector } from 'react-redux';
-
+import { clientBaseURL } from '../lib/api/client';
 export default function Login() {
 	const { name } = useSelector(({ login }: RootState) => ({
 		name: login.name,
@@ -43,7 +43,7 @@ export default function Login() {
 	}, [name]);
 	const onPressSocial = useCallback(async (social: any) => {
 		setSocialModalVisible(true);
-		setSource('http://api.dps0340.xyz/accounts/kakao/login');
+		setSource(`${clientBaseURL}accounts/kakao/login`);
 		//setSource(`http://localhost:8000/accounts/kakao/login`);
 	}, []);
 	const onCloseSocial = useCallback(async () => {
