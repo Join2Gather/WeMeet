@@ -3,6 +3,8 @@ export interface timetable {
 	teamDates: make_days[];
 	startTime: number;
 	endTime: number;
+	startMinute: number;
+	endMinute: number;
 	// selectTimes: [selectDays, selectDays];
 	selectTime: selectDay;
 	day: string;
