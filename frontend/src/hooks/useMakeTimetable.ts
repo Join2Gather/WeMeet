@@ -9,7 +9,14 @@ export function useMakeTimetable() {
 	const timesText: Array<string> = [];
 
 	for (let i = 8; i <= 24; i += 1) {
-		times.push({ time: i, color: Colors.white, isFullTime: false });
+		times.push({
+			time: i,
+			color: Colors.white,
+			isFullTime: false,
+			endPercent: 100,
+			startPercent: 100,
+			mode: 'normal',
+		});
 		if (i <= 12) {
 			if (i % 2 === 0) {
 				timesText.push(`${i} AM`);
@@ -20,7 +27,14 @@ export function useMakeTimetable() {
 			}
 		}
 		if (i === 24) {
-			times.push({ time: 1, color: Colors.white, isFullTime: false });
+			times.push({
+				time: 1,
+				color: Colors.white,
+				isFullTime: false,
+				startPercent: 100,
+				endPercent: 100,
+				mode: 'normal',
+			});
 			timesText.push('2 AM');
 		}
 	}
