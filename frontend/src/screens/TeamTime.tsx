@@ -133,12 +133,7 @@ export default function Home({ route }: Props) {
 						)}
 						{mode === 'endMode' && (
 							<>
-								<Text style={styles.stepText}>[3] 종료 시간 터치해주세요</Text>
-							</>
-						)}
-						{mode === '4' && (
-							<>
-								<Text style={styles.stepText}>[4] 일정 종료 분 설정</Text>
+								<Text style={styles.stepText}>[3] 종료 시간 입력해주세요</Text>
 							</>
 						)}
 					</View>
@@ -148,7 +143,7 @@ export default function Home({ route }: Props) {
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
 						isGroup={isGroup}
-					></Timetable>
+					/>
 				</View>
 			</ScrollEnabledProvider>
 		</SafeAreaView>
