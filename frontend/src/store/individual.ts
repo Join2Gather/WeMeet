@@ -4,7 +4,6 @@ import * as api from '../lib/api/individual';
 import { takeLatest } from 'redux-saga/effects';
 import { createAction } from 'redux-actions';
 import type {
-	default_days,
 	requestTeamAPI,
 	responseTeamAPI,
 	state_time,
@@ -15,13 +14,17 @@ import type {
 } from '../interface';
 
 const POST_IMAGE = 'individual/POST_IMAGE';
+const LOGIN_EVERYTIME = 'individual/LOGIN_EVERYTIME';
 
 export const postImage = createAction(POST_IMAGE, (data: postImageAPI) => data);
+export const loginEveryTime = createAction(LOGIN_EVERYTIME);
 
 const postImageSaga = createRequestSaga(POST_IMAGE, api.postImage);
+const loginEverySaga = createRequestSaga(LOGIN_EVERYTIME, api.loginEveryTime);
 
 export function* individualSaga() {
 	yield takeLatest(POST_IMAGE, postImageSaga);
+	yield takeLatest(LOGIN_EVERYTIME, loginEverySaga);
 }
 
 const initialState: individual = {
@@ -51,6 +54,12 @@ export const individualSlice = createSlice({
 			state.dates.sun.time = action.payload.sun;
 		},
 		POST_IMAGE_FAILURE: (state, action: PayloadAction<any>) => {
+			state.error = action.payload;
+		},
+		LOGIN_EVERYTIME_SUCCESS: (state, action: PayloadAction<any>) => {
+			console.log(action.payload);
+		},
+		LOGIN_EVERYTIME_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
 	},

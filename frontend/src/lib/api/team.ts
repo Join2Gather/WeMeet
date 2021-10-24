@@ -1,4 +1,3 @@
-import axios from 'axios';
 import client from './client';
 import type { requestTeamAPI } from '../../interface';
 

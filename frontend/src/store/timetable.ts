@@ -55,6 +55,17 @@ export const timetableSlice = createSlice({
 		setStartMin: (state, action: PayloadAction<number>) => {
 			state.startMinute = action.payload;
 		},
+		setStartPercentage: (state) => {
+			const find = state.dates[state.dayIdx].times.find(
+				(d) => d.time === state.startTime
+			);
+			if (find) {
+				find.color = Colors.blue200;
+				find.isFullTime = true;
+				find.startPercent = (1 - state.startMinute / 60) * 100;
+				find.mode = 'start';
+			}
+		},
 		setEndMin: (state, action: PayloadAction<number>) => {
 			state.endMinute = action.payload;
 		},
@@ -86,12 +97,15 @@ export const timetableSlice = createSlice({
 		changeAllColor: (state) => {
 			for (
 				let i = Math.floor(state.startTime);
-				i < Math.floor(state.endTime);
+				i <= Math.floor(state.endTime);
 				i++
 			) {
 				state.dates[state.dayIdx].times[i - 8].color = Colors.blue200;
-				if (i === Math.floor(state.endTime) - 1) {
+				if (i === Math.floor(state.endTime)) {
 					state.dates[state.dayIdx].times[i - 8].isFullTime = true;
+					state.dates[state.dayIdx].times[i - 8].endPercent =
+						(state.endMinute / 60) * 100;
+					state.dates[state.dayIdx].times[i - 8].mode = 'end';
 				}
 			}
 		},
@@ -107,8 +121,10 @@ export const {
 	setEndMin,
 	changeColor,
 	pushSelectEnd,
+	pushSelectStart,
 	changeAllColor,
 	setDay,
+	setStartPercentage,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;

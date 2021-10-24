@@ -55,4 +55,7 @@ export interface state_time {
 	time: number;
 	color: string;
 	isFullTime: boolean;
+	startPercent: number;
+	endPercent: number;
+	mode: string;
 }
