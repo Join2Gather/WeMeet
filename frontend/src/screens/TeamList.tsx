@@ -50,13 +50,11 @@ export default function TeamList() {
 			<View style={[styles.view, { opacity: modalVisible ? 0.2 : 1 }]}>
 				<NavigationHeader title="모임 목록" />
 				<Text style={styles.headerUnderText}>Plan list</Text>
-				{/* <View style={{ height: 50, flexGrow: 0 }}> */}
 				{!clubs && (
 					<TouchableView
 						style={[
 							styles.teamListTouchableView,
 							{ width: '100%', justifyContent: 'space-between' },
-							// { width: '120%', justifyContent: 'flex-start' },
 						]}
 					>
 						<View style={styles.rowCircle} />
@@ -67,7 +65,6 @@ export default function TeamList() {
 					style={{
 						height: dimensions.screen.height * 0.55,
 						flexGrow: 0,
-						// paddingTop: '-20%',
 					}}
 					data={clubs}
 					renderItem={({ item }) => (
@@ -89,7 +86,6 @@ export default function TeamList() {
 					)}
 					keyExtractor={(item, index) => String(item.id)}
 				/>
-
 				{/* <View
 					style={[
 						styles.blurView,
@@ -119,6 +115,7 @@ export default function TeamList() {
 					user={user}
 					id={id}
 					token={token}
+					goTeamTime={goTeamTime}
 				/>
 			</View>
 
@@ -230,9 +227,6 @@ const styles = StyleSheet.create({
 			width: 1,
 			height: 1,
 		},
-		// shadowOpacity: 0.21,
-		// shadowRadius: 1.0,
-		// marginBottom: 10,
 	},
 	blurView: {
 		paddingTop: 5,

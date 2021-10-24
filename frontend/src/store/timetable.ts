@@ -1,23 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import createRequestSaga from '../hooks/createRequestSaga';
-import * as api from '../lib/api/team';
-import { takeLatest } from 'redux-saga/effects';
-import { createAction } from 'redux-actions';
-import type { changeColorType, team, timetable } from '../interface';
+import type { changeColorType, timetable } from '../interface';
 import { Colors } from 'react-native-paper';
-
-// const POST_TEAM = 'team/POST_TEAM';
-
-// export const postTeamName = createAction(
-// 	POST_TEAM,
-// 	(data: requestTeamAPI) => data
-// );
-
-// const postTeamSaga = createRequestSaga(POST_TEAM, api.postTeamName);
-
-// export function* teamSaga() {
-// 	yield takeLatest(POST_TEAM, postTeamSaga);
-// }
 
 const initialState: timetable = {
 	dates: [
@@ -51,6 +34,8 @@ const initialState: timetable = {
 	},
 	day: '',
 	dayIdx: 0,
+	startMinute: 0,
+	endMinute: 0,
 };
 
 export const timetableSlice = createSlice({
@@ -68,10 +53,10 @@ export const timetableSlice = createSlice({
 			state.endTime = action.payload;
 		},
 		setStartMin: (state, action: PayloadAction<number>) => {
-			state.startTime = state.startTime + action.payload / 100;
+			state.startMinute = action.payload;
 		},
 		setEndMin: (state, action: PayloadAction<number>) => {
-			state.endTime = state.endTime + action.payload / 100;
+			state.endMinute = action.payload;
 		},
 		setDay: (state, action: PayloadAction<string>) => {
 			state.day = action.payload;
