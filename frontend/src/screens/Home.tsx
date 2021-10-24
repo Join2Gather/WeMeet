@@ -13,6 +13,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { postImage } from '../store/individual';
+import { ModalSelect } from '../components';
 import * as FileSystem from 'expo-file-system';
 
 export default function Home() {
@@ -27,6 +28,7 @@ export default function Home() {
 	const [people, setPeople] = useState([]);
 	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
 	const [modalVisible, setModalVisible] = useState(false);
+	const [selectModalVisible, setSelectModalVisible] = useState(false);
 	const flatListRef = useRef<FlatList | null>(null);
 	const addTimetable = useCallback(() => {
 		// navigation.navigate('')
@@ -38,6 +40,8 @@ export default function Home() {
 		setMode('1');
 	}, []);
 	const [day, setDay] = useState('');
+	// modal
+
 	useEffect(() => {
 		(async () => {
 			if (Platform.OS !== 'web') {
@@ -50,26 +54,22 @@ export default function Home() {
 		})();
 	}, []);
 
-	useEffect(() => {
-		if (dates) {
-			console.log(dates);
-		}
-	}, [dates]);
+	// useEffect(() => {
+	// 	if (dates) {
+	// 	}
+	// }, [dates]);
+
 	const pickImage = async () => {
 		const result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
 			allowsEditing: false,
 			aspect: [4, 3],
 			quality: 1,
-			// base64: true,
-			// exif: true,
 		});
 		if (!result.cancelled) {
-			console.log(result);
 			const imagePath = result.uri;
 			const imageExt = result.uri.split('.').pop();
 			const imageMime = `image/${imageExt}`;
-			// setImage(imagePath);
 			dispatch(postImage({ image: imagePath, token: token }));
 		}
 	};
@@ -85,7 +85,7 @@ export default function Home() {
 								size={28}
 								color={Colors.black}
 								style={{ paddingTop: 1 }}
-								onPress={pickImage}
+								onPress={() => setSelectModalVisible(true)}
 							/>
 						)}
 						Right={() => (
@@ -104,21 +104,6 @@ export default function Home() {
 							style={{ width: 200, height: 200 }}
 						/>
 					)}
-					{/* <TopBar noSwitch>
-						<UnderlineText onPress={addPerson} style={styles.text}>
-							add
-						</UnderlineText>
-						<UnderlineText onPress={removeAllPersons} style={styles.text}>
-							remove all
-						</UnderlineText>
-					</TopBar> */}
-					{/* <LeftRightNavigation
-						ref={leftRef}
-						distance={40}
-						flatListRef={flatListRef}
-						onLeftToRight={goLeft}
-						onRightToLeft={goRight}
-					></LeftRightNavigation> */}
 					<Text style={styles.titleText}>make your plan</Text>
 					<View style={styles.rowView}>
 						{mode === '0' && (
@@ -153,6 +138,10 @@ export default function Home() {
 						setModalVisible={setModalVisible}
 						mode={mode}
 					></Timetable>
+					<ModalSelect
+						selectModalVisible={selectModalVisible}
+						setSelectModalVisible={setSelectModalVisible}
+					/>
 				</View>
 			</ScrollEnabledProvider>
 		</SafeAreaView>
