@@ -12,9 +12,29 @@ services:
     container_name: nginx-proxy
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - certs:/etc/nginx/certs:ro
+      - conf:/etc/nginx/conf.d
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - dhparam:/etc/nginx/dhparam
     ports:
       - 80:80
       - 443:443
+  
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: letsencrypt
+    depends_on:
+      - nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - dhparam:/etc/nginx/dhparam
+      - acme:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
 
   django_app:
     image: a891/join2gather_backend:latest
@@ -26,9 +46,19 @@ services:
       - everytime_parser
     environment:
       - VIRTUAL_HOST=api.dps0340.xyz
+      - LETSENCRYPT_HOST=api.dps0340.xyz
 
   everytime_parser:
     image: a891/join2gather_everytime:latest
     restart: always
     environment:
       - VIRTUAL_HOST=everytime.dps0340.xyz
+      - LETSENCRYPT_HOST=everytime.dps0340.xyz
+
+volumes:
+  conf:
+  vhost:
+  html:
+  dhparam:
+  acme:
+  certs:
