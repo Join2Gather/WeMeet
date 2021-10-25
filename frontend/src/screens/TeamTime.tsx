@@ -13,6 +13,13 @@ import { LeftRightNavigation, Timetable } from '../components';
 import type { LeftRightNavigationMethods } from '../components';
 import { Colors } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useDispatch } from 'react-redux';
+import {
+	setEndHour,
+	setEndMin,
+	setStartHour,
+	setStartMin,
+} from '../store/timetable';
 type TeamStackParamList = {
 	TeamTime: { name: string };
 };
@@ -28,12 +35,16 @@ export default function Home({ route }: Props) {
 	}, []);
 
 	const [isGroup, setGroupMode] = useState(true);
-
+	const dispatch = useDispatch();
 	//modal
 	const [modalVisible, setModalVisible] = useState(false);
-	const [mode, setMode] = useState('0');
+	const [mode, setMode] = useState('normal');
 	const onPressPlus = useCallback(() => {
-		setMode('1');
+		setMode('startMode');
+		dispatch(setStartHour(0));
+		dispatch(setStartMin(0));
+		dispatch(setEndHour(0));
+		dispatch(setEndMin(0));
 	}, []);
 	return (
 		<SafeAreaView style={{ backgroundColor: Colors.white, flex: 1 }}>
@@ -66,13 +77,13 @@ export default function Home({ route }: Props) {
 									size={28}
 									color={Colors.white}
 									style={{ paddingTop: 1 }}
-									onPress={() => setMode('1')}
+									onPress={() => setMode('startMode')}
 								/>
 							)
 						}
 					/>
 					<View style={styles.rowButtonView}>
-						{mode === '0' && (
+						{mode === 'normal' && (
 							<>
 								<TouchableOpacity
 									style={styles.touchableBoxView}
@@ -108,26 +119,21 @@ export default function Home({ route }: Props) {
 								</TouchableOpacity>
 							</>
 						)}
-						{mode === '1' && (
+						{mode === 'startMode' && (
 							<>
 								<Text style={styles.stepText}>
 									{'[1] 일정 시작 시간을 터치해주세요'}
 								</Text>
 							</>
 						)}
-						{mode === '2' && (
+						{mode === 'startMinute' && (
 							<>
 								<Text style={styles.stepText}>[2] 일정 시작 분 설정</Text>
 							</>
 						)}
-						{mode === '3' && (
+						{mode === 'endMode' && (
 							<>
-								<Text style={styles.stepText}>[3] 종료 시간 터치해주세요</Text>
-							</>
-						)}
-						{mode === '4' && (
-							<>
-								<Text style={styles.stepText}>[4] 일정 종료 분 설정</Text>
+								<Text style={styles.stepText}>[3] 종료 시간 입력해주세요</Text>
 							</>
 						)}
 					</View>
@@ -137,7 +143,7 @@ export default function Home({ route }: Props) {
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
 						isGroup={isGroup}
-					></Timetable>
+					/>
 				</View>
 			</ScrollEnabledProvider>
 		</SafeAreaView>

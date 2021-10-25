@@ -7,6 +7,10 @@ export interface postImageAPI {
 	image: string;
 	token: string;
 }
+export interface loginEveryTimeAPI {
+	id: string;
+	password: string;
+}
 
 export interface responseImageAPI {
 	sun: Array<string>;

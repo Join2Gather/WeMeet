@@ -3,6 +3,8 @@ export interface timetable {
 	teamDates: make_days[];
 	startTime: number;
 	endTime: number;
+	startMinute: number;
+	endMinute: number;
 	// selectTimes: [selectDays, selectDays];
 	selectTime: selectDay;
 	day: string;
@@ -53,4 +55,7 @@ export interface state_time {
 	time: number;
 	color: string;
 	isFullTime: boolean;
+	startPercent: number;
+	endPercent: number;
+	mode: string;
 }

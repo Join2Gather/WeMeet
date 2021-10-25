@@ -1,23 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import createRequestSaga from '../hooks/createRequestSaga';
-import * as api from '../lib/api/team';
-import { takeLatest } from 'redux-saga/effects';
-import { createAction } from 'redux-actions';
-import type { changeColorType, team, timetable } from '../interface';
+import type { changeColorType, timetable } from '../interface';
 import { Colors } from 'react-native-paper';
-
-// const POST_TEAM = 'team/POST_TEAM';
-
-// export const postTeamName = createAction(
-// 	POST_TEAM,
-// 	(data: requestTeamAPI) => data
-// );
-
-// const postTeamSaga = createRequestSaga(POST_TEAM, api.postTeamName);
-
-// export function* teamSaga() {
-// 	yield takeLatest(POST_TEAM, postTeamSaga);
-// }
 
 const initialState: timetable = {
 	dates: [
@@ -51,6 +34,8 @@ const initialState: timetable = {
 	},
 	day: '',
 	dayIdx: 0,
+	startMinute: 0,
+	endMinute: 0,
 };
 
 export const timetableSlice = createSlice({
@@ -68,10 +53,21 @@ export const timetableSlice = createSlice({
 			state.endTime = action.payload;
 		},
 		setStartMin: (state, action: PayloadAction<number>) => {
-			state.startTime = state.startTime + action.payload / 100;
+			state.startMinute = action.payload;
+		},
+		setStartPercentage: (state) => {
+			const find = state.dates[state.dayIdx].times.find(
+				(d) => d.time === state.startTime
+			);
+			if (find) {
+				find.color = Colors.blue200;
+				find.isFullTime = true;
+				find.startPercent = (1 - state.startMinute / 60) * 100;
+				find.mode = 'start';
+			}
 		},
 		setEndMin: (state, action: PayloadAction<number>) => {
-			state.endTime = state.endTime + action.payload / 100;
+			state.endMinute = action.payload;
 		},
 		setDay: (state, action: PayloadAction<string>) => {
 			state.day = action.payload;
@@ -101,12 +97,15 @@ export const timetableSlice = createSlice({
 		changeAllColor: (state) => {
 			for (
 				let i = Math.floor(state.startTime);
-				i < Math.floor(state.endTime);
+				i <= Math.floor(state.endTime);
 				i++
 			) {
 				state.dates[state.dayIdx].times[i - 8].color = Colors.blue200;
-				if (i === Math.floor(state.endTime) - 1) {
+				if (i === Math.floor(state.endTime)) {
 					state.dates[state.dayIdx].times[i - 8].isFullTime = true;
+					state.dates[state.dayIdx].times[i - 8].endPercent =
+						(state.endMinute / 60) * 100;
+					state.dates[state.dayIdx].times[i - 8].mode = 'end';
 				}
 			}
 		},
@@ -122,8 +121,10 @@ export const {
 	setEndMin,
 	changeColor,
 	pushSelectEnd,
+	pushSelectStart,
 	changeAllColor,
 	setDay,
+	setStartPercentage,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;

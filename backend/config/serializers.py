@@ -1,4 +1,5 @@
 from logging import error
+from config.parse import intersect_time
 from config.models import ClubEntries, Clubs, Dates, ProfileDates, Profiles
 from config import constants
 from rest_framework import serializers
@@ -173,7 +174,7 @@ class DaySerializer(serializers.Serializer):
         child=AvailableTimeSerializer())
     count = serializers.ListField(child=serializers.IntegerField())
     avail_people = serializers.ListField(
-        child=serializers.CharField())
+        child=serializers.ListField(child=serializers.CharField()))
 
 
 class ClubAvailableTimeSerializer(serializers.ModelSerializer):
@@ -198,24 +199,129 @@ class ClubAvailableTimeSerializer(serializers.ModelSerializer):
         profile_dates = ProfileDates.objects.filter(
             club=obj.id).select_related('date', 'profile')
         profile_dates = profile_dates.distinct()
+
         for profile_date in profile_dates:
             date = profile_date.date
             day = constants.week[date.day]
 
-            result[day]['avail_time'].append({
+            avail_time = {
                 'starting_hours': date.starting_hours,
-                'starting_minutes': date.starting_hours,
+                'starting_minutes': date.starting_minutes,
                 'end_hours': date.end_hours,
                 'end_minutes': date.end_minutes,
-            })
-
+            }
             profiles = profile_dates.filter(
                 date=date.id).values_list('profile__name', flat=True)
-            result[day]['count'].append(len(profiles))
+            avail_people = sorted(list(profiles))
 
-            avail_people = list(profiles)
+            starting_time = avail_time['starting_hours'] * \
+                60 + avail_time['starting_minutes']
+            end_time = avail_time['end_hours'] * \
+                60 + avail_time['end_minutes']
 
-            result[day]['avail_people'] = avail_people
+            append_results = []
+
+            for intersect_idx, cmp_avail_time in enumerate(result[day]['avail_time']):
+                cmp_starting_time = cmp_avail_time['starting_hours'] * \
+                    60 + cmp_avail_time['starting_minutes']
+                cmp_end_time = cmp_avail_time['end_hours'] * \
+                    60 + cmp_avail_time['end_minutes']
+
+                intersection = intersect_time(
+                    starting_time, end_time, cmp_starting_time, cmp_end_time)
+
+                if not intersection:
+                    continue
+
+                intersection_starting_time, intersection_end_time = intersection
+                s = set(
+                    result[day]['avail_people'][intersect_idx] + avail_people)
+
+                append_results.append({
+                    'index': intersect_idx,
+                    'avail_people': sorted(list(s)),
+                    'cmp_avail_people': sorted(result[day]['avail_people'][intersect_idx]),
+                    'starting_time': intersection_starting_time,
+                    'end_time': intersection_end_time
+                })
+
+            for append_result in append_results:
+                index = append_result['index']
+
+                intersection_avail_people = append_result['avail_people']
+                intersection_starting_time = append_result['starting_time']
+                intersection_end_time = append_result['end_time']
+
+                starting_time_minutes = avail_time['starting_hours'] * \
+                    60 + avail_time['starting_minutes']
+                end_time_minutes = avail_time['end_hours'] * \
+                    60 + avail_time['end_minutes']
+
+                times = [
+                    (min(intersection_starting_time, starting_time_minutes),
+                     max(intersection_starting_time, starting_time_minutes)),
+                    (min(intersection_starting_time, intersection_end_time),
+                     max(intersection_starting_time, intersection_end_time)),
+                    (min(intersection_end_time, end_time_minutes),
+                     max(intersection_end_time, end_time_minutes)),
+                ]
+
+                times = [
+                    {'starting_hours': e[0] // 60, 'starting_minutes': e[0] % 60, 'end_hours': e[1] // 60, 'end_minutes': e[1] % 60} for e in times
+                ]
+
+                for idx, time in enumerate(times):
+                    if time['starting_hours'] * 60 + time['starting_minutes'] >= time['end_hours'] * 60 + time['end_minutes']:
+                        continue
+
+                    indices = [idx for idx, t in enumerate(
+                        result[day]['avail_time']) if t == time]
+
+                    selected_avail_people = [
+                        avail_people, intersection_avail_people, avail_people][idx]
+
+                    if indices:
+                        for index in indices:
+                            selected_avail_people = sorted(
+                                list(set(selected_avail_people + result[day]['avail_people'][index])))
+
+                        result[day]['avail_time'] = [
+                            x for idx, x in enumerate(result[day]['avail_time']) if idx not in indices]
+                        result[day]['count'] = [
+                            x for idx, x in enumerate(result[day]['count']) if idx not in indices]
+                        result[day]['avail_people'] = [
+                            x for idx, x in enumerate(result[day]['avail_people']) if idx not in indices]
+
+                    result[day]['avail_time'].append(time)
+                    result[day]['count'].append(
+                        len(selected_avail_people))
+                    result[day]['avail_people'].append(
+                        selected_avail_people)
+
+            if not append_results:
+                result[day]['avail_time'].append(avail_time)
+                result[day]['count'].append(len(avail_people))
+                result[day]['avail_people'].append(avail_people)
+
+        dict_result = {day: [{'avail_time': avail_time, 'count': count, 'avail_people': avail_people}
+                             for avail_time, count, avail_people in zip(result[day]['avail_time'], result[day]['count'], result[day]['avail_people'])] for day in constants.week}
+
+        def unique(lst):
+            return [k for j, k in enumerate(lst) if k not in lst[j + 1:]]
+
+        dict_result = {day: sorted(unique(v), key=lambda x: tuple(x['avail_time']))
+                       for day, v in dict_result.items()}
+
+        result = {day: {
+            'avail_time': [],
+            'count': [],
+            'avail_people': []
+        } for day in constants.week}
+
+        for day in dict_result:
+            for elem in dict_result[day]:
+                for k, v in elem.items():
+                    result[day][k].append(v)
 
         return result
 

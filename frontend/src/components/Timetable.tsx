@@ -8,6 +8,7 @@ import {
 	changeAllColor,
 	changeColor,
 	pushSelectEnd,
+	pushSelectStart,
 	setDay,
 	setEndHour,
 	setStartHour,
@@ -15,7 +16,7 @@ import {
 import { View, Text, TouchableView } from '../theme';
 import { RootState } from '../store';
 
-const dayOfWeek = ['SUN', 'TUE', 'THU', 'WED', 'THU', 'FRI', 'SAT'];
+const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 interface props {
 	mode: string;
@@ -33,25 +34,32 @@ export function Timetable({
 	isGroup,
 }: props) {
 	const { timesText } = useMakeTimetable();
-	const { dates, teamDates } = useSelector(({ timetable }: RootState) => ({
-		dates: timetable.dates,
-		teamDates: timetable.teamDates,
-	}));
+	const { dates, teamDates, startTime, endTime, startMinute, endMinute } =
+		useSelector(({ timetable }: RootState) => ({
+			dates: timetable.dates,
+			teamDates: timetable.teamDates,
+			startTime: timetable.startTime,
+			endTime: timetable.endTime,
+			startMinute: timetable.startMinute,
+			endMinute: timetable.endMinute,
+		}));
 	const dispatch = useDispatch();
 	const onSetStartHour = useCallback(
 		(idx: number, time: number, day: string) => {
 			dispatch(setStartHour(time));
-			setMode('2');
+			setMode('startMinute');
 			setStart(time);
 			setModalVisible(true);
 			dispatch(changeColor({ idx: idx, time: time }));
 			dispatch(setDay(day));
+			dispatch(pushSelectStart(time));
 		},
 		[]
 	);
 	const onSetEndHour = useCallback((idx: number, time: number) => {
 		dispatch(setEndHour(time));
 		setMode('4');
+		setEnd(time);
 		setModalVisible(true);
 		dispatch(pushSelectEnd());
 		dispatch(changeAllColor());
@@ -95,29 +103,31 @@ export function Timetable({
 									{day.times.map((d) => (
 										<TouchableView
 											onPress={() => {
-												mode === '1' &&
+												mode === 'startMode' &&
 													onSetStartHour(idx, Number(d.time), day.day);
-												mode === '3' && onSetEndHour(idx, Number(d.time));
+												mode === 'endMode' && onSetEndHour(idx, Number(d.time));
 											}}
 											key={Number(d.time)}
 											style={[
 												styles.boxView,
 												{
 													borderBottomWidth: Number(d.time) === 1 ? 0.3 : 0,
-													// backgroundColor: d.color,
 												},
 											]}
 										>
 											<View
 												style={{
-													height: '50%',
+													height:
+														d.time === endTime
+															? `${(endMinute / 60) * 100}%`
+															: '100%',
 													backgroundColor: d.time % 1 ? Colors.white : d.color,
 												}}
 											/>
 											<View
 												style={{
-													height: '50%',
-													backgroundColor: d.time % 1 ? Colors.white : d.color,
+													height: '100%',
+													backgroundColor: d.color,
 												}}
 											/>
 										</TouchableView>
@@ -132,9 +142,9 @@ export function Timetable({
 									{day.times.map((d) => (
 										<TouchableView
 											onPress={() => {
-												mode === '1' &&
+												mode === 'startMode' &&
 													onSetStartHour(idx, Number(d.time), day.day);
-												mode === '3' && onSetEndHour(idx, Number(d.time));
+												mode === 'endMode' && onSetEndHour(idx, Number(d.time));
 											}}
 											key={Number(d.time)}
 											style={[
@@ -147,14 +157,35 @@ export function Timetable({
 										>
 											<View
 												style={{
-													height: '50%',
-													backgroundColor: d.time % 1 ? Colors.white : d.color,
+													height:
+														d.isFullTime && d.mode === 'start'
+															? `${100 - d.startPercent}%`
+															: d.mode === 'end'
+															? `${d.endPercent}%`
+															: '100%',
+
+													backgroundColor:
+														d.isFullTime && d.mode === 'start'
+															? Colors.white
+															: d.mode === 'end'
+															? d.color
+															: d.color,
 												}}
 											/>
 											<View
 												style={{
-													height: '50%',
-													backgroundColor: d.time % 1 ? Colors.white : d.color,
+													height:
+														d.isFullTime && d.mode === 'start'
+															? `${d.startPercent}%`
+															: d.mode === 'end'
+															? `${d.endPercent}%`
+															: '0%',
+													backgroundColor:
+														d.isFullTime && d.mode === 'start'
+															? d.color
+															: d.mode === 'end'
+															? Colors.white
+															: Colors.white,
 												}}
 											/>
 										</TouchableView>
@@ -220,8 +251,9 @@ const styles = StyleSheet.create({
 		height: 29.6,
 		// marginLeft: 10,
 		width: 41,
-		borderWidth: 0.3,
-		borderTopWidth: 0.3,
+		// flex: 3,
+		borderWidth: 0.2,
+		borderTopWidth: 0.2,
 		borderBottomWidth: 0.2,
 		// borderRightWidth: 1,
 	},

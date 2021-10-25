@@ -5,3 +5,4 @@ export * from './LeftRightNavigation';
 export * from './ModalInput';
 export * from './Timetable';
 export * from './ModalMinute';
+export * from './ModalSelect';

@@ -1,11 +1,9 @@
 import axios from 'axios';
-
+import { API_URL } from 'react-native-dotenv';
 const client = axios.create();
 
-client.defaults.baseURL = 'http://api.dps0340.xyz/';
-//client.defaults.baseURL = 'http://localhost:8000/';
+export const clientBaseURL = API_URL;
 
-// client.defaults.baseURL = '';
-// client.defaults.withCredentials = true;
+client.defaults.baseURL = clientBaseURL;
 
 export default client;
