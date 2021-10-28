@@ -312,6 +312,20 @@ class ClubAvailableTimeSerializer(serializers.ModelSerializer):
         dict_result = {day: sorted(unique(v), key=lambda x: tuple(x['avail_time']))
                        for day, v in dict_result.items()}
 
+        def flatten(t):
+            return [item for sublist in t for item in sublist]
+
+        times = flatten([[(day, tuple(e['avail_time'].values()))]
+                         for v in dict_result.values() for e in v])
+
+        duplications = set()
+
+        while times != (remove_duplicated
+                        := (set(times) - (duplicated
+                                          := set([(x[0], (x[1][0], x[1][1], y[1][2], y[1][3])) for x in times for y in times if x[0] == y[0] and x[1][2] == y[1][0] and x[1][3] == y[1][1]])))):
+            duplications |= duplicated
+            times = remove_duplicated
+
         result = {day: {
             'avail_time': [],
             'count': [],
@@ -320,6 +334,8 @@ class ClubAvailableTimeSerializer(serializers.ModelSerializer):
 
         for day in dict_result:
             for elem in dict_result[day]:
+                if (day, tuple(elem['avail_time'].values())) in duplications:
+                    continue
                 for k, v in elem.items():
                     result[day][k].append(v)
 
