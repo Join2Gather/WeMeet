@@ -13,20 +13,24 @@ import { LeftRightNavigation, Timetable } from '../components';
 import type { LeftRightNavigationMethods } from '../components';
 import { Colors } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
 	setEndHour,
 	setEndMin,
 	setStartHour,
 	setStartMin,
 } from '../store/timetable';
+import { RootState } from '../store';
 type TeamStackParamList = {
 	TeamTime: { name: string };
 };
 
 type Props = NativeStackScreenProps<TeamStackParamList, 'TeamTime'>;
 
-export default function Home({ route }: Props) {
+export default function TeamTime({ route }: Props) {
+	const { dates } = useSelector(({ timetable }: RootState) => ({
+		dates: timetable.dates,
+	}));
 	// navigation
 	const name = route.params.name;
 	const navigation = useNavigation();
@@ -143,6 +147,7 @@ export default function Home({ route }: Props) {
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
 						isGroup={isGroup}
+						dates={dates}
 					/>
 				</View>
 			</ScrollEnabledProvider>
