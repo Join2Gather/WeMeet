@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
 	changeAllColor,
 	pushSelectEnd,
+	removeStartPercentage,
 	setEndHour,
 	setEndMin,
 	setStartMin,
@@ -45,6 +46,8 @@ export function ModalMinute({
 	const [minute, setMinute] = useState('');
 	const [hour, setHour] = useState('');
 	const focus = useAutoFocus();
+	console.log(mode);
+	// 확인 처리 로직
 	const onPressConfirm = useCallback(() => {
 		if (mode === 'startMinute') {
 			dispatch(setStartMin(Number(minute)));
@@ -66,6 +69,18 @@ export function ModalMinute({
 			console.log(value);
 		}
 	}, [minute, mode, hour]);
+	// 닫기 버튼
+	const onPressClose = useCallback(() => {
+		setMode('normal');
+		dispatch(removeStartPercentage());
+		setModalVisible(false);
+	}, []);
+	// 이전 모드
+	const onPressPrevMode = useCallback(() => {
+		setMode('startMinute');
+		// setModalVisible(false);
+		dispatch(removeStartPercentage());
+	}, []);
 	const [open, setOpen] = useState(false);
 	const [value, setValue] = useState('PM');
 	const [items, setItems] = useState([
@@ -103,7 +118,7 @@ export function ModalMinute({
 								// backgroundColor: 'blue',
 							}}
 							onPress={() => {
-								setModalVisible(false);
+								onPressClose();
 							}}
 						>
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={28} />
@@ -118,7 +133,7 @@ export function ModalMinute({
 								<View style={styles.viewFlex1} />
 								<View
 									style={{
-										flex: 1,
+										flex: 1.0,
 										flexShrink: 1.0,
 										flexGrow: 1.0,
 										flexDirection: 'column',
@@ -175,14 +190,9 @@ export function ModalMinute({
 									style={[
 										styles.hourText,
 										{
-											flex:
-												start <= 12
-													? start - 9 < 0
-														? 0.75
-														: 1
-													: start - 21 < 0
-													? 0.75
-													: 1,
+											flex: 1.0,
+											flexShrink: 0.25,
+											flexGrow: 0.25,
 										},
 									]}
 								>
@@ -196,7 +206,7 @@ export function ModalMinute({
 								</Text>
 								<TextInput
 									// onFocus={focus}
-									style={[styles.textInput, { color: Colors.black }]}
+									style={[styles.textInput, { color: Colors.black, flex: 0.2 }]}
 									keyboardType={'number-pad'}
 									value={minute}
 									onChangeText={(min) => setMinute(min)}
@@ -208,34 +218,44 @@ export function ModalMinute({
 						)}
 					</View>
 					{mode === 'endMode' ? (
-						<View style={{ flexDirection: 'row' }}>
-							<View style={styles.buttonRowView}>
-								<TouchableHighlight
-									activeOpacity={0.1}
-									underlayColor={Colors.grey200}
-									style={styles.closeButtonStyle}
-									onPress={() => {
-										onPressConfirm();
-										// setModalVisible(false);
-									}}
-								>
-									<Text style={styles.buttonText}>이전</Text>
-								</TouchableHighlight>
+						<>
+							<View
+								style={{
+									marginTop: 0,
+									borderTopColor: Colors.grey800,
+									borderWidth: 0.3,
+									width: '105%',
+								}}
+							></View>
+							<View style={{ flexDirection: 'row' }}>
+								<View style={[styles.buttonRowView, { flex: 1 }]}>
+									<TouchableHighlight
+										activeOpacity={0.1}
+										underlayColor={Colors.grey200}
+										style={styles.closeButtonStyle}
+										onPress={() => {
+											onPressPrevMode();
+											// setModalVisible(false);
+										}}
+									>
+										<Text style={styles.buttonText}>이전</Text>
+									</TouchableHighlight>
+								</View>
+								<View style={[styles.buttonRowView, { flex: 1 }]}>
+									<TouchableHighlight
+										activeOpacity={0.1}
+										underlayColor={Colors.grey200}
+										style={styles.closeButtonStyle}
+										onPress={() => {
+											onPressConfirm();
+											// setModalVisible(false);
+										}}
+									>
+										<Text style={styles.buttonText}>확인</Text>
+									</TouchableHighlight>
+								</View>
 							</View>
-							<View style={styles.buttonRowView}>
-								<TouchableHighlight
-									activeOpacity={0.1}
-									underlayColor={Colors.grey200}
-									style={styles.closeButtonStyle}
-									onPress={() => {
-										onPressConfirm();
-										// setModalVisible(false);
-									}}
-								>
-									<Text style={styles.buttonText}>확인</Text>
-								</TouchableHighlight>
-							</View>
-						</View>
+						</>
 					) : (
 						<View style={styles.buttonRowView}>
 							<TouchableHighlight
@@ -252,6 +272,23 @@ export function ModalMinute({
 						</View>
 					)}
 					{/* <ModalMinute /> */}
+					{/* {mode === 'startMinute' && (
+						<>
+							<View style={styles.buttonRowView}>
+								<TouchableHighlight
+									activeOpacity={0.1}
+									underlayColor={Colors.grey200}
+									style={styles.closeButtonStyle}
+									onPress={() => {
+										onPressConfirm();
+										// setModalVisible(false);
+									}}
+								>
+									<Text style={styles.buttonText}>확인</Text>
+								</TouchableHighlight>
+							</View>
+						</>
+					)} */}
 				</View>
 			</View>
 		</Modal>
@@ -272,7 +309,7 @@ const styles = StyleSheet.create({
 		marginBottom: 60,
 		backgroundColor: 'white',
 		borderRadius: 13,
-		padding: 20,
+		padding: 10,
 		alignItems: 'center',
 		// shadowColor: '#000',
 		shadowColor: 'black',
@@ -283,7 +320,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
 		// elevation: 5,
-		width: '85%',
+		width: '80%',
 	},
 	titleText: {
 		textAlign: 'center',
@@ -335,6 +372,10 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		marginTop: 10,
 		marginBottom: 0,
+		// flex: 1,
+		// flexGrow: 0.5,
+		// flexShrink: 0.5,
+		// backgroundColor: Colors.red200,
 	},
 	textStyle: {
 		color: 'white',
@@ -342,12 +383,12 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 	closeButtonStyle: {
-		padding: 13,
 		// width: '40%',
 		// height: '100%',
 		borderRadius: 8,
-		backgroundColor: Colors.blue300,
-		flex: 0.5,
+		// backgroundColor: Colors.blue300,
+		padding: 12,
+		flex: 1,
 	},
 	acceptButtonStyle: {
 		padding: 15,
