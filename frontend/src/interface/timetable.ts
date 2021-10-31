@@ -9,7 +9,10 @@ export interface timetable {
 	selectTime: selectDay;
 	day: string;
 	dayIdx: number;
+	weekIndex: weekIndex;
 }
+
+export type weekIndex = Array<string>;
 
 export interface changeColorType {
 	idx: number;
@@ -58,4 +61,5 @@ export interface state_time {
 	startPercent: number;
 	endPercent: number;
 	mode: string;
+	isEveryTime: boolean;
 }
