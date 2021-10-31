@@ -9,13 +9,14 @@ import {
 	TextInput,
 } from 'react-native';
 import { Colors } from 'react-native-paper';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { inputTeamName, postTeamName } from '../store/team';
 //import { MaterialCommunityIcon as Icon } from '../theme';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { loginEveryTime } from '../store/individual';
+import type { RootState } from '../store';
 interface props {
 	selectModalVisible: boolean;
 	setSelectModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,13 +26,21 @@ export function ModalSelect({
 	selectModalVisible,
 	setSelectModalVisible,
 }: props) {
+	const { everyTime, id, name } = useSelector(
+		({ individual, login }: RootState) => ({
+			// dates: timetable.dates,
+			everyTime: individual.everyTime,
+			id: login.id,
+			name: login.name,
+		})
+	);
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('normal');
-	const [id, setID] = useState('');
+	const [loginID, setID] = useState('');
 	const [password, setPassword] = useState('');
 
 	const onPressLogin = useCallback(() => {
-		dispatch(loginEveryTime({ id: id, password: password }));
+		dispatch(loginEveryTime({ id: loginID, password: password }));
 		setSelectModalVisible(false);
 		setMode('normal');
 	}, [id, password]);
@@ -139,8 +148,8 @@ export function ModalSelect({
 										/>
 										<TextInput
 											style={[styles.textInput]}
-											value={id}
-											onChangeText={(useId) => setID((text) => useId)}
+											value={loginID}
+											onChangeText={(loginID) => setID((text) => loginID)}
 											autoCapitalize="none"
 											placeholder="ID"
 											placeholderTextColor={Colors.grey800}

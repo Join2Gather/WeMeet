@@ -13,6 +13,7 @@ import {
 	setEndHour,
 	setStartHour,
 } from '../store/timetable';
+import type { make_days } from '../interface';
 import { View, Text, TouchableView } from '../theme';
 import { RootState } from '../store';
 
@@ -21,9 +22,10 @@ const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 interface props {
 	mode: string;
 	modalVisible: boolean;
-	setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	setModalVisible: React.Dispatch<React.SetStateAction<boolean>> | null;
 	setMode: React.Dispatch<React.SetStateAction<string>>;
 	isGroup: boolean;
+	dates: make_days[];
 }
 
 export function Timetable({
@@ -32,24 +34,29 @@ export function Timetable({
 	setModalVisible,
 	setMode,
 	isGroup,
+	dates,
 }: props) {
 	const { timesText } = useMakeTimetable();
-	const { dates, teamDates, startTime, endTime, startMinute, endMinute } =
-		useSelector(({ timetable }: RootState) => ({
-			dates: timetable.dates,
+	const { teamDates, startTime, endTime, startMinute, endMinute } = useSelector(
+		({ timetable, individual }: RootState) => ({
+			// dates: timetable.dates,
 			teamDates: timetable.teamDates,
 			startTime: timetable.startTime,
 			endTime: timetable.endTime,
 			startMinute: timetable.startMinute,
 			endMinute: timetable.endMinute,
-		}));
+			// individualDates: individual.individualDates,
+		})
+	);
 	const dispatch = useDispatch();
 	const onSetStartHour = useCallback(
 		(idx: number, time: number, day: string) => {
 			dispatch(setStartHour(time));
 			setMode('startMinute');
 			setStart(time);
-			setModalVisible(true);
+			if (setModalVisible) {
+				setModalVisible(true);
+			}
 			dispatch(changeColor({ idx: idx, time: time }));
 			dispatch(setDay(day));
 			dispatch(pushSelectStart(time));
@@ -60,7 +67,9 @@ export function Timetable({
 		dispatch(setEndHour(time));
 		setMode('4');
 		setEnd(time);
-		setModalVisible(true);
+		if (setModalVisible) {
+			setModalVisible(true);
+		}
 		dispatch(pushSelectEnd());
 		dispatch(changeAllColor());
 	}, []);

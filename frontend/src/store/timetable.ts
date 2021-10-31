@@ -36,6 +36,7 @@ const initialState: timetable = {
 	dayIdx: 0,
 	startMinute: 0,
 	endMinute: 0,
+	weekIndex: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
 };
 
 export const timetableSlice = createSlice({
@@ -64,6 +65,17 @@ export const timetableSlice = createSlice({
 				find.isFullTime = true;
 				find.startPercent = (1 - state.startMinute / 60) * 100;
 				find.mode = 'start';
+			}
+		},
+		removeStartPercentage: (state) => {
+			const find = state.dates[state.dayIdx].times.find(
+				(d) => d.time === state.startTime
+			);
+			if (find) {
+				find.color = Colors.white;
+				find.isFullTime = false;
+				find.startPercent = 0;
+				find.mode = 'normal';
 			}
 		},
 		setEndMin: (state, action: PayloadAction<number>) => {
@@ -125,6 +137,7 @@ export const {
 	changeAllColor,
 	setDay,
 	setStartPercentage,
+	removeStartPercentage,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;
