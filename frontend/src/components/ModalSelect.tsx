@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import {
 	Alert,
 	Modal,
@@ -10,13 +10,12 @@ import {
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { inputTeamName, postTeamName } from '../store/team';
-//import { MaterialCommunityIcon as Icon } from '../theme';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { loginEveryTime } from '../store/individual';
+import { cloneLogin, loginEveryTime, postEveryTime } from '../store/individual';
 import type { RootState } from '../store';
+
 interface props {
 	selectModalVisible: boolean;
 	setSelectModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -26,30 +25,34 @@ export function ModalSelect({
 	selectModalVisible,
 	setSelectModalVisible,
 }: props) {
-	const { everyTime, id, name } = useSelector(
-		({ individual, login }: RootState) => ({
+	const { everyTime, id, user, loadingLogin, loginSuccess, token } =
+		useSelector(({ individual, login, loading }: RootState) => ({
 			// dates: timetable.dates,
 			everyTime: individual.everyTime,
 			id: login.id,
-			name: login.name,
-		})
-	);
+			user: login.user,
+			loadingLogin: loading['individual/POST_EVERYTIME'],
+			loginSuccess: individual.loginSuccess,
+			token: login.token,
+		}));
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('normal');
 	const [loginID, setID] = useState('');
 	const [password, setPassword] = useState('');
 
 	const onPressLogin = useCallback(() => {
+		dispatch(cloneLogin({ id: id, user: user }));
 		dispatch(loginEveryTime({ id: loginID, password: password }));
 		setSelectModalVisible(false);
 		setMode('normal');
-	}, [id, password]);
-	// const onChangeInput = useCallback(() => {
-	// 	dispatch(inputTeamName(name));
-	// 	dispatch(postTeamName({ user, id, name, token }));
-	// 	setName('');
-	// }, [name]);
+	}, [loginID, password, id, user]);
 
+	useEffect(() => {
+		loginSuccess &&
+			dispatch(
+				postEveryTime({ id: id, user: user, data: everyTime, token: token })
+			);
+	}, [loginSuccess, id, user, everyTime, token]);
 	return (
 		// <AutoFocusProvider contentContainerStyle={[styles.keyboardAwareFocus]}>
 		<Modal
