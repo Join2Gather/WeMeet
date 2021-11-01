@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { cloneLogin, loginEveryTime, postEveryTime } from '../store/individual';
+import { loginEveryTime, postEveryTime } from '../store/individual';
 import type { RootState } from '../store';
 
 interface props {
@@ -41,11 +41,10 @@ export function ModalSelect({
 	const [password, setPassword] = useState('');
 
 	const onPressLogin = useCallback(() => {
-		dispatch(cloneLogin({ id: id, user: user }));
 		dispatch(loginEveryTime({ id: loginID, password: password }));
 		setSelectModalVisible(false);
 		setMode('normal');
-	}, [loginID, password, id, user]);
+	}, [loginID, password]);
 
 	useEffect(() => {
 		loginSuccess &&
