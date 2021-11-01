@@ -24,10 +24,9 @@ export function SocialWebview({ closeSocialModal, source }: any) {
 			user: result.profiles[0].user,
 			id: result.profiles[0].id,
 			clubs: result.profiles[0].clubs,
-			dates: result.profiles[0].dates,
+			kakaoDates: result.profiles[0].dates,
 		};
 		// let userToken = result.Authorization;
-		console.log(data);
 
 		try {
 			dispatch(getSocialLogin(data));
