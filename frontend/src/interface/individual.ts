@@ -6,6 +6,7 @@ export interface individual {
 	everyTime: responseEveryTime;
 	weekIndex: Array<string>;
 	loginSuccess: boolean;
+	cloneDateSuccess: boolean;
 }
 
 export interface postImageAPI {
