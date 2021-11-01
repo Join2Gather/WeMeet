@@ -1,30 +1,26 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-// interface loading {
-//   sample/GET_POST: boolean;
-//   sample/GET_USERS: boolean;
-// }
+interface initialLoading {
+	[prop: string]: any;
+}
 
-// const initialState: loading = {
-//   sample/GET_POST: true,
-//   sample_GET_USERS: true,
-// };
+const initialState: initialLoading = {};
 
 export const loadingSlice = createSlice({
-  name: 'LOADING',
-  initialState: {},
-  reducers: {
-    startLoading: (state, action: PayloadAction<string>) => ({
-      ...state,
-      [action.payload]: true,
-    }),
-    endLoading: (state, action: PayloadAction<string>) => ({
-      ...state,
-      [action.payload]: false,
-    }),
-  },
+	name: 'LOADING',
+	initialState: initialState,
+	reducers: {
+		startLoading: (state, action: PayloadAction<string>) => ({
+			...state,
+			[action.payload]: true,
+		}),
+		endLoading: (state, action: PayloadAction<string>) => ({
+			...state,
+			[action.payload]: false,
+		}),
+	},
 });
 
-export const {startLoading, endLoading} = loadingSlice.actions;
+export const { startLoading, endLoading } = loadingSlice.actions;
 
 export default loadingSlice.reducer;

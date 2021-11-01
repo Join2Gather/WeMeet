@@ -7,7 +7,7 @@ import loading from './loading';
 import login from './login';
 import team, { teamSaga } from './team';
 import individual, { individualSaga } from './individual';
-import timetable from './timetable';
+import timetable, { timetableSaga } from './timetable';
 // import storageSession from 'redux-persist/lib/storage/session';
 const persistConfig = {
 	key: 'root',
@@ -25,5 +25,5 @@ export default persistReducer(persistConfig, rootReducer);
 export type RootState = ReturnType<typeof rootReducer>;
 
 export function* rootSaga() {
-	yield all([teamSaga(), individualSaga()]);
+	yield all([teamSaga(), individualSaga(), timetableSaga()]);
 }

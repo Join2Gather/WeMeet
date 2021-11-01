@@ -8,7 +8,8 @@ const initialState: Login = {
 	user: 0,
 	token: '',
 	clubs: [],
-	dates: [],
+	kakaoDates: [],
+	uri: '',
 };
 
 export const loginSlice = createSlice({
@@ -24,12 +25,18 @@ export const loginSlice = createSlice({
 			state.clubs.map((club) => {
 				club.name = decodeURIComponent(club.name);
 			});
-			state.dates = action.payload.dates;
+			state.kakaoDates = action.payload.kakaoDates[0];
+		},
+		findURI: (state, action: PayloadAction<string>) => {
+			const data = state.clubs.find((club) => club.name === action.payload);
+			if (data) {
+				state.uri = data.uri;
+			}
 		},
 	},
 	extraReducers: {},
 });
 
-export const { getSocialLogin } = loginSlice.actions;
+export const { getSocialLogin, findURI } = loginSlice.actions;
 
 export default loginSlice.reducer;

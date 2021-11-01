@@ -21,6 +21,7 @@ import {
 	setStartMin,
 } from '../store/timetable';
 import { RootState } from '../store';
+import { findURI } from '../store/login';
 type TeamStackParamList = {
 	TeamTime: { name: string };
 };
@@ -28,11 +29,15 @@ type TeamStackParamList = {
 type Props = NativeStackScreenProps<TeamStackParamList, 'TeamTime'>;
 
 export default function TeamTime({ route }: Props) {
-	const { dates } = useSelector(({ timetable }: RootState) => ({
+	const { dates, uri } = useSelector(({ timetable, login }: RootState) => ({
 		dates: timetable.dates,
+		uri: login.uri,
 	}));
 	// navigation
 	const name = route.params.name;
+	useEffect(() => {
+		dispatch(findURI(name));
+	}, [name]);
 	const navigation = useNavigation();
 	const goLeft = useCallback(() => {
 		navigation.goBack();
@@ -148,6 +153,7 @@ export default function TeamTime({ route }: Props) {
 						setModalVisible={setModalVisible}
 						isGroup={isGroup}
 						dates={dates}
+						uri={uri}
 					/>
 				</View>
 			</ScrollEnabledProvider>
