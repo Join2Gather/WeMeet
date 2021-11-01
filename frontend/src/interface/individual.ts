@@ -5,6 +5,7 @@ export interface individual {
 	error: string;
 	everyTime: responseEveryTime;
 	weekIndex: Array<string>;
+	loginSuccess: boolean;
 }
 
 export interface postImageAPI {
@@ -58,4 +59,5 @@ export interface postEveryTimeAPI {
 	user: number;
 	id: number;
 	data: responseEveryTime;
+	token: string;
 }
