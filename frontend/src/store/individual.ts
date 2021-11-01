@@ -4,15 +4,10 @@ import * as api from '../lib/api/individual';
 import { takeLatest } from 'redux-saga/effects';
 import { createAction } from 'redux-actions';
 import type {
-	requestTeamAPI,
-	responseTeamAPI,
-	team,
 	postImageAPI,
 	individual,
 	responseImageAPI,
 	make_days,
-	weekIndex,
-	state_time,
 	postEveryTimeAPI,
 } from '../interface';
 import { Colors } from 'react-native-paper';
@@ -59,6 +54,7 @@ const initialState: individual = {
 		sat: [],
 	},
 	weekIndex: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
+	loginSuccess: false,
 };
 
 export const individualSlice = createSlice({
@@ -71,6 +67,7 @@ export const individualSlice = createSlice({
 		},
 		LOGIN_EVERYTIME_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.everyTime = action.payload;
+			state.loginSuccess = true;
 			state.weekIndex.map((day, idx) =>
 				state.everyTime[day].map((d) => {
 					state.individualDates[idx].times.map((inDay) => {
@@ -97,13 +94,19 @@ export const individualSlice = createSlice({
 					});
 				})
 			);
-			console.log(state.everyTime);
 		},
 		LOGIN_EVERYTIME_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
 		cloneIndividualDates: (state, action: PayloadAction<make_days[]>) => {
 			state.individualDates = action.payload;
+		},
+		POST_EVERYTIME_SUCCESS: (state, action: PayloadAction<any>) => {
+			console.log(action.payload);
+			state.loginSuccess = false;
+		},
+		POST_EVERYTIME_FAILURE: (state, action: PayloadAction<any>) => {
+			state.error = action.payload;
 		},
 	},
 	extraReducers: {},
