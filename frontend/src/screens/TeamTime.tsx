@@ -70,7 +70,7 @@ export default function TeamTime({ route }: Props) {
 							isGroup ? (
 								<MIcon
 									name="check-bold"
-									size={28}
+									size={27}
 									color={Colors.white}
 									style={{ paddingTop: 1 }}
 									onPress={onPressPlus}
@@ -78,7 +78,7 @@ export default function TeamTime({ route }: Props) {
 							) : (
 								<MIcon
 									name="plus"
-									size={28}
+									size={27}
 									color={Colors.white}
 									style={{ paddingTop: 1 }}
 									onPress={() => setMode('startMode')}
