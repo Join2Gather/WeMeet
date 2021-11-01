@@ -56,11 +56,6 @@ export default function Home() {
 		})();
 	}, []);
 
-	// useEffect(() => {
-	// 	if (dates) {
-	// 	}
-	// }, [dates]);
-
 	const pickImage = async () => {
 		const result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -139,6 +134,7 @@ export default function Home() {
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
 						mode={mode}
+						setMode={setMode}
 						dates={individualDates}
 						isGroup={false}
 					></Timetable>
