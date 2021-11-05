@@ -68,7 +68,6 @@ class DateCalculator(ABC):
     def __init__(self, obj) -> None:
         super().__init__()
         self.obj = obj
-        self.obj = None
         self.week = constants.week
         self.dates = {}
 
