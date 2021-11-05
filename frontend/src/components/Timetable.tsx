@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,23 +7,29 @@ import { useMakeTimetable } from '../hooks';
 import {
 	changeAllColor,
 	changeColor,
+	getGroupDates,
+	getIndividualDates,
 	pushSelectEnd,
 	pushSelectStart,
 	setDay,
 	setEndHour,
 	setStartHour,
 } from '../store/timetable';
+import type { make_days } from '../interface';
 import { View, Text, TouchableView } from '../theme';
 import { RootState } from '../store';
+import { kakaoLogin } from '../store/individual';
 
 const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 interface props {
 	mode: string;
 	modalVisible: boolean;
-	setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	setModalVisible: React.Dispatch<React.SetStateAction<boolean>> | null;
 	setMode: React.Dispatch<React.SetStateAction<string>>;
 	isGroup: boolean;
+	dates: make_days[];
+	uri?: string;
 }
 
 export function Timetable({
@@ -32,24 +38,62 @@ export function Timetable({
 	setModalVisible,
 	setMode,
 	isGroup,
+	dates,
+	uri,
 }: props) {
-	const { timesText } = useMakeTimetable();
-	const { dates, teamDates, startTime, endTime, startMinute, endMinute } =
-		useSelector(({ timetable }: RootState) => ({
-			dates: timetable.dates,
-			teamDates: timetable.teamDates,
-			startTime: timetable.startTime,
-			endTime: timetable.endTime,
-			startMinute: timetable.startMinute,
-			endMinute: timetable.endMinute,
-		}));
+	const {
+		teamDates,
+		startTime,
+		endTime,
+		startMinute,
+		endMinute,
+		id,
+		user,
+		token,
+		loadingGroup,
+		loadingIndividual,
+		cloneDateSuccess,
+		kakaoDates,
+	} = useSelector(({ timetable, individual, login, loading }: RootState) => ({
+		// dates: timetable.dates,
+		teamDates: timetable.teamDates,
+		startTime: timetable.startTime,
+		endTime: timetable.endTime,
+		startMinute: timetable.startMinute,
+		endMinute: timetable.endMinute,
+		id: login.id,
+		user: login.user,
+		token: login.token,
+		loadingGroup: loading['timetable/GET_GROUP'],
+		loadingIndividual: loading['timetable/GET_INDIVIDUAL'],
+		cloneDateSuccess: individual.cloneDateSuccess,
+		kakaoDates: login.kakaoDates,
+	}));
 	const dispatch = useDispatch();
+	// 최초 렌더링 개인 페이지 정보 받아오기
+	useEffect(() => {
+		if (uri && isGroup) {
+			dispatch(getGroupDates({ id: id, user: user, token: token, uri: uri }));
+		} else if (uri && !isGroup) {
+			dispatch(
+				getIndividualDates({ id: id, user: user, token: token, uri: uri })
+			);
+		}
+	}, [uri, id, user, token, isGroup]);
+	useEffect(() => {
+		if (cloneDateSuccess) {
+			dispatch(kakaoLogin(kakaoDates));
+		}
+	}, [cloneDateSuccess, kakaoDates]);
+	const { timesText } = useMakeTimetable();
 	const onSetStartHour = useCallback(
 		(idx: number, time: number, day: string) => {
 			dispatch(setStartHour(time));
 			setMode('startMinute');
 			setStart(time);
-			setModalVisible(true);
+			if (setModalVisible) {
+				setModalVisible(true);
+			}
 			dispatch(changeColor({ idx: idx, time: time }));
 			dispatch(setDay(day));
 			dispatch(pushSelectStart(time));
@@ -60,7 +104,9 @@ export function Timetable({
 		dispatch(setEndHour(time));
 		setMode('4');
 		setEnd(time);
-		setModalVisible(true);
+		if (setModalVisible) {
+			setModalVisible(true);
+		}
 		dispatch(pushSelectEnd());
 		dispatch(changeAllColor());
 	}, []);

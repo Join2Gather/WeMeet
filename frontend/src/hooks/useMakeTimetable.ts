@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import type { time, state_time } from '../interface';
 import { useEffect } from 'react';
 import { cloneDates } from '../store/timetable';
+import { cloneIndividualDates } from '../store/individual';
 
 export function useMakeTimetable() {
 	const times: Array<state_time> = [];
@@ -16,6 +17,7 @@ export function useMakeTimetable() {
 			endPercent: 100,
 			startPercent: 100,
 			mode: 'normal',
+			isEveryTime: false,
 		});
 		if (i <= 12) {
 			if (i % 2 === 0) {
@@ -34,6 +36,7 @@ export function useMakeTimetable() {
 				startPercent: 100,
 				endPercent: 100,
 				mode: 'normal',
+				isEveryTime: false,
 			});
 			timesText.push('2 AM');
 		}
@@ -51,6 +54,7 @@ export function useMakeTimetable() {
 	const dispatch = useDispatch();
 	useEffect(() => {
 		dispatch(cloneDates(defaultDates));
+		dispatch(cloneIndividualDates(defaultDates));
 	}, []);
 	return { defaultDates, timesText };
 }

@@ -1,5 +1,10 @@
 import axios from 'axios';
-import type { postImageAPI, loginEveryTimeAPI } from '../../interface';
+import client from './client';
+import type {
+	postImageAPI,
+	loginEveryTimeAPI,
+	postEveryTimeAPI,
+} from '../../interface';
 import FormData from 'form-data';
 import { LOGIN_URL, IMAGE_URL } from 'react-native-dotenv';
 export const postImage = ({ image, token }: postImageAPI) => {
@@ -23,4 +28,18 @@ export const postImage = ({ image, token }: postImageAPI) => {
 
 export const loginEveryTime = ({ id, password }: loginEveryTimeAPI) => {
 	return axios.post(`${LOGIN_URL}?id=${id}&password=${password}`);
+};
+
+export const postEveryTime = ({ user, id, data, token }: postEveryTimeAPI) => {
+	const sendData = JSON.stringify(data);
+	const headers = {
+		'Content-type': 'Application/json',
+		Authorization: `Token ${token}`,
+		Accept: '*/*',
+	};
+	return axios.post(
+		`https://api.dps0340.xyz/users/${user}/profiles/${id}/everytime`,
+		sendData,
+		{ headers }
+	);
 };

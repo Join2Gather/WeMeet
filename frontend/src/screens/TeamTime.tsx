@@ -13,22 +13,31 @@ import { LeftRightNavigation, Timetable } from '../components';
 import type { LeftRightNavigationMethods } from '../components';
 import { Colors } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
 	setEndHour,
 	setEndMin,
 	setStartHour,
 	setStartMin,
 } from '../store/timetable';
+import { RootState } from '../store';
+import { findURI } from '../store/login';
 type TeamStackParamList = {
 	TeamTime: { name: string };
 };
 
 type Props = NativeStackScreenProps<TeamStackParamList, 'TeamTime'>;
 
-export default function Home({ route }: Props) {
+export default function TeamTime({ route }: Props) {
+	const { dates, uri } = useSelector(({ timetable, login }: RootState) => ({
+		dates: timetable.dates,
+		uri: login.uri,
+	}));
 	// navigation
 	const name = route.params.name;
+	useEffect(() => {
+		dispatch(findURI(name));
+	}, [name]);
 	const navigation = useNavigation();
 	const goLeft = useCallback(() => {
 		navigation.goBack();
@@ -66,7 +75,7 @@ export default function Home({ route }: Props) {
 							isGroup ? (
 								<MIcon
 									name="check-bold"
-									size={28}
+									size={27}
 									color={Colors.white}
 									style={{ paddingTop: 1 }}
 									onPress={onPressPlus}
@@ -74,7 +83,7 @@ export default function Home({ route }: Props) {
 							) : (
 								<MIcon
 									name="plus"
-									size={28}
+									size={27}
 									color={Colors.white}
 									style={{ paddingTop: 1 }}
 									onPress={() => setMode('startMode')}
@@ -143,6 +152,8 @@ export default function Home({ route }: Props) {
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
 						isGroup={isGroup}
+						dates={dates}
+						uri={uri}
 					/>
 				</View>
 			</ScrollEnabledProvider>

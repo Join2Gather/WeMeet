@@ -17,10 +17,12 @@ import { ModalSelect } from '../components';
 import * as FileSystem from 'expo-file-system';
 
 export default function Home() {
-	const { token, dates } = useSelector(({ login, individual }: RootState) => ({
-		token: login.token,
-		dates: individual.dates,
-	}));
+	const { token, individualDates } = useSelector(
+		({ login, individual }: RootState) => ({
+			token: login.token,
+			individualDates: individual.individualDates,
+		})
+	);
 	// navigation
 	const navigation = useNavigation();
 	const dispatch = useDispatch();
@@ -53,11 +55,6 @@ export default function Home() {
 			}
 		})();
 	}, []);
-
-	// useEffect(() => {
-	// 	if (dates) {
-	// 	}
-	// }, [dates]);
 
 	const pickImage = async () => {
 		const result = await ImagePicker.launchImageLibraryAsync({
@@ -137,6 +134,9 @@ export default function Home() {
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
 						mode={mode}
+						setMode={setMode}
+						dates={individualDates}
+						isGroup={false}
 					></Timetable>
 					<ModalSelect
 						selectModalVisible={selectModalVisible}

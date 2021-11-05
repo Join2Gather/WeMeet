@@ -70,6 +70,8 @@ INSTALLED_APPS = [
 
 SITE_ID = 1  # Admin 페이지를 위해 추가
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'config.urls.api_info',
     'USE_SESSION_AUTH': False,

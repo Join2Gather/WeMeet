@@ -4,5 +4,6 @@ export interface Login {
 	user: number;
 	token: string;
 	clubs: Array<any>;
-	dates: Array<any>;
+	kakaoDates: Array<any>;
+	uri?: string;
 }

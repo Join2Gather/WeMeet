@@ -25,6 +25,20 @@ from drf_yasg.utils import swagger_serializer_method
     여기서는 다형성 방법론을 사용해 Date를 계산해서 반환하도록 작성했다.
 """
 
+
+class DaySerializer(serializers.Serializer):
+    class AvailableTimeSerializer(serializers.Serializer):
+        starting_hours = serializers.IntegerField()
+        starting_minutes = serializers.IntegerField()
+
+        end_hours = serializers.IntegerField()
+        end_minutes = serializers.IntegerField()
+    avail_time = serializers.ListField(
+        child=AvailableTimeSerializer())
+    count = serializers.ListField(child=serializers.IntegerField())
+    avail_people = serializers.ListField(
+        child=serializers.ListField(child=serializers.CharField()))
+
 # property method등으로 decorator를 처리할 방법이 딱히 보이지 않아 class 외부에 선언해둠.
 
 
@@ -35,7 +49,7 @@ class ClubType(serializers.Serializer):
 
 class DateCalculatorChildType(serializers.Serializer):
     exec(
-        '\n'.join([f'{day} = serializers.ListField(child=serializers.FloatField())' for day in constants.week]))
+        '\n'.join([f'{day} = serializers.ListField(child=DaySerializer.AvailableTimeSerializer())' for day in constants.week]))
     club = ClubType()
     is_temporary_reserved = serializers.BooleanField()
 
@@ -162,20 +176,6 @@ class ClubsWithDateCalculator(DateCalculator):
         week = self.week
         for day in week:
             dates[day].sort()
-
-
-class DaySerializer(serializers.Serializer):
-    class AvailableTimeSerializer(serializers.Serializer):
-        starting_hours = serializers.IntegerField()
-        starting_minutes = serializers.IntegerField()
-
-        end_hours = serializers.IntegerField()
-        end_minutes = serializers.IntegerField()
-    avail_time = serializers.ListField(
-        child=AvailableTimeSerializer())
-    count = serializers.ListField(child=serializers.IntegerField())
-    avail_people = serializers.ListField(
-        child=serializers.ListField(child=serializers.CharField()))
 
 
 class ClubAvailableTimeSerializer(serializers.ModelSerializer):
