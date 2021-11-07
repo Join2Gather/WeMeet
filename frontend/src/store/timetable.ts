@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type {
 	changeColorType,
+	postConfirmAPI,
 	postIndividualDatesAPI,
 	requestGroupDatesAPI,
 	requestIndividualDatesAPI,
@@ -11,10 +12,13 @@ import { createAction } from 'redux-actions';
 import createRequestSaga from '../hooks/createRequestSaga';
 import * as api from '../lib/api/timetable';
 import { takeLatest } from '@redux-saga/core/effects';
+import { useMakeTimetable } from '../hooks';
+import { Alert } from 'react-native';
 
 const GET_INDIVIDUAL = 'timetable/GET_INDIVIDUAL';
 const GET_GROUP = 'timetable/GET_GROUP';
 const POST_INDIVIDUAL = 'timetable/POST_INDIVIDUAL';
+const POST_CONFIRM = 'timetable/POST_CONFIRM';
 
 export const getIndividualDates = createAction(
 	GET_INDIVIDUAL,
@@ -29,6 +33,11 @@ export const postIndividualTime = createAction(
 	(data: postIndividualDatesAPI) => data
 );
 
+export const postConfirm = createAction(
+	POST_CONFIRM,
+	(data: postConfirmAPI) => data
+);
+
 const getIndividualSaga = createRequestSaga(
 	GET_INDIVIDUAL,
 	api.getIndividualDates
@@ -38,32 +47,20 @@ const postIndividualSaga = createRequestSaga(
 	POST_INDIVIDUAL,
 	api.postIndividualTime
 );
+const postConfirmSaga = createRequestSaga(POST_CONFIRM, api.postConfirm);
 
 export function* timetableSaga() {
 	yield takeLatest(GET_INDIVIDUAL, getIndividualSaga);
 	yield takeLatest(GET_GROUP, getGroupSaga);
 	yield takeLatest(POST_INDIVIDUAL, postIndividualSaga);
+	yield takeLatest(POST_CONFIRM, postConfirmSaga);
 }
 
+const { defaultDates } = useMakeTimetable();
+
 const initialState: timetable = {
-	dates: [
-		{ day: 'sun', times: [] },
-		{ day: 'mon', times: [] },
-		{ day: 'tue', times: [] },
-		{ day: 'thu', times: [] },
-		{ day: 'wed', times: [] },
-		{ day: 'fri', times: [] },
-		{ day: 'sat', times: [] },
-	],
-	teamDates: [
-		{ day: 'sun', times: [] },
-		{ day: 'mon', times: [] },
-		{ day: 'tue', times: [] },
-		{ day: 'thu', times: [] },
-		{ day: 'wed', times: [] },
-		{ day: 'fri', times: [] },
-		{ day: 'sat', times: [] },
-	],
+	dates: defaultDates,
+	teamDates: defaultDates,
 	startTime: 0.0,
 	endTime: 0.0,
 	selectTime: {
@@ -90,22 +87,153 @@ const initialState: timetable = {
 		sat: [],
 	},
 	error: '',
+	postDatesPrepare: false,
+	responseIndividual: {
+		sun: [],
+		mon: [],
+		tue: [],
+		wed: [],
+		thu: [],
+		fri: [],
+		sat: [],
+	},
+	responseGroup: {
+		sun: {
+			avail_people: [],
+			avail_time: [],
+			count: [],
+		},
+		mon: {
+			avail_people: [],
+			avail_time: [],
+			count: [],
+		},
+		tue: {
+			avail_people: [],
+			avail_time: [],
+			count: [],
+		},
+		wed: {
+			avail_people: [],
+			avail_time: [],
+			count: [],
+		},
+		thu: {
+			avail_people: [],
+			avail_time: [],
+			count: [],
+		},
+		fri: {
+			avail_people: [],
+			avail_time: [],
+			count: [],
+		},
+		sat: {
+			avail_people: [],
+			avail_time: [],
+			count: [],
+		},
+	},
+	isTimePicked: false,
 };
 
 export const timetableSlice = createSlice({
 	name: 'timetable',
 	initialState,
 	reducers: {
+		makeInitialTimetable: (state) => {
+			state.dates = defaultDates;
+			state.teamDates = defaultDates;
+			state.postIndividualDates = {
+				sun: [],
+				mon: [],
+				tue: [],
+				wed: [],
+				thu: [],
+				fri: [],
+				sat: [],
+			};
+		},
+
 		GET_INDIVIDUAL_SUCCESS: (state, action: PayloadAction<any>) => {
-			console.log(action.payload);
+			state.responseIndividual = action.payload;
+			state.weekIndex.map((day, idx) =>
+				state.responseIndividual[day].map((d) => {
+					state.postIndividualDates[day].push(d);
+					state.dates[idx].times.map((inDay) => {
+						if (d.starting_hours === inDay.time) {
+							for (let i = d.starting_hours - 8; i <= d.end_hours - 8; i++) {
+								if (i + 8 == d.starting_hours) {
+									state.dates[idx].times[i].color = Colors.blue400;
+									state.dates[idx].times[i].isPicked = true;
+									state.dates[idx].times[i].startPercent =
+										(1 - d.starting_minutes / 60) * 100;
+									state.dates[idx].times[i].mode = 'start';
+								} else if (i + 8 == d.end_hours) {
+									state.dates[idx].times[i].color = Colors.blue400;
+									state.dates[idx].times[i].isPicked = true;
+									state.dates[idx].times[i].endPercent =
+										(d.end_minutes / 60) * 100;
+									state.dates[idx].times[i].mode = 'end';
+								} else {
+									state.dates[idx].times[i].color = Colors.blue400;
+									state.dates[idx].times[i].isPicked = true;
+									state.dates[idx].times[i].isFullTime = true;
+								}
+							}
+						}
+					});
+				})
+			);
 		},
 		GET_INDIVIDUAL_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
 		GET_GROUP_SUCCESS: (state, action: PayloadAction<any>) => {
-			console.log(action.payload);
+			state.responseGroup = action.payload;
+			state.weekIndex.map((day, idx) => {
+				state.responseGroup[day].avail_time.map((d) => {
+					state.teamDates[idx].times.map((inDay) => {
+						if (d.starting_hours === inDay.time) {
+							for (let i = d.starting_hours - 8; i <= d.end_hours - 8; i++) {
+								if (i + 8 == d.starting_hours) {
+									state.teamDates[idx].times[i].color = Colors.blue400;
+									state.teamDates[idx].times[i].isPicked = true;
+									state.teamDates[idx].times[i].startPercent =
+										(1 - d.starting_minutes / 60) * 100;
+									state.teamDates[idx].times[i].mode = 'start';
+								} else if (i + 8 == d.end_hours) {
+									state.teamDates[idx].times[i].color = Colors.blue400;
+									state.teamDates[idx].times[i].isPicked = true;
+									state.teamDates[idx].times[i].endPercent =
+										(d.end_minutes / 60) * 100;
+									state.teamDates[idx].times[i].mode = 'end';
+								} else {
+									state.teamDates[idx].times[i].color = Colors.blue400;
+									state.teamDates[idx].times[i].isPicked = true;
+									state.teamDates[idx].times[i].isFullTime = true;
+								}
+							}
+						}
+					});
+				});
+			});
 		},
 		GET_GROUP_FAILURE: (state, action: PayloadAction<any>) => {
+			state.error = action.payload;
+		},
+		POST_INDIVIDUAL_SUCCESS: (state, action: PayloadAction<any>) => {
+			state.responseIndividual = action.payload;
+			// state.loginSuccess = true;
+			state.postDatesPrepare = false;
+		},
+		POST_INDIVIDUAL_FAILURE: (state, action: PayloadAction<any>) => {
+			state.error = action.payload;
+		},
+		POST_CONFIRM_SUCCESS: (state, action: PayloadAction<any>) => {
+			console.log(action.payload);
+		},
+		POST_CONFIRM_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
 		cloneDates: (state, action: PayloadAction<any>) => {
@@ -126,8 +254,8 @@ export const timetableSlice = createSlice({
 				(d) => d.time === state.startTime
 			);
 			if (find) {
-				find.color = Colors.blue200;
-				find.isFullTime = true;
+				find.color = Colors.blue400;
+				find.isPicked = true;
 				find.startPercent = (1 - state.startMinute / 60) * 100;
 				find.mode = 'start';
 			}
@@ -138,13 +266,14 @@ export const timetableSlice = createSlice({
 			);
 			if (find) {
 				find.color = Colors.white;
-				find.isFullTime = false;
+				find.isPicked = false;
 				find.startPercent = 0;
 				find.mode = 'normal';
 			}
 		},
 		setEndMin: (state, action: PayloadAction<number>) => {
 			state.endMinute = action.payload;
+			state.isTimePicked = false; // 초기화
 		},
 		setDay: (state, action: PayloadAction<string>) => {
 			state.day = action.payload;
@@ -161,15 +290,8 @@ export const timetableSlice = createSlice({
 				state.selectTime[state.day] && state.selectTime[state.day].push(i);
 			}
 		},
-		changeColor: (state, action: PayloadAction<changeColorType>) => {
-			state.dayIdx = action.payload.idx;
-			const find = state.dates[action.payload.idx].times.find(
-				(d) => d.time === action.payload.time
-			);
-			if (find) {
-				find.color = Colors.blue200;
-				find.isFullTime = true;
-			}
+		changeDayIdx: (state, action: PayloadAction<any>) => {
+			state.dayIdx = action.payload;
 		},
 		changeAllColor: (state) => {
 			for (
@@ -177,13 +299,47 @@ export const timetableSlice = createSlice({
 				i <= Math.floor(state.endTime);
 				i++
 			) {
-				state.dates[state.dayIdx].times[i - 8].color = Colors.blue200;
-				if (i === Math.floor(state.endTime)) {
-					state.dates[state.dayIdx].times[i - 8].isFullTime = true;
-					state.dates[state.dayIdx].times[i - 8].endPercent =
-						(state.endMinute / 60) * 100;
-					state.dates[state.dayIdx].times[i - 8].mode = 'end';
+				if (state.dates[state.dayIdx].times[i - 8].color !== Colors.white) {
+					state.isTimePicked = true;
+					Alert.alert('이미 지정된 시간 입니다');
+					break;
 				}
+			}
+			for (
+				let i = Math.floor(state.startTime);
+				i <= Math.floor(state.endTime);
+				i++
+			) {
+				if (state.isTimePicked) {
+					break;
+				} else {
+					state.dates[state.dayIdx].times[i - 8].color = Colors.blue400;
+					state.dates[state.dayIdx].times[i - 8].isFullTime = true;
+					if (i === Math.floor(state.endTime)) {
+						state.dates[state.dayIdx].times[i - 8].isPicked = true;
+						state.dates[state.dayIdx].times[i - 8].endPercent =
+							(state.endMinute / 60) * 100;
+						state.dates[state.dayIdx].times[i - 8].mode = 'end';
+						state.dates[state.dayIdx].times[i - 8].isFullTime = false;
+					} else if (i === Math.floor(state.startTime)) {
+						state.dates[state.dayIdx].times[i - 8].color = Colors.blue400;
+						state.dates[state.dayIdx].times[i - 8].isPicked = true;
+						state.dates[state.dayIdx].times[i - 8].startPercent =
+							(1 - state.startMinute / 60) * 100;
+						state.dates[state.dayIdx].times[i - 8].mode = 'start';
+					}
+				}
+			}
+		},
+		makePostIndividualDates: (state) => {
+			if (!state.isTimePicked) {
+				state.postIndividualDates[state.weekIndex[state.dayIdx]].push({
+					starting_hours: state.startTime,
+					starting_minutes: state.startMinute,
+					end_hours: state.endTime,
+					end_minutes: state.endMinute,
+				});
+				state.postDatesPrepare = true;
 			}
 		},
 	},
@@ -196,13 +352,16 @@ export const {
 	setEndHour,
 	setStartMin,
 	setEndMin,
-	changeColor,
+	// changeColor,
 	pushSelectEnd,
 	pushSelectStart,
 	changeAllColor,
 	setDay,
-	setStartPercentage,
+	// setStartPercentage,
 	removeStartPercentage,
+	makePostIndividualDates,
+	makeInitialTimetable,
+	changeDayIdx,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;

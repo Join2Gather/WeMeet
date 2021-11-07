@@ -9,12 +9,13 @@ NavigationHeader,  Text} from '../theme';
 import Icon from 'react-native-vector-icons/Fontisto';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
-import { LeftRightNavigation, Timetable } from '../components';
-import type { LeftRightNavigationMethods } from '../components';
+import { Timetable } from '../components';
 import { Colors } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+	cloneDates,
+	makeInitialTimetable,
 	setEndHour,
 	setEndMin,
 	setStartHour,
@@ -22,6 +23,7 @@ import {
 } from '../store/timetable';
 import { RootState } from '../store';
 import { findURI } from '../store/login';
+import { useMakeTimetable } from '../hooks';
 type TeamStackParamList = {
 	TeamTime: { name: string };
 };
@@ -29,10 +31,14 @@ type TeamStackParamList = {
 type Props = NativeStackScreenProps<TeamStackParamList, 'TeamTime'>;
 
 export default function TeamTime({ route }: Props) {
-	const { dates, uri } = useSelector(({ timetable, login }: RootState) => ({
-		dates: timetable.dates,
-		uri: login.uri,
-	}));
+	const { dates, uri, postDatesPrepare } = useSelector(
+		({ timetable, login }: RootState) => ({
+			dates: timetable.dates,
+			uri: login.uri,
+			postDatesPrepare: timetable.postDatesPrepare,
+		})
+	);
+	// const { defaultDates } = useMakeTimetable();
 	// navigation
 	const name = route.params.name;
 	useEffect(() => {
@@ -55,6 +61,12 @@ export default function TeamTime({ route }: Props) {
 		dispatch(setEndHour(0));
 		dispatch(setEndMin(0));
 	}, []);
+	useEffect(() => {
+		dispatch(makeInitialTimetable());
+	}, [uri]);
+	// useEffect(() => {
+	// 	dispatch(cloneDates(defaultDates));
+	// }, []);
 	return (
 		<SafeAreaView style={{ backgroundColor: Colors.white, flex: 1 }}>
 			<ScrollEnabledProvider>
@@ -154,6 +166,7 @@ export default function TeamTime({ route }: Props) {
 						isGroup={isGroup}
 						dates={dates}
 						uri={uri}
+						postDatesPrepare={postDatesPrepare}
 					/>
 				</View>
 			</ScrollEnabledProvider>
