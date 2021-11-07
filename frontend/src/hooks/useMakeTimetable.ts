@@ -13,11 +13,12 @@ export function useMakeTimetable() {
 		times.push({
 			time: i,
 			color: Colors.white,
-			isFullTime: false,
+			isPicked: false,
 			endPercent: 100,
 			startPercent: 100,
 			mode: 'normal',
 			isEveryTime: false,
+			isFullTime: false,
 		});
 		if (i <= 12) {
 			if (i % 2 === 0) {
@@ -32,11 +33,12 @@ export function useMakeTimetable() {
 			times.push({
 				time: 1,
 				color: Colors.white,
-				isFullTime: false,
+				isPicked: false,
 				startPercent: 100,
 				endPercent: 100,
 				mode: 'normal',
 				isEveryTime: false,
+				isFullTime: false,
 			});
 			timesText.push('2 AM');
 		}
@@ -51,10 +53,6 @@ export function useMakeTimetable() {
 		{ day: 'fri', times: times },
 		{ day: 'sat', times: times },
 	];
-	const dispatch = useDispatch();
-	useEffect(() => {
-		dispatch(cloneDates(defaultDates));
-		dispatch(cloneIndividualDates(defaultDates));
-	}, []);
+
 	return { defaultDates, timesText };
 }
