@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import {
 	Alert,
 	Modal,
@@ -16,12 +16,14 @@ import { useAutoFocus } from '../contexts';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
 	changeAllColor,
+	makePostIndividualDates,
+	postIndividualTime,
 	pushSelectEnd,
 	removeStartPercentage,
 	setEndHour,
 	setEndMin,
 	setStartMin,
-	setStartPercentage,
+	// setStartPercentage,
 } from '../store/timetable';
 import { min } from 'react-native-reanimated';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -32,6 +34,13 @@ interface props {
 	end: number;
 	mode: string;
 	setMode: React.Dispatch<React.SetStateAction<string>>;
+	postDatesPrepare?: boolean;
+	token: string;
+	uri?: string;
+	id: number;
+	user: number;
+	postIndividualDates: any;
+	isTimePicked?: boolean;
 }
 
 export function ModalMinute({
@@ -41,12 +50,21 @@ export function ModalMinute({
 	end,
 	mode,
 	setMode,
+	postDatesPrepare,
+	token,
+	uri,
+	user,
+	id,
+	postIndividualDates,
+	isTimePicked,
 }: props) {
 	const dispatch = useDispatch();
 	const [minute, setMinute] = useState('');
 	const [hour, setHour] = useState('');
 	const focus = useAutoFocus();
-	console.log(mode);
+	useEffect(() => {
+		isTimePicked && Alert.alert('이미 지정된 시간 입니다');
+	}, [isTimePicked]);
 	// 확인 처리 로직
 	const onPressConfirm = useCallback(() => {
 		if (mode === 'startMinute') {
@@ -54,7 +72,7 @@ export function ModalMinute({
 			setMode('endMode');
 			setMinute('');
 			setModalVisible(true);
-			dispatch(setStartPercentage());
+			// dispatch(setStartPercentage());
 		} else {
 			dispatch(setEndMin(Number(minute)));
 			if (value === 'PM') {
@@ -66,7 +84,8 @@ export function ModalMinute({
 			setHour('');
 			setModalVisible(false);
 			dispatch(changeAllColor());
-			console.log(value);
+
+			dispatch(makePostIndividualDates());
 		}
 	}, [minute, mode, hour]);
 	// 닫기 버튼
@@ -87,6 +106,20 @@ export function ModalMinute({
 		{ label: 'PM', value: 'PM' },
 		{ label: 'AM', value: 'AM' },
 	]);
+	// 개인 시간 전송
+	useEffect(() => {
+		if (postDatesPrepare && uri) {
+			dispatch(
+				postIndividualTime({
+					dates: postIndividualDates,
+					id: id,
+					token: token,
+					uri: uri,
+					user: user,
+				})
+			);
+		}
+	}, [postDatesPrepare, uri, postIndividualDates, id, token, user]);
 
 	return (
 		// <AutoFocusProvider contentContainerStyle={[styles.keyboardAwareFocus]}>
