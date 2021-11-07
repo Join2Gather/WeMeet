@@ -12,9 +12,10 @@ import { Colors } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { postImage } from '../store/individual';
+import { cloneIndividualDates, postImage } from '../store/individual';
 import { ModalSelect } from '../components';
 import * as FileSystem from 'expo-file-system';
+import { useMakeTimetable } from '../hooks';
 
 export default function Home() {
 	const { token, individualDates } = useSelector(
@@ -23,9 +24,16 @@ export default function Home() {
 			individualDates: individual.individualDates,
 		})
 	);
+	const dispatch = useDispatch();
+	const { defaultDates } = useMakeTimetable();
+	useEffect(() => {
+		if (!individualDates.length) {
+		}
+		dispatch(cloneIndividualDates(defaultDates));
+	}, []);
 	// navigation
 	const navigation = useNavigation();
-	const dispatch = useDispatch();
+
 	const [scrollEnabled] = useScrollEnabled();
 	const [people, setPeople] = useState([]);
 	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
@@ -80,7 +88,7 @@ export default function Home() {
 							<Icon
 								name="timetable"
 								size={28}
-								color={Colors.black}
+								color={Colors.white}
 								style={{ paddingTop: 1 }}
 								onPress={() => setSelectModalVisible(true)}
 							/>
@@ -89,7 +97,7 @@ export default function Home() {
 							<Icon
 								name="plus"
 								size={28}
-								color={Colors.black}
+								color={Colors.white}
 								style={{ paddingTop: 1 }}
 								onPress={onPressPlus}
 							/>
