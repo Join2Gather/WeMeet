@@ -82,7 +82,7 @@ export default function App() {
 	// 	}, 2000);
 	// }, []);
 	const toggleTheme = useCallback(
-		() => setTheme(({ dark }) => (dark ? DefaultTheme : DarkTheme)),
+		() => setTheme(({ dark }) => (dark ? DefaultTheme : DefaultTheme)),
 		[]
 	);
 
