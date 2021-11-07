@@ -20,12 +20,13 @@ import {
 import Icons from 'react-native-vector-icons/AntDesign';
 import { useAutoFocus, AutoFocusProvider } from '../contexts';
 import { Colors } from 'react-native-paper';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { postTeamName } from '../store/team';
 import { ModalInput } from '../components';
 import { NavigationHeader } from '../theme';
-import { useLayout } from '../hooks';
+import { useLayout, useMakeTimetable } from '../hooks';
+import { cloneDates } from '../store/timetable';
 
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
@@ -45,6 +46,11 @@ export default function TeamList() {
 		(name) => navigation.navigate('TeamTime', { name: name }),
 		[name]
 	);
+	const { defaultDates } = useMakeTimetable();
+	const dispatch = useDispatch();
+	useEffect(() => {
+		dispatch(cloneDates(defaultDates));
+	}, []);
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }}>
 			<View style={[styles.view, { opacity: modalVisible ? 0.2 : 1 }]}>
@@ -176,11 +182,11 @@ const styles = StyleSheet.create({
 		backgroundColor: '#017bff',
 		borderRadius: 20,
 		position: 'absolute',
-		top: 14,
+		top: 12,
 		left: 40,
 	},
 	teamTitle: {
-		fontSize: 16,
+		fontSize: 15,
 		fontFamily: 'SCDream4',
 		color: '#000',
 		position: 'absolute',
