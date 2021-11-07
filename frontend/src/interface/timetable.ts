@@ -1,3 +1,4 @@
+import type { responseTime } from './individual';
 export interface timetable {
 	dates: make_days[];
 	teamDates: make_days[];
@@ -7,10 +8,14 @@ export interface timetable {
 	endMinute: number;
 	selectTime: selectDay;
 	day: string;
+	responseIndividual: responseIndividualTimetable;
+	responseGroup: responseTeamTimetable;
 	dayIdx: number;
 	weekIndex: weekIndex;
 	postIndividualDates: postIndividualDates;
+	postDatesPrepare: boolean;
 	error: string;
+	isTimePicked: boolean;
 }
 
 export type weekIndex = Array<string>;
@@ -58,6 +63,7 @@ export interface make_days {
 export interface state_time {
 	time: number;
 	color: string;
+	isPicked: boolean;
 	isFullTime: boolean;
 	startPercent: number;
 	endPercent: number;
@@ -101,9 +107,46 @@ export interface postIndividualDatesAPI {
 	token: string;
 }
 
+// 그룹 확정 시간 보내기
+export interface postConfirmAPI {
+	date: postIndividualDates;
+	id: number;
+	user: number;
+	uri: string;
+	token: string;
+}
+
 export interface post_time {
 	starting_hours: number;
 	starting_minutes: number;
 	end_hours: number;
 	end_minutes: number;
+}
+
+export interface responseIndividualTimetable {
+	sun: Array<responseTime>;
+	mon: Array<responseTime>;
+	tue: Array<responseTime>;
+	wed: Array<responseTime>;
+	thu: Array<responseTime>;
+	fri: Array<responseTime>;
+	sat: Array<responseTime>;
+	[prop: string]: responseTime[];
+}
+
+export interface responseTeamTimetable {
+	sun: groupTime;
+	mon: groupTime;
+	tue: groupTime;
+	wed: groupTime;
+	thu: groupTime;
+	fri: groupTime;
+	sat: groupTime;
+	[prop: string]: groupTime;
+}
+
+export interface groupTime {
+	avail_time: responseTime[];
+	count: Array<number>;
+	avail_people: string[];
 }
