@@ -7,6 +7,7 @@ import { useMakeTimetable } from '../hooks';
 import {
 	changeAllColor,
 	changeDayIdx,
+	cloneEveryTime,
 	// changeColor,
 	getGroupDates,
 	getIndividualDates,
@@ -92,6 +93,7 @@ export function Timetable({
 	useEffect(() => {
 		if (cloneDateSuccess) {
 			dispatch(kakaoLogin(kakaoDates));
+			dispatch(cloneEveryTime(kakaoDates));
 		}
 	}, [cloneDateSuccess, kakaoDates]);
 	const { timesText } = useMakeTimetable();
