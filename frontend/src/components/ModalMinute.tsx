@@ -60,6 +60,7 @@ export function ModalMinute({
 }: props) {
 	const dispatch = useDispatch();
 	const [minute, setMinute] = useState('');
+	const [startMinute, setStartMinute] = useState(0);
 	const [hour, setHour] = useState('');
 	const focus = useAutoFocus();
 	useEffect(() => {
@@ -69,13 +70,14 @@ export function ModalMinute({
 	const onPressConfirm = useCallback(() => {
 		if (mode === 'startMinute') {
 			dispatch(setStartMin(Number(minute)));
+			setStartMinute(Number(minute));
 			setMode('endMode');
 			setMinute('');
 			setModalVisible(true);
 			// dispatch(setStartPercentage());
 		} else {
 			dispatch(setEndMin(Number(minute)));
-			if (value === 'PM') {
+			if (value === '오후') {
 				dispatch(setEndHour(Number(hour) + 12));
 				dispatch(pushSelectEnd());
 			} else dispatch(setEndHour(Number(hour)));
@@ -101,10 +103,10 @@ export function ModalMinute({
 		dispatch(removeStartPercentage());
 	}, []);
 	const [open, setOpen] = useState(false);
-	const [value, setValue] = useState('PM');
+	const [value, setValue] = useState('오후');
 	const [items, setItems] = useState([
-		{ label: 'PM', value: 'PM' },
-		{ label: 'AM', value: 'AM' },
+		{ label: '오후', value: '오후' },
+		{ label: '오전', value: '오전' },
 	]);
 	// 개인 시간 전송
 	useEffect(() => {
@@ -148,6 +150,7 @@ export function ModalMinute({
 								// position: 'absolute',
 								marginLeft: '90%',
 								width: '9%',
+								marginBottom: 10,
 								// backgroundColor: 'blue',
 							}}
 							onPress={() => {
@@ -161,6 +164,21 @@ export function ModalMinute({
 								? '시작 시간의 분을 입력하세요'
 								: '종료 시간을 입력하세요'}
 						</Text>
+						{console.log(mode)}
+						{mode === 'endMode' && (
+							<Text style={styles.startTimeText}>
+								시작 시간 :
+								{mode
+									? start <= 12
+										? ` 오전 ${start}시 `
+										: ` 오후 ${start - 12}시 `
+									: end <= 12
+									? ` 오전 ${end}시 `
+									: ` 오후 ${end - 12}시 `}
+								{startMinute} 분
+							</Text>
+						)}
+
 						{mode === 'endMode' && (
 							<View style={[styles.textInputView]}>
 								<View style={styles.viewFlex1} />
@@ -174,7 +192,7 @@ export function ModalMinute({
 								>
 									<DropDownPicker
 										style={{
-											height: 32,
+											height: 30,
 											alignSelf: 'center',
 											justifyContent: 'center',
 											alignItems: 'center',
@@ -189,6 +207,7 @@ export function ModalMinute({
 										setOpen={setOpen}
 										setValue={setValue}
 										setItems={setItems}
+										dropDownDirection="TOP"
 									/>
 								</View>
 								<TextInput
@@ -224,18 +243,18 @@ export function ModalMinute({
 										styles.hourText,
 										{
 											flex: 1.0,
-											flexShrink: 0.25,
-											flexGrow: 0.25,
+											flexShrink: 0.28,
+											flexGrow: 0.28,
 										},
 									]}
 								>
 									{mode
 										? start <= 12
-											? `AM ${start} :`
-											: `PM ${start - 12} :`
+											? `오전 ${start} :`
+											: `오후 ${start - 12} :`
 										: end <= 12
-										? `AM ${end} :`
-										: `PM ${end - 12} :`}
+										? `오전 ${end} :`
+										: `오후 ${end - 12} :`}
 								</Text>
 								<TextInput
 									// onFocus={focus}
@@ -342,24 +361,30 @@ const styles = StyleSheet.create({
 		marginBottom: 60,
 		backgroundColor: 'white',
 		borderRadius: 13,
-		padding: 10,
+		padding: 15,
 		alignItems: 'center',
 		// shadowColor: '#000',
 		shadowColor: 'black',
 		shadowOffset: {
 			width: 1,
-			height: 1,
+			height: 0.3,
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
 		// elevation: 5,
-		width: '80%',
+		width: '82%',
 	},
 	titleText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareBold',
 		fontSize: 21,
-		marginBottom: 15,
+		marginBottom: 18,
+	},
+	startTimeText: {
+		textAlign: 'center',
+		fontFamily: 'NanumSquareR',
+		fontSize: 17,
+		marginBottom: 18,
 	},
 	textView: {
 		width: '100%',
@@ -373,7 +398,7 @@ const styles = StyleSheet.create({
 		// backgroundColor: Colors.red100,
 	},
 	textInput: {
-		fontSize: 23,
+		fontSize: 22,
 		flex: 0.6,
 		fontFamily: 'NanumSquareR',
 		// marginTop: -2,
