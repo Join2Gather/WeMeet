@@ -1,4 +1,4 @@
-import type { responseTime } from './individual';
+import type { responseTime, responseEveryTime } from './individual';
 export interface timetable {
 	dates: make_days[];
 	teamDates: make_days[];
@@ -16,6 +16,7 @@ export interface timetable {
 	postDatesPrepare: boolean;
 	error: string;
 	isTimePicked: boolean;
+	everyTime: responseEveryTime;
 }
 
 export type weekIndex = Array<string>;
