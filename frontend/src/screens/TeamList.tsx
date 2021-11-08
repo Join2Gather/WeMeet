@@ -27,7 +27,7 @@ import { ModalInput } from '../components';
 import { NavigationHeader } from '../theme';
 import { useLayout, useMakeTimetable } from '../hooks';
 import { cloneDates } from '../store/timetable';
-
+import FontAweSome from 'react-native-vector-icons/FontAwesome5';
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
 export default function TeamList() {
@@ -39,11 +39,17 @@ export default function TeamList() {
 	}));
 	const [dimensions, setDimensions] = useState({ window, screen });
 	const [name, setName] = useState('');
-
+	const [modalMode, setModalMode] = useState('join');
 	const [modalVisible, setModalVisible] = useState(false);
 	const navigation = useNavigation();
 	const goTeamTime = useCallback(
-		(name) => navigation.navigate('TeamTime', { name: name }),
+		(name) =>
+			navigation.navigate('TeamTime', {
+				name: name,
+				user: user,
+				id: id,
+				token: token,
+			}),
 		[name]
 	);
 	const { defaultDates } = useMakeTimetable();
@@ -51,10 +57,29 @@ export default function TeamList() {
 	useEffect(() => {
 		dispatch(cloneDates(defaultDates));
 	}, []);
+	const onMakeTeamTime = useCallback(() => {
+		setModalMode('make');
+		setModalVisible(true);
+	}, []);
+	const onJoinTeamTime = useCallback(() => {
+		setModalMode('join');
+		setModalVisible(true);
+	}, []);
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }}>
 			<View style={[styles.view, { opacity: modalVisible ? 0.2 : 1 }]}>
-				<NavigationHeader title="모임 목록" />
+				<NavigationHeader
+					title="모임 목록"
+					Right={() => (
+						<FontAweSome
+							name="plus"
+							size={22}
+							color={Colors.white}
+							style={{ paddingTop: 1 }}
+							onPress={onMakeTeamTime}
+						/>
+					)}
+				/>
 				<Text style={styles.headerUnderText}>Plan list</Text>
 				{!clubs && (
 					<TouchableView
@@ -122,14 +147,15 @@ export default function TeamList() {
 					id={id}
 					token={token}
 					goTeamTime={goTeamTime}
+					modalMode={modalMode}
 				/>
 			</View>
 
 			<TouchableView
-				onPress={() => setModalVisible(true)}
 				style={[styles.touchableView, { backgroundColor: '#017bff' }]}
+				onPress={onJoinTeamTime}
 			>
-				<Text style={styles.loginText}>새 모임 생성</Text>
+				<Text style={styles.loginText}>모임 참여</Text>
 			</TouchableView>
 		</SafeAreaView>
 	);
