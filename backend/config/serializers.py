@@ -65,13 +65,11 @@ class ClubsWithDateCalculatorType(serializers.Serializer):
 
 
 class DateCalculator(ABC):
-    obj = None
-    week = constants.week
-    dates = {}
-
     def __init__(self, obj) -> None:
         super().__init__()
         self.obj = obj
+        self.week = constants.week
+        self.dates = {}
 
     @ property
     def result(self):
@@ -91,6 +89,8 @@ class DateCalculator(ABC):
             비슷한 메소드로 prefetch_related가 있는데 이것은 쿼리를 원래 테이블과 외래 키 테이블로 나눠서 실행시키고 장고에서 합쳐주는 방식이다.
             상황마다 성능 비교가 다르다고 하는데 우리의 요구사항 기준으로는 지금은 select_related만 써도 충분한 것 같다.
         """
+        self.dates = {}
+
         for pd in ProfileDates.objects \
             .filter(**self.filter_expression) \
                 .select_related('date', 'club'):

@@ -12,9 +12,10 @@ import { Colors } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { postImage } from '../store/individual';
+import { cloneIndividualDates, postImage } from '../store/individual';
 import { ModalSelect } from '../components';
 import * as FileSystem from 'expo-file-system';
+import { useMakeTimetable } from '../hooks';
 
 export default function Home() {
 	const { token, individualDates } = useSelector(
@@ -23,9 +24,16 @@ export default function Home() {
 			individualDates: individual.individualDates,
 		})
 	);
+	const dispatch = useDispatch();
+	const { defaultDates } = useMakeTimetable();
+	useEffect(() => {
+		if (!individualDates.length) {
+		}
+		dispatch(cloneIndividualDates(defaultDates));
+	}, []);
 	// navigation
 	const navigation = useNavigation();
-	const dispatch = useDispatch();
+
 	const [scrollEnabled] = useScrollEnabled();
 	const [people, setPeople] = useState([]);
 	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
@@ -80,7 +88,7 @@ export default function Home() {
 							<Icon
 								name="timetable"
 								size={28}
-								color={Colors.black}
+								color={Colors.white}
 								style={{ paddingTop: 1 }}
 								onPress={() => setSelectModalVisible(true)}
 							/>
@@ -89,46 +97,49 @@ export default function Home() {
 							<Icon
 								name="plus"
 								size={28}
-								color={Colors.black}
+								color={Colors.white}
 								style={{ paddingTop: 1 }}
 								onPress={onPressPlus}
 							/>
 						)}
 					/>
-					{image && (
-						<Image
-							source={{ uri: image }}
-							style={{ width: 200, height: 200 }}
-						/>
-					)}
-					<Text style={styles.titleText}>make your plan</Text>
-					<View style={styles.rowView}>
-						{mode === '0' && (
-							<>
-								<View
-									style={[styles.boxView, { backgroundColor: Colors.blue400 }]}
-								/>
-								<Text style={styles.infoText}>모임 일정</Text>
-								<View
-									style={[styles.boxView, { backgroundColor: Colors.grey300 }]}
-								/>
-								<Text style={styles.infoText}>개인 일정</Text>
-								<View
-									style={[styles.boxView, { backgroundColor: Colors.white }]}
-								/>
-								<Text style={styles.infoText}>비어있는 일정</Text>
-							</>
-						)}
-						{mode === '1' && (
-							<>
-								<Text style={styles.stepText}>1. 시작 시간 터치</Text>
-							</>
-						)}
-						{mode === '3' && (
-							<>
-								<Text style={styles.stepText}>3. 종료 시간 터치</Text>
-							</>
-						)}
+
+					<View style={styles.viewHeight}>
+						<Text style={styles.titleText}>make your plan</Text>
+						<View style={styles.rowView}>
+							{mode === '0' && (
+								<>
+									<View
+										style={[
+											styles.boxView,
+											{ backgroundColor: Colors.blue400 },
+										]}
+									/>
+									<Text style={styles.infoText}>모임 일정</Text>
+									<View
+										style={[
+											styles.boxView,
+											{ backgroundColor: Colors.grey300 },
+										]}
+									/>
+									<Text style={styles.infoText}>개인 일정</Text>
+									<View
+										style={[styles.boxView, { backgroundColor: Colors.white }]}
+									/>
+									<Text style={styles.infoText}>비어있는 일정</Text>
+								</>
+							)}
+							{mode === '1' && (
+								<>
+									<Text style={styles.stepText}>1. 시작 시간 터치</Text>
+								</>
+							)}
+							{mode === '3' && (
+								<>
+									<Text style={styles.stepText}>3. 종료 시간 터치</Text>
+								</>
+							)}
+						</View>
 					</View>
 					<Timetable
 						modalVisible={modalVisible}
@@ -155,7 +166,10 @@ const styles = StyleSheet.create({
 		alignContent: 'center',
 		justifyContent: 'center',
 		// marginLeft: 20,
-		marginTop: 24,
+		marginTop: 26,
+	},
+	viewHeight: {
+		height: 80,
 	},
 	infoText: {
 		fontFamily: 'NanumSquareR',
@@ -179,7 +193,7 @@ const styles = StyleSheet.create({
 		fontSize: 17,
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
-		marginTop: 12,
+		marginTop: 14,
 		letterSpacing: -1,
 	},
 });

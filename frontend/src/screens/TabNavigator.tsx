@@ -1,5 +1,8 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {
+	createBottomTabNavigator,
+	BottomTabBarProps,
+} from '@react-navigation/bottom-tabs';
 import { Colors } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import HomeNavigator from './HomeNavigator';
@@ -28,6 +31,8 @@ const screenOptions = ({
 			const iconName = focused ? icon : iconOutline;
 			return <Icon name={iconName} size={focusedSize} color={focusedColor} />;
 		},
+		tabBarActiveBackgroundColor: Colors.white,
+		tabBarInactiveBackgroundColor: Colors.white,
 		headerShown: false,
 	};
 };
@@ -39,7 +44,9 @@ export default function TabNavigator() {
 			<Tab.Screen
 				name="Home"
 				component={Home}
-				options={{ tabBarLabel: 'Home' }}
+				options={{
+					tabBarLabel: 'Home',
+				}}
 			/>
 			<Tab.Screen
 				name="HomeNavigator"

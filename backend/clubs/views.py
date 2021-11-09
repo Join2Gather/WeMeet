@@ -1,3 +1,4 @@
+from config.serializers import ClubsSerializer
 from config.serializers import ClubsWithDatePageSerializer
 from django.contrib.auth.models import User as Users
 from typing import Any
@@ -235,7 +236,7 @@ class ClubJoinView(APIView):
     @swagger_auto_schema(
         operation_id="그룹 참여",
         responses={
-            status.HTTP_200_OK: SuccessSerializer,
+            status.HTTP_200_OK: ClubsSerializer,
             status.HTTP_404_NOT_FOUND: ErrorSerializer
         },
     )
@@ -245,7 +246,9 @@ class ClubJoinView(APIView):
         ClubEntries.objects.get_or_create(
             profile=profile, club=club)
 
-        return JsonResponse(SuccessSerializer({'success': True}).data)
+        result = ClubsSerializer(club).data
+
+        return JsonResponse(result)
 
 
 class ClubShareView(APIView):

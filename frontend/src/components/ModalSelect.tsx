@@ -74,10 +74,11 @@ export function ModalSelect({
 					>
 						<TouchableHighlight
 							activeOpacity={1}
-							underlayColor={Colors.grey200}
+							underlayColor={Colors.white}
 							style={{
 								marginLeft: '90%',
 								width: '9%',
+								marginBottom: 10,
 							}}
 							onPress={() => {
 								setSelectModalVisible(false);
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
 		marginBottom: 60,
 		backgroundColor: 'white',
 		borderRadius: 13,
-		padding: 20,
+		padding: 15,
 		alignItems: 'center',
 		// shadowColor: '#000',
 		shadowColor: 'black',
@@ -234,7 +235,7 @@ const styles = StyleSheet.create({
 		marginBottom: 15,
 	},
 	textView: {
-		width: '100%',
+		width: '93%',
 		//
 	},
 	textInput: {

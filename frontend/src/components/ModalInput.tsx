@@ -20,6 +20,7 @@ interface props {
 	id: number;
 	token: string;
 	goTeamTime: Function;
+	modalMode: string;
 }
 
 export function ModalInput({
@@ -29,9 +30,11 @@ export function ModalInput({
 	id,
 	token,
 	goTeamTime,
+	modalMode,
 }: props) {
 	const dispatch = useDispatch();
 	const [name, setName] = useState('');
+
 	const onChangeInput = useCallback(() => {
 		dispatch(inputTeamName(name));
 		dispatch(postTeamName({ user, id, name, token }));
@@ -60,7 +63,7 @@ export function ModalInput({
 					>
 						<TouchableHighlight
 							activeOpacity={1}
-							underlayColor={Colors.grey200}
+							underlayColor={Colors.white}
 							style={{
 								// position: 'absolute',
 								marginLeft: '90%',
@@ -73,17 +76,34 @@ export function ModalInput({
 						>
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={28} />
 						</TouchableHighlight>
-						<Text style={styles.titleText}>모임명을 입력하세요</Text>
-						<View style={[styles.textInputView]}>
-							<TextInput
-								// onFocus={focus}
-								style={[styles.textInput, { color: Colors.black }]}
-								value={name}
-								onChangeText={(name) => setName((text) => name)}
-								placeholder="Enter your ID"
-								placeholderTextColor={Colors.grey600}
-							/>
-						</View>
+						{modalMode === 'join' ? (
+							<Text style={styles.titleText}>공유 코드를 입력하세요</Text>
+						) : (
+							<Text style={styles.titleText}>모임명을 입력하세요</Text>
+						)}
+						{modalMode === 'join' ? (
+							<View style={[styles.textInputView]}>
+								<TextInput
+									// onFocus={focus}
+									style={[styles.textInput, { color: Colors.black }]}
+									value={name}
+									onChangeText={(name) => setName((text) => name)}
+									placeholder="Enter your Code"
+									placeholderTextColor={Colors.grey600}
+								/>
+							</View>
+						) : (
+							<View style={[styles.textInputView]}>
+								<TextInput
+									// onFocus={focus}
+									style={[styles.textInput, { color: Colors.black }]}
+									value={name}
+									onChangeText={(name) => setName((text) => name)}
+									placeholder="Enter your ID"
+									placeholderTextColor={Colors.grey600}
+								/>
+							</View>
+						)}
 					</View>
 					<View style={styles.buttonRowView}>
 						<TouchableHighlight

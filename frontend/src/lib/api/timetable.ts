@@ -5,39 +5,41 @@ import type {
 	requestIndividualDatesAPI,
 	postIndividualDatesAPI,
 } from '../../interface';
-
+import { makeHeader } from '../util/header';
+import { API_URL } from 'react-native-dotenv';
+// 개인 시간 받아오기
 export const getIndividualDates = ({
 	user,
 	id,
 	uri,
 	token,
 }: requestIndividualDatesAPI) => {
-	const headers = {
-		'Content-type': 'Application/json',
-		Authorization: `Token ${token}`,
-		Accept: '*/*',
-	};
-	return axios.get(`${user}​/profiles​/${id}​/clubs​/${uri}​/individual`, {
-		headers,
-	});
+	const headers = makeHeader(token);
+	return client.get(
+		`${API_URL}users/${user}/profiles/${id}/clubs/${uri}/individual`,
+		{
+			headers,
+		}
+	);
 };
 
+// 팀 시간 받아오기
 export const getGroupDates = ({
 	user,
 	id,
 	uri,
 	token,
 }: requestGroupDatesAPI) => {
-	const headers = {
-		'Content-type': 'Application/json',
-		Authorization: `Token ${token}`,
-		Accept: '*/*',
-	};
-	return client.get(`${user}​/profiles​/${id}​/clubs​/${uri}​/group`, {
-		headers,
-	});
+	const headers = makeHeader(token);
+	return axios.get(
+		`${API_URL}users/${user}/profiles/${id}/clubs/${uri}/group`,
+		{
+			headers,
+		}
+	);
 };
 
+// 개인 시간 보내기
 export const postIndividualTime = ({
 	user,
 	id,
@@ -45,12 +47,23 @@ export const postIndividualTime = ({
 	dates,
 	token,
 }: postIndividualDatesAPI) => {
-	const headers = {
-		'Content-type': 'Application/json',
-		Authorization: `Token ${token}`,
-		Accept: '*/*',
-	};
+	const headers = makeHeader(token);
 	const data = JSON.stringify(dates);
+
+	return axios.post(
+		`${API_URL}users/${user}/profiles/${id}/clubs/${uri}`,
+		data,
+		{
+			headers,
+		}
+	);
+};
+
+// 그룹 시간 개별 확정
+export const postConfirm = ({ user, id, uri, dates, token }) => {
+	const headers = makeHeader(token);
+	const data = JSON.stringify(dates);
+
 	return client.post(`users/${user}/profiles/${id}/clubs/${uri}`, data, {
 		headers,
 	});

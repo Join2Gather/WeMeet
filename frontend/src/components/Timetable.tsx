@@ -1,14 +1,18 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { ModalMinute } from './ModalMinute';
 import { useMakeTimetable } from '../hooks';
 import {
 	changeAllColor,
-	changeColor,
+	changeDayIdx,
+	cloneEveryTime,
+	// changeColor,
 	getGroupDates,
 	getIndividualDates,
+	makePostIndividualDates,
+	postIndividualTime,
 	pushSelectEnd,
 	pushSelectStart,
 	setDay,
@@ -30,6 +34,7 @@ interface props {
 	isGroup: boolean;
 	dates: make_days[];
 	uri?: string;
+	postDatesPrepare?: boolean;
 }
 
 export function Timetable({
@@ -40,6 +45,7 @@ export function Timetable({
 	isGroup,
 	dates,
 	uri,
+	postDatesPrepare,
 }: props) {
 	const {
 		teamDates,
@@ -54,6 +60,8 @@ export function Timetable({
 		loadingIndividual,
 		cloneDateSuccess,
 		kakaoDates,
+		isTimePicked,
+		postIndividualDates,
 	} = useSelector(({ timetable, individual, login, loading }: RootState) => ({
 		// dates: timetable.dates,
 		teamDates: timetable.teamDates,
@@ -68,6 +76,8 @@ export function Timetable({
 		loadingIndividual: loading['timetable/GET_INDIVIDUAL'],
 		cloneDateSuccess: individual.cloneDateSuccess,
 		kakaoDates: login.kakaoDates,
+		postIndividualDates: timetable.postIndividualDates,
+		isTimePicked: timetable.isTimePicked,
 	}));
 	const dispatch = useDispatch();
 	// 최초 렌더링 개인 페이지 정보 받아오기
@@ -83,6 +93,7 @@ export function Timetable({
 	useEffect(() => {
 		if (cloneDateSuccess) {
 			dispatch(kakaoLogin(kakaoDates));
+			dispatch(cloneEveryTime(kakaoDates));
 		}
 	}, [cloneDateSuccess, kakaoDates]);
 	const { timesText } = useMakeTimetable();
@@ -94,21 +105,29 @@ export function Timetable({
 			if (setModalVisible) {
 				setModalVisible(true);
 			}
-			dispatch(changeColor({ idx: idx, time: time }));
+			dispatch(changeDayIdx(idx));
+			// dispatch(changeColor({ idx: idx, time: time }));
 			dispatch(setDay(day));
 			dispatch(pushSelectStart(time));
 		},
 		[]
 	);
+	useEffect(() => {
+		isTimePicked && Alert.alert('이미 지정된 시간 입니다');
+	}, [isTimePicked]);
 	const onSetEndHour = useCallback((idx: number, time: number) => {
 		dispatch(setEndHour(time));
-		setMode('4');
 		setEnd(time);
 		if (setModalVisible) {
 			setModalVisible(true);
 		}
 		dispatch(pushSelectEnd());
 		dispatch(changeAllColor());
+	}, []);
+	const onMakeInitial = useCallback(() => {
+		Alert.alert('이미 지정된 시간 입니다');
+		setMode('normal');
+		setModalVisible && setModalVisible(false);
 	}, []);
 	const [start, setStart] = useState(0);
 	const [end, setEnd] = useState(0);
@@ -158,22 +177,41 @@ export function Timetable({
 												styles.boxView,
 												{
 													borderBottomWidth: Number(d.time) === 1 ? 0.3 : 0,
+													// backgroundColor: d.color,
 												},
 											]}
 										>
 											<View
 												style={{
 													height:
-														d.time === endTime
-															? `${(endMinute / 60) * 100}%`
+														d.mode === 'start'
+															? `${100 - d.startPercent}%`
+															: d.mode === 'end'
+															? `${d.endPercent}%`
 															: '100%',
-													backgroundColor: d.time % 1 ? Colors.white : d.color,
+
+													backgroundColor:
+														d.mode === 'start'
+															? Colors.white
+															: d.mode === 'end'
+															? d.color
+															: d.color,
 												}}
 											/>
 											<View
 												style={{
-													height: '100%',
-													backgroundColor: d.color,
+													height:
+														d.mode === 'start'
+															? `${d.startPercent}%`
+															: d.mode === 'end'
+															? `${d.endPercent}%`
+															: '0%',
+													backgroundColor:
+														d.mode === 'start'
+															? d.color
+															: d.mode === 'end'
+															? Colors.white
+															: Colors.white,
 												}}
 											/>
 										</TouchableView>
@@ -188,8 +226,11 @@ export function Timetable({
 									{day.times.map((d) => (
 										<TouchableView
 											onPress={() => {
-												mode === 'startMode' &&
-													onSetStartHour(idx, Number(d.time), day.day);
+												console.log(d, mode);
+												mode === 'startMode' ||
+												(mode === 'normal' && d.isFullTime && d.isPicked)
+													? onMakeInitial()
+													: onSetStartHour(idx, Number(d.time), day.day);
 												mode === 'endMode' && onSetEndHour(idx, Number(d.time));
 											}}
 											key={Number(d.time)}
@@ -204,14 +245,14 @@ export function Timetable({
 											<View
 												style={{
 													height:
-														d.isFullTime && d.mode === 'start'
+														d.mode === 'start'
 															? `${100 - d.startPercent}%`
 															: d.mode === 'end'
 															? `${d.endPercent}%`
 															: '100%',
 
 													backgroundColor:
-														d.isFullTime && d.mode === 'start'
+														d.mode === 'start'
 															? Colors.white
 															: d.mode === 'end'
 															? d.color
@@ -221,13 +262,13 @@ export function Timetable({
 											<View
 												style={{
 													height:
-														d.isFullTime && d.mode === 'start'
+														d.mode === 'start'
 															? `${d.startPercent}%`
 															: d.mode === 'end'
 															? `${d.endPercent}%`
 															: '0%',
 													backgroundColor:
-														d.isFullTime && d.mode === 'start'
+														d.mode === 'start'
 															? d.color
 															: d.mode === 'end'
 															? Colors.white
@@ -247,6 +288,13 @@ export function Timetable({
 						end={end}
 						mode={mode}
 						setMode={setMode}
+						id={id}
+						postIndividualDates={postIndividualDates}
+						token={token}
+						uri={uri}
+						user={user}
+						postDatesPrepare={postDatesPrepare}
+						isTimePicked={isTimePicked}
 					/>
 				</View>
 			</View>

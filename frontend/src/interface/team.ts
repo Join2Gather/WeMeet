@@ -20,3 +20,17 @@ export interface team {
 	name: string;
 	error: string;
 }
+
+export interface shareUriAPI {
+	user: number;
+	id: number;
+	token: string;
+	uri: string;
+}
+
+export interface joinTeamAPI {
+	user: number;
+	id: number;
+	token: string;
+	uri: string;
+}
