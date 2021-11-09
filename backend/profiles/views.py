@@ -1,6 +1,6 @@
 from typing import Any
 from clubs.views import profile_guard
-from config.serializers import ProfilesSerializer
+from config.serializers import ProfilesSerializer, ErrorSerializer
 from config.constants import week
 from django.http.response import JsonResponse
 from rest_framework.views import APIView
@@ -28,8 +28,30 @@ class ProfileView(APIView):
     def get(self, request: Request, user: int, profile: Any):
         return JsonResponse(ProfilesSerializer(profile).data)
 
-    # Create는 TODO
-    # 최초 소셜 로그인시 자동으로 Profile 생성 하므로 지금은 필요 없어보임
+    @profile_guard
+    @swagger_auto_schema(
+        operation_id="프로필 닉네임 변경",
+        responses={
+            status.HTTP_200_OK: ProfilesSerializer,
+            status.HTTP_400_BAD_REQUEST: ErrorSerializer,
+        },
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'nickname': openapi.Schema(type=openapi.TYPE_STRING)
+            }
+        ))
+    def put(self, request: Request, user: int, profile: Any):
+        if not (nickname := request.data.get('nickname', None)):
+            return JsonResponse({'error': 'nickname not provided'}, status=status.HTTP_400_BAD_REQUEST)
+        elif len(nickname) > 100:
+            return JsonResponse({'error': 'nickname too long. max length is 100'}, status=status.HTTP_400_BAD_REQUEST)
+
+        profile.user.username = nickname
+        profile.user.save()
+        profile.save()
+
+        return JsonResponse(ProfilesSerializer(profile).data)
 
 
 class MyProfileView(APIView):

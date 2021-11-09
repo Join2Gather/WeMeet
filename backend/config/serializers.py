@@ -351,6 +351,7 @@ class ClubsSerializer(serializers.ModelSerializer):
 class ProfilesSerializer(serializers.ModelSerializer):
     clubs = serializers.SerializerMethodField()
     dates = serializers.SerializerMethodField()
+    nickname = serializers.SerializerMethodField()
 
     class Meta:
         model = Profiles
@@ -366,6 +367,10 @@ class ProfilesSerializer(serializers.ModelSerializer):
     def get_dates(self, obj):
         calculator = ProfilesDateCalculator(obj)
         return calculator.calculate()
+
+    @ swagger_serializer_method(serializer_or_field=serializers.CharField())
+    def get_nickname(self, obj):
+        return obj.user.username
 
 
 class ClubsWithDateSerializer(serializers.ModelSerializer):
