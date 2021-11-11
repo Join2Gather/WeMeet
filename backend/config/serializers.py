@@ -343,9 +343,15 @@ class ClubAvailableTimeSerializer(serializers.ModelSerializer):
 
 
 class ClubsSerializer(serializers.ModelSerializer):
+    people_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Clubs
         fields = '__all__'
+
+    @swagger_serializer_method(serializer_or_field=serializers.IntegerField())
+    def get_people_count(self, obj):
+        return ClubEntries.objects.filter(club=obj.id).count()
 
 
 class ProfilesSerializer(serializers.ModelSerializer):

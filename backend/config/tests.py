@@ -1,4 +1,6 @@
 from django.test import TestCase
+from config.models import ClubEntries
+from config.serializers import ClubsSerializer
 from config.models import Profiles, Clubs, Dates, ProfileDates
 from django.contrib.auth.models import User as Users
 from config.serializers import ClubAvailableTimeSerializer
@@ -80,3 +82,32 @@ class InterSectionTestCase(TestCase):
         self.assertEquals(sorted(avail_time), sorted(set(avail_time)),
                           "there's no duplicate elements in avail_time")
         return result
+
+
+class ClubPeopleCountTestCase(TestCase):
+    def setUp(self) -> None:
+        self.club = Clubs.objects.create(name="example", uri="example-uri")
+
+        self.users = [
+            Users.objects.create_user(
+                username=f'user {i}', password='testUser') for i in range(1, 5)
+        ]
+
+        self.profiles = [
+            Profiles.objects.create(
+                name=user.username, user=user) for user in self.users
+        ]
+
+        self.clubEntries = [
+            ClubEntries.objects.create(club=self.club, profile=profile) for profile in self.profiles
+        ]
+
+    def test_people_count_matches(self):
+        serialized_club = ClubsSerializer(self.club).data
+
+        self.assertTrue('people_count' in serialized_club,
+                        'people_count key is exists on ClubsSerializer')
+
+        self.assertEquals(serialized_club.get('people_count'),
+                          len(self.clubEntries),
+                          'people_count must matches with matching club entries length')
