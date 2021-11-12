@@ -164,7 +164,7 @@ export function ModalMinute({
 								? '시작 시간의 분을 입력하세요'
 								: '종료 시간을 입력하세요'}
 						</Text>
-						{console.log(mode)}
+
 						{mode === 'endMode' && (
 							<Text style={styles.startTimeText}>
 								시작 시간 :
