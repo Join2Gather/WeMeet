@@ -35,7 +35,6 @@ export default function Login() {
 	const goTabNavigator = useCallback(() => navigation.navigate('TabNavigator'), []);
 	useEffect(() => {
 		if (name.length) {
-			console.log('hihi');
 			navigation.navigate('TabNavigator');
 		} else {
 			console.log('없음');
