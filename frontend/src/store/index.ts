@@ -4,7 +4,7 @@ import { persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import sample, { sampleSaga } from './sample';
 import loading from './loading';
-import login from './login';
+import login, { loginSaga } from './login';
 import team, { teamSaga } from './team';
 import individual, { individualSaga } from './individual';
 import timetable, { timetableSaga } from './timetable';
@@ -12,7 +12,7 @@ import timetable, { timetableSaga } from './timetable';
 const persistConfig = {
 	key: 'root',
 	storage: AsyncStorage,
-	blacklist: ['individual', 'team', 'timetable'],
+	blacklist: ['individual', 'team', 'timetable', 'login', 'timetable'],
 };
 const rootReducer = combineReducers({
 	loading,
@@ -25,5 +25,5 @@ export default persistReducer(persistConfig, rootReducer);
 export type RootState = ReturnType<typeof rootReducer>;
 
 export function* rootSaga() {
-	yield all([teamSaga(), individualSaga(), timetableSaga()]);
+	yield all([teamSaga(), individualSaga(), timetableSaga(), loginSaga()]);
 }
