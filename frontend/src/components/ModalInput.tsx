@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
-import { inputTeamName, postTeamName } from '../store/team';
+import { inputTeamName, joinTeam, postTeamName } from '../store/team';
 //import { MaterialCommunityIcon as Icon } from '../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 interface props {
@@ -21,6 +21,7 @@ interface props {
 	token: string;
 	goTeamTime: Function;
 	modalMode: string;
+	setModalMode: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export function ModalInput({
@@ -31,15 +32,25 @@ export function ModalInput({
 	token,
 	goTeamTime,
 	modalMode,
+	setModalMode,
 }: props) {
 	const dispatch = useDispatch();
 	const [name, setName] = useState('');
 
 	const onChangeInput = useCallback(() => {
-		dispatch(inputTeamName(name));
-		dispatch(postTeamName({ user, id, name, token }));
-		setName('');
-	}, [name]);
+		if (modalMode === 'join') {
+			dispatch(joinTeam({ id: id, token: token, user: user, uri: name }));
+			setName('');
+		} else {
+			dispatch(inputTeamName(name));
+			dispatch(postTeamName({ user, id, name, token }));
+			setName('');
+		}
+	}, [name, modalMode]);
+	const onPressClose = useCallback(() => {
+		setModalMode('make');
+		setModalVisible(false);
+	}, []);
 
 	return (
 		// <AutoFocusProvider contentContainerStyle={[styles.keyboardAwareFocus]}>
@@ -70,9 +81,7 @@ export function ModalInput({
 								width: '9%',
 								// backgroundColor: 'blue',
 							}}
-							onPress={() => {
-								setModalVisible(false);
-							}}
+							onPress={onPressClose}
 						>
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={28} />
 						</TouchableHighlight>
@@ -173,8 +182,8 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		paddingBottom: 0.7,
 		borderBottomWidth: 0.3,
-		width: '90%',
-		marginLeft: '5%',
+		width: '70%',
+		marginLeft: '15%',
 		padding: 10,
 	},
 	buttonText: {
