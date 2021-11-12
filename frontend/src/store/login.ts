@@ -1,6 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-import type { Login } from '../interface';
+import createRequestSaga from '../hooks/createRequestSaga';
+import * as api from '../lib/api/login';
+import { takeLatest } from 'redux-saga/effects';
+import { createAction } from 'redux-actions';
+import type { Login, userMeAPI } from '../interface';
 
 const initialState: Login = {
 	id: 0,
@@ -10,7 +13,18 @@ const initialState: Login = {
 	clubs: [],
 	kakaoDates: [],
 	uri: '',
+	error: '',
 };
+
+const USER_ME = 'login/USER_ME';
+
+export const getUserMe = createAction(USER_ME, (data: userMeAPI) => data);
+
+const getUserMeSaga = createRequestSaga(USER_ME, api.getUserMe);
+
+export function* loginSaga() {
+	yield takeLatest(USER_ME, getUserMeSaga);
+}
 
 export const loginSlice = createSlice({
 	name: 'login',
@@ -33,10 +47,22 @@ export const loginSlice = createSlice({
 				state.uri = data.uri;
 			}
 		},
+		USER_ME_SUCCESS: (state, action: PayloadAction<any>) => {
+			state.clubs = action.payload.clubs;
+			state.clubs.map((club) => {
+				club.name = decodeURIComponent(club.name);
+			});
+		},
+		USER_ME_FAILURE: (state, action: PayloadAction<any>) => {
+			state.error = action.payload;
+		},
+		putURI: (state, action: PayloadAction<string>) => {
+			state.uri = action.payload;
+		},
 	},
 	extraReducers: {},
 });
 
-export const { getSocialLogin, findURI } = loginSlice.actions;
+export const { getSocialLogin, findURI, putURI } = loginSlice.actions;
 
 export default loginSlice.reducer;
