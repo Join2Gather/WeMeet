@@ -33,10 +33,15 @@ export function* teamSaga() {
 }
 
 const initialState: team = {
-	uri: '',
+	joinUri: '',
 	date: {},
-	name: '',
+	joinName: '',
 	error: '',
+	user: 0,
+	name: '',
+	id: 0,
+	joinTeam: false,
+	joinTeamError: false,
 };
 
 export const teamSlice = createSlice({
@@ -45,24 +50,34 @@ export const teamSlice = createSlice({
 	reducers: {
 		POST_TEAM_SUCCESS: (state, action: PayloadAction<responseTeamAPI>) => {
 			state.date = action.payload.date;
-			state.uri = action.payload.uri;
+			state.joinUri = action.payload.uri;
 		},
 		POST_TEAM_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
 		SHARE_URI_SUCCESS: (state, action: PayloadAction<any>) => {
-			state.uri = action.payload.uri;
-			Clipboard.setString(state.uri);
+			state.joinUri = action.payload.uri;
+			Clipboard.setString(state.joinUri);
 			Alert.alert('클립보드에 초대 링크가 복사 되었습니다');
 		},
 		SHARE_URI_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
 		JOIN_TEAM_SUCCESS: (state, action: PayloadAction<any>) => {
-			console.log(action.payload);
+			state.id = action.payload.id;
+			state.joinName = decodeURI(action.payload.name);
+			state.joinUri = action.payload.uri;
+			state.joinTeam = !state.joinTeam;
+			state.joinTeamError = false;
 		},
 		JOIN_TEAM_FAILURE: (state, action: PayloadAction<any>) => {
-			state.error = action.payload;
+			// Alert.alert('초대 코드가 올바르지 않습니다');
+			state.joinTeamError = true;
+			state.joinName = '';
+			state.joinUri = '';
+		},
+		initialError: (state) => {
+			state.joinTeamError = false;
 		},
 		inputTeamName: (state, action: PayloadAction<string>) => {
 			state.name = action.payload;
@@ -71,6 +86,6 @@ export const teamSlice = createSlice({
 	extraReducers: {},
 });
 
-export const { inputTeamName } = teamSlice.actions;
+export const { inputTeamName, initialError } = teamSlice.actions;
 
 export default teamSlice.reducer;

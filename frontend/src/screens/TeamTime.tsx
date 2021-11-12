@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 // prettier-ignore
 import {SafeAreaView, View, UnderlineText,TopBar,
@@ -9,7 +9,7 @@ NavigationHeader,  Text} from '../theme';
 import Icon from 'react-native-vector-icons/Fontisto';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
-import { Timetable } from '../components';
+import { Timetable, Spinner } from '../components';
 import { Colors } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,27 +22,48 @@ import {
 	setStartMin,
 } from '../store/timetable';
 import { RootState } from '../store';
-import { findURI } from '../store/login';
+import { findURI, putURI } from '../store/login';
 import { useMakeTimetable } from '../hooks';
 import FontAwesome from 'react-native-vector-icons/FontAwesome5';
+
 type TeamStackParamList = {
-	TeamTime: { name: string; user: number; id: number; token: string };
+	TeamTime: {
+		name: string;
+		user: number;
+		id: number;
+		token: string;
+		modalMode: string;
+		setModalMode: any;
+	};
 };
 
 type Props = NativeStackScreenProps<TeamStackParamList, 'TeamTime'>;
-import * as Clipboard from 'expo-clipboard';
 import { shareUri } from '../store/team';
 
 export default function TeamTime({ route }: Props) {
-	const { dates, uri, postDatesPrepare } = useSelector(
-		({ timetable, login }: RootState) => ({
-			dates: timetable.dates,
-			uri: login.uri,
-			postDatesPrepare: timetable.postDatesPrepare,
-		})
-	);
+	const {
+		dates,
+		uri,
+		postDatesPrepare,
+		loadingIndividual,
+		loadingGroup,
+		joinName,
+		joinUri,
+		loadingJoin,
+		joinTeamError,
+	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
+		dates: timetable.dates,
+		uri: login.uri,
+		postDatesPrepare: timetable.postDatesPrepare,
+		loadingIndividual: loading['timetable/GET_INDIVIDUAL'],
+		loadingGroup: loading['timetable/GET_GROUP'],
+		loadingJoin: loading['team/JOIN_TEAM'],
+		joinName: team.joinName,
+		joinUri: team.joinUri,
+		joinTeamError: team.joinTeamError,
+	}));
 	// navigation
-	const { name, id, user, token } = route.params;
+	const { name, id, user, token, modalMode } = route.params;
 
 	const navigation = useNavigation();
 	const goLeft = useCallback(() => {
@@ -51,8 +72,9 @@ export default function TeamTime({ route }: Props) {
 
 	// URI 찾아오기 로직
 	useEffect(() => {
-		dispatch(findURI(name));
-	}, [name]);
+		if (modalMode === 'make') dispatch(findURI(name));
+		else dispatch(putURI(joinUri));
+	}, [name, modalMode, joinUri]);
 	// 그룹인지 아닌지
 	const [isGroup, setGroupMode] = useState(true);
 	const dispatch = useDispatch();
@@ -69,20 +91,24 @@ export default function TeamTime({ route }: Props) {
 	}, []);
 	useEffect(() => {
 		dispatch(makeInitialTimetable());
-	}, [uri]);
+	}, [name]);
 	// 공유하기 버튼
 	const onShareURI = useCallback(() => {
-		uri && dispatch(shareUri({ id: id, user: user, token: token, uri: uri }));
-	}, [id, user, token, uri]);
-	// useEffect(() => {
-	// 	dispatch(cloneDates(defaultDates));
-	// }, []);
+		if (modalMode === 'make' && uri)
+			dispatch(shareUri({ id, user, token, uri }));
+		else dispatch(shareUri({ id, user, token, uri: joinUri }));
+	}, [id, user, token, uri, joinUri]);
+	useEffect(() => {
+		if (joinTeamError) {
+			navigation.navigate('TeamList');
+		}
+	}, [joinTeamError, loadingJoin]);
 	return (
 		<SafeAreaView style={{ backgroundColor: Colors.white }}>
 			<ScrollEnabledProvider>
 				<View style={[styles.view]}>
 					<NavigationHeader
-						title={name}
+						title={modalMode === 'join' ? joinName : name}
 						titleStyle={{ paddingLeft: 0 }}
 						Left={() => (
 							<Icon
@@ -122,8 +148,10 @@ export default function TeamTime({ route }: Props) {
 							/>
 						)}
 					/>
+
 					<View style={styles.viewHeight}>
 						<View style={styles.rowButtonView}>
+							{/* <Spinner loading={isGroup ? loadingGroup : loadingIndividual} /> */}
 							{mode === 'normal' && (
 								<View style={{ flexDirection: 'column' }}>
 									<View
@@ -317,5 +345,10 @@ const styles = StyleSheet.create({
 		fontSize: 15,
 		letterSpacing: -1,
 		height: 40,
+	},
+	loadingText: {
+		fontFamily: 'NanumSquareR',
+		fontSize: 20,
+		color: Colors.white,
 	},
 });

@@ -49,47 +49,44 @@ export function Timetable({
 }: props) {
 	const {
 		teamDates,
-		startTime,
-		endTime,
-		startMinute,
-		endMinute,
 		id,
 		user,
 		token,
-		loadingGroup,
-		loadingIndividual,
 		cloneDateSuccess,
 		kakaoDates,
 		isTimePicked,
 		postIndividualDates,
-	} = useSelector(({ timetable, individual, login, loading }: RootState) => ({
-		// dates: timetable.dates,
-		teamDates: timetable.teamDates,
-		startTime: timetable.startTime,
-		endTime: timetable.endTime,
-		startMinute: timetable.startMinute,
-		endMinute: timetable.endMinute,
-		id: login.id,
-		user: login.user,
-		token: login.token,
-		loadingGroup: loading['timetable/GET_GROUP'],
-		loadingIndividual: loading['timetable/GET_INDIVIDUAL'],
-		cloneDateSuccess: individual.cloneDateSuccess,
-		kakaoDates: login.kakaoDates,
-		postIndividualDates: timetable.postIndividualDates,
-		isTimePicked: timetable.isTimePicked,
-	}));
+		loadingJoin,
+		joinTeamError,
+	} = useSelector(
+		({ timetable, individual, login, loading, team }: RootState) => ({
+			// dates: timetable.dates,
+			teamDates: timetable.teamDates,
+			id: login.id,
+			user: login.user,
+			token: login.token,
+			cloneDateSuccess: individual.cloneDateSuccess,
+			kakaoDates: login.kakaoDates,
+			postIndividualDates: timetable.postIndividualDates,
+			isTimePicked: timetable.isTimePicked,
+			loadingJoin: loading['team/JOIN_TEAM'],
+			joinTeamError: team.joinTeamError,
+		})
+	);
 	const dispatch = useDispatch();
 	// 최초 렌더링 개인 페이지 정보 받아오기
 	useEffect(() => {
-		if (uri && isGroup) {
-			dispatch(getGroupDates({ id: id, user: user, token: token, uri: uri }));
-		} else if (uri && !isGroup) {
-			dispatch(
-				getIndividualDates({ id: id, user: user, token: token, uri: uri })
-			);
+		if (!loadingJoin && !joinTeamError) {
+			if (uri && isGroup) {
+				dispatch(getGroupDates({ id: id, user: user, token: token, uri: uri }));
+			} else if (uri && !isGroup) {
+				dispatch(
+					getIndividualDates({ id: id, user: user, token: token, uri: uri })
+				);
+			}
 		}
-	}, [uri, id, user, token, isGroup]);
+	}, [uri, id, user, token, isGroup, loadingJoin, joinTeamError]);
+
 	useEffect(() => {
 		if (cloneDateSuccess) {
 			dispatch(kakaoLogin(kakaoDates));
@@ -106,7 +103,6 @@ export function Timetable({
 				setModalVisible(true);
 			}
 			dispatch(changeDayIdx(idx));
-			// dispatch(changeColor({ idx: idx, time: time }));
 			dispatch(setDay(day));
 			dispatch(pushSelectStart(time));
 		},
@@ -226,7 +222,6 @@ export function Timetable({
 									{day.times.map((d) => (
 										<TouchableView
 											onPress={() => {
-												console.log(d, mode);
 												mode === 'startMode' ||
 												(mode === 'normal' && d.isFullTime && d.isPicked)
 													? onMakeInitial()

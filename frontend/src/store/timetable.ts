@@ -162,35 +162,6 @@ export const timetableSlice = createSlice({
 				fri: [],
 				sat: [],
 			};
-			if (state.everyTime) {
-				state.weekIndex.map((day, idx) =>
-					state.everyTime[day].map((d) => {
-						state.dates[idx].times.map((inDay) => {
-							if (d.starting_hours === inDay.time) {
-								for (let i = d.starting_hours - 8; i <= d.end_hours - 8; i++) {
-									if (i + 8 == d.starting_hours) {
-										state.dates[idx].times[i].color = Colors.grey400;
-										state.dates[idx].times[i].isPicked = true;
-										state.dates[idx].times[i].startPercent =
-											(1 - d.starting_minutes / 60) * 100;
-										state.dates[idx].times[i].mode = 'start';
-									} else if (i + 8 == d.end_hours) {
-										state.dates[idx].times[i].color = Colors.grey400;
-										state.dates[idx].times[i].isPicked = true;
-										state.dates[idx].times[i].endPercent =
-											(d.end_minutes / 60) * 100;
-										state.dates[idx].times[i].mode = 'end';
-									} else {
-										state.dates[idx].times[i].color = Colors.grey400;
-										state.dates[idx].times[i].isPicked = true;
-										state.dates[idx].times[i].isFullTime = true;
-									}
-								}
-							}
-						});
-					})
-				);
-			}
 		},
 
 		GET_INDIVIDUAL_SUCCESS: (state, action: PayloadAction<any>) => {
@@ -223,19 +194,49 @@ export const timetableSlice = createSlice({
 					});
 				})
 			);
+			if (state.everyTime) {
+				state.weekIndex.map((day, idx) =>
+					state.everyTime[day].map((d) => {
+						state.dates[idx].times.map((inDay) => {
+							if (d.starting_hours === inDay.time) {
+								for (let i = d.starting_hours - 8; i <= d.end_hours - 8; i++) {
+									if (i + 8 == d.starting_hours) {
+										state.dates[idx].times[i].color = Colors.grey400;
+										state.dates[idx].times[i].isPicked = true;
+										state.dates[idx].times[i].startPercent =
+											(1 - d.starting_minutes / 60) * 100;
+										state.dates[idx].times[i].mode = 'start';
+									} else if (i + 8 == d.end_hours) {
+										state.dates[idx].times[i].color = Colors.grey400;
+										state.dates[idx].times[i].isPicked = true;
+										state.dates[idx].times[i].endPercent =
+											(d.end_minutes / 60) * 100;
+										state.dates[idx].times[i].mode = 'end';
+									} else {
+										state.dates[idx].times[i].color = Colors.grey400;
+										state.dates[idx].times[i].isPicked = true;
+										state.dates[idx].times[i].isFullTime = true;
+									}
+								}
+							}
+						});
+					})
+				);
+			}
 		},
 		GET_INDIVIDUAL_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
 		GET_GROUP_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.responseGroup = action.payload;
+
 			state.weekIndex.map((day, idx) => {
 				state.responseGroup[day].avail_time.map((d) => {
 					state.teamDates[idx].times.map((inDay) => {
 						if (d.starting_hours === inDay.time) {
 							for (let i = d.starting_hours - 8; i <= d.end_hours - 8; i++) {
 								if (i + 8 == d.starting_hours) {
-									state.teamDates[idx].times[i].color = Colors.blue400;
+									state.teamDates[idx].times[i].color = `${Colors.blue400}`;
 									state.teamDates[idx].times[i].isPicked = true;
 									state.teamDates[idx].times[i].startPercent =
 										(1 - d.starting_minutes / 60) * 100;

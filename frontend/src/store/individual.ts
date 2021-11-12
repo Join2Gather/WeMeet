@@ -68,9 +68,53 @@ export const individualSlice = createSlice({
 		},
 		kakaoLogin: (state, action: PayloadAction<any>) => {
 			if (state.cloneDateSuccess) {
-				state.everyTime = action.payload;
-				state.weekIndex.map((day, idx) =>
-					state.everyTime[day].map((d) => {
+				if (action.payload) {
+					state.everyTime = action.payload;
+					state.weekIndex.map(
+						(day, idx) =>
+							state.everyTime[day]?.length &&
+							state.everyTime[day]?.map((d) => {
+								state.individualDates[idx].times.map((inDay) => {
+									if (d.starting_hours === inDay.time) {
+										for (
+											let i = d.starting_hours - 8;
+											i <= d.end_hours - 8;
+											i++
+										) {
+											if (i + 8 == d.starting_hours) {
+												state.individualDates[idx].times[i].color =
+													Colors.grey400;
+												state.individualDates[idx].times[i].isFullTime = true;
+												state.individualDates[idx].times[i].startPercent =
+													(1 - d.starting_minutes / 60) * 100;
+												state.individualDates[idx].times[i].mode = 'start';
+											} else if (i + 8 == d.end_hours) {
+												state.individualDates[idx].times[i].color =
+													Colors.grey400;
+												state.individualDates[idx].times[i].isFullTime = true;
+												state.individualDates[idx].times[i].endPercent =
+													(d.end_minutes / 60) * 100;
+												state.individualDates[idx].times[i].mode = 'end';
+											} else {
+												state.individualDates[idx].times[i].color =
+													Colors.grey400;
+												state.individualDates[idx].times[i].isFullTime = true;
+											}
+										}
+									}
+								});
+							})
+					);
+				}
+			}
+		},
+		LOGIN_EVERYTIME_SUCCESS: (state, action: PayloadAction<any>) => {
+			state.everyTime = action.payload;
+			state.loginSuccess = true;
+			state.weekIndex.map(
+				(day, idx) =>
+					state.everyTime[day]?.length &&
+					state.everyTime[day]?.map((d) => {
 						state.individualDates[idx].times.map((inDay) => {
 							if (d.starting_hours === inDay.time) {
 								for (let i = d.starting_hours - 8; i <= d.end_hours - 8; i++) {
@@ -94,37 +138,6 @@ export const individualSlice = createSlice({
 							}
 						});
 					})
-				);
-			}
-		},
-		LOGIN_EVERYTIME_SUCCESS: (state, action: PayloadAction<any>) => {
-			state.everyTime = action.payload;
-			state.loginSuccess = true;
-			state.weekIndex.map((day, idx) =>
-				state.everyTime[day].map((d) => {
-					state.individualDates[idx].times.map((inDay) => {
-						if (d.starting_hours === inDay.time) {
-							for (let i = d.starting_hours - 8; i <= d.end_hours - 8; i++) {
-								if (i + 8 == d.starting_hours) {
-									state.individualDates[idx].times[i].color = Colors.grey400;
-									state.individualDates[idx].times[i].isFullTime = true;
-									state.individualDates[idx].times[i].startPercent =
-										(1 - d.starting_minutes / 60) * 100;
-									state.individualDates[idx].times[i].mode = 'start';
-								} else if (i + 8 == d.end_hours) {
-									state.individualDates[idx].times[i].color = Colors.grey400;
-									state.individualDates[idx].times[i].isFullTime = true;
-									state.individualDates[idx].times[i].endPercent =
-										(d.end_minutes / 60) * 100;
-									state.individualDates[idx].times[i].mode = 'end';
-								} else {
-									state.individualDates[idx].times[i].color = Colors.grey400;
-									state.individualDates[idx].times[i].isFullTime = true;
-								}
-							}
-						}
-					});
-				})
 			);
 		},
 		LOGIN_EVERYTIME_FAILURE: (state, action: PayloadAction<any>) => {

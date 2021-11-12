@@ -15,10 +15,15 @@ export interface responseTeamAPI {
 }
 
 export interface team {
-	uri: string;
+	joinUri: string;
 	date: Object;
+	joinName: string;
 	name: string;
+	user: number;
+	id: number;
 	error: string;
+	joinTeam: boolean;
+	joinTeamError: boolean;
 }
 
 export interface shareUriAPI {

@@ -6,6 +6,7 @@ import {
 	FlatList,
 	Platform,
 	Dimensions,
+	Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -22,41 +23,76 @@ import { useAutoFocus, AutoFocusProvider } from '../contexts';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { postTeamName } from '../store/team';
+import { initialError, postTeamName } from '../store/team';
 import { ModalInput } from '../components';
 import { NavigationHeader } from '../theme';
 import { useLayout, useMakeTimetable } from '../hooks';
 import { cloneDates } from '../store/timetable';
 import FontAweSome from 'react-native-vector-icons/FontAwesome5';
+import { getUserMe } from '../store/login';
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
 export default function TeamList() {
-	const { user, id, clubs, token } = useSelector(({ login }: RootState) => ({
+	const {
+		user,
+		id,
+		clubs,
+		token,
+		joinTeam,
+		joinName,
+		joinTeamError,
+		loadingJoin,
+	} = useSelector(({ login, team, loading }: RootState) => ({
 		user: login.user,
 		id: login.id,
 		clubs: login.clubs,
 		token: login.token,
+		joinTeam: team.joinTeam,
+		joinName: team.joinName,
+		joinTeamError: team.joinTeamError,
+		loadingJoin: ['team/JOIN_TEAM'],
 	}));
 	const [dimensions, setDimensions] = useState({ window, screen });
-	const [name, setName] = useState('');
-	const [modalMode, setModalMode] = useState('join');
+	const [modalMode, setModalMode] = useState('make');
 	const [modalVisible, setModalVisible] = useState(false);
 	const navigation = useNavigation();
-	const goTeamTime = useCallback(
-		(name) =>
-			navigation.navigate('TeamTime', {
-				name: name,
-				user: user,
-				id: id,
-				token: token,
-			}),
-		[name]
-	);
-	const { defaultDates } = useMakeTimetable();
 	const dispatch = useDispatch();
+	const { defaultDates } = useMakeTimetable();
 	useEffect(() => {
-		dispatch(cloneDates(defaultDates));
-	}, []);
+		dispatch(getUserMe({ id, token, user }));
+	}, [joinTeam]);
+	useEffect(() => {
+		setModalMode('make');
+		joinTeamError && Alert.alert('hihi');
+	}, [joinTeamError]);
+
+	const goTeamTime = useCallback(
+		(name) => {
+			if (modalMode === 'join') {
+				navigation.navigate('TeamTime', {
+					name,
+					user,
+					id,
+					token,
+					modalMode,
+				});
+				dispatch(initialError());
+				setModalMode('make');
+			} else {
+				navigation.navigate('TeamTime', {
+					name,
+					user,
+					id,
+					token,
+					modalMode,
+				});
+				setModalMode('make');
+				dispatch(initialError());
+			}
+		},
+		[modalMode, joinName]
+	);
+
 	const onMakeTeamTime = useCallback(() => {
 		setModalMode('make');
 		setModalVisible(true);
@@ -148,6 +184,7 @@ export default function TeamList() {
 					token={token}
 					goTeamTime={goTeamTime}
 					modalMode={modalMode}
+					setModalMode={setModalMode}
 				/>
 			</View>
 
