@@ -6,4 +6,11 @@ export interface Login {
 	clubs: Array<any>;
 	kakaoDates: Array<any>;
 	uri?: string;
+	error: string;
+}
+
+export interface userMeAPI {
+	user: number;
+	id: number;
+	token: string;
 }
