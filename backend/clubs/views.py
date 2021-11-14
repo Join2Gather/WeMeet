@@ -251,6 +251,23 @@ class ClubJoinView(APIView):
         return JsonResponse(result)
 
 
+class ClubLeaveView(APIView):
+    @swagger_auto_schema(
+        operation_id="그룹 탈퇴",
+        responses={
+            status.HTTP_200_OK: SuccessSerializer,
+            status.HTTP_404_NOT_FOUND: ErrorSerializer
+        },
+    )
+    @profile_guard
+    @club_guard
+    def post(self, request: Request, user: int, profile: Any, uri: str, club: Any):
+        ClubEntries.objects.filter(
+            profile=profile, club=club).delete()
+
+        return JsonResponse({'success': True})
+
+
 class ClubShareView(APIView):
     permission_classes = [IsAuthenticated]
 
