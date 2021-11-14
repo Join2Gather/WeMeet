@@ -144,6 +144,7 @@ const initialState: timetable = {
 		sat: [],
 	},
 	isTimePicked: false,
+	color: '',
 };
 
 export const timetableSlice = createSlice({
@@ -173,19 +174,19 @@ export const timetableSlice = createSlice({
 						if (d.starting_hours === inDay.time) {
 							for (let i = d.starting_hours - 8; i <= d.end_hours - 8; i++) {
 								if (i + 8 == d.starting_hours) {
-									state.dates[idx].times[i].color = Colors.blue400;
+									state.dates[idx].times[i].color = state.color;
 									state.dates[idx].times[i].isPicked = true;
 									state.dates[idx].times[i].startPercent =
 										(1 - d.starting_minutes / 60) * 100;
 									state.dates[idx].times[i].mode = 'start';
 								} else if (i + 8 == d.end_hours) {
-									state.dates[idx].times[i].color = Colors.blue400;
+									state.dates[idx].times[i].color = state.color;
 									state.dates[idx].times[i].isPicked = true;
 									state.dates[idx].times[i].endPercent =
 										(d.end_minutes / 60) * 100;
 									state.dates[idx].times[i].mode = 'end';
 								} else {
-									state.dates[idx].times[i].color = Colors.blue400;
+									state.dates[idx].times[i].color = state.color;
 									state.dates[idx].times[i].isPicked = true;
 									state.dates[idx].times[i].isFullTime = true;
 								}
@@ -229,26 +230,25 @@ export const timetableSlice = createSlice({
 		},
 		GET_GROUP_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.responseGroup = action.payload;
-
 			state.weekIndex.map((day, idx) => {
 				state.responseGroup[day].avail_time.map((d) => {
 					state.teamDates[idx].times.map((inDay) => {
 						if (d.starting_hours === inDay.time) {
 							for (let i = d.starting_hours - 8; i <= d.end_hours - 8; i++) {
 								if (i + 8 == d.starting_hours) {
-									state.teamDates[idx].times[i].color = `${Colors.blue400}`;
+									state.teamDates[idx].times[i].color = `${state.color}`;
 									state.teamDates[idx].times[i].isPicked = true;
 									state.teamDates[idx].times[i].startPercent =
 										(1 - d.starting_minutes / 60) * 100;
 									state.teamDates[idx].times[i].mode = 'start';
 								} else if (i + 8 == d.end_hours) {
-									state.teamDates[idx].times[i].color = Colors.blue400;
+									state.teamDates[idx].times[i].color = state.color;
 									state.teamDates[idx].times[i].isPicked = true;
 									state.teamDates[idx].times[i].endPercent =
 										(d.end_minutes / 60) * 100;
 									state.teamDates[idx].times[i].mode = 'end';
 								} else {
-									state.teamDates[idx].times[i].color = Colors.blue400;
+									state.teamDates[idx].times[i].color = state.color;
 									state.teamDates[idx].times[i].isPicked = true;
 									state.teamDates[idx].times[i].isFullTime = true;
 								}
@@ -293,7 +293,7 @@ export const timetableSlice = createSlice({
 				(d) => d.time === state.startTime
 			);
 			if (find) {
-				find.color = Colors.blue400;
+				find.color = state.color;
 				find.isPicked = true;
 				find.startPercent = (1 - state.startMinute / 60) * 100;
 				find.mode = 'start';
@@ -352,7 +352,7 @@ export const timetableSlice = createSlice({
 				if (state.isTimePicked) {
 					break;
 				} else {
-					state.dates[state.dayIdx].times[i - 8].color = Colors.blue400;
+					state.dates[state.dayIdx].times[i - 8].color = state.color;
 					state.dates[state.dayIdx].times[i - 8].isFullTime = true;
 					if (i === Math.floor(state.endTime)) {
 						state.dates[state.dayIdx].times[i - 8].isPicked = true;
@@ -361,7 +361,7 @@ export const timetableSlice = createSlice({
 						state.dates[state.dayIdx].times[i - 8].mode = 'end';
 						state.dates[state.dayIdx].times[i - 8].isFullTime = false;
 					} else if (i === Math.floor(state.startTime)) {
-						state.dates[state.dayIdx].times[i - 8].color = Colors.blue400;
+						state.dates[state.dayIdx].times[i - 8].color = state.color;
 						state.dates[state.dayIdx].times[i - 8].isPicked = true;
 						state.dates[state.dayIdx].times[i - 8].startPercent =
 							(1 - state.startMinute / 60) * 100;
@@ -384,6 +384,12 @@ export const timetableSlice = createSlice({
 		cloneEveryTime: (state, action: PayloadAction<any>) => {
 			state.everyTime = action.payload;
 		},
+		getColor: (state, action: PayloadAction<string>) => {
+			state.color = action.payload;
+			if (state.color === '#FFFFFF' || '') {
+				state.color = Colors.blue500;
+			}
+		},
 	},
 	extraReducers: {},
 });
@@ -405,6 +411,7 @@ export const {
 	makeInitialTimetable,
 	changeDayIdx,
 	cloneEveryTime,
+	getColor,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;

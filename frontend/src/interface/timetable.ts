@@ -17,6 +17,7 @@ export interface timetable {
 	error: string;
 	isTimePicked: boolean;
 	everyTime: responseEveryTime;
+	color: string;
 }
 
 export type weekIndex = Array<string>;

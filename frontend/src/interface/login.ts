@@ -7,6 +7,7 @@ export interface Login {
 	kakaoDates: Array<any>;
 	uri?: string;
 	error: string;
+	color: string;
 }
 
 export interface userMeAPI {
