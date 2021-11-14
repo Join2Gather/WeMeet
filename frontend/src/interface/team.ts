@@ -23,6 +23,7 @@ export interface team {
 	id: number;
 	error: string;
 	joinTeam: boolean;
+	postTeamError: boolean;
 	joinTeamError: boolean;
 }
 
@@ -38,4 +39,12 @@ export interface joinTeamAPI {
 	id: number;
 	token: string;
 	uri: string;
+}
+
+export interface changeColorAPI {
+	id: number;
+	uri: string;
+	token: string;
+	user: number;
+	color: string;
 }
