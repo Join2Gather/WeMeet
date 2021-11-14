@@ -14,6 +14,7 @@ const initialState: Login = {
 	kakaoDates: [],
 	uri: '',
 	error: '',
+	color: '',
 };
 
 const USER_ME = 'login/USER_ME';
@@ -45,6 +46,7 @@ export const loginSlice = createSlice({
 			const data = state.clubs.find((club) => club.name === action.payload);
 			if (data) {
 				state.uri = data.uri;
+				state.color = data.color;
 			}
 		},
 		USER_ME_SUCCESS: (state, action: PayloadAction<any>) => {
