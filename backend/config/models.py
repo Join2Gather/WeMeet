@@ -25,6 +25,7 @@ class Clubs(models.Model):
 
     name = models.CharField(max_length=100)
     uri = models.CharField(max_length=100)
+    color = models.CharField(max_length=100, default="#FFFFFF")
 
     class Meta:
         db_table = 'clubs'

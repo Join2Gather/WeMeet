@@ -99,6 +99,7 @@ class ClubView(APIView):
             type=openapi.TYPE_OBJECT,
             properties={
                 'name': openapi.Schema(type=openapi.TYPE_STRING, description='name of club'),
+                'color': openapi.Schema(type=openapi.TYPE_STRING, description='color of club'),
             }
         ),
         responses={
@@ -108,11 +109,12 @@ class ClubView(APIView):
     @profile_guard
     def post(self, request: Request, user: int, profile: Any):
         name = request.data.get('name')
-
+        color = request.data.get('color', '#FFFFFF')
         if not name:
             return JsonResponse(ErrorSerializer({'error': 'name not found'}).data, status=status.HTTP_404_NOT_FOUND)
+
         uri = uuid.uuid4()
-        club = Clubs.objects.create(name=name, uri=uri)
+        club = Clubs.objects.create(name=name, uri=uri, color=color)
 
         # 자신의 Profile과 Club 사이의 Entry는 기본적으로 생성
 
@@ -245,6 +247,35 @@ class ClubJoinView(APIView):
     def post(self, request: Request, user: int, profile: Any, uri: str, club: Any):
         ClubEntries.objects.get_or_create(
             profile=profile, club=club)
+
+        result = ClubsSerializer(club).data
+
+        return JsonResponse(result)
+
+
+class ClubColorView(APIView):
+    @swagger_auto_schema(
+        operation_id="색상 변경",
+        responses={
+            status.HTTP_200_OK: ClubsSerializer,
+            status.HTTP_400_BAD_REQUEST: ErrorSerializer
+        },
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'color': openapi.Schema(type=openapi.TYPE_STRING, description='color hex code of club'),
+            }
+        ),
+    )
+    @profile_guard
+    @club_guard
+    def put(self, request: Request, user: int, profile: Any, uri: str, club: Any):
+        color = request.data.get('color')
+        if not color:
+            return JsonResponse({'error': 'color not given'})
+
+        club.color = color
+        club.save()
 
         result = ClubsSerializer(club).data
 

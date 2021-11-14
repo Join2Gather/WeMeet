@@ -1,10 +1,30 @@
 from django.test import TestCase
 from config.models import ClubEntries
 from config.serializers import ClubsSerializer
-from config.models import Profiles, Clubs, Dates, ProfileDates
+from config.models import Profiles, Clubs, Dates, ProfileDates, ClubEntries, UserModel
 from django.contrib.auth.models import User as Users
 from config.serializers import ClubAvailableTimeSerializer
+from rest_framework.views import APIView
+from clubs.views import ClubView
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APIRequestFactory, force_authenticate
+from django.urls import reverse
 import json
+
+
+def mock_request(user: UserModel, token: Token, params: dict = {}, data: dict = {}, view_name: str = 'club_view', view: APIView = ClubView, mode: str = 'post'):
+    url = reverse(view_name, kwargs=params)
+    factory = APIRequestFactory()
+
+    request = factory.__getattribute__(mode)(
+        url, data=data, format='json')
+
+    force_authenticate(request, user=user, token=token)
+
+    response = view.as_view()(
+        request, **params)
+
+    return response
 
 
 class InterSectionTestCase(TestCase):

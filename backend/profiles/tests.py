@@ -1,11 +1,10 @@
 from django.http.response import JsonResponse
 from django.test import TestCase
+from config.tests import mock_request
 from config.models import UserModel, Profiles
 from profiles.views import ProfileView
 from rest_framework.authtoken.models import Token
 import uuid
-from rest_framework.test import APIRequestFactory, force_authenticate
-from django.urls import reverse
 import json
 
 # Create your tests here.
@@ -21,38 +20,26 @@ class ChangeNickNameTestCase(TestCase):
 
         self.token = Token.objects.create(key=key, user=self.user)
 
-        self.profile_view = ProfileView.as_view()
-        self.factory = APIRequestFactory()
-
-    def request(self, data: dict = {}):
-        url = reverse('profile_view', kwargs={
-                      'user': self.user.id, 'profile': self.profile.id})
-        request = self.factory.put(
-            url, data=data, format='json')
-
-        force_authenticate(request, user=self.user, token=self.token)
-
-        response = self.profile_view(
-            request, user=self.user.id, profile=self.profile.id)
-
-        return response
-
     def test_nickname_not_given(self):
-        nickname_not_given: JsonResponse = self.request()
+        nickname_not_given: JsonResponse = mock_request(
+            self.user, self.token, params={'user': self.user.id, 'profile': self.profile.id}, view_name='profile_view', view=ProfileView, mode='put')
         self.assertEquals(nickname_not_given.status_code,
                           400, '닉네임이 주어지지 않았다면 400')
 
     def test_nickname_too_long(self):
-        nickname_too_long: JsonResponse = self.request(
-            data={'nickname': 'a'*200})
+        nickname = 'a' * 200
+
+        nickname_too_long: JsonResponse = mock_request(
+            self.user, self.token, params={'user': self.user.id, 'profile': self.profile.id}, data={'nickname': nickname}, view_name='profile_view', view=ProfileView, mode='put')
+
         self.assertEquals(nickname_too_long.status_code,
                           400, '닉네임이 너무 길면 400')
 
     def test_nickname_has_changed(self):
 
         nickname = 'a' * 20
-        nickname_changed: JsonResponse = self.request(
-            data={'nickname': nickname})
+        nickname_changed: JsonResponse = mock_request(
+            self.user, self.token, params={'user': self.user.id, 'profile': self.profile.id}, data={'nickname': nickname}, view_name='profile_view', view=ProfileView, mode='put')
 
         self.assertEquals(nickname_changed.status_code, 200, '닉네임이 주어지면 200')
 
