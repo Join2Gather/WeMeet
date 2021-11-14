@@ -33,6 +33,7 @@
 		"react-dom": "16.13.1",
 		"react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",
 		"react-native-appearance": "^0.3.4",
+		"react-native-color-picker": "^0.6.0",
 		"react-native-dotenv": "^3.2.0",
 		"react-native-dropdown-picker": "^5.2.0",
 		"react-native-gesture-handler": "^1.10.3",
