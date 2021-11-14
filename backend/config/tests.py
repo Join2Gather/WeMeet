@@ -1,9 +1,10 @@
-from django.test import TestCase
-from config.models import ClubEntries
-from config.serializers import ClubsSerializer
-from config.models import Profiles, Clubs, Dates, ProfileDates, ClubEntries, UserModel
+from hypothesis.extra.django import TestCase, from_model
+from hypothesis import given
+from hypothesis.strategies import lists
+from config.serializers import ClubsSerializer, ClubsWithDateSerializer, ProfilesSerializer, ClubAvailableTimeSerializer
+from config.models import Profiles, Clubs, Dates, ProfileDates, ClubEntries, UserModel, ClubEntries
+from config.constants import week
 from django.contrib.auth.models import User as Users
-from config.serializers import ClubAvailableTimeSerializer
 from rest_framework.views import APIView
 from clubs.views import ClubView
 from rest_framework.authtoken.models import Token
@@ -131,3 +132,56 @@ class ClubPeopleCountTestCase(TestCase):
         self.assertEquals(serialized_club.get('people_count'),
                           len(self.clubEntries),
                           'people_count must matches with matching club entries length')
+
+
+class ClubCalculatorTestCase(TestCase):
+
+    def check_time_included(self, serialized_dates, date, club=None):
+        time = {
+            'starting_hours': date.starting_hours,
+            'starting_minutes': date.starting_minutes,
+            'end_hours': date.end_hours,
+            'end_minutes': date.end_minutes,
+        }
+
+        if isinstance(serialized_dates, list):
+            if serialized_dates and isinstance(serialized_dates[0], dict):
+                matching_elems = [elem for elem in serialized_dates if elem.get(
+                    'club', {}).get('id', None) == club.id]
+
+                self.assertEquals(len(matching_elems), 1)
+                self.assertIn(time, matching_elems[0].get(week[date.day], []))
+            else:
+                self.assertIn(time, serialized_dates)
+        else:
+            self.assertIn(time, serialized_dates.get(week[date.day], []))
+
+    @given(from_model(Profiles, user=from_model(UserModel)), lists(from_model(Dates)), lists(from_model(Clubs)))
+    def test_date_calculate(self, profile: Profiles, dates: list[Dates], clubs: list[Clubs]):
+        for club in clubs:
+            for date in dates:
+                ProfileDates.objects.create(
+                    is_temporary_reserved=True, profile=profile, date=date, club=club)
+
+            serialized_dates = ClubsWithDateSerializer(
+                club).data.get('dates', {})
+
+            for date in dates:
+                self.check_time_included(serialized_dates, date)
+
+        serialized_dates = ProfilesSerializer(profile).data.get('dates', [])
+
+        for club in clubs:
+            for date in dates:
+                self.check_time_included(serialized_dates, date, club)
+
+        for club in clubs:
+            intersection = ClubAvailableTimeSerializer(
+                club).data.get('intersection', {})
+
+            for day in week:
+                self.assertIn(day, intersection)
+                day_data = intersection.get(day)
+
+                for key in ['avail_time', 'count', 'avail_people']:
+                    self.assertIn(key, day_data)
