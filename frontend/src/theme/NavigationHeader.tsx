@@ -10,6 +10,7 @@ export type NavigationHeaderProps = {
 	Left?: () => ReactNode;
 	Right?: () => ReactNode;
 	secondRight?: () => ReactNode;
+	headerColor?: string;
 	viewStyle?: StyleProp<ViewStyle>;
 	titleStyle?: StyleProp<TextStyle>;
 };
@@ -21,6 +22,7 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 	secondRight,
 	viewStyle,
 	titleStyle,
+	headerColor,
 }) => {
 	return (
 		<View style={[styles.view, viewStyle]}>
