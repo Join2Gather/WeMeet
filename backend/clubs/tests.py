@@ -74,6 +74,9 @@ class ClubTestCase(TestCase):
     @given(from_model(UserModel), from_model(Clubs), text(min_size=40))
     def test_club_color(self, user: UserModel, club: Clubs, key: str):
         color = ''.join(generate_color())
+
+        self.assertTrue(is_color(color))
+
         profile = Profiles.objects.create(name=user.username, user=user)
         token = self.get_token(profile, key)
 
