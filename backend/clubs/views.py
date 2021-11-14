@@ -272,7 +272,7 @@ class ClubColorView(APIView):
     def put(self, request: Request, user: int, profile: Any, uri: str, club: Any):
         color = request.data.get('color')
         if not color:
-            return JsonResponse({'error': 'color not given'})
+            return JsonResponse({'error': 'color not given'}, status=status.HTTP_404_NOT_FOUND)
 
         club.color = color
         club.save()
