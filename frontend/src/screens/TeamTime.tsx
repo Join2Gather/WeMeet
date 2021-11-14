@@ -15,6 +15,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
 import {
 	cloneDates,
+	getColor,
 	makeInitialTimetable,
 	setEndHour,
 	setEndMin,
@@ -44,6 +45,7 @@ export default function TeamTime({ route }: Props) {
 	const {
 		dates,
 		uri,
+		color,
 		postDatesPrepare,
 		loadingIndividual,
 		loadingGroup,
@@ -51,9 +53,11 @@ export default function TeamTime({ route }: Props) {
 		joinUri,
 		loadingJoin,
 		joinTeamError,
+		error,
 	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
 		dates: timetable.dates,
 		uri: login.uri,
+		color: login.color,
 		postDatesPrepare: timetable.postDatesPrepare,
 		loadingIndividual: loading['timetable/GET_INDIVIDUAL'],
 		loadingGroup: loading['timetable/GET_GROUP'],
@@ -61,27 +65,44 @@ export default function TeamTime({ route }: Props) {
 		joinName: team.joinName,
 		joinUri: team.joinUri,
 		joinTeamError: team.joinTeamError,
+		error: team.error,
 	}));
 	// navigation
 	const { name, id, user, token, modalMode } = route.params;
-
 	const navigation = useNavigation();
-	const goLeft = useCallback(() => {
-		navigation.goBack();
-	}, []);
+	const dispatch = useDispatch();
 
+	// 그룹인지 아닌지
+	const [isGroup, setGroupMode] = useState(true);
+
+	//modal
+	const [modalVisible, setModalVisible] = useState(false);
+	const [mode, setMode] = useState('normal');
+
+	// useEffect
+	// initial
+	useEffect(() => {
+		dispatch(makeInitialTimetable());
+	}, [name]);
 	// URI 찾아오기 로직
 	useEffect(() => {
 		if (modalMode === 'make') dispatch(findURI(name));
 		else dispatch(putURI(joinUri));
 	}, [name, modalMode, joinUri]);
-	// 그룹인지 아닌지
-	const [isGroup, setGroupMode] = useState(true);
-	const dispatch = useDispatch();
-	//modal
-	const [modalVisible, setModalVisible] = useState(false);
-	const [mode, setMode] = useState('normal');
-	// initial
+	// 에러 있으면 목록 페이지로 이동
+	useEffect(() => {
+		if (joinTeamError || error !== '') {
+			navigation.navigate('TeamList');
+		}
+	}, [joinTeamError, loadingJoin, error]);
+	useEffect(() => {
+		dispatch(getColor(color));
+	}, [color]);
+
+	// useCallback
+	const goLeft = useCallback(() => {
+		navigation.goBack();
+	}, []);
 	const onPressPlus = useCallback(() => {
 		setMode('startMode');
 		dispatch(setStartHour(0));
@@ -89,25 +110,18 @@ export default function TeamTime({ route }: Props) {
 		dispatch(setEndHour(0));
 		dispatch(setEndMin(0));
 	}, []);
-	useEffect(() => {
-		dispatch(makeInitialTimetable());
-	}, [name]);
 	// 공유하기 버튼
 	const onShareURI = useCallback(() => {
 		if (modalMode === 'make' && uri)
 			dispatch(shareUri({ id, user, token, uri }));
 		else dispatch(shareUri({ id, user, token, uri: joinUri }));
 	}, [id, user, token, uri, joinUri]);
-	useEffect(() => {
-		if (joinTeamError) {
-			navigation.navigate('TeamList');
-		}
-	}, [joinTeamError, loadingJoin]);
 	return (
 		<SafeAreaView style={{ backgroundColor: Colors.white }}>
 			<ScrollEnabledProvider>
 				<View style={[styles.view]}>
 					<NavigationHeader
+						headerColor={color}
 						title={modalMode === 'join' ? joinName : name}
 						titleStyle={{ paddingLeft: 0 }}
 						Left={() => (
@@ -151,7 +165,7 @@ export default function TeamTime({ route }: Props) {
 
 					<View style={styles.viewHeight}>
 						<View style={styles.rowButtonView}>
-							{/* <Spinner loading={isGroup ? loadingGroup : loadingIndividual} /> */}
+							<Spinner loading={isGroup ? loadingGroup : loadingIndividual} />
 							{mode === 'normal' && (
 								<View style={{ flexDirection: 'column' }}>
 									<View
@@ -181,7 +195,7 @@ export default function TeamTime({ route }: Props) {
 														: 'checkbox-blank-outline'
 												}
 												size={24}
-												color={Colors.blue600}
+												color={color}
 											/>
 											<Text style={styles.iconText}>그룹</Text>
 										</TouchableOpacity>
@@ -196,17 +210,14 @@ export default function TeamTime({ route }: Props) {
 														: 'checkbox-marked-outline'
 												}
 												size={23}
-												color={Colors.blue600}
+												color={color}
 											/>
 											<Text style={styles.iconText}>개인</Text>
 										</TouchableOpacity>
 									</View>
 									<View style={{ flexDirection: 'row' }}>
 										<View
-											style={[
-												styles.boxView,
-												{ backgroundColor: Colors.blue400 },
-											]}
+											style={[styles.boxView, { backgroundColor: color }]}
 										/>
 										<Text style={styles.infoText}>가능 일정</Text>
 										<View
