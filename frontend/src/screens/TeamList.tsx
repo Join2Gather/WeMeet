@@ -40,8 +40,10 @@ export default function TeamList() {
 		token,
 		joinTeam,
 		joinName,
+		postTeamError,
 		joinTeamError,
 		loadingJoin,
+		joinUri,
 	} = useSelector(({ login, team, loading }: RootState) => ({
 		user: login.user,
 		id: login.id,
@@ -50,22 +52,26 @@ export default function TeamList() {
 		joinTeam: team.joinTeam,
 		joinName: team.joinName,
 		joinTeamError: team.joinTeamError,
-		loadingJoin: ['team/JOIN_TEAM'],
+		postTeamError: team.postTeamError,
+		loadingJoin: loading['team/JOIN_TEAM'],
+		joinUri: team.joinUri,
 	}));
 	const [dimensions, setDimensions] = useState({ window, screen });
 	const [modalMode, setModalMode] = useState('make');
 	const [modalVisible, setModalVisible] = useState(false);
 	const navigation = useNavigation();
 	const dispatch = useDispatch();
-	const { defaultDates } = useMakeTimetable();
+
+	// useEffect
 	useEffect(() => {
 		dispatch(getUserMe({ id, token, user }));
 	}, [joinTeam]);
 	useEffect(() => {
 		setModalMode('make');
-		joinTeamError && Alert.alert('hihi');
 	}, [joinTeamError]);
 
+	// useCallback
+	// Navigation 이동
 	const goTeamTime = useCallback(
 		(name) => {
 			if (modalMode === 'join') {
@@ -92,7 +98,7 @@ export default function TeamList() {
 		},
 		[modalMode, joinName]
 	);
-
+	// 모달 모드 분리
 	const onMakeTeamTime = useCallback(() => {
 		setModalMode('make');
 		setModalVisible(true);
@@ -185,6 +191,10 @@ export default function TeamList() {
 					goTeamTime={goTeamTime}
 					modalMode={modalMode}
 					setModalMode={setModalMode}
+					loadingJoin={loadingJoin}
+					postTeamError={postTeamError}
+					joinTeamError={joinTeamError}
+					joinUri={joinUri}
 				/>
 			</View>
 
