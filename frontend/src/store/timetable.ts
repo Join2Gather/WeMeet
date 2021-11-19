@@ -12,8 +12,9 @@ import { createAction } from 'redux-actions';
 import createRequestSaga from '../hooks/createRequestSaga';
 import * as api from '../lib/api/timetable';
 import { takeLatest } from '@redux-saga/core/effects';
-import { useMakeTimetable } from '../hooks';
+import { useMakeTimetable, useMakeTimeTableWith60 } from '../hooks';
 import { Alert } from 'react-native';
+import { makeGroupTimetable, makeIndividualTimetable } from '../lib/util';
 
 const GET_INDIVIDUAL = 'timetable/GET_INDIVIDUAL';
 const GET_GROUP = 'timetable/GET_GROUP';
@@ -57,10 +58,12 @@ export function* timetableSaga() {
 }
 
 const { defaultDates } = useMakeTimetable();
+const { defaultDatesWith60 } = useMakeTimeTableWith60();
 
 const initialState: timetable = {
 	dates: defaultDates,
 	teamDates: defaultDates,
+	teamDatesWith60: defaultDatesWith60,
 	startTime: 0.0,
 	endTime: 0.0,
 	selectTime: {
@@ -145,6 +148,7 @@ const initialState: timetable = {
 	},
 	isTimePicked: false,
 	color: '',
+	peopleCount: 0,
 };
 
 export const timetableSlice = createSlice({
@@ -167,34 +171,7 @@ export const timetableSlice = createSlice({
 
 		GET_INDIVIDUAL_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.responseIndividual = action.payload;
-			state.weekIndex.map((day, idx) =>
-				state.responseIndividual[day].map((d) => {
-					state.postIndividualDates[day].push(d);
-					state.dates[idx].times.map((inDay) => {
-						if (d.starting_hours === inDay.time) {
-							for (let i = d.starting_hours - 8; i <= d.end_hours - 8; i++) {
-								if (i + 8 == d.starting_hours) {
-									state.dates[idx].times[i].color = state.color;
-									state.dates[idx].times[i].isPicked = true;
-									state.dates[idx].times[i].startPercent =
-										(1 - d.starting_minutes / 60) * 100;
-									state.dates[idx].times[i].mode = 'start';
-								} else if (i + 8 == d.end_hours) {
-									state.dates[idx].times[i].color = state.color;
-									state.dates[idx].times[i].isPicked = true;
-									state.dates[idx].times[i].endPercent =
-										(d.end_minutes / 60) * 100;
-									state.dates[idx].times[i].mode = 'end';
-								} else {
-									state.dates[idx].times[i].color = state.color;
-									state.dates[idx].times[i].isPicked = true;
-									state.dates[idx].times[i].isFullTime = true;
-								}
-							}
-						}
-					});
-				})
-			);
+			makeIndividualTimetable(state);
 			if (state.everyTime) {
 				state.weekIndex.map((day, idx) =>
 					state.everyTime[day].map((d) => {
@@ -230,33 +207,7 @@ export const timetableSlice = createSlice({
 		},
 		GET_GROUP_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.responseGroup = action.payload;
-			state.weekIndex.map((day, idx) => {
-				state.responseGroup[day].avail_time.map((d) => {
-					state.teamDates[idx].times.map((inDay) => {
-						if (d.starting_hours === inDay.time) {
-							for (let i = d.starting_hours - 8; i <= d.end_hours - 8; i++) {
-								if (i + 8 == d.starting_hours) {
-									state.teamDates[idx].times[i].color = `${state.color}`;
-									state.teamDates[idx].times[i].isPicked = true;
-									state.teamDates[idx].times[i].startPercent =
-										(1 - d.starting_minutes / 60) * 100;
-									state.teamDates[idx].times[i].mode = 'start';
-								} else if (i + 8 == d.end_hours) {
-									state.teamDates[idx].times[i].color = state.color;
-									state.teamDates[idx].times[i].isPicked = true;
-									state.teamDates[idx].times[i].endPercent =
-										(d.end_minutes / 60) * 100;
-									state.teamDates[idx].times[i].mode = 'end';
-								} else {
-									state.teamDates[idx].times[i].color = state.color;
-									state.teamDates[idx].times[i].isPicked = true;
-									state.teamDates[idx].times[i].isFullTime = true;
-								}
-							}
-						}
-					});
-				});
-			});
+			makeGroupTimetable(state);
 		},
 		GET_GROUP_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
@@ -384,8 +335,12 @@ export const timetableSlice = createSlice({
 		cloneEveryTime: (state, action: PayloadAction<any>) => {
 			state.everyTime = action.payload;
 		},
-		getColor: (state, action: PayloadAction<string>) => {
-			state.color = action.payload;
+		getColor: (
+			state,
+			action: PayloadAction<{ color: string; peopleCount: number }>
+		) => {
+			state.color = action.payload.color;
+			state.peopleCount = action.payload.peopleCount;
 			if (state.color === '#FFFFFF' || '') {
 				state.color = Colors.blue500;
 			}
