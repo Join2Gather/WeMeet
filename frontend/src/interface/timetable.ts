@@ -2,6 +2,7 @@ import type { responseTime, responseEveryTime } from './individual';
 export interface timetable {
 	dates: make_days[];
 	teamDates: make_days[];
+	teamDatesWith60: make60[];
 	startTime: number;
 	endTime: number;
 	startMinute: number;
@@ -18,6 +19,7 @@ export interface timetable {
 	isTimePicked: boolean;
 	everyTime: responseEveryTime;
 	color: string;
+	peopleCount: number;
 }
 
 export type weekIndex = Array<string>;
@@ -62,15 +64,54 @@ export interface make_days {
 	times: Array<state_time>;
 }
 
+export interface make60 {
+	day: string;
+	times: timeWith60;
+}
+
 export interface state_time {
 	time: number;
 	color: string;
+	secondColor?: string;
 	isPicked: boolean;
 	isFullTime: boolean;
 	startPercent: number;
 	endPercent: number;
 	mode: string;
 	isEveryTime: boolean;
+}
+
+export interface timeWith60 {
+	6: timeProps[];
+	7: timeProps[];
+	8: timeProps[];
+	9: timeProps[];
+	10: timeProps[];
+	11: timeProps[];
+	12: timeProps[];
+	13: timeProps[];
+	14: timeProps[];
+	15: timeProps[];
+	16: timeProps[];
+	17: timeProps[];
+	18: timeProps[];
+	19: timeProps[];
+	20: timeProps[];
+	21: timeProps[];
+	22: timeProps[];
+	23: timeProps[];
+	24: timeProps[];
+	25: timeProps[];
+	26: timeProps[];
+	[prop: string]: timeProps[];
+}
+
+export interface timeProps {
+	color: string;
+	isPicked: boolean;
+	mode: string;
+	isEveryTime: boolean;
+	minute: number;
 }
 
 export interface postIndividualDates {
