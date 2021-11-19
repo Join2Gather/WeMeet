@@ -8,6 +8,7 @@ export interface Login {
 	uri?: string;
 	error: string;
 	color: string;
+	peopleCount: number;
 }
 
 export interface userMeAPI {

@@ -39,13 +39,14 @@ type TeamStackParamList = {
 };
 
 type Props = NativeStackScreenProps<TeamStackParamList, 'TeamTime'>;
-import { shareUri } from '../store/team';
+import { changeColor, shareUri } from '../store/team';
 
 export default function TeamTime({ route }: Props) {
 	const {
 		dates,
 		uri,
 		color,
+		peopleCount,
 		postDatesPrepare,
 		loadingIndividual,
 		loadingGroup,
@@ -58,6 +59,7 @@ export default function TeamTime({ route }: Props) {
 		dates: timetable.dates,
 		uri: login.uri,
 		color: login.color,
+		peopleCount: login.peopleCount,
 		postDatesPrepare: timetable.postDatesPrepare,
 		loadingIndividual: loading['timetable/GET_INDIVIDUAL'],
 		loadingGroup: loading['timetable/GET_GROUP'],
@@ -96,9 +98,13 @@ export default function TeamTime({ route }: Props) {
 		}
 	}, [joinTeamError, loadingJoin, error]);
 	useEffect(() => {
-		dispatch(getColor(color));
-	}, [color]);
-
+		dispatch(getColor({ color, peopleCount }));
+	}, [color, peopleCount]);
+	useEffect(() => {
+		if (color === '#FFFFFF' && uri) {
+			dispatch(changeColor({ id, uri, token, user, color: Colors.blue500 }));
+		}
+	}, [color, uri, id, token, user]);
 	// useCallback
 	const goLeft = useCallback(() => {
 		navigation.goBack();
@@ -195,7 +201,7 @@ export default function TeamTime({ route }: Props) {
 														: 'checkbox-blank-outline'
 												}
 												size={24}
-												color={color}
+												color={color !== '' ? color : Colors.blue500}
 											/>
 											<Text style={styles.iconText}>그룹</Text>
 										</TouchableOpacity>
@@ -210,7 +216,7 @@ export default function TeamTime({ route }: Props) {
 														: 'checkbox-marked-outline'
 												}
 												size={23}
-												color={color}
+												color={color !== '' ? color : Colors.blue500}
 											/>
 											<Text style={styles.iconText}>개인</Text>
 										</TouchableOpacity>

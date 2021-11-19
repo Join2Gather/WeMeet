@@ -15,6 +15,7 @@ const initialState: Login = {
 	uri: '',
 	error: '',
 	color: '',
+	peopleCount: 0,
 };
 
 const USER_ME = 'login/USER_ME';
@@ -47,6 +48,7 @@ export const loginSlice = createSlice({
 			if (data) {
 				state.uri = data.uri;
 				state.color = data.color;
+				state.peopleCount = data.people_count;
 			}
 		},
 		USER_ME_SUCCESS: (state, action: PayloadAction<any>) => {
