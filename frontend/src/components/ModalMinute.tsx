@@ -19,7 +19,6 @@ import {
 	makePostIndividualDates,
 	postIndividualTime,
 	pushSelectEnd,
-	removeStartPercentage,
 	setEndHour,
 	setEndMin,
 	setStartMin,
@@ -93,14 +92,12 @@ export function ModalMinute({
 	// 닫기 버튼
 	const onPressClose = useCallback(() => {
 		setMode('normal');
-		dispatch(removeStartPercentage());
 		setModalVisible(false);
 	}, []);
 	// 이전 모드
 	const onPressPrevMode = useCallback(() => {
 		setMode('startMinute');
 		// setModalVisible(false);
-		dispatch(removeStartPercentage());
 	}, []);
 	const [open, setOpen] = useState(false);
 	const [value, setValue] = useState('오후');
@@ -171,9 +168,13 @@ export function ModalMinute({
 								{mode
 									? start <= 12
 										? ` 오전 ${start}시 `
+										: start >= 24
+										? ` 오전 ${start - 24}시 `
 										: ` 오후 ${start - 12}시 `
 									: end <= 12
 									? ` 오전 ${end}시 `
+									: end >= 24
+									? ` 오전 ${end - 24}시 `
 									: ` 오후 ${end - 12}시 `}
 								{startMinute} 분
 							</Text>
@@ -251,9 +252,13 @@ export function ModalMinute({
 									{mode
 										? start <= 12
 											? `오전 ${start} :`
+											: start >= 24
+											? `오전 ${start - 24} :`
 											: `오후 ${start - 12} :`
 										: end <= 12
 										? `오전 ${end} :`
+										: end >= 24
+										? `오전 ${end - 24} :`
 										: `오후 ${end - 12} :`}
 								</Text>
 								<TextInput
