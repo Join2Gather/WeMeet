@@ -1,7 +1,7 @@
-import type { make_days } from './timetable';
+import type { make60 } from './timetable';
 
 export interface individual {
-	individualDates: make_days[];
+	individualDates: make60[];
 	error: string;
 	everyTime: responseEveryTime;
 	weekIndex: Array<string>;
