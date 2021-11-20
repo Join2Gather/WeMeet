@@ -32,7 +32,7 @@ export function useMakeTimeTableWith60() {
 	const timesText: Array<string> = [];
 
 	for (let i = 6; i <= 26; i++) {
-		for (let j = 0; j <= 60; j++) {
+		for (let j = 0; j <= 50; j += 10) {
 			times[i].push({
 				color: Colors.white,
 				isPicked: false,
@@ -67,7 +67,7 @@ export function useMakeTimetable() {
 	const times: Array<state_time> = [];
 	const timesText: Array<string> = [];
 
-	for (let i = 8; i <= 24; i += 1) {
+	for (let i = 6; i <= 26; i += 1) {
 		times.push({
 			time: i,
 			color: Colors.white,
@@ -86,19 +86,6 @@ export function useMakeTimetable() {
 			if (i % 2 === 0) {
 				timesText.push(`${i - 12} PM`);
 			}
-		}
-		if (i === 24) {
-			times.push({
-				time: 1,
-				color: Colors.white,
-				isPicked: false,
-				startPercent: 100,
-				endPercent: 100,
-				mode: 'normal',
-				isEveryTime: false,
-				isFullTime: false,
-			});
-			timesText.push('2 AM');
 		}
 	}
 
