@@ -19,7 +19,7 @@ import {
 	setEndHour,
 	setStartHour,
 } from '../store/timetable';
-import type { make_days } from '../interface';
+import type { make_days, make60 } from '../interface';
 import { View, Text, TouchableView } from '../theme';
 import { RootState } from '../store';
 import { kakaoLogin } from '../store/individual';
@@ -34,7 +34,7 @@ interface props {
 	setModalVisible: React.Dispatch<React.SetStateAction<boolean>> | null;
 	setMode: React.Dispatch<React.SetStateAction<string>>;
 	isGroup: boolean;
-	dates: make_days[];
+	individualDates?: make60[];
 	uri?: string;
 	postDatesPrepare?: boolean;
 }
@@ -45,12 +45,12 @@ export function Timetable({
 	setModalVisible,
 	setMode,
 	isGroup,
-	dates,
+	individualDates,
 	uri,
 	postDatesPrepare,
 }: props) {
 	const {
-		teamDates,
+		dates,
 		id,
 		user,
 		token,
@@ -63,8 +63,7 @@ export function Timetable({
 		teamDatesWith60,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
-			// dates: timetable.dates,
-			teamDates: timetable.teamDates,
+			dates: timetable.dates,
 			id: login.id,
 			user: login.user,
 			token: login.token,
@@ -188,67 +187,65 @@ export function Timetable({
 								</View>
 							))}
 						</>
+					) : individualDates ? (
+						<>
+							{individualDates.map((day, idx) => (
+								<View style={styles.columnView} key={day.day}>
+									{Object.keys(day.times).map((time) => (
+										<TouchableView
+											style={[
+												styles.boxView,
+												{ borderBottomWidth: Number(time) === 1 ? 0.3 : 0 },
+											]}
+											key={time}
+											onPress={() => console.log(time)}
+										>
+											{day.times[time].map((t) => (
+												<View
+													key={t.minute}
+													style={{
+														backgroundColor: t.color,
+														height: boxHeight / 5,
+													}}
+												></View>
+											))}
+										</TouchableView>
+									))}
+								</View>
+							))}
+						</>
 					) : (
 						<>
 							{dates.map((day, idx) => (
 								<View style={styles.columnView} key={day.day}>
-									{day.times.map((d) => (
+									{Object.keys(day.times).map((time) => (
 										<TouchableView
-											onPress={() => {
-												mode === 'startMode' ||
-												(mode === 'normal' && d.isFullTime && d.isPicked)
-													? onMakeInitial()
-													: onSetStartHour(idx, Number(d.time), day.day);
-												mode === 'endMode' && onSetEndHour(idx, Number(d.time));
-											}}
-											key={Number(d.time)}
 											style={[
 												styles.boxView,
-												{
-													borderBottomWidth: Number(d.time) === 1 ? 0.3 : 0,
-													// backgroundColor: d.color,
-												},
+												{ borderBottomWidth: Number(time) === 1 ? 0.3 : 0 },
 											]}
+											key={time}
+											onPress={() => {
+												mode === 'normal' &&
+													onSetStartHour(idx, Number(time), day.day);
+											}}
 										>
-											<View
-												style={{
-													height:
-														d.mode === 'start'
-															? `${100 - d.startPercent}%`
-															: d.mode === 'end'
-															? `${d.endPercent}%`
-															: '100%',
-
-													backgroundColor:
-														d.mode === 'start'
-															? Colors.white
-															: d.mode === 'end'
-															? d.color
-															: d.color,
-												}}
-											/>
-											<View
-												style={{
-													height:
-														d.mode === 'start'
-															? `${d.startPercent}%`
-															: d.mode === 'end'
-															? `${d.endPercent}%`
-															: '0%',
-													backgroundColor:
-														d.mode === 'start'
-															? d.color
-															: d.mode === 'end'
-															? Colors.white
-															: Colors.white,
-												}}
-											/>
+											{day.times[time].map((t) => (
+												<View
+													key={t.minute}
+													style={{
+														backgroundColor: t.color,
+														height: boxHeight / 5,
+													}}
+												></View>
+											))}
 										</TouchableView>
 									))}
 								</View>
 							))}
 						</>
 					)}
+
 					<ModalMinute
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}

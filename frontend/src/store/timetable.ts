@@ -14,7 +14,7 @@ import * as api from '../lib/api/timetable';
 import { takeLatest } from '@redux-saga/core/effects';
 import { useMakeTimetable, useMakeTimeTableWith60 } from '../hooks';
 import { Alert } from 'react-native';
-import { makeGroupTimetable, makeIndividualTimetable } from '../lib/util';
+import { makeGroupTimeTableWith60, makeIndividualTimetable } from '../lib/util';
 
 const GET_INDIVIDUAL = 'timetable/GET_INDIVIDUAL';
 const GET_GROUP = 'timetable/GET_GROUP';
@@ -61,8 +61,7 @@ const { defaultDates } = useMakeTimetable();
 const { defaultDatesWith60 } = useMakeTimeTableWith60();
 
 const initialState: timetable = {
-	dates: defaultDates,
-	teamDates: defaultDates,
+	dates: defaultDatesWith60,
 	teamDatesWith60: defaultDatesWith60,
 	startTime: 0.0,
 	endTime: 0.0,
@@ -156,8 +155,9 @@ export const timetableSlice = createSlice({
 	initialState,
 	reducers: {
 		makeInitialTimetable: (state) => {
-			state.dates = defaultDates;
-			state.teamDates = defaultDates;
+			state.dates = defaultDatesWith60;
+
+			state.teamDatesWith60 = defaultDatesWith60;
 			state.postIndividualDates = {
 				sun: [],
 				mon: [],
@@ -175,29 +175,32 @@ export const timetableSlice = createSlice({
 			if (state.everyTime) {
 				state.weekIndex.map((day, idx) =>
 					state.everyTime[day].map((d) => {
-						state.dates[idx].times.map((inDay) => {
-							if (d.starting_hours === inDay.time) {
-								for (let i = d.starting_hours - 8; i <= d.end_hours - 8; i++) {
-									if (i + 8 == d.starting_hours) {
-										state.dates[idx].times[i].color = Colors.grey400;
-										state.dates[idx].times[i].isPicked = true;
-										state.dates[idx].times[i].startPercent =
-											(1 - d.starting_minutes / 60) * 100;
-										state.dates[idx].times[i].mode = 'start';
-									} else if (i + 8 == d.end_hours) {
-										state.dates[idx].times[i].color = Colors.grey400;
-										state.dates[idx].times[i].isPicked = true;
-										state.dates[idx].times[i].endPercent =
-											(d.end_minutes / 60) * 100;
-										state.dates[idx].times[i].mode = 'end';
-									} else {
-										state.dates[idx].times[i].color = Colors.grey400;
-										state.dates[idx].times[i].isPicked = true;
-										state.dates[idx].times[i].isFullTime = true;
-									}
+						const startingMinute = Math.round(d.starting_minutes / 10) * 10;
+						const endMinute = Math.round(d.end_minutes / 10) * 10;
+						console.log(startingMinute, endMinute);
+						for (let i = d.starting_hours; i <= d.end_hours; i++) {
+							if (i === d.starting_hours) {
+								for (let j = startingMinute / 10; j < 6; j++) {
+									state.dates[idx].times[i][j].color = Colors.grey400;
+									state.dates[idx].times[i][j].isEveryTime = false;
+									state.dates[idx].times[i][j].isPicked = true;
+									state.dates[idx].times[i][j].mode = 'start';
+								}
+							} else if (i === d.end_hours) {
+								for (let j = 0; j <= endMinute / 10; j++) {
+									state.dates[idx].times[i][j].color = Colors.grey400;
+									state.dates[idx].times[i][j].isEveryTime = false;
+									state.dates[idx].times[i][j].isPicked = true;
+									state.dates[idx].times[i][j].mode = 'start';
+								}
+							} else {
+								for (let j = 0; j <= 5; j++) {
+									state.dates[idx].times[i][j].color = Colors.grey400;
+									state.dates[idx].times[i][j].isEveryTime = false;
+									state.dates[idx].times[i][j].isPicked = true;
 								}
 							}
-						});
+						}
 					})
 				);
 			}
@@ -207,7 +210,8 @@ export const timetableSlice = createSlice({
 		},
 		GET_GROUP_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.responseGroup = action.payload;
-			makeGroupTimetable(state);
+			// makeGroupTimetable(state);
+			makeGroupTimeTableWith60(state);
 		},
 		GET_GROUP_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
@@ -228,7 +232,6 @@ export const timetableSlice = createSlice({
 		},
 		cloneDates: (state, action: PayloadAction<any>) => {
 			state.dates = action.payload;
-			state.teamDates = action.payload;
 		},
 		setStartHour: (state, action: PayloadAction<number>) => {
 			state.startTime = action.payload;
@@ -238,28 +241,6 @@ export const timetableSlice = createSlice({
 		},
 		setStartMin: (state, action: PayloadAction<number>) => {
 			state.startMinute = action.payload;
-		},
-		setStartPercentage: (state) => {
-			const find = state.dates[state.dayIdx].times.find(
-				(d) => d.time === state.startTime
-			);
-			if (find) {
-				find.color = state.color;
-				find.isPicked = true;
-				find.startPercent = (1 - state.startMinute / 60) * 100;
-				find.mode = 'start';
-			}
-		},
-		removeStartPercentage: (state) => {
-			const find = state.dates[state.dayIdx].times.find(
-				(d) => d.time === state.startTime
-			);
-			if (find) {
-				find.color = Colors.white;
-				find.isPicked = false;
-				find.startPercent = 0;
-				find.mode = 'normal';
-			}
 		},
 		setEndMin: (state, action: PayloadAction<number>) => {
 			state.endMinute = action.payload;
@@ -284,39 +265,38 @@ export const timetableSlice = createSlice({
 			state.dayIdx = action.payload;
 		},
 		changeAllColor: (state) => {
-			for (
-				let i = Math.floor(state.startTime);
-				i <= Math.floor(state.endTime);
-				i++
-			) {
-				if (state.dates[state.dayIdx].times[i - 8].color !== Colors.white) {
-					state.isTimePicked = true;
-					Alert.alert('이미 지정된 시간 입니다');
-					break;
-				}
-			}
-			for (
-				let i = Math.floor(state.startTime);
-				i <= Math.floor(state.endTime);
-				i++
-			) {
-				if (state.isTimePicked) {
-					break;
+			const startingMinute = Math.round(state.startMinute / 10);
+			const endMinute = Math.round(state.endMinute / 10);
+			// for (let i = state.startTime; i <= state.endTime; i++) {
+			// 	if (
+			// 		state.dates[state.dayIdx].times[state.startTime][i].color !==
+			// 		Colors.white
+			// 	) {
+			// 		state.isTimePicked = true;
+			// 		Alert.alert('이미 지정된 시간 입니다');
+			// 		break;
+			// 	}
+			// }
+			for (let i = state.startTime; i <= state.endTime; i++) {
+				if (i === state.startTime) {
+					for (let j = startingMinute; j < 6; j++) {
+						state.dates[state.dayIdx].times[i][j].color = state.color;
+						state.dates[state.dayIdx].times[i][j].isEveryTime = false;
+						state.dates[state.dayIdx].times[i][j].isPicked = true;
+						state.dates[state.dayIdx].times[i][j].mode = 'start';
+					}
+				} else if (i === state.endTime) {
+					for (let j = 0; j <= endMinute; j++) {
+						state.dates[state.dayIdx].times[i][j].color = state.color;
+						state.dates[state.dayIdx].times[i][j].isEveryTime = false;
+						state.dates[state.dayIdx].times[i][j].isPicked = true;
+						state.dates[state.dayIdx].times[i][j].mode = 'start';
+					}
 				} else {
-					state.dates[state.dayIdx].times[i - 8].color = state.color;
-					state.dates[state.dayIdx].times[i - 8].isFullTime = true;
-					if (i === Math.floor(state.endTime)) {
-						state.dates[state.dayIdx].times[i - 8].isPicked = true;
-						state.dates[state.dayIdx].times[i - 8].endPercent =
-							(state.endMinute / 60) * 100;
-						state.dates[state.dayIdx].times[i - 8].mode = 'end';
-						state.dates[state.dayIdx].times[i - 8].isFullTime = false;
-					} else if (i === Math.floor(state.startTime)) {
-						state.dates[state.dayIdx].times[i - 8].color = state.color;
-						state.dates[state.dayIdx].times[i - 8].isPicked = true;
-						state.dates[state.dayIdx].times[i - 8].startPercent =
-							(1 - state.startMinute / 60) * 100;
-						state.dates[state.dayIdx].times[i - 8].mode = 'start';
+					for (let j = 0; j <= 5; j++) {
+						state.dates[state.dayIdx].times[i][j].color = state.color;
+						state.dates[state.dayIdx].times[i][j].isEveryTime = false;
+						state.dates[state.dayIdx].times[i][j].isPicked = true;
 					}
 				}
 			}
@@ -355,13 +335,10 @@ export const {
 	setEndHour,
 	setStartMin,
 	setEndMin,
-	// changeColor,
 	pushSelectEnd,
 	pushSelectStart,
 	changeAllColor,
 	setDay,
-	// setStartPercentage,
-	removeStartPercentage,
 	makePostIndividualDates,
 	makeInitialTimetable,
 	changeDayIdx,

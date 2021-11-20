@@ -6,7 +6,7 @@ import { useNavigation, DrawerActions } from '@react-navigation/native';
 import {SafeAreaView, View, UnderlineText,TopBar,
 NavigationHeader, MaterialCommunityIcon as Icon, Text} from '../theme';
 import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
-import { LeftRightNavigation, Timetable } from '../components';
+import { LeftRightNavigation, Spinner, Timetable } from '../components';
 import type { LeftRightNavigationMethods } from '../components';
 import { Colors } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
@@ -18,10 +18,12 @@ import * as FileSystem from 'expo-file-system';
 import { useMakeTimetable } from '../hooks';
 
 export default function Home() {
-	const { token, individualDates } = useSelector(
-		({ login, individual }: RootState) => ({
+	const { token, individualDates, loginEveryTime, postEveryTime } = useSelector(
+		({ login, individual, loading }: RootState) => ({
 			token: login.token,
 			individualDates: individual.individualDates,
+			loginEveryTime: loading['individual/LOGIN_EVERYTIME'],
+			postEveryTime: loading['individual/POST_EVERYTIME'],
 		})
 	);
 	const dispatch = useDispatch();
@@ -106,6 +108,7 @@ export default function Home() {
 
 					<View style={styles.viewHeight}>
 						<Text style={styles.titleText}>make your plan</Text>
+						<Spinner loading={postEveryTime} />
 						<View style={styles.rowView}>
 							{mode === '0' && (
 								<>
@@ -146,7 +149,7 @@ export default function Home() {
 						setModalVisible={setModalVisible}
 						mode={mode}
 						setMode={setMode}
-						dates={individualDates}
+						individualDates={individualDates}
 						isGroup={false}
 					></Timetable>
 					<ModalSelect

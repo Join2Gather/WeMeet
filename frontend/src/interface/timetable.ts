@@ -1,7 +1,6 @@
 import type { responseTime, responseEveryTime } from './individual';
 export interface timetable {
 	dates: make60[];
-	teamDates: make_days[];
 	teamDatesWith60: make60[];
 	startTime: number;
 	endTime: number;

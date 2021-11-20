@@ -11,6 +11,7 @@ import type {
 	postEveryTimeAPI,
 } from '../interface';
 import { Colors } from 'react-native-paper';
+import { useMakeTimeTableWith60 } from '../hooks';
 
 const POST_IMAGE = 'individual/POST_IMAGE';
 const LOGIN_EVERYTIME = 'individual/LOGIN_EVERYTIME';
@@ -33,16 +34,10 @@ export function* individualSaga() {
 	yield takeLatest(POST_EVERYTIME, postEveryTimeSaga);
 }
 
+const { defaultDatesWith60 } = useMakeTimeTableWith60();
+
 const initialState: individual = {
-	individualDates: [
-		{ day: 'sun', times: [] },
-		{ day: 'mon', times: [] },
-		{ day: 'tue', times: [] },
-		{ day: 'thu', times: [] },
-		{ day: 'wed', times: [] },
-		{ day: 'fri', times: [] },
-		{ day: 'sat', times: [] },
-	],
+	individualDates: defaultDatesWith60,
 	error: '',
 	everyTime: {
 		sun: [],
@@ -74,35 +69,38 @@ export const individualSlice = createSlice({
 						(day, idx) =>
 							state.everyTime[day]?.length &&
 							state.everyTime[day]?.map((d) => {
-								state.individualDates[idx].times.map((inDay) => {
-									if (d.starting_hours === inDay.time) {
-										for (
-											let i = d.starting_hours - 8;
-											i <= d.end_hours - 8;
-											i++
-										) {
-											if (i + 8 == d.starting_hours) {
-												state.individualDates[idx].times[i].color =
-													Colors.grey400;
-												state.individualDates[idx].times[i].isFullTime = true;
-												state.individualDates[idx].times[i].startPercent =
-													(1 - d.starting_minutes / 60) * 100;
-												state.individualDates[idx].times[i].mode = 'start';
-											} else if (i + 8 == d.end_hours) {
-												state.individualDates[idx].times[i].color =
-													Colors.grey400;
-												state.individualDates[idx].times[i].isFullTime = true;
-												state.individualDates[idx].times[i].endPercent =
-													(d.end_minutes / 60) * 100;
-												state.individualDates[idx].times[i].mode = 'end';
-											} else {
-												state.individualDates[idx].times[i].color =
-													Colors.grey400;
-												state.individualDates[idx].times[i].isFullTime = true;
-											}
+								const startingMinute = Math.round(d.starting_minutes / 10) * 10;
+								const endMinute = Math.round(d.end_minutes / 10) * 10;
+
+								for (let i = d.starting_hours; i <= d.end_hours; i++) {
+									if (i === d.starting_hours) {
+										for (let j = startingMinute / 10; j < 6; j++) {
+											state.individualDates[idx].times[i][j].color =
+												Colors.grey400;
+											state.individualDates[idx].times[i][j].isEveryTime =
+												false;
+											state.individualDates[idx].times[i][j].isPicked = true;
+											state.individualDates[idx].times[i][j].mode = 'start';
+										}
+									} else if (i === d.end_hours) {
+										for (let j = 0; j <= endMinute / 10; j++) {
+											state.individualDates[idx].times[i][j].color =
+												Colors.grey400;
+											state.individualDates[idx].times[i][j].isEveryTime =
+												false;
+											state.individualDates[idx].times[i][j].isPicked = true;
+											state.individualDates[idx].times[i][j].mode = 'start';
+										}
+									} else {
+										for (let j = 0; j <= 5; j++) {
+											state.individualDates[idx].times[i][j].color =
+												Colors.grey400;
+											state.individualDates[idx].times[i][j].isEveryTime =
+												false;
+											state.individualDates[idx].times[i][j].isPicked = true;
 										}
 									}
-								});
+								}
 							})
 					);
 				}
@@ -115,28 +113,32 @@ export const individualSlice = createSlice({
 				(day, idx) =>
 					state.everyTime[day]?.length &&
 					state.everyTime[day]?.map((d) => {
-						state.individualDates[idx].times.map((inDay) => {
-							if (d.starting_hours === inDay.time) {
-								for (let i = d.starting_hours - 8; i <= d.end_hours - 8; i++) {
-									if (i + 8 == d.starting_hours) {
-										state.individualDates[idx].times[i].color = Colors.grey400;
-										state.individualDates[idx].times[i].isFullTime = true;
-										state.individualDates[idx].times[i].startPercent =
-											(1 - d.starting_minutes / 60) * 100;
-										state.individualDates[idx].times[i].mode = 'start';
-									} else if (i + 8 == d.end_hours) {
-										state.individualDates[idx].times[i].color = Colors.grey400;
-										state.individualDates[idx].times[i].isFullTime = true;
-										state.individualDates[idx].times[i].endPercent =
-											(d.end_minutes / 60) * 100;
-										state.individualDates[idx].times[i].mode = 'end';
-									} else {
-										state.individualDates[idx].times[i].color = Colors.grey400;
-										state.individualDates[idx].times[i].isFullTime = true;
-									}
+						const startingMinute = Math.round(d.starting_minutes / 10) * 10;
+						const endMinute = Math.round(d.end_minutes / 10) * 10;
+
+						for (let i = d.starting_hours; i <= d.end_hours; i++) {
+							if (i === d.starting_hours) {
+								for (let j = startingMinute / 10; j < 6; j++) {
+									state.individualDates[idx].times[i][j].color = Colors.grey400;
+									state.individualDates[idx].times[i][j].isEveryTime = false;
+									state.individualDates[idx].times[i][j].isPicked = true;
+									state.individualDates[idx].times[i][j].mode = 'start';
+								}
+							} else if (i === d.end_hours) {
+								for (let j = 0; j <= endMinute / 10; j++) {
+									state.individualDates[idx].times[i][j].color = Colors.grey400;
+									state.individualDates[idx].times[i][j].isEveryTime = false;
+									state.individualDates[idx].times[i][j].isPicked = true;
+									state.individualDates[idx].times[i][j].mode = 'start';
+								}
+							} else {
+								for (let j = 0; j <= 5; j++) {
+									state.individualDates[idx].times[i][j].color = Colors.grey400;
+									state.individualDates[idx].times[i][j].isEveryTime = false;
+									state.individualDates[idx].times[i][j].isPicked = true;
 								}
 							}
-						});
+						}
 					})
 			);
 		},
@@ -144,7 +146,6 @@ export const individualSlice = createSlice({
 			state.error = action.payload;
 		},
 		cloneIndividualDates: (state, action: PayloadAction<make_days[]>) => {
-			state.individualDates = action.payload;
 			state.cloneDateSuccess = true;
 		},
 		POST_EVERYTIME_SUCCESS: (state, action: PayloadAction<any>) => {
