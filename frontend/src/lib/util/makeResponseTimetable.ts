@@ -33,33 +33,41 @@ export function makeIndividualTimetable(state: timetable) {
 
 export function makeGroupTimeTableWith60(state: timetable) {
 	const result = hexToRGB(state.color);
+
 	result &&
 		state.weekIndex.map((day, idx) => {
 			state.responseGroup[day].avail_time.map((d, idxNumber) => {
 				const color =
 					state.responseGroup[day].count[idxNumber] / state.peopleCount;
+				const startingMinute = Math.round(d.starting_minutes / 10) * 10;
+				const endMinute = Math.round(d.end_minutes / 10) * 10;
+				console.log(startingMinute, endMinute);
 				for (let i = d.starting_hours; i <= d.end_hours; i++) {
 					if (i === d.starting_hours) {
-						for (let j = d.starting_minutes; j <= 60; j++) {
-							state.teamDatesWith60[idx].times[j].map((h) => {
-								if (h.minute === j) {
-									h.color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
-									h.isEveryTime = false;
-									h.isPicked = true;
-									h.mode = 'start';
-								}
-							});
+						for (let j = startingMinute / 10; j < 6; j++) {
+							state.teamDatesWith60[idx].times[i][
+								j
+							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
+							state.teamDatesWith60[idx].times[i][j].isEveryTime = false;
+							state.teamDatesWith60[idx].times[i][j].isPicked = true;
+							state.teamDatesWith60[idx].times[i][j].mode = 'start';
 						}
 					} else if (i === d.end_hours) {
-						for (let j = 0; j <= d.end_minutes; j++) {
-							state.teamDatesWith60[idx].times[j].map((h) => {
-								if (h.minute === j) {
-									h.color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
-									h.isEveryTime = false;
-									h.isPicked = true;
-									h.mode = 'end';
-								}
-							});
+						for (let j = 0; j <= endMinute / 10; j++) {
+							state.teamDatesWith60[idx].times[i][
+								j
+							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
+							state.teamDatesWith60[idx].times[i][j].isEveryTime = false;
+							state.teamDatesWith60[idx].times[i][j].isPicked = true;
+							state.teamDatesWith60[idx].times[i][j].mode = 'start';
+						}
+					} else {
+						for (let j = 0; j <= 5; j++) {
+							state.teamDatesWith60[idx].times[i][
+								j
+							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
+							state.teamDatesWith60[idx].times[i][j].isEveryTime = false;
+							state.teamDatesWith60[idx].times[i][j].isPicked = true;
 						}
 					}
 				}
