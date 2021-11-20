@@ -32,7 +32,7 @@ export function useMakeTimeTableWith60() {
 	const timesText: Array<string> = [];
 
 	for (let i = 6; i <= 26; i++) {
-		for (let j = 0; j <= 50; j += 10) {
+		for (let j = 0; j <= 60; j += 10) {
 			times[i].push({
 				color: Colors.white,
 				isPicked: false,
