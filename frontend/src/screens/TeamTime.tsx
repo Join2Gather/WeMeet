@@ -43,7 +43,6 @@ import { changeColor, shareUri } from '../store/team';
 
 export default function TeamTime({ route }: Props) {
 	const {
-		dates,
 		uri,
 		color,
 		peopleCount,
@@ -56,7 +55,6 @@ export default function TeamTime({ route }: Props) {
 		joinTeamError,
 		error,
 	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
-		dates: timetable.dates,
 		uri: login.uri,
 		color: login.color,
 		peopleCount: login.peopleCount,
@@ -270,7 +268,6 @@ export default function TeamTime({ route }: Props) {
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
 						isGroup={isGroup}
-						dates={dates}
 						uri={uri}
 						postDatesPrepare={postDatesPrepare}
 					/>
