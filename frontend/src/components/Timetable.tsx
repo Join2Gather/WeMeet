@@ -26,6 +26,8 @@ import { kakaoLogin } from '../store/individual';
 
 const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
+const boxHeight = 25;
+
 interface props {
 	mode: string;
 	modalVisible: boolean;
@@ -58,6 +60,7 @@ export function Timetable({
 		postIndividualDates,
 		loadingJoin,
 		joinTeamError,
+		teamDatesWith60,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			// dates: timetable.dates,
@@ -71,6 +74,7 @@ export function Timetable({
 			isTimePicked: timetable.isTimePicked,
 			loadingJoin: loading['team/JOIN_TEAM'],
 			joinTeamError: team.joinTeamError,
+			teamDatesWith60: timetable.teamDatesWith60,
 		})
 	);
 	const dispatch = useDispatch();
@@ -159,57 +163,26 @@ export function Timetable({
 				<View style={styles.contentView}>
 					{isGroup ? (
 						<>
-							{teamDates.map((day, idx) => (
+							{teamDatesWith60.map((day, idx) => (
 								<View style={styles.columnView} key={day.day}>
-									{day.times.map((d) => (
+									{Object.keys(day.times).map((time) => (
 										<TouchableView
-											onPress={() => {
-												mode === 'startMode' &&
-													onSetStartHour(idx, Number(d.time), day.day);
-												mode === 'endMode' && onSetEndHour(idx, Number(d.time));
-											}}
-											key={Number(d.time)}
 											style={[
 												styles.boxView,
-												{
-													borderBottomWidth: Number(d.time) === 1 ? 0.3 : 0,
-													// backgroundColor: d.color,
-												},
+												{ borderBottomWidth: Number(time) === 1 ? 0.3 : 0 },
 											]}
+											key={time}
+											onPress={() => console.log(time)}
 										>
-											<View
-												style={{
-													height:
-														d.mode === 'start'
-															? `${100 - d.startPercent}%`
-															: d.mode === 'end'
-															? `${d.endPercent}%`
-															: '100%',
-
-													backgroundColor:
-														d.mode === 'start'
-															? Colors.white
-															: d.mode === 'end'
-															? d.color
-															: d.color,
-												}}
-											/>
-											<View
-												style={{
-													height:
-														d.mode === 'start'
-															? `${d.startPercent}%`
-															: d.mode === 'end'
-															? `${d.endPercent}%`
-															: '0%',
-													backgroundColor:
-														d.mode === 'start'
-															? d.color
-															: d.mode === 'end'
-															? Colors.white
-															: Colors.white,
-												}}
-											/>
+											{day.times[time].map((t) => (
+												<View
+													key={t.minute}
+													style={{
+														backgroundColor: t.color,
+														height: boxHeight / 5,
+													}}
+												></View>
+											))}
 										</TouchableView>
 									))}
 								</View>
@@ -337,7 +310,7 @@ const styles = StyleSheet.create({
 		// textAlignVertical: 'center',
 	},
 	boxView: {
-		height: 29.6,
+		height: boxHeight,
 		// marginLeft: 10,
 		width: 41,
 		// flex: 3,
