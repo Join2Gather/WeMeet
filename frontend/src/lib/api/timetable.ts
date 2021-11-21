@@ -4,6 +4,7 @@ import type {
 	requestGroupDatesAPI,
 	requestIndividualDatesAPI,
 	postIndividualDatesAPI,
+	postConfirmAPI,
 } from '../../interface';
 import { makeHeader } from '../util/header';
 import { API_URL } from 'react-native-dotenv';
@@ -60,11 +61,15 @@ export const postIndividualTime = ({
 };
 
 // 그룹 시간 개별 확정
-export const postConfirm = ({ user, id, uri, dates, token }) => {
+export const postConfirm = ({ user, id, uri, date, token }: postConfirmAPI) => {
 	const headers = makeHeader(token);
-	const data = JSON.stringify(dates);
+	const data = JSON.stringify(date);
 
-	return client.post(`users/${user}/profiles/${id}/clubs/${uri}`, data, {
-		headers,
-	});
+	return axios.post(
+		`${API_URL}users/${user}/profiles/${id}/clubs/${uri}/confirm/ok`,
+		data,
+		{
+			headers,
+		}
+	);
 };
