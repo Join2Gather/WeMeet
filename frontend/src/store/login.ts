@@ -16,6 +16,7 @@ const initialState: Login = {
 	error: '',
 	color: '',
 	peopleCount: 0,
+	response: '',
 };
 
 const USER_ME = 'login/USER_ME';
@@ -52,6 +53,7 @@ export const loginSlice = createSlice({
 			}
 		},
 		USER_ME_SUCCESS: (state, action: PayloadAction<any>) => {
+			state.response = action.payload;
 			state.clubs = action.payload.clubs;
 			state.clubs.map((club) => {
 				club.name = decodeURIComponent(club.name);
