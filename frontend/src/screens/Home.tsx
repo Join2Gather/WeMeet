@@ -1,6 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { StyleSheet, FlatList, Platform, Image } from 'react-native';
+import {
+	StyleSheet,
+	FlatList,
+	Platform,
+	Image,
+	ScrollView,
+} from 'react-native';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 // prettier-ignore
 import {SafeAreaView, View, UnderlineText,TopBar,
@@ -82,7 +88,7 @@ export default function Home() {
 	};
 	return (
 		<SafeAreaView style={{ backgroundColor: Colors.white }}>
-			<ScrollEnabledProvider>
+			<ScrollView>
 				<View style={[styles.view]}>
 					<NavigationHeader
 						title="내 일정 등록하기"
@@ -157,7 +163,7 @@ export default function Home() {
 						setSelectModalVisible={setSelectModalVisible}
 					/>
 				</View>
-			</ScrollEnabledProvider>
+			</ScrollView>
 		</SafeAreaView>
 	);
 }

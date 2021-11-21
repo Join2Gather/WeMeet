@@ -9,6 +9,7 @@ export interface Login {
 	error: string;
 	color: string;
 	peopleCount: number;
+	response: '';
 }
 
 export interface userMeAPI {

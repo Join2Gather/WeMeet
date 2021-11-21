@@ -10,14 +10,14 @@ export function makeIndividualTimetable(state: timetable) {
 			const endMinute = Math.round(d.end_minutes / 10);
 			for (let i = d.starting_hours; i <= d.end_hours; i++) {
 				if (i === d.starting_hours) {
-					for (let j = startingMinute - 1; j <= 6; j++) {
+					for (let j = startingMinute; j <= 6; j++) {
 						state.dates[idx].times[i][j].color = state.color;
 						state.dates[idx].times[i][j].isEveryTime = false;
 						state.dates[idx].times[i][j].isPicked = true;
 						state.dates[idx].times[i][j].mode = 'start';
 					}
 				} else if (i === d.end_hours) {
-					for (let j = 0; j < endMinute; j++) {
+					for (let j = 0; j <= endMinute; j++) {
 						state.dates[idx].times[i][j].color = state.color;
 						state.dates[idx].times[i][j].isEveryTime = false;
 						state.dates[idx].times[i][j].isPicked = true;
@@ -48,7 +48,7 @@ export function makeGroupTimeTableWith60(state: timetable) {
 
 				for (let i = d.starting_hours; i <= d.end_hours; i++) {
 					if (i === d.starting_hours) {
-						for (let j = startingMinute - 1; j <= 6; j++) {
+						for (let j = startingMinute; j <= 6; j++) {
 							state.teamDatesWith60[idx].times[i][
 								j
 							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
@@ -57,7 +57,7 @@ export function makeGroupTimeTableWith60(state: timetable) {
 							state.teamDatesWith60[idx].times[i][j].mode = 'start';
 						}
 					} else if (i === d.end_hours) {
-						for (let j = 0; j < endMinute; j++) {
+						for (let j = 0; j <= endMinute; j++) {
 							state.teamDatesWith60[idx].times[i][
 								j
 							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;

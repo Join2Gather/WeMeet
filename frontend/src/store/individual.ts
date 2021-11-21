@@ -69,12 +69,12 @@ export const individualSlice = createSlice({
 						(day, idx) =>
 							state.everyTime[day]?.length &&
 							state.everyTime[day]?.map((d) => {
-								const startingMinute = Math.round(d.starting_minutes / 10) * 10;
-								const endMinute = Math.round(d.end_minutes / 10) * 10;
+								const startingMinute = Math.round(d.starting_minutes / 10);
+								const endMinute = Math.round(d.end_minutes / 10);
 
 								for (let i = d.starting_hours; i <= d.end_hours; i++) {
 									if (i === d.starting_hours) {
-										for (let j = startingMinute / 10; j < 6; j++) {
+										for (let j = startingMinute; j <= 6; j++) {
 											state.individualDates[idx].times[i][j].color =
 												Colors.grey400;
 											state.individualDates[idx].times[i][j].isEveryTime =
@@ -83,7 +83,7 @@ export const individualSlice = createSlice({
 											state.individualDates[idx].times[i][j].mode = 'start';
 										}
 									} else if (i === d.end_hours) {
-										for (let j = 0; j <= endMinute / 10; j++) {
+										for (let j = 0; j < endMinute; j++) {
 											state.individualDates[idx].times[i][j].color =
 												Colors.grey400;
 											state.individualDates[idx].times[i][j].isEveryTime =
@@ -92,7 +92,7 @@ export const individualSlice = createSlice({
 											state.individualDates[idx].times[i][j].mode = 'start';
 										}
 									} else {
-										for (let j = 0; j <= 5; j++) {
+										for (let j = 0; j <= 6; j++) {
 											state.individualDates[idx].times[i][j].color =
 												Colors.grey400;
 											state.individualDates[idx].times[i][j].isEveryTime =
@@ -113,26 +113,26 @@ export const individualSlice = createSlice({
 				(day, idx) =>
 					state.everyTime[day]?.length &&
 					state.everyTime[day]?.map((d) => {
-						const startingMinute = Math.round(d.starting_minutes / 10) * 10;
-						const endMinute = Math.round(d.end_minutes / 10) * 10;
+						const startingMinute = Math.round(d.starting_minutes / 10);
+						const endMinute = Math.round(d.end_minutes / 10);
 
 						for (let i = d.starting_hours; i <= d.end_hours; i++) {
 							if (i === d.starting_hours) {
-								for (let j = startingMinute / 10; j < 6; j++) {
+								for (let j = startingMinute; j <= 6; j++) {
 									state.individualDates[idx].times[i][j].color = Colors.grey400;
 									state.individualDates[idx].times[i][j].isEveryTime = false;
 									state.individualDates[idx].times[i][j].isPicked = true;
 									state.individualDates[idx].times[i][j].mode = 'start';
 								}
 							} else if (i === d.end_hours) {
-								for (let j = 0; j <= endMinute / 10; j++) {
+								for (let j = 0; j < endMinute; j++) {
 									state.individualDates[idx].times[i][j].color = Colors.grey400;
 									state.individualDates[idx].times[i][j].isEveryTime = false;
 									state.individualDates[idx].times[i][j].isPicked = true;
 									state.individualDates[idx].times[i][j].mode = 'start';
 								}
 							} else {
-								for (let j = 0; j <= 5; j++) {
+								for (let j = 0; j <= 6; j++) {
 									state.individualDates[idx].times[i][j].color = Colors.grey400;
 									state.individualDates[idx].times[i][j].isEveryTime = false;
 									state.individualDates[idx].times[i][j].isPicked = true;

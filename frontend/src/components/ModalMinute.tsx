@@ -16,9 +16,12 @@ import { useAutoFocus } from '../contexts';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
 	changeAllColor,
+	changeConfirmTime,
+	makeConfirmDates,
+	makeInitialTimePicked,
 	makePostIndividualDates,
+	postConfirm,
 	postIndividualTime,
-	pushSelectEnd,
 	setEndHour,
 	setEndMin,
 	setStartMin,
@@ -34,12 +37,15 @@ interface props {
 	mode: string;
 	setMode: React.Dispatch<React.SetStateAction<string>>;
 	postDatesPrepare?: boolean;
+	confirmDatesPrepare?: boolean;
 	token: string;
 	uri?: string;
 	id: number;
 	user: number;
 	postIndividualDates: any;
+	confirmDates: any;
 	isTimePicked?: boolean;
+	isGroup: boolean;
 }
 
 export function ModalMinute({
@@ -50,21 +56,22 @@ export function ModalMinute({
 	mode,
 	setMode,
 	postDatesPrepare,
+	confirmDatesPrepare,
 	token,
 	uri,
 	user,
 	id,
 	postIndividualDates,
+	confirmDates,
 	isTimePicked,
+	isGroup,
 }: props) {
 	const dispatch = useDispatch();
 	const [minute, setMinute] = useState('');
 	const [startMinute, setStartMinute] = useState(0);
 	const [hour, setHour] = useState('');
 	const focus = useAutoFocus();
-	useEffect(() => {
-		isTimePicked && Alert.alert('이미 지정된 시간 입니다');
-	}, [isTimePicked]);
+
 	// 확인 처리 로직
 	const onPressConfirm = useCallback(() => {
 		if (mode === 'startMinute') {
@@ -73,22 +80,44 @@ export function ModalMinute({
 			setMode('endMode');
 			setMinute('');
 			setModalVisible(true);
-			// dispatch(setStartPercentage());
 		} else {
-			dispatch(setEndMin(Number(minute)));
-			if (value === '오후') {
-				dispatch(setEndHour(Number(hour) + 12));
-				dispatch(pushSelectEnd());
-			} else dispatch(setEndHour(Number(hour)));
-			setMode('normal');
-			setMinute('');
-			setHour('');
-			setModalVisible(false);
-			dispatch(changeAllColor());
-
-			dispatch(makePostIndividualDates());
+			if (isGroup) {
+				{
+					dispatch(setEndMin(Number(minute)));
+					if (value === '오후') {
+						dispatch(setEndHour(Number(hour) + 12));
+					} else if (value === '오전' && Number(hour) < 6) {
+						dispatch(setEndHour(Number(hour + 24)));
+					} else if (value === '오전' && Number(hour) >= 6) {
+						dispatch(setEndHour(Number(hour)));
+					}
+					setMode('normal');
+					setMinute('');
+					setHour('');
+					setModalVisible(false);
+					dispatch(changeConfirmTime());
+					dispatch(makeConfirmDates());
+				}
+			} else {
+				{
+					dispatch(setEndMin(Number(minute)));
+					if (value === '오후') {
+						dispatch(setEndHour(Number(hour) + 12));
+					} else if (value === '오전' && Number(hour) < 6) {
+						dispatch(setEndHour(Number(hour + 24)));
+					} else if (value === '오전' && Number(hour) >= 6) {
+						dispatch(setEndHour(Number(hour)));
+					}
+					setMode('normal');
+					setMinute('');
+					setHour('');
+					setModalVisible(false);
+					dispatch(changeAllColor());
+					dispatch(makePostIndividualDates());
+				}
+			}
 		}
-	}, [minute, mode, hour]);
+	}, [minute, mode, hour, isGroup]);
 	// 닫기 버튼
 	const onPressClose = useCallback(() => {
 		setMode('normal');
@@ -111,14 +140,24 @@ export function ModalMinute({
 			dispatch(
 				postIndividualTime({
 					dates: postIndividualDates,
-					id: id,
-					token: token,
-					uri: uri,
-					user: user,
+					id,
+					token,
+					uri,
+					user,
 				})
 			);
+		} else if (confirmDatesPrepare && uri) {
+			dispatch(postConfirm({ date: confirmDates, id, token, uri, user }));
 		}
-	}, [postDatesPrepare, uri, postIndividualDates, id, token, user]);
+	}, [
+		postDatesPrepare,
+		uri,
+		postIndividualDates,
+		id,
+		token,
+		user,
+		confirmDates,
+	]);
 
 	return (
 		// <AutoFocusProvider contentContainerStyle={[styles.keyboardAwareFocus]}>

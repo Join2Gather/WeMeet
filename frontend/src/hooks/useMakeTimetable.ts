@@ -28,10 +28,11 @@ export function useMakeTimeTableWith60() {
 		24: [],
 		25: [],
 		26: [],
+		27: [],
 	};
 	const timesText: Array<string> = [];
 
-	for (let i = 6; i <= 26; i++) {
+	for (let i = 6; i <= 27; i++) {
 		for (let j = 0; j <= 60; j += 10) {
 			times[i].push({
 				color: Colors.white,
@@ -39,6 +40,8 @@ export function useMakeTimeTableWith60() {
 				mode: 'normal',
 				isEveryTime: false,
 				minute: j,
+				borderWidth: 0.2,
+				borderColor: Colors.black,
 			});
 		}
 		if (i <= 12) {
@@ -67,7 +70,7 @@ export function useMakeTimetable() {
 	const times: Array<state_time> = [];
 	const timesText: Array<string> = [];
 
-	for (let i = 6; i <= 26; i += 1) {
+	for (let i = 6; i <= 27; i += 1) {
 		times.push({
 			time: i,
 			color: Colors.white,
@@ -81,6 +84,10 @@ export function useMakeTimetable() {
 		if (i <= 12) {
 			if (i % 2 === 0) {
 				timesText.push(`${i} AM`);
+			}
+		} else if (i > 24) {
+			if (i % 2 === 0) {
+				timesText.push(`${i - 24} AM`);
 			}
 		} else {
 			if (i % 2 === 0) {
