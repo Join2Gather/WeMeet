@@ -1,6 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import {
+	StyleSheet,
+	FlatList,
+	TouchableOpacity,
+	Alert,
+	ScrollView,
+} from 'react-native';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 // prettier-ignore
 import {SafeAreaView, View, UnderlineText,TopBar,
@@ -16,6 +22,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
 	cloneDates,
 	getColor,
+	makeInitialTimePicked,
 	makeInitialTimetable,
 	setEndHour,
 	setEndMin,
@@ -47,6 +54,7 @@ export default function TeamTime({ route }: Props) {
 		color,
 		peopleCount,
 		postDatesPrepare,
+		confirmDatesPrepare,
 		loadingIndividual,
 		loadingGroup,
 		joinName,
@@ -54,11 +62,13 @@ export default function TeamTime({ route }: Props) {
 		loadingJoin,
 		joinTeamError,
 		error,
+		isTimePicked,
 	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
 		uri: login.uri,
 		color: login.color,
 		peopleCount: login.peopleCount,
 		postDatesPrepare: timetable.postDatesPrepare,
+		confirmDatesPrepare: timetable.confirmDatesPrepare,
 		loadingIndividual: loading['timetable/GET_INDIVIDUAL'],
 		loadingGroup: loading['timetable/GET_GROUP'],
 		loadingJoin: loading['team/JOIN_TEAM'],
@@ -66,6 +76,7 @@ export default function TeamTime({ route }: Props) {
 		joinUri: team.joinUri,
 		joinTeamError: team.joinTeamError,
 		error: team.error,
+		isTimePicked: timetable.isTimePicked,
 	}));
 	// navigation
 	const { name, id, user, token, modalMode } = route.params;
@@ -122,7 +133,7 @@ export default function TeamTime({ route }: Props) {
 	}, [id, user, token, uri, joinUri]);
 	return (
 		<SafeAreaView style={{ backgroundColor: Colors.white }}>
-			<ScrollEnabledProvider>
+			<ScrollView>
 				<View style={[styles.view]}>
 					<NavigationHeader
 						headerColor={color}
@@ -144,7 +155,7 @@ export default function TeamTime({ route }: Props) {
 									size={27}
 									color={Colors.white}
 									style={{ paddingTop: 1 }}
-									onPress={onPressPlus}
+									onPress={() => setMode('confirmMode')}
 								/>
 							) : (
 								<MIcon
@@ -248,6 +259,13 @@ export default function TeamTime({ route }: Props) {
 									</Text>
 								</>
 							)}
+							{mode === 'confirmMode' && (
+								<>
+									<Text style={styles.stepText}>
+										{'[1] 확정 시작 시간을 터치해주세요'}
+									</Text>
+								</>
+							)}
 							{mode === 'startMinute' && (
 								<>
 									<Text style={styles.stepText}>[2] 일정 시작 분 설정</Text>
@@ -270,9 +288,10 @@ export default function TeamTime({ route }: Props) {
 						isGroup={isGroup}
 						uri={uri}
 						postDatesPrepare={postDatesPrepare}
+						confirmDatesPrepare={confirmDatesPrepare}
 					/>
 				</View>
-			</ScrollEnabledProvider>
+			</ScrollView>
 		</SafeAreaView>
 	);
 }
