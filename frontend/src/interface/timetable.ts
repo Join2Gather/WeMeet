@@ -14,11 +14,14 @@ export interface timetable {
 	weekIndex: weekIndex;
 	postIndividualDates: postIndividualDates;
 	postDatesPrepare: boolean;
+	confirmDatesPrepare: boolean;
 	error: string;
 	isTimePicked: boolean;
+	isTimeNotExist: boolean;
 	everyTime: responseEveryTime;
 	color: string;
 	peopleCount: number;
+	confirmDates: confirmDates;
 }
 
 export type weekIndex = Array<string>;
@@ -102,6 +105,7 @@ export interface timeWith60 {
 	24: timeProps[];
 	25: timeProps[];
 	26: timeProps[];
+	27: timeProps[];
 	[prop: string]: timeProps[];
 }
 
@@ -111,6 +115,8 @@ export interface timeProps {
 	mode: string;
 	isEveryTime: boolean;
 	minute: number;
+	borderWidth: number;
+	borderColor: string;
 }
 
 export interface postIndividualDates {
@@ -122,6 +128,17 @@ export interface postIndividualDates {
 	fri: post_time[];
 	sat: post_time[];
 	[prop: string]: any;
+}
+
+export interface confirmDates {
+	sun: post_time[];
+	mon: post_time[];
+	tue: post_time[];
+	wed: post_time[];
+	thu: post_time[];
+	fri: post_time[];
+	sat: post_time[];
+	[prop: string]: post_time[];
 }
 
 // 개별 일정 받아오기
