@@ -88,8 +88,18 @@ const initialState: timetable = {
 		fri: [],
 		sat: [],
 	},
+	confirmDates: {
+		sun: [],
+		mon: [],
+		tue: [],
+		wed: [],
+		thu: [],
+		fri: [],
+		sat: [],
+	},
 	error: '',
 	postDatesPrepare: false,
+	confirmDatesPrepare: false,
 	responseIndividual: {
 		sun: [],
 		mon: [],
@@ -146,6 +156,7 @@ const initialState: timetable = {
 		sat: [],
 	},
 	isTimePicked: false,
+	isTimeNotExist: false,
 	color: '',
 	peopleCount: 0,
 };
@@ -175,26 +186,26 @@ export const timetableSlice = createSlice({
 			if (state.everyTime) {
 				state.weekIndex.map((day, idx) =>
 					state.everyTime[day].map((d) => {
-						const startingMinute = Math.round(d.starting_minutes / 10) * 10;
-						const endMinute = Math.round(d.end_minutes / 10) * 10;
+						const startingMinute = Math.round(d.starting_minutes / 10);
+						const endMinute = Math.round(d.end_minutes / 10);
 						console.log(startingMinute, endMinute);
 						for (let i = d.starting_hours; i <= d.end_hours; i++) {
 							if (i === d.starting_hours) {
-								for (let j = startingMinute / 10; j < 6; j++) {
+								for (let j = startingMinute; j <= 6; j++) {
 									state.dates[idx].times[i][j].color = Colors.grey400;
 									state.dates[idx].times[i][j].isEveryTime = false;
 									state.dates[idx].times[i][j].isPicked = true;
 									state.dates[idx].times[i][j].mode = 'start';
 								}
 							} else if (i === d.end_hours) {
-								for (let j = 0; j <= endMinute / 10; j++) {
+								for (let j = 0; j < endMinute; j++) {
 									state.dates[idx].times[i][j].color = Colors.grey400;
 									state.dates[idx].times[i][j].isEveryTime = false;
 									state.dates[idx].times[i][j].isPicked = true;
 									state.dates[idx].times[i][j].mode = 'start';
 								}
 							} else {
-								for (let j = 0; j <= 5; j++) {
+								for (let j = 0; j <= 6; j++) {
 									state.dates[idx].times[i][j].color = Colors.grey400;
 									state.dates[idx].times[i][j].isEveryTime = false;
 									state.dates[idx].times[i][j].isPicked = true;
@@ -226,6 +237,7 @@ export const timetableSlice = createSlice({
 		},
 		POST_CONFIRM_SUCCESS: (state, action: PayloadAction<any>) => {
 			console.log(action.payload);
+			state.confirmDatesPrepare = false;
 		},
 		POST_CONFIRM_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
@@ -249,54 +261,152 @@ export const timetableSlice = createSlice({
 		setDay: (state, action: PayloadAction<string>) => {
 			state.day = action.payload;
 		},
-		pushSelectStart: (state, action: PayloadAction<number>) => {
-			state.selectTime[state.day].push(action.payload);
+		checkIsBlank: (state) => {
+			for (let i = 0; i <= 6; i++) {
+				if (
+					state.dates[state.dayIdx].times[state.startTime][i].color !==
+					Colors.white
+				) {
+					Alert.alert('알림', '이미 지정된 시간 입니다', [
+						{
+							text: '확인',
+							onPress: () => {},
+						},
+					]);
+					state.isTimePicked = true;
+					return;
+				}
+			}
+			// state.selectTime[state.day].push(action.payload);
 		},
-		pushSelectEnd: (state) => {
-			for (
-				let i = Math.floor(state.startTime) + 1;
-				i < Math.floor(state.endTime);
-				i++
-			) {
-				state.selectTime[state.day] && state.selectTime[state.day].push(i);
+		checkIsExist: (state) => {
+			let isNonColor = 0;
+			for (let i = 0; i <= 6; i++) {
+				if (
+					state.teamDatesWith60[state.dayIdx].times[state.startTime][i]
+						.color === Colors.white
+				)
+					isNonColor++;
+			}
+			if (isNonColor === 7) {
+				Alert.alert('알림', '가능 시간 중에서 선택해 주세요', [
+					{
+						text: '확인',
+						onPress: () => {},
+					},
+				]);
+				state.isTimeNotExist = true;
 			}
 		},
 		changeDayIdx: (state, action: PayloadAction<any>) => {
 			state.dayIdx = action.payload;
 		},
+		changeConfirmTime: (state) => {
+			const startingMinute = Math.round(state.startMinute / 10);
+			const endMinute = Math.round(state.endMinute / 10);
+			for (let i = state.startTime; i <= state.endTime; i++) {
+				for (let j = 0; j <= 6; j++) {
+					let isNonColor = 0;
+					if (
+						state.teamDatesWith60[state.dayIdx].times[i][j].color ===
+						Colors.white
+					) {
+						isNonColor++;
+					}
+					if (isNonColor === 7) {
+						Alert.alert('알림', '가능 시간 중에서 선택해 주세요', [
+							{
+								text: '확인',
+								onPress: () => {},
+							},
+						]);
+						state.isTimeNotExist = true;
+						break;
+					}
+				}
+			}
+
+			if (!state.isTimeNotExist) {
+				for (let i = state.startTime; i <= state.endTime; i++) {
+					if (i === state.startTime) {
+						for (let j = startingMinute; j <= 6; j++) {
+							state.teamDatesWith60[state.dayIdx].times[i][j].color =
+								state.color;
+							state.teamDatesWith60[state.dayIdx].times[i][j].isEveryTime =
+								false;
+							state.teamDatesWith60[state.dayIdx].times[i][j].isPicked = true;
+							state.teamDatesWith60[state.dayIdx].times[i][j].mode = 'start';
+							state.teamDatesWith60[state.dayIdx].times[i][j].borderColor =
+								state.color;
+							state.teamDatesWith60[state.dayIdx].times[i][j].borderWidth = 1;
+						}
+					} else if (i === state.endTime) {
+						for (let j = 0; j <= endMinute; j++) {
+							state.teamDatesWith60[state.dayIdx].times[i][j].color =
+								state.color;
+							state.teamDatesWith60[state.dayIdx].times[i][j].isEveryTime =
+								false;
+							state.teamDatesWith60[state.dayIdx].times[i][j].isPicked = true;
+							state.teamDatesWith60[state.dayIdx].times[i][j].mode = 'start';
+							state.teamDatesWith60[state.dayIdx].times[i][j].borderColor =
+								state.color;
+							state.teamDatesWith60[state.dayIdx].times[i][j].borderWidth = 1;
+						}
+					} else {
+						for (let j = 0; j <= 6; j++) {
+							state.teamDatesWith60[state.dayIdx].times[i][j].color =
+								state.color;
+							state.teamDatesWith60[state.dayIdx].times[i][j].isEveryTime =
+								false;
+							state.teamDatesWith60[state.dayIdx].times[i][j].isPicked = true;
+							state.teamDatesWith60[state.dayIdx].times[i][j].borderColor =
+								state.color;
+							state.teamDatesWith60[state.dayIdx].times[i][j].borderWidth = 1;
+						}
+					}
+				}
+			}
+		},
 		changeAllColor: (state) => {
 			const startingMinute = Math.round(state.startMinute / 10);
 			const endMinute = Math.round(state.endMinute / 10);
-			// for (let i = state.startTime; i <= state.endTime; i++) {
-			// 	if (
-			// 		state.dates[state.dayIdx].times[state.startTime][i].color !==
-			// 		Colors.white
-			// 	) {
-			// 		state.isTimePicked = true;
-			// 		Alert.alert('이미 지정된 시간 입니다');
-			// 		break;
-			// 	}
-			// }
+
 			for (let i = state.startTime; i <= state.endTime; i++) {
-				if (i === state.startTime) {
-					for (let j = startingMinute; j < 6; j++) {
-						state.dates[state.dayIdx].times[i][j].color = state.color;
-						state.dates[state.dayIdx].times[i][j].isEveryTime = false;
-						state.dates[state.dayIdx].times[i][j].isPicked = true;
-						state.dates[state.dayIdx].times[i][j].mode = 'start';
+				for (let j = 0; j <= 6; j++) {
+					if (state.dates[state.dayIdx].times[i][j].color !== Colors.white) {
+						state.isTimePicked = true;
+						Alert.alert('알림', '이미 지정된 시간 입니다', [
+							{
+								text: '확인',
+								onPress: () => {},
+							},
+						]);
+						break;
 					}
-				} else if (i === state.endTime) {
-					for (let j = 0; j <= endMinute; j++) {
-						state.dates[state.dayIdx].times[i][j].color = state.color;
-						state.dates[state.dayIdx].times[i][j].isEveryTime = false;
-						state.dates[state.dayIdx].times[i][j].isPicked = true;
-						state.dates[state.dayIdx].times[i][j].mode = 'start';
-					}
-				} else {
-					for (let j = 0; j <= 5; j++) {
-						state.dates[state.dayIdx].times[i][j].color = state.color;
-						state.dates[state.dayIdx].times[i][j].isEveryTime = false;
-						state.dates[state.dayIdx].times[i][j].isPicked = true;
+				}
+			}
+			if (!state.isTimePicked) {
+				for (let i = state.startTime; i <= state.endTime; i++) {
+					if (i === state.startTime) {
+						for (let j = startingMinute; j <= 6; j++) {
+							state.dates[state.dayIdx].times[i][j].color = state.color;
+							state.dates[state.dayIdx].times[i][j].isEveryTime = false;
+							state.dates[state.dayIdx].times[i][j].isPicked = true;
+							state.dates[state.dayIdx].times[i][j].mode = 'start';
+						}
+					} else if (i === state.endTime) {
+						for (let j = 0; j <= endMinute; j++) {
+							state.dates[state.dayIdx].times[i][j].color = state.color;
+							state.dates[state.dayIdx].times[i][j].isEveryTime = false;
+							state.dates[state.dayIdx].times[i][j].isPicked = true;
+							state.dates[state.dayIdx].times[i][j].mode = 'start';
+						}
+					} else {
+						for (let j = 0; j <= 6; j++) {
+							state.dates[state.dayIdx].times[i][j].color = state.color;
+							state.dates[state.dayIdx].times[i][j].isEveryTime = false;
+							state.dates[state.dayIdx].times[i][j].isPicked = true;
+						}
 					}
 				}
 			}
@@ -312,6 +422,17 @@ export const timetableSlice = createSlice({
 				state.postDatesPrepare = true;
 			}
 		},
+		makeConfirmDates: (state) => {
+			if (!state.isTimeNotExist) {
+				state.confirmDates[state.weekIndex[state.dayIdx]].push({
+					starting_hours: state.startTime,
+					starting_minutes: state.startMinute,
+					end_hours: state.endTime,
+					end_minutes: state.endMinute,
+				});
+			}
+			state.confirmDatesPrepare = true;
+		},
 		cloneEveryTime: (state, action: PayloadAction<any>) => {
 			state.everyTime = action.payload;
 		},
@@ -325,6 +446,10 @@ export const timetableSlice = createSlice({
 				state.color = Colors.blue500;
 			}
 		},
+		makeInitialTimePicked: (state) => {
+			state.isTimePicked = false;
+			state.isTimeNotExist = false;
+		},
 	},
 	extraReducers: {},
 });
@@ -335,15 +460,18 @@ export const {
 	setEndHour,
 	setStartMin,
 	setEndMin,
-	pushSelectEnd,
-	pushSelectStart,
+	checkIsBlank,
 	changeAllColor,
 	setDay,
 	makePostIndividualDates,
+	makeConfirmDates,
 	makeInitialTimetable,
 	changeDayIdx,
 	cloneEveryTime,
 	getColor,
+	makeInitialTimePicked,
+	checkIsExist,
+	changeConfirmTime,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;
