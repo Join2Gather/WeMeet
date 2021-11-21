@@ -7,14 +7,15 @@ import { useMakeTimetable } from '../hooks';
 import {
 	changeAllColor,
 	changeDayIdx,
+	checkIsBlank,
+	checkIsExist,
 	cloneEveryTime,
 	// changeColor,
 	getGroupDates,
 	getIndividualDates,
+	makeInitialTimePicked,
 	makePostIndividualDates,
 	postIndividualTime,
-	pushSelectEnd,
-	pushSelectStart,
 	setDay,
 	setEndHour,
 	setStartHour,
@@ -26,7 +27,7 @@ import { kakaoLogin } from '../store/individual';
 
 const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
-const boxHeight = 25;
+const boxHeight = 28;
 
 interface props {
 	mode: string;
@@ -37,6 +38,7 @@ interface props {
 	individualDates?: make60[];
 	uri?: string;
 	postDatesPrepare?: boolean;
+	confirmDatesPrepare?: boolean;
 }
 
 export function Timetable({
@@ -48,6 +50,7 @@ export function Timetable({
 	individualDates,
 	uri,
 	postDatesPrepare,
+	confirmDatesPrepare,
 }: props) {
 	const {
 		dates,
@@ -58,9 +61,11 @@ export function Timetable({
 		kakaoDates,
 		isTimePicked,
 		postIndividualDates,
+		confirmDates,
 		loadingJoin,
 		joinTeamError,
 		teamDatesWith60,
+		isTimeNotExist,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
@@ -70,10 +75,12 @@ export function Timetable({
 			cloneDateSuccess: individual.cloneDateSuccess,
 			kakaoDates: login.kakaoDates,
 			postIndividualDates: timetable.postIndividualDates,
+			confirmDates: timetable.confirmDates,
 			isTimePicked: timetable.isTimePicked,
 			loadingJoin: loading['team/JOIN_TEAM'],
 			joinTeamError: team.joinTeamError,
 			teamDatesWith60: timetable.teamDatesWith60,
+			isTimeNotExist: timetable.isTimeNotExist,
 		})
 	);
 	const dispatch = useDispatch();
@@ -102,32 +109,26 @@ export function Timetable({
 			dispatch(setStartHour(time));
 			setMode('startMinute');
 			setStart(time);
-			if (setModalVisible) {
-				setModalVisible(true);
-			}
+			setModalVisible && setModalVisible(true);
 			dispatch(changeDayIdx(idx));
 			dispatch(setDay(day));
-			dispatch(pushSelectStart(time));
+			isGroup ? dispatch(checkIsExist()) : dispatch(checkIsBlank());
 		},
-		[]
+		[isTimePicked, isGroup]
 	);
+
+	// const onMakeInitial = useCallback(() => {
+	// 	Alert.alert('이미 지정된 시간 입니다');
+	// 	setMode('normal');
+	// 	setModalVisible && setModalVisible(false);
+	// }, [isTimePicked]);
 	useEffect(() => {
-		isTimePicked && Alert.alert('이미 지정된 시간 입니다');
-	}, [isTimePicked]);
-	const onSetEndHour = useCallback((idx: number, time: number) => {
-		dispatch(setEndHour(time));
-		setEnd(time);
-		if (setModalVisible) {
-			setModalVisible(true);
+		if (isTimePicked || isTimeNotExist) {
+			setMode('normal');
+			setModalVisible && setModalVisible(false);
+			dispatch(makeInitialTimePicked());
 		}
-		dispatch(pushSelectEnd());
-		dispatch(changeAllColor());
-	}, []);
-	const onMakeInitial = useCallback(() => {
-		Alert.alert('이미 지정된 시간 입니다');
-		setMode('normal');
-		setModalVisible && setModalVisible(false);
-	}, []);
+	}, [isTimePicked, isTimeNotExist]);
 	const [start, setStart] = useState(0);
 	const [end, setEnd] = useState(0);
 	return (
@@ -168,17 +169,25 @@ export function Timetable({
 										<TouchableView
 											style={[
 												styles.boxView,
-												{ borderBottomWidth: Number(time) === 1 ? 0.3 : 0 },
+												{
+													borderBottomWidth: Number(time) === 27 ? 0.2 : 0,
+													borderLeftWidth: Number(time) === 27 ? 0 : 0.2,
+													borderRightWidth: Number(time) === 27 ? 0 : 0.2,
+													// borderTopWidth: Number(time) === 26 ? 10 : 0.2,
+												},
 											]}
 											key={time}
-											onPress={() => console.log(time)}
+											onPress={() => {
+												mode === 'confirmMode' &&
+													onSetStartHour(idx, Number(time), day.day);
+											}}
 										>
 											{day.times[time].map((t) => (
 												<View
 													key={t.minute}
 													style={{
 														backgroundColor: t.color,
-														height: boxHeight / 5,
+														height: boxHeight / 7,
 													}}
 												></View>
 											))}
@@ -195,7 +204,11 @@ export function Timetable({
 										<TouchableView
 											style={[
 												styles.boxView,
-												{ borderBottomWidth: Number(time) === 1 ? 0.3 : 0 },
+												{
+													borderBottomWidth: Number(time) === 27 ? 0.2 : 0,
+													borderLeftWidth: Number(time) === 27 ? 0 : 0.2,
+													borderRightWidth: Number(time) === 27 ? 0 : 0.2,
+												},
 											]}
 											key={time}
 											onPress={() => console.log(time)}
@@ -205,7 +218,7 @@ export function Timetable({
 													key={t.minute}
 													style={{
 														backgroundColor: t.color,
-														height: boxHeight / 5,
+														height: boxHeight / 7,
 													}}
 												></View>
 											))}
@@ -222,7 +235,11 @@ export function Timetable({
 										<TouchableView
 											style={[
 												styles.boxView,
-												{ borderBottomWidth: Number(time) === 1 ? 0.3 : 0 },
+												{
+													borderBottomWidth: Number(time) === 27 ? 0.2 : 0,
+													borderLeftWidth: Number(time) === 27 ? 0 : 0.2,
+													borderRightWidth: Number(time) === 27 ? 0 : 0.2,
+												},
 											]}
 											key={time}
 											onPress={() => {
@@ -235,7 +252,7 @@ export function Timetable({
 													key={t.minute}
 													style={{
 														backgroundColor: t.color,
-														height: boxHeight / 5,
+														height: boxHeight / 7,
 													}}
 												></View>
 											))}
@@ -259,7 +276,10 @@ export function Timetable({
 						uri={uri}
 						user={user}
 						postDatesPrepare={postDatesPrepare}
+						confirmDatesPrepare={confirmDatesPrepare}
 						isTimePicked={isTimePicked}
+						isGroup={isGroup}
+						confirmDates={confirmDates}
 					/>
 				</View>
 			</View>
@@ -285,14 +305,14 @@ const styles = StyleSheet.create({
 		// height: 80,
 	},
 	timeView: {
-		top: '-10%',
+		top: '-9%',
 	},
 	timeText: {
 		fontSize: 10,
 		alignSelf: 'flex-end',
 		textAlign: 'right',
 		width: '100%',
-		marginTop: 47.5,
+		marginTop: 44,
 		fontFamily: 'NanumSquareR',
 	},
 	columnView: {
@@ -312,8 +332,11 @@ const styles = StyleSheet.create({
 		width: 41,
 		// flex: 3,
 		borderWidth: 0.2,
-		borderTopWidth: 0.2,
-		borderBottomWidth: 0.2,
+		// borderBottomWidth: 10,
+		// borderBottomColor: Colors.red800,
+		// borderColor: Colors.blue900,
+		// borderTopWidth: 0.2,
+		// borderBottomWidth: 0.2,
 		// borderRightWidth: 1,
 	},
 });
