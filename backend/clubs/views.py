@@ -1,16 +1,10 @@
-from config.serializers import ClubsSerializer
-from config.serializers import ClubsWithDatePageSerializer
 from django.contrib.auth.models import User as Users
 from typing import Any
-from config.serializers import ErrorSerializer, SuccessSerializer, DateCalculatorChildType, ShareSerializer
-from config.serializers import ProfilesSerializer
-from config.serializers import ClubAvailableTimeSerializer
-from config.models import Dates, ProfileDates
 from config import constants
-from config.serializers import ClubsWithDateSerializer
-from config.models import Clubs, Profiles
+from config.serializers import ErrorSerializer, SuccessSerializer, DateCalculatorChildType, ShareSerializer, ClubsWithDateSerializer
+from config.serializers import ProfilesSerializer, ClubsWithDatePageSerializer, ClubsSerializer, ClubAvailableTimeSerializer, SnapshotSerializer
+from config.models import Dates, ProfileDates, Clubs, Profiles, ClubEntries, ClubSnapshots
 from django.http.response import JsonResponse
-from config.models import ClubEntries
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework import status
@@ -320,15 +314,74 @@ class ClubConfirmView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="그룹 일정 개별 확정",
+        operation_id="그룹 일정 개별 확정 & 스냅샷 생성",
         responses={
-            status.HTTP_200_OK: SuccessSerializer,
-            status.HTTP_404_NOT_FOUND: ErrorSerializer
+            status.HTTP_200_OK: SnapshotSerializer,
         },
     )
     @profile_guard
     @club_guard
     def post(self, request: Request, user: int, profile: Any, uri: str, club: Any):
+
+        if snapshot := ClubSnapshots.objects.filter(club=club.id):
+            snapshot = snapshot.get()
+            return JsonResponse(SnapshotSerializer(snapshot).data)
+
+        snapshot = ClubSnapshots.objects.create(club=club)
+
+        fields = [f.name for f in ProfileDates._meta.get_fields()
+                  if f.name not in ['id', 'club', 'snapshot']]
+
+        foreign_keys = ['profile', 'date']
+
+        profile_dates = ProfileDates.objects.filter(club=club.id)
+        for prefetched, profile_dates in zip(profile_dates.prefetch_related(*foreign_keys), profile_dates.values(*fields)):
+            profile_dates = {k: prefetched.__getattribute__(k)
+                             if k in foreign_keys else v for k, v in profile_dates.items()}
+            ProfileDates.objects.create(
+                **profile_dates, snapshot=snapshot)
+
+        return JsonResponse(SnapshotSerializer(snapshot).data)
+
+
+class ClubSnapshotView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="스냅샷 확인",
+        responses={
+            status.HTTP_200_OK: SnapshotSerializer,
+            status.HTTP_404_NOT_FOUND: SnapshotSerializer
+        },
+    )
+    @profile_guard
+    @club_guard
+    def get(self, request: Request, user: int, profile: Any, uri: str, club: Any):
+
+        snapshot = ClubSnapshots.objects.filter(club=club.id)
+
+        if not snapshot:
+            return JsonResponse(SnapshotSerializer(None).data, status=status.HTTP_404_NOT_FOUND)
+
+        snapshot = snapshot.get()
+
+        return JsonResponse(SnapshotSerializer(snapshot).data)
+
+    @swagger_auto_schema(
+        operation_id="스냅샷 삭제",
+        responses={
+            status.HTTP_200_OK: SuccessSerializer
+        },
+    )
+    @profile_guard
+    @club_guard
+    def delete(self, request: Request, user: int, profile: Any, uri: str, club: Any):
+
+        if old_snapshot := ClubSnapshots.objects.filter(club=club.id):
+            old_snapshot = old_snapshot.get()
+
+            ProfileDates.objects.filter(snapshot=old_snapshot.id).delete()
+            ClubSnapshots.objects.filter(id=old_snapshot.id).delete()
 
         return JsonResponse(SuccessSerializer({'success': True}).data)
 

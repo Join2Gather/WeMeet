@@ -19,6 +19,8 @@ urlpatterns = [
          views.ClubShareView.as_view(), name='club_share_view'),
     path('<int:user>/profiles/<int:profile>/clubs/<str:uri>/confirm',
          views.ClubConfirmView.as_view(), name='club_confirm_view'),
+    path('<int:user>/profiles/<int:profile>/clubs/<str:uri>/snapshot',
+         views.ClubSnapshotView.as_view(), name='club_snapshot_view'),
     path('<int:user>/profiles/<int:profile>/clubs/<str:uri>/confirm/ok',
          views.ClubConfirmOKView.as_view(), name='club_confirm_ok_view'),
 ]
