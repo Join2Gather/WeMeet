@@ -35,6 +35,11 @@ class Clubs(models.Model):
         return self.name
 
 
+class ClubSnapshots(models.Model):
+    club = models.ForeignKey(Clubs, on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+
 # 내 일정과 모임 간의 관계 테이블
 class ClubEntries(models.Model):
 
@@ -75,6 +80,8 @@ class ProfileDates(models.Model):
     profile = models.ForeignKey(Profiles, on_delete=models.CASCADE)
     date = models.ForeignKey(Dates, on_delete=models.CASCADE)
     club = models.ForeignKey(Clubs, on_delete=models.CASCADE, null=True)
+    snapshot = models.ForeignKey(
+        ClubSnapshots, on_delete=models.CASCADE, null=True, default=None)
 
     class Meta:
         db_table = 'profile_dates'
