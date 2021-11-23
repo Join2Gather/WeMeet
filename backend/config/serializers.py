@@ -93,7 +93,7 @@ class DateCalculator(ABC):
 
         for pd in ProfileDates.objects \
             .filter(**self.filter_expression) \
-                .select_related('date', 'club', 'snapshot'):
+                .select_related('date', 'club'):
             date = pd.date
             club = pd.club
             is_temporary_reserved = pd.is_temporary_reserved
@@ -179,31 +179,10 @@ class ClubsWithDateCalculator(DateCalculator):
             dates[day].sort(key=lambda x: list(x.values()))
 
 
-class SnapshotWithDateCalculator(DateCalculator):
-    def init_dates(self):
-        self.dates = {day: [] for day in self.week}
-
+class SnapshotWithDateCalculator(ClubsWithDateCalculator):
     @ property
     def filter_expression(self):
         return {'snapshot': self.obj.id}
-
-    def append_date(self, date, club, is_temporary_reserved):
-        dates = self.dates
-        week = self.week
-        dates['is_temporary_reserved'] = is_temporary_reserved
-        time = {
-            'starting_hours': date.starting_hours,
-            'starting_minutes': date.starting_minutes,
-            'end_hours': date.end_hours,
-            'end_minutes': date.end_minutes,
-        }
-        dates[week[date.day]].append(time)
-
-    def sort_date(self):
-        dates = self.dates
-        week = self.week
-        for day in week:
-            dates[day].sort(key=lambda x: list(x.values()))
 
 
 class ClubAvailableTimeSerializer(serializers.ModelSerializer):

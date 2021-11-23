@@ -117,6 +117,8 @@ class SnapshotTestCase(TestCase):
 
         token.save()
 
+        club = Clubs.objects.get(id=1)
+
         def confirm_request():
             return mock_request(
                 user, token, params={'profile': profile.id,
@@ -132,7 +134,6 @@ class SnapshotTestCase(TestCase):
                 user, token, params={'profile': profile.id,
                                      'user': profile.user.id, 'uri': club.uri}, view_name='club_snapshot_view', view=ClubSnapshotView, mode='delete')
 
-        club = Clubs.objects.get(id=1)
         confirm_response: JsonResponse = confirm_request()
         snapshots = ClubSnapshots.objects.filter(club=club.id)
 
