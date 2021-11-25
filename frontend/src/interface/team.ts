@@ -25,6 +25,7 @@ export interface team {
 	joinTeam: boolean;
 	postTeamError: boolean;
 	joinTeamError: boolean;
+	teamColor: string;
 }
 
 export interface shareUriAPI {
