@@ -52,6 +52,7 @@ const initialState: team = {
 	joinTeam: false,
 	joinTeamError: false,
 	postTeamError: false,
+	teamColor: '',
 };
 
 export const teamSlice = createSlice({
@@ -77,7 +78,8 @@ export const teamSlice = createSlice({
 			state.id = action.payload.id;
 			state.joinName = decodeURI(action.payload.name);
 			state.joinUri = action.payload.uri;
-			state.joinTeam = !state.joinTeam;
+			state.teamColor = action.payload.color;
+			state.joinTeam = true;
 			state.joinTeamError = false;
 		},
 		JOIN_TEAM_FAILURE: (state, action: PayloadAction<any>) => {
@@ -87,7 +89,7 @@ export const teamSlice = createSlice({
 			state.joinUri = '';
 		},
 		CHANGE_COLOR_SUCCESS: (state, action: PayloadAction<any>) => {
-			console.log(action.payload);
+			state.teamColor = action.payload.color;
 		},
 		CHANGE_COLOR_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
@@ -100,10 +102,14 @@ export const teamSlice = createSlice({
 		inputTeamName: (state, action: PayloadAction<string>) => {
 			state.name = action.payload;
 		},
+		initialJoinTeam: (state) => {
+			state.joinTeam = false;
+		},
 	},
 	extraReducers: {},
 });
 
-export const { inputTeamName, initialError } = teamSlice.actions;
+export const { inputTeamName, initialError, initialJoinTeam } =
+	teamSlice.actions;
 
 export default teamSlice.reducer;
