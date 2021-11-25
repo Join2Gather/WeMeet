@@ -12,6 +12,15 @@ export interface Login {
 	response: '';
 }
 
+export interface kakaoLoginAPI {
+	id: number;
+	name: string;
+	user: number;
+	token: string;
+	clubs: Array<any>;
+	kakaoDates: Array<any>;
+}
+
 export interface userMeAPI {
 	user: number;
 	id: number;
