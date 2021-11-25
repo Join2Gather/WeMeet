@@ -27,9 +27,9 @@ import { initialError, postTeamName } from '../store/team';
 import { ModalInput } from '../components';
 import { NavigationHeader } from '../theme';
 import { useLayout, useMakeTimetable } from '../hooks';
-import { cloneDates } from '../store/timetable';
+import { cloneDates, getColor } from '../store/timetable';
 import FontAweSome from 'react-native-vector-icons/FontAwesome5';
-import { getUserMe } from '../store/login';
+import { getUserMe, makeGroupColor } from '../store/login';
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
 export default function TeamList() {
@@ -43,6 +43,8 @@ export default function TeamList() {
 		postTeamError,
 		joinTeamError,
 		loadingJoin,
+		loadingChangeColor,
+		teamColor,
 		joinUri,
 	} = useSelector(({ login, team, loading }: RootState) => ({
 		user: login.user,
@@ -54,6 +56,8 @@ export default function TeamList() {
 		joinTeamError: team.joinTeamError,
 		postTeamError: team.postTeamError,
 		loadingJoin: loading['team/JOIN_TEAM'],
+		loadingChangeColor: loading['team/CHANGE_COLOR'],
+		teamColor: team.teamColor,
 		joinUri: team.joinUri,
 	}));
 	const [dimensions, setDimensions] = useState({ window, screen });
@@ -69,7 +73,10 @@ export default function TeamList() {
 	useEffect(() => {
 		setModalMode('make');
 	}, [joinTeamError]);
-
+	useEffect(() => {
+		dispatch(makeGroupColor(teamColor));
+		dispatch(getColor({ color: teamColor, peopleCount: 1 }));
+	}, [loadingChangeColor, teamColor]);
 	// useCallback
 	// Navigation 이동
 	const goTeamTime = useCallback(
@@ -82,8 +89,6 @@ export default function TeamList() {
 					token,
 					modalMode,
 				});
-				dispatch(initialError());
-				setModalMode('make');
 			} else {
 				navigation.navigate('TeamTime', {
 					name,
@@ -92,11 +97,11 @@ export default function TeamList() {
 					token,
 					modalMode,
 				});
-				setModalMode('make');
-				dispatch(initialError());
 			}
+			dispatch(initialError());
+			setModalMode('make');
 		},
-		[modalMode, joinName]
+		[modalMode]
 	);
 	// 모달 모드 분리
 	const onMakeTeamTime = useCallback(() => {
@@ -152,8 +157,16 @@ export default function TeamList() {
 								},
 							]}
 						>
-							<View style={styles.rowCircle} />
-							<Text style={styles.teamTitle}>{item.name}</Text>
+							<View
+								style={[styles.rowCircle, { backgroundColor: item.color }]}
+							/>
+							<Text
+								numberOfLines={1}
+								ellipsizeMode="tail"
+								style={styles.teamTitle}
+							>
+								{item.name}
+							</Text>
 							<Icons size={15} name="right" style={styles.iconStyle} />
 						</TouchableView>
 					)}
@@ -195,6 +208,8 @@ export default function TeamList() {
 					postTeamError={postTeamError}
 					joinTeamError={joinTeamError}
 					joinUri={joinUri}
+					loadingChangeColor={loadingChangeColor}
+					joinName={joinName}
 				/>
 			</View>
 
@@ -265,6 +280,8 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		letterSpacing: -0.5,
 		left: 70,
+		overflow: 'hidden',
+		maxWidth: 230,
 	},
 	iconStyle: {
 		position: 'absolute',
