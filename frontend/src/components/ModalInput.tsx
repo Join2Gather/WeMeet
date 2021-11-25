@@ -33,9 +33,11 @@ interface props {
 	modalMode: string;
 	setModalMode: React.Dispatch<React.SetStateAction<string>>;
 	loadingJoin: string[];
+	loadingChangeColor: string[];
 	joinTeamError: boolean;
 	postTeamError: boolean;
 	joinUri: string;
+	joinName: string;
 }
 
 export function ModalInput({
@@ -47,59 +49,68 @@ export function ModalInput({
 	goTeamTime,
 	modalMode,
 	loadingJoin,
+	loadingChangeColor,
 	joinTeamError,
 	joinUri,
 	postTeamError,
 	setModalMode,
+	joinName,
 }: props) {
 	const dispatch = useDispatch();
 	// const [name, setName] = useState('2ff148e7-05b9-461e-a2c2-1d3ccce16ba9');
-	const [name, setName] = useState('');
+	const [name, setName] = useState('ea55df07-e437-4ce4-baf7-29ee28aa579d');
 	const [mode, setMode] = useState('1');
-	const [color, setColor] = useState('');
+	const [color, setColor] = useState(Colors.red500);
 
 	// useEffect
 	useEffect(() => {
-		if (joinTeamError) {
-			setMode('joinError');
-		} else if (postTeamError) {
-			setMode('makeError');
-		}
-	}, [joinTeamError, postTeamError]);
+		if (joinTeamError) setMode('joinError');
+		else if (mode === 'loading' && modalMode === 'join') setMode('3');
 
+		if (postTeamError) setMode('makeError');
+		else if (mode === 'loading' && modalMode === 'make') setMode('2');
+	}, [joinTeamError, postTeamError, mode, modalMode]);
 	// useCallback
 	const onChangeInput = useCallback(() => {
 		if (mode === '1') {
 			dispatch(initialError());
 			if (modalMode === 'join') {
 				dispatch(joinTeam({ id: id, token: token, user: user, uri: name }));
-				setMode('3');
-			} else {
-				// make
+				setMode('loading');
+			} else if (modalMode === 'make') {
 				dispatch(inputTeamName(name));
 				dispatch(postTeamName({ user, id, name, token }));
-				setMode('2');
+				setTimeout(() => {
+					setMode('loading');
+				}, 1000);
 			}
 		} else if (mode === '2') {
-			dispatch(getColor(color));
+			// dispatch(getColor(color));
 			goTeamTime(name);
 			dispatch(changeColor({ color, id, token, uri: joinUri, user }));
 			setMode('1');
 			setModalVisible(false);
 			dispatch(getUserMe({ id, token, user }));
-			setName('');
 		}
-	}, [name, modalMode, color, id, token, joinUri, user]);
+		setName('');
+	}, [name, modalMode, mode, color, id, token, joinUri, user]);
 	const onCloseError = useCallback(() => {
 		setMode('1');
+		dispatch(initialError());
 		setModalVisible(false);
 	}, []);
 	const onPressClose = useCallback(() => {
 		setModalMode('make');
+		dispatch(initialError());
 		setModalVisible(false);
 		setMode('1');
 	}, []);
-
+	const onMoveTeamTime = useCallback(() => {
+		setModalVisible(false);
+		setMode('1');
+		setModalMode('make');
+		goTeamTime(joinName);
+	}, [joinName]);
 	return (
 		<Modal
 			animationType="fade"
@@ -112,7 +123,6 @@ export function ModalInput({
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
 					{loadingJoin && <ActivityIndicator size="large" />}
-
 					{!loadingJoin && (
 						<View
 							style={[
@@ -211,7 +221,7 @@ export function ModalInput({
 						</>
 					)}
 					{mode === '3' && (
-						<Text style={styles.titleText}>
+						<Text style={[styles.titleText, { fontSize: 18 }]}>
 							🎉 모임에 참여가 완료 되었습니다 {'\n'} 가능한 시간을 입력해주세요
 						</Text>
 					)}
@@ -221,7 +231,11 @@ export function ModalInput({
 							underlayColor={Colors.grey200}
 							style={styles.closeButtonStyle}
 							onPress={() => {
-								joinTeamError ? onCloseError() : onChangeInput();
+								joinTeamError
+									? onCloseError()
+									: mode === '3'
+									? onMoveTeamTime()
+									: onChangeInput();
 							}}
 						>
 							<Text style={styles.buttonText}>확인</Text>

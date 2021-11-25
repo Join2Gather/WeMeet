@@ -3,7 +3,7 @@ import createRequestSaga from '../hooks/createRequestSaga';
 import * as api from '../lib/api/login';
 import { takeLatest } from 'redux-saga/effects';
 import { createAction } from 'redux-actions';
-import type { Login, userMeAPI } from '../interface';
+import type { kakaoLoginAPI, Login, userMeAPI } from '../interface';
 
 const initialState: Login = {
 	id: 0,
@@ -33,7 +33,7 @@ export const loginSlice = createSlice({
 	name: 'login',
 	initialState,
 	reducers: {
-		getSocialLogin: (state, action: PayloadAction<Login>) => {
+		getSocialLogin: (state, action: PayloadAction<kakaoLoginAPI>) => {
 			state.id = action.payload.id;
 			state.name = action.payload.name;
 			state.user = action.payload.user;
@@ -42,7 +42,7 @@ export const loginSlice = createSlice({
 			state.clubs.map((club) => {
 				club.name = decodeURIComponent(club.name);
 			});
-			state.kakaoDates = action.payload.kakaoDates[0];
+			state.kakaoDates = action.payload.kakaoDates;
 		},
 		findURI: (state, action: PayloadAction<string>) => {
 			const data = state.clubs.find((club) => club.name === action.payload);
@@ -65,10 +65,14 @@ export const loginSlice = createSlice({
 		putURI: (state, action: PayloadAction<string>) => {
 			state.uri = action.payload;
 		},
+		makeGroupColor: (state, action: PayloadAction<string>) => {
+			state.color = action.payload;
+		},
 	},
 	extraReducers: {},
 });
 
-export const { getSocialLogin, findURI, putURI } = loginSlice.actions;
+export const { getSocialLogin, findURI, putURI, makeGroupColor } =
+	loginSlice.actions;
 
 export default loginSlice.reducer;

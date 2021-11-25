@@ -40,11 +40,15 @@ export default function Login() {
 			console.log('없음');
 		}
 	}, [name]);
-	const onPressSocial = useCallback(async (social: any) => {
-		setSocialModalVisible(true);
-		setSource(`${clientBaseURL}accounts/kakao/login`);
-		//setSource(`http://localhost:8000/accounts/kakao/login`);
-	}, []);
+	const onPressSocial = useCallback(
+		async (social: any) => {
+			setSocialModalVisible(true);
+
+			setSource(`${clientBaseURL}accounts/kakao/login`);
+			//setSource(`http://localhost:8000/accounts/kakao/login`);
+		},
+		[clientBaseURL]
+	);
 	const onCloseSocial = useCallback(async () => {
 		setSocialModalVisible(false);
 	}, []);

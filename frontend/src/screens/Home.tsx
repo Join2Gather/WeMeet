@@ -43,21 +43,18 @@ export default function Home() {
 	const navigation = useNavigation();
 
 	const [scrollEnabled] = useScrollEnabled();
-	const [people, setPeople] = useState([]);
 	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [selectModalVisible, setSelectModalVisible] = useState(false);
 	const flatListRef = useRef<FlatList | null>(null);
-	const addTimetable = useCallback(() => {
-		// navigation.navigate('')
-	}, []);
+
 	// image picker
 	const [image, setImage] = useState(null);
 	const [mode, setMode] = useState('0');
 	const onPressPlus = useCallback(() => {
 		setMode('1');
 	}, []);
-	const [day, setDay] = useState('');
+
 	// modal
 
 	useEffect(() => {
@@ -157,7 +154,7 @@ export default function Home() {
 						setMode={setMode}
 						individualDates={individualDates}
 						isGroup={false}
-					></Timetable>
+					/>
 					<ModalSelect
 						selectModalVisible={selectModalVisible}
 						setSelectModalVisible={setSelectModalVisible}
