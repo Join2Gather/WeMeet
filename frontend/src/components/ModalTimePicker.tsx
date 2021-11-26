@@ -26,6 +26,7 @@ import dayjs from 'dayjs';
 import { Colors } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { App } from './Time';
+import { useIsDarkMode } from '../hooks';
 interface props {
 	modalVisible: boolean;
 	setModalVisible: React.Dispatch<React.SetStateAction<boolean>> | null;
@@ -71,7 +72,7 @@ export function ModalTimePicker({
 
 	const [minute, setMinute] = useState(0);
 	const [hour, setHour] = useState(0);
-
+	const { isDark } = useIsDarkMode();
 	// useEffect(() => {
 	// 	console.log(start);
 	// 	date.setHours(start);
@@ -194,7 +195,7 @@ export function ModalTimePicker({
 			date={date}
 			// isDarkModeEnabled={false}
 			onChange={(date) => setDate(date)}
-			textColor={Colors.black}
+			textColor={isDark ? Colors.white : Colors.black}
 			onConfirm={onPressConfirm}
 			onCancel={onPressClose}
 		/>
