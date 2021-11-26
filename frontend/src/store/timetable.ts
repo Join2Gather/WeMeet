@@ -196,6 +196,8 @@ export const timetableSlice = createSlice({
 									state.dates[idx].times[i][j].isEveryTime = false;
 									state.dates[idx].times[i][j].isPicked = true;
 									state.dates[idx].times[i][j].mode = 'start';
+									state.dates[idx].times[i][j].borderTop = false;
+									state.dates[idx].times[i][j].borderBottom = false;
 								}
 							} else if (i === d.end_hours) {
 								for (let j = 0; j < endMinute; j++) {
@@ -203,12 +205,16 @@ export const timetableSlice = createSlice({
 									state.dates[idx].times[i][j].isEveryTime = false;
 									state.dates[idx].times[i][j].isPicked = true;
 									state.dates[idx].times[i][j].mode = 'start';
+									state.dates[idx].times[i][j].borderTop = false;
+									state.dates[idx].times[i][j].borderBottom = false;
 								}
 							} else {
 								for (let j = 0; j <= 6; j++) {
 									state.dates[idx].times[i][j].color = Colors.grey400;
 									state.dates[idx].times[i][j].isEveryTime = false;
 									state.dates[idx].times[i][j].isPicked = true;
+									state.dates[idx].times[i][j].borderTop = false;
+									state.dates[idx].times[i][j].borderBottom = false;
 								}
 							}
 						}
