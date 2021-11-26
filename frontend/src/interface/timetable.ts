@@ -120,6 +120,8 @@ export interface timeProps {
 	minute: number;
 	borderWidth: number;
 	borderColor: string;
+	borderTop: boolean;
+	borderBottom: boolean;
 }
 
 export interface postIndividualDates {

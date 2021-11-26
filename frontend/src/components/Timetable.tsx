@@ -28,6 +28,7 @@ import { ModalTimePicker } from './ModalTimePicker';
 const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 const boxHeight = 28;
+const lastBox = 25;
 
 interface props {
 	mode: string;
@@ -175,9 +176,6 @@ export function Timetable({
 											style={[
 												styles.boxView,
 												{
-													borderBottomWidth: Number(time) === 27 ? 0.2 : 0,
-													borderLeftWidth: Number(time) === 27 ? 0 : 0.2,
-													borderRightWidth: Number(time) === 27 ? 0 : 0.2,
 													// borderTopWidth: Number(time) === 26 ? 10 : 0.2,
 												},
 											]}
@@ -187,14 +185,28 @@ export function Timetable({
 													onSetStartHour(idx, Number(time), day.day);
 											}}
 										>
-											{day.times[time].map((t) => (
+											{day.times[time].map((t, tIdx) => (
 												<View
 													key={t.minute}
 													style={{
 														backgroundColor: t.color,
-														height: boxHeight / 7,
+														height: boxHeight / 6,
+														borderTopWidth:
+															Number(time) === lastBox - 1
+																? 0.2
+																: t.borderBottom
+																? 0.2
+																: 0,
+														borderBottomWidth:
+															Number(time) === lastBox - 2 && tIdx === 5
+																? 0.2
+																: 0,
+														borderLeftWidth:
+															Number(time) === lastBox - 1 ? 0 : 0.2,
+														borderRightWidth:
+															Number(time) === lastBox - 1 ? 0 : 0.2,
 													}}
-												></View>
+												/>
 											))}
 										</TouchableView>
 									))}
@@ -207,25 +219,32 @@ export function Timetable({
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
 										<TouchableView
-											style={[
-												styles.boxView,
-												{
-													borderBottomWidth: Number(time) === 27 ? 0.2 : 0,
-													borderLeftWidth: Number(time) === 27 ? 0 : 0.2,
-													borderRightWidth: Number(time) === 27 ? 0 : 0.2,
-												},
-											]}
+											style={[styles.boxView]}
 											key={time}
 											onPress={() => console.log(time)}
 										>
-											{day.times[time].map((t) => (
+											{day.times[time].map((t, tIdx) => (
 												<View
 													key={t.minute}
 													style={{
 														backgroundColor: t.color,
-														height: boxHeight / 7,
+														height: boxHeight / 6,
+														borderTopWidth:
+															Number(time) === lastBox - 1
+																? 0.2
+																: t.borderBottom
+																? 0.2
+																: 0,
+														borderBottomWidth:
+															Number(time) === lastBox - 2 && tIdx === 5
+																? 0.2
+																: 0,
+														borderLeftWidth:
+															Number(time) === lastBox - 1 ? 0 : 0.2,
+														borderRightWidth:
+															Number(time) === lastBox - 1 ? 0 : 0.2,
 													}}
-												></View>
+												/>
 											))}
 										</TouchableView>
 									))}
@@ -238,28 +257,35 @@ export function Timetable({
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
 										<TouchableView
-											style={[
-												styles.boxView,
-												{
-													borderBottomWidth: Number(time) === 27 ? 0.2 : 0,
-													borderLeftWidth: Number(time) === 27 ? 0 : 0.2,
-													borderRightWidth: Number(time) === 27 ? 0 : 0.2,
-												},
-											]}
+											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
 												mode === 'normal' &&
 													onSetStartHour(idx, Number(time), day.day);
 											}}
 										>
-											{day.times[time].map((t) => (
+											{day.times[time].map((t, tIdx) => (
 												<View
 													key={t.minute}
 													style={{
 														backgroundColor: t.color,
-														height: boxHeight / 7,
+														height: boxHeight / 6,
+														borderTopWidth:
+															Number(time) === lastBox - 1
+																? 0.2
+																: t.borderBottom
+																? 0.2
+																: 0,
+														borderBottomWidth:
+															Number(time) === lastBox - 2 && tIdx === 5
+																? 0.2
+																: 0,
+														borderLeftWidth:
+															Number(time) === lastBox - 1 ? 0 : 0.2,
+														borderRightWidth:
+															Number(time) === lastBox - 1 ? 0 : 0.2,
 													}}
-												></View>
+												/>
 											))}
 										</TouchableView>
 									))}
@@ -356,7 +382,7 @@ const styles = StyleSheet.create({
 		// marginLeft: 10,
 		width: 41,
 		// flex: 3,
-		borderWidth: 0.2,
+		// borderWidth: 0.2,
 		// borderBottomWidth: 10,
 		// borderBottomColor: Colors.red800,
 		// borderColor: Colors.blue900,

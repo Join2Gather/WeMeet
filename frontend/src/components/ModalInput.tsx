@@ -21,7 +21,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import Material from 'react-native-vector-icons/MaterialIcons';
-import { getUserMe } from '../store/login';
+import { findURI, getUserMe } from '../store/login';
 import { getColor } from '../store/timetable';
 interface props {
 	modalVisible: boolean;
@@ -58,7 +58,7 @@ export function ModalInput({
 }: props) {
 	const dispatch = useDispatch();
 	// const [name, setName] = useState('2ff148e7-05b9-461e-a2c2-1d3ccce16ba9');
-	const [name, setName] = useState('ea55df07-e437-4ce4-baf7-29ee28aa579d');
+	const [name, setName] = useState('');
 	const [mode, setMode] = useState('1');
 	const [color, setColor] = useState(Colors.red500);
 
@@ -66,7 +66,6 @@ export function ModalInput({
 	useEffect(() => {
 		if (joinTeamError) setMode('joinError');
 		else if (mode === 'loading' && modalMode === 'join') setMode('3');
-
 		if (postTeamError) setMode('makeError');
 		else if (mode === 'loading' && modalMode === 'make') setMode('2');
 	}, [joinTeamError, postTeamError, mode, modalMode]);
@@ -85,15 +84,16 @@ export function ModalInput({
 				}, 1000);
 			}
 		} else if (mode === '2') {
-			// dispatch(getColor(color));
 			goTeamTime(name);
 			dispatch(changeColor({ color, id, token, uri: joinUri, user }));
 			setMode('1');
 			setModalVisible(false);
 			dispatch(getUserMe({ id, token, user }));
+			dispatch(findURI(name));
+			setColor(Colors.red500);
 		}
-		setName('');
 	}, [name, modalMode, mode, color, id, token, joinUri, user]);
+
 	const onCloseError = useCallback(() => {
 		setMode('1');
 		dispatch(initialError());

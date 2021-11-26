@@ -180,7 +180,7 @@ export default function TeamTime({ route }: Props) {
 
 					<View style={styles.viewHeight}>
 						<View style={styles.rowButtonView}>
-							<Spinner loading={isGroup ? loadingGroup : loadingIndividual} />
+							<Spinner loading={loadingIndividual} />
 							{mode === 'normal' && (
 								<View style={{ flexDirection: 'column' }}>
 									<View

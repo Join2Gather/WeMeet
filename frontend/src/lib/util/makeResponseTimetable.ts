@@ -15,6 +15,8 @@ export function makeIndividualTimetable(state: timetable) {
 						state.dates[idx].times[i][j].isEveryTime = false;
 						state.dates[idx].times[i][j].isPicked = true;
 						state.dates[idx].times[i][j].mode = 'start';
+						state.dates[idx].times[i][j].borderTop = false;
+						state.dates[idx].times[i][j].borderBottom = false;
 					}
 				} else if (i === d.end_hours) {
 					for (let j = 0; j <= endMinute; j++) {
@@ -22,12 +24,16 @@ export function makeIndividualTimetable(state: timetable) {
 						state.dates[idx].times[i][j].isEveryTime = false;
 						state.dates[idx].times[i][j].isPicked = true;
 						state.dates[idx].times[i][j].mode = 'start';
+						state.dates[idx].times[i][j].borderTop = false;
+						state.dates[idx].times[i][j].borderBottom = false;
 					}
 				} else {
 					for (let j = 0; j <= 6; j++) {
 						state.dates[idx].times[i][j].color = state.color;
 						state.dates[idx].times[i][j].isEveryTime = false;
 						state.dates[idx].times[i][j].isPicked = true;
+						state.dates[idx].times[i][j].borderTop = false;
+						state.dates[idx].times[i][j].borderBottom = false;
 					}
 				}
 			}
@@ -55,6 +61,8 @@ export function makeGroupTimeTableWith60(state: timetable) {
 							state.teamDatesWith60[idx].times[i][j].isEveryTime = false;
 							state.teamDatesWith60[idx].times[i][j].isPicked = true;
 							state.teamDatesWith60[idx].times[i][j].mode = 'start';
+							state.teamDatesWith60[idx].times[i][j].borderTop = false;
+							state.teamDatesWith60[idx].times[i][j].borderBottom = false;
 						}
 					} else if (i === d.end_hours) {
 						for (let j = 0; j <= endMinute; j++) {
@@ -64,6 +72,8 @@ export function makeGroupTimeTableWith60(state: timetable) {
 							state.teamDatesWith60[idx].times[i][j].isEveryTime = false;
 							state.teamDatesWith60[idx].times[i][j].isPicked = true;
 							state.teamDatesWith60[idx].times[i][j].mode = 'start';
+							state.teamDatesWith60[idx].times[i][j].borderTop = false;
+							state.teamDatesWith60[idx].times[i][j].borderBottom = false;
 						}
 					} else {
 						for (let j = 0; j <= 6; j++) {
@@ -71,7 +81,8 @@ export function makeGroupTimeTableWith60(state: timetable) {
 								j
 							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
 							state.teamDatesWith60[idx].times[i][j].isEveryTime = false;
-							state.teamDatesWith60[idx].times[i][j].isPicked = true;
+							state.teamDatesWith60[idx].times[i][j].borderTop = false;
+							state.teamDatesWith60[idx].times[i][j].borderBottom = false;
 						}
 					}
 				}
