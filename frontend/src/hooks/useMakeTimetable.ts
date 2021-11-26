@@ -35,17 +35,33 @@ export function useMakeTimeTableWith60() {
 	};
 	const timesText: Array<string> = [];
 
-	for (let i = 0; i <= 24; i++) {
+	for (let i = 0; i < 24; i++) {
 		for (let j = 0; j <= 60; j += 10) {
-			times[i].push({
-				color: Colors.white,
-				isPicked: false,
-				mode: 'normal',
-				isEveryTime: false,
-				minute: j,
-				borderWidth: 0.2,
-				borderColor: Colors.black,
-			});
+			if (j === 0 || j === 60) {
+				times[i].push({
+					color: Colors.white,
+					isPicked: false,
+					mode: 'normal',
+					isEveryTime: false,
+					minute: j,
+					borderWidth: 0.2,
+					borderColor: Colors.black,
+					borderBottom: true,
+					borderTop: true,
+				});
+			} else {
+				times[i].push({
+					color: Colors.white,
+					isPicked: false,
+					mode: 'normal',
+					isEveryTime: false,
+					minute: j,
+					borderWidth: 0.2,
+					borderColor: Colors.black,
+					borderBottom: false,
+					borderTop: false,
+				});
+			}
 		}
 
 		if (i <= 12) {
