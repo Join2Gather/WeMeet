@@ -84,6 +84,12 @@ export interface state_time {
 }
 
 export interface timeWith60 {
+	0: timeProps[];
+	1: timeProps[];
+	2: timeProps[];
+	3: timeProps[];
+	4: timeProps[];
+	5: timeProps[];
 	6: timeProps[];
 	7: timeProps[];
 	8: timeProps[];
@@ -103,9 +109,6 @@ export interface timeWith60 {
 	22: timeProps[];
 	23: timeProps[];
 	24: timeProps[];
-	25: timeProps[];
-	26: timeProps[];
-	27: timeProps[];
 	[prop: string]: timeProps[];
 }
 

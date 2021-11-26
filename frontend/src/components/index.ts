@@ -7,3 +7,4 @@ export * from './Timetable';
 export * from './ModalMinute';
 export * from './ModalSelect';
 export * from './Spinner';
+export * from './ModalTimePicker';

@@ -7,6 +7,12 @@ import { cloneIndividualDates } from '../store/individual';
 
 export function useMakeTimeTableWith60() {
 	const times: timeWith60 = {
+		0: [],
+		1: [],
+		2: [],
+		3: [],
+		4: [],
+		5: [],
 		6: [],
 		7: [],
 		8: [],
@@ -26,13 +32,10 @@ export function useMakeTimeTableWith60() {
 		22: [],
 		23: [],
 		24: [],
-		25: [],
-		26: [],
-		27: [],
 	};
 	const timesText: Array<string> = [];
 
-	for (let i = 6; i <= 27; i++) {
+	for (let i = 0; i <= 24; i++) {
 		for (let j = 0; j <= 60; j += 10) {
 			times[i].push({
 				color: Colors.white,
@@ -44,9 +47,11 @@ export function useMakeTimeTableWith60() {
 				borderColor: Colors.black,
 			});
 		}
+
 		if (i <= 12) {
 			if (i % 2 === 0) {
-				timesText.push(`${i} AM`);
+				if (i === 0) timesText.push('12 AM');
+				else timesText.push(`${i} AM`);
 			}
 		} else {
 			if (i % 2 === 0) {
@@ -70,7 +75,7 @@ export function useMakeTimetable() {
 	const times: Array<state_time> = [];
 	const timesText: Array<string> = [];
 
-	for (let i = 6; i <= 27; i += 1) {
+	for (let i = 0; i <= 24; i += 1) {
 		times.push({
 			time: i,
 			color: Colors.white,
@@ -83,7 +88,8 @@ export function useMakeTimetable() {
 		});
 		if (i <= 12) {
 			if (i % 2 === 0) {
-				timesText.push(`${i} AM`);
+				if (i === 0) timesText.push('12 AM');
+				else timesText.push(`${i} AM`);
 			}
 		} else if (i > 24) {
 			if (i % 2 === 0) {
