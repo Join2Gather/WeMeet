@@ -81,6 +81,9 @@ export const individualSlice = createSlice({
 												false;
 											state.individualDates[idx].times[i][j].isPicked = true;
 											state.individualDates[idx].times[i][j].mode = 'start';
+											state.individualDates[idx].times[i][j].borderBottom =
+												false;
+											state.individualDates[idx].times[i][j].borderTop = false;
 										}
 									} else if (i === d.end_hours) {
 										for (let j = 0; j < endMinute; j++) {
@@ -90,6 +93,9 @@ export const individualSlice = createSlice({
 												false;
 											state.individualDates[idx].times[i][j].isPicked = true;
 											state.individualDates[idx].times[i][j].mode = 'start';
+											state.individualDates[idx].times[i][j].borderBottom =
+												false;
+											state.individualDates[idx].times[i][j].borderTop = false;
 										}
 									} else {
 										for (let j = 0; j <= 6; j++) {
@@ -98,6 +104,9 @@ export const individualSlice = createSlice({
 											state.individualDates[idx].times[i][j].isEveryTime =
 												false;
 											state.individualDates[idx].times[i][j].isPicked = true;
+											state.individualDates[idx].times[i][j].borderBottom =
+												false;
+											state.individualDates[idx].times[i][j].borderTop = false;
 										}
 									}
 								}
@@ -123,6 +132,7 @@ export const individualSlice = createSlice({
 									state.individualDates[idx].times[i][j].isEveryTime = false;
 									state.individualDates[idx].times[i][j].isPicked = true;
 									state.individualDates[idx].times[i][j].mode = 'start';
+									state.individualDates[idx].times[i][j].borderBottom = false;
 								}
 							} else if (i === d.end_hours) {
 								for (let j = 0; j < endMinute; j++) {
@@ -130,12 +140,15 @@ export const individualSlice = createSlice({
 									state.individualDates[idx].times[i][j].isEveryTime = false;
 									state.individualDates[idx].times[i][j].isPicked = true;
 									state.individualDates[idx].times[i][j].mode = 'start';
+									state.individualDates[idx].times[i][j].borderTop = false;
 								}
 							} else {
 								for (let j = 0; j <= 6; j++) {
 									state.individualDates[idx].times[i][j].color = Colors.grey400;
 									state.individualDates[idx].times[i][j].isEveryTime = false;
 									state.individualDates[idx].times[i][j].isPicked = true;
+									state.individualDates[idx].times[i][j].borderTop = false;
+									state.individualDates[idx].times[i][j].borderBottom = false;
 								}
 							}
 						}
