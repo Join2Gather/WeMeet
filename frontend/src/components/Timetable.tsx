@@ -24,7 +24,7 @@ import type { make_days, make60 } from '../interface';
 import { View, Text, TouchableView } from '../theme';
 import { RootState } from '../store';
 import { kakaoLogin } from '../store/individual';
-
+import { ModalTimePicker } from './ModalTimePicker';
 const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 const boxHeight = 28;
@@ -84,6 +84,9 @@ export function Timetable({
 		})
 	);
 	const dispatch = useDispatch();
+
+	const [date, setDate] = useState<Date>(new Date());
+
 	// 최초 렌더링 개인 페이지 정보 받아오기
 	useEffect(() => {
 		if (!loadingJoin && !joinTeamError) {
@@ -107,6 +110,8 @@ export function Timetable({
 	const onSetStartHour = useCallback(
 		(idx: number, time: number, day: string) => {
 			dispatch(setStartHour(time));
+			date.setHours(time);
+			setDate(new Date(date));
 			setMode('startMinute');
 			setStart(time);
 			setModalVisible && setModalVisible(true);
@@ -114,7 +119,7 @@ export function Timetable({
 			dispatch(setDay(day));
 			isGroup ? dispatch(checkIsExist()) : dispatch(checkIsBlank());
 		},
-		[isTimePicked, isGroup]
+		[isTimePicked, isGroup, date]
 	);
 
 	// const onMakeInitial = useCallback(() => {
@@ -263,7 +268,7 @@ export function Timetable({
 						</>
 					)}
 
-					<ModalMinute
+					{/* <ModalMinute
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
 						start={start}
@@ -280,6 +285,26 @@ export function Timetable({
 						isTimePicked={isTimePicked}
 						isGroup={isGroup}
 						confirmDates={confirmDates}
+					/> */}
+					<ModalTimePicker
+						modalVisible={modalVisible}
+						setModalVisible={setModalVisible}
+						start={start}
+						end={end}
+						mode={mode}
+						setMode={setMode}
+						id={id}
+						postIndividualDates={postIndividualDates}
+						token={token}
+						uri={uri}
+						user={user}
+						postDatesPrepare={postDatesPrepare}
+						confirmDatesPrepare={confirmDatesPrepare}
+						isTimePicked={isTimePicked}
+						isGroup={isGroup}
+						confirmDates={confirmDates}
+						date={date}
+						setDate={setDate}
 					/>
 				</View>
 			</View>
