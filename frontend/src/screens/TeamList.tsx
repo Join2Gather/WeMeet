@@ -24,11 +24,12 @@ import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { initialError, postTeamName } from '../store/team';
-import { ModalInput } from '../components';
+import { ModalInput, Spinner } from '../components';
 import { NavigationHeader } from '../theme';
 import { useLayout, useMakeTimetable } from '../hooks';
 import { cloneDates, getColor } from '../store/timetable';
 import FontAweSome from 'react-native-vector-icons/FontAwesome5';
+import Material from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getUserMe, makeGroupColor } from '../store/login';
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
@@ -46,6 +47,7 @@ export default function TeamList() {
 		loadingChangeColor,
 		teamColor,
 		joinUri,
+		loadingUserMe,
 	} = useSelector(({ login, team, loading }: RootState) => ({
 		user: login.user,
 		id: login.id,
@@ -59,6 +61,7 @@ export default function TeamList() {
 		loadingChangeColor: loading['team/CHANGE_COLOR'],
 		teamColor: team.teamColor,
 		joinUri: team.joinUri,
+		loadingUserMe: loading['login/USER_ME'],
 	}));
 	const [dimensions, setDimensions] = useState({ window, screen });
 	const [modalMode, setModalMode] = useState('make');
@@ -112,11 +115,23 @@ export default function TeamList() {
 		setModalMode('join');
 		setModalVisible(true);
 	}, []);
+	const onReload = useCallback(() => {
+		dispatch(getUserMe({ id, user, token }));
+	}, []);
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }}>
 			<View style={[styles.view, { opacity: modalVisible ? 0.2 : 1 }]}>
 				<NavigationHeader
 					title="모임 목록"
+					Left={() => (
+						<Material
+							name="reload"
+							size={25}
+							color={Colors.white}
+							style={{ paddingTop: 1 }}
+							onPress={onReload}
+						/>
+					)}
 					Right={() => (
 						<FontAweSome
 							name="plus"
@@ -139,6 +154,7 @@ export default function TeamList() {
 						<Text style={styles.teamTitle}>아직 아무런 모임이 없네요 😭</Text>
 					</TouchableView>
 				)}
+				<Spinner loading={loadingUserMe} />
 				<FlatList
 					style={{
 						height: dimensions.screen.height * 0.55,
