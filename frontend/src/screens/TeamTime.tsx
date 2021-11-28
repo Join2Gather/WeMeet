@@ -28,6 +28,7 @@ import {
 	setEndMin,
 	setStartHour,
 	setStartMin,
+	setTimeMode,
 } from '../store/timetable';
 import { RootState } from '../store';
 import { findURI, putURI } from '../store/login';
@@ -63,6 +64,9 @@ export default function TeamTime({ route }: Props) {
 		joinTeamError,
 		error,
 		isTimePicked,
+		startHour,
+		endHour,
+		makeReady,
 	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
 		uri: login.uri,
 		color: login.color,
@@ -77,6 +81,9 @@ export default function TeamTime({ route }: Props) {
 		joinTeamError: team.joinTeamError,
 		error: team.error,
 		isTimePicked: timetable.isTimePicked,
+		startHour: login.startHour,
+		endHour: login.endHour,
+		makeReady: timetable.makeReady,
 	}));
 	// navigation
 	const { name, id, user, token, modalMode } = route.params;
@@ -91,10 +98,13 @@ export default function TeamTime({ route }: Props) {
 	const [mode, setMode] = useState('normal');
 
 	// useEffect
+	useEffect(() => {
+		dispatch(getColor({ color, peopleCount, startHour, endHour }));
+	}, [color, peopleCount, startHour, endHour]);
 	// initial
 	useEffect(() => {
-		dispatch(makeInitialTimetable());
-	}, [name]);
+		makeReady && dispatch(makeInitialTimetable());
+	}, [name, makeReady]);
 	// URI 찾아오기 로직
 	useEffect(() => {
 		if (modalMode === 'make') dispatch(findURI(name));
@@ -106,17 +116,16 @@ export default function TeamTime({ route }: Props) {
 			navigation.navigate('TeamList');
 		}
 	}, [joinTeamError, loadingJoin, error]);
-	useEffect(() => {
-		dispatch(getColor({ color, peopleCount }));
-	}, [color, peopleCount]);
-	useEffect(() => {
-		if (color === '#FFFFFF' && uri) {
-			dispatch(changeColor({ id, uri, token, user, color: Colors.blue500 }));
-		}
-	}, [color, uri, id, token, user]);
+
+	// useEffect(() => {
+	// 	if (color === '#FFFFFF' && uri) {
+	// 		dispatch(changeColor({ id, uri, token, user, color: Colors.blue500 }));
+	// 	}
+	// }, [color, uri, id, token, user]);
 	// useCallback
 	const goLeft = useCallback(() => {
 		navigation.goBack();
+		dispatch(setTimeMode('normal'));
 	}, []);
 	const onPressPlus = useCallback(() => {
 		setMode('startMode');
