@@ -27,6 +27,9 @@ class Clubs(models.Model):
     uri = models.CharField(max_length=100)
     color = models.CharField(max_length=100, default="#FFFFFF")
 
+    starting_hour = models.IntegerField(default=9)
+    end_hour = models.IntegerField(default=22)
+
     class Meta:
         db_table = 'clubs'
         verbose_name = 'Club'

@@ -94,18 +94,20 @@ class ClubView(APIView):
             properties={
                 'name': openapi.Schema(type=openapi.TYPE_STRING, description='name of club'),
                 'color': openapi.Schema(type=openapi.TYPE_STRING, description='color of club'),
+                'starting_hours': openapi.Schema(type=openapi.TYPE_INTEGER, description='calendar starting hours'),
+                'end_hours': openapi.Schema(type=openapi.TYPE_INTEGER, description='calendar ending hours'),
             }
         ),
         responses={
             status.HTTP_200_OK: ClubsWithDateSerializer,
-            status.HTTP_404_NOT_FOUND: ErrorSerializer
+            status.HTTP_400_BAD_REQUEST: ErrorSerializer
         })
     @profile_guard
     def post(self, request: Request, user: int, profile: Any):
         name = request.data.get('name')
         color = request.data.get('color', '#FFFFFF')
         if not name:
-            return JsonResponse(ErrorSerializer({'error': 'name not found'}).data, status=status.HTTP_404_NOT_FOUND)
+            return JsonResponse(ErrorSerializer({'error': 'name not found'}).data, status=status.HTTP_400_BAD_REQUEST)
 
         uri = uuid.uuid4()
         club = Clubs.objects.create(name=name, uri=uri, color=color)
@@ -138,7 +140,7 @@ class ClubDateView(APIView):
         ),
         responses={
             status.HTTP_200_OK: ClubAvailableTimeSerializer.InterSectionSerializer,
-            status.HTTP_404_NOT_FOUND: ErrorSerializer
+            status.HTTP_400_BAD_REQUEST: ErrorSerializer
         },
     )
     @profile_guard
