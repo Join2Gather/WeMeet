@@ -187,7 +187,7 @@ class SnapshotTestCase(TestCase):
 class ClubHoursTestCase(MockRequestBaseTestCase):
 
     @given(from_model(Profiles, user=from_model(Users)), text(),
-           integers(), integers(), integers(), integers(), integers(), integers())
+           integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100))
     def test_club_starting_end_hours(self, profile: Profiles, name: str,
                                      starting_hours: int, end_hours: int, date_starting_hours: int, date_starting_minutes: int, date_end_hours: int, date_end_minutes: int):
         user = profile.user
@@ -218,10 +218,10 @@ class ClubHoursTestCase(MockRequestBaseTestCase):
         self.check_match_serializer_type(
             res, ClubView.post, status=response_status)
 
-        expected_count = int(response_status != status.HTTP_200_OK)
+        expected_count = int(response_status == status.HTTP_200_OK)
 
         clubs = Clubs.objects.filter(name=name, color=color,
-                                     starting_hour=starting_hours, end_hour=end_hours).count()
+                                     starting_hours=starting_hours, end_hours=end_hours).count()
 
         self.assertEquals(clubs, expected_count)
 

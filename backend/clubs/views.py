@@ -109,8 +109,25 @@ class ClubView(APIView):
         if not name:
             return JsonResponse(ErrorSerializer({'error': 'name not found'}).data, status=status.HTTP_400_BAD_REQUEST)
 
+        try:
+            starting_hours = int(request.data.get('starting_hours', '9'))
+            end_hours = int(request.data.get('end_hours', '22'))
+        except ValueError:
+            return JsonResponse(ErrorSerializer({'error': "can't parse hours"}).data, status=status.HTTP_400_BAD_REQUEST)
+
+        def OOB_hour(x):
+            return not (0 <= x <= 24)
+
+        if OOB_hour(starting_hours):
+            return JsonResponse(ErrorSerializer({'error': "starting_hours out of bound"}).data, status=status.HTTP_400_BAD_REQUEST)
+        if OOB_hour(end_hours):
+            return JsonResponse(ErrorSerializer({'error': "end_hours out of bound"}).data, status=status.HTTP_400_BAD_REQUEST)
+        if starting_hours >= end_hours:
+            return JsonResponse(ErrorSerializer({'error': "starting_hours must less than end_hours"}).data, status=status.HTTP_400_BAD_REQUEST)
+
         uri = uuid.uuid4()
-        club = Clubs.objects.create(name=name, uri=uri, color=color)
+        club = Clubs.objects.create(
+            name=name, uri=uri, color=color, starting_hours=starting_hours, end_hours=end_hours)
 
         # 자신의 Profile과 Club 사이의 Entry는 기본적으로 생성
 
@@ -148,6 +165,31 @@ class ClubDateView(APIView):
     def post(self, request: Request, user: int, profile: Any, uri: str, club: Any):
 
         days = {day: request.data.get(day) or [] for day in constants.week}
+
+        def OOB_hour(x):
+            return not (0 <= x <= 24)
+
+        def OOB_min(x):
+            return not (0 <= x <= 60)
+
+        club_starting_hours = club.starting_hours
+        club_end_hours = club.end_hours
+
+        for day, times in days.items():
+            for time in times:
+                starting_hours = time.get('starting_hours')
+                starting_minutes = time.get('starting_minutes')
+                end_hours = time.get('end_hours')
+                end_minutes = time.get('end_minutes')
+
+                if OOB_hour(starting_hours) or OOB_hour(end_hours) or OOB_min(starting_minutes) or OOB_min(end_minutes):
+                    return JsonResponse(ErrorSerializer({'error': f"times out of bound in {time}"}).data, status=status.HTTP_400_BAD_REQUEST)
+                if starting_hours * 60 + starting_minutes >= end_hours * 60 + end_minutes:
+                    return JsonResponse(ErrorSerializer({'error': f"starting_hours must less than end_hours, but violated in {time}"}).data, status=status.HTTP_400_BAD_REQUEST)
+                if club_starting_hours > starting_hours:
+                    return JsonResponse(ErrorSerializer({'error': f"starting_hours muss greater or equal than club starting_hours ({starting_hours}, {club_starting_hours})"}).data, status=status.HTTP_400_BAD_REQUEST)
+                if club_end_hours < end_hours:
+                    return JsonResponse(ErrorSerializer({'error': f"end_hours muss less or equal than club starting_hours ({end_hours}, {club_end_hours})"}).data, status=status.HTTP_400_BAD_REQUEST)
 
         # 기존에 있던 시간표는 delete
         ProfileDates.objects.filter(profile=profile.id, club=club.id).delete()
