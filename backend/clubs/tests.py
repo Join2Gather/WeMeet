@@ -3,10 +3,13 @@ from hypothesis.extra.django import TestCase, from_model
 from hypothesis import given
 from hypothesis.strategies import text, lists, integers
 from django.http.response import JsonResponse
-from config.tests import mock_request
+from clubs.views import ClubView, ClubDateView
+from django.contrib.auth.models import User as Users
+from config.tests import MockRequestBaseTestCase, mock_request
 from clubs.views import ClubJoinView, ClubLeaveView, ClubColorView, ClubConfirmView, ClubSnapshotView
 from config.models import Profiles, Clubs, ClubEntries, UserModel, ProfileDates, ClubSnapshots, Dates
 from rest_framework.authtoken.models import Token
+from rest_framework import status
 import uuid
 import random
 import json
@@ -179,3 +182,66 @@ class SnapshotTestCase(TestCase):
 
         snapshots = ClubSnapshots.objects.filter(club=club.id)
         self.assertFalse(snapshots.exists())
+
+
+class ClubHoursTestCase(MockRequestBaseTestCase):
+
+    @given(from_model(Profiles, user=from_model(Users)), text(),
+           integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100))
+    def test_club_starting_end_hours(self, profile: Profiles, name: str,
+                                     starting_hours: int, end_hours: int, date_starting_hours: int, date_starting_minutes: int, date_end_hours: int, date_end_minutes: int):
+        user = profile.user
+        color = ''.join(generate_color())
+
+        profile.save()
+        user.save()
+
+        token = self.get_token(user)
+
+        def OOB_hour(x):
+            return not (0 <= x <= 24)
+
+        def OOB_min(x):
+            return not (0 <= x <= 60)
+
+        res = self.mock_request(user, token, params={'user': user.id, 'profile': profile.id}, data={
+            'name': name,
+            'color': color,
+            'starting_hours': starting_hours,
+            'end_hours': end_hours
+        }, view_name='club_view', view=ClubView, mode='post')
+
+        response_status = status.HTTP_200_OK
+        if not name or OOB_hour(starting_hours) or OOB_hour(end_hours) or starting_hours >= end_hours:
+            response_status = status.HTTP_400_BAD_REQUEST
+
+        self.check_match_serializer_type(
+            res, ClubView.post, status=response_status)
+
+        expected_count = int(response_status == status.HTTP_200_OK)
+
+        clubs = Clubs.objects.filter(name=name, color=color,
+                                     starting_hours=starting_hours, end_hours=end_hours).count()
+
+        self.assertEquals(clubs, expected_count)
+
+        if expected_count == 0:
+            return
+
+        club = clubs.get()
+
+        res = self.mock_request(user, token, params={'user': user.id, 'profile': profile.id, 'uri': club.uri}, data={
+            'starting_hours': date_starting_hours,
+            'starting_minutes': date_starting_minutes,
+            'end_hours': date_end_hours,
+            'end_minutes': date_end_minutes
+        }, view_name='club_date_view', view=ClubDateView, mode='post')
+
+        response_status = status.HTTP_200_OK
+        if OOB_hour(date_starting_hours) or OOB_hour(date_end_hours) or OOB_min(date_starting_minutes) or OOB_min(date_end_minutes) \
+                or date_starting_hours * 60 + date_starting_minutes >= date_end_hours * 60 + date_end_minutes \
+                or starting_hours > date_starting_hours or end_hours < date_end_hours:
+            response_status = status.HTTP_400_BAD_REQUEST
+
+        self.check_match_serializer_type(
+            res, ClubView.post, status=response_status)
