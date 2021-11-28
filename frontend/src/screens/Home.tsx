@@ -18,20 +18,40 @@ import { Colors } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { cloneIndividualDates, postImage } from '../store/individual';
+import {
+	cloneINDates,
+	cloneIndividualDates,
+	postImage,
+} from '../store/individual';
 import { ModalSelect } from '../components';
 import * as FileSystem from 'expo-file-system';
 import { useMakeTimetable } from '../hooks';
+import { getUserMe } from '../store/login';
 
 export default function Home() {
-	const { token, individualDates, loginEveryTime, postEveryTime } = useSelector(
-		({ login, individual, loading }: RootState) => ({
-			token: login.token,
-			individualDates: individual.individualDates,
-			loginEveryTime: loading['individual/LOGIN_EVERYTIME'],
-			postEveryTime: loading['individual/POST_EVERYTIME'],
-		})
-	);
+	const {
+		token,
+		individualDates,
+		loginEveryTime,
+		postEveryTime,
+		id,
+		user,
+		userMeSuccess,
+		confirmClubs,
+		confirmDatesTimetable,
+		individualTimesText,
+	} = useSelector(({ login, individual, loading }: RootState) => ({
+		token: login.token,
+		id: login.id,
+		user: login.user,
+		individualDates: individual.individualDates,
+		loginEveryTime: loading['individual/LOGIN_EVERYTIME'],
+		postEveryTime: loading['individual/POST_EVERYTIME'],
+		userMeSuccess: login.userMeSuccess,
+		confirmClubs: login.confirmClubs,
+		confirmDatesTimetable: login.confirmDatesTimetable,
+		individualTimesText: individual.individualTimesText,
+	}));
 	const dispatch = useDispatch();
 	const { defaultDates } = useMakeTimetable();
 	useEffect(() => {
@@ -39,6 +59,12 @@ export default function Home() {
 		}
 		dispatch(cloneIndividualDates(defaultDates));
 	}, []);
+	useEffect(() => {
+		dispatch(getUserMe({ id, token, user }));
+	}, []);
+	useEffect(() => {
+		dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
+	}, [confirmClubs, confirmDatesTimetable]);
 	// navigation
 	const navigation = useNavigation();
 
@@ -48,7 +74,7 @@ export default function Home() {
 	const [selectModalVisible, setSelectModalVisible] = useState(false);
 	const flatListRef = useRef<FlatList | null>(null);
 
-	// image picker
+	// image pic1er
 	const [image, setImage] = useState(null);
 	const [mode, setMode] = useState('0');
 	const onPressPlus = useCallback(() => {
@@ -83,6 +109,7 @@ export default function Home() {
 			dispatch(postImage({ image: imagePath, token: token }));
 		}
 	};
+
 	return (
 		<SafeAreaView style={{ backgroundColor: Colors.white }}>
 			<ScrollView>
@@ -154,6 +181,7 @@ export default function Home() {
 						setMode={setMode}
 						individualDates={individualDates}
 						isGroup={false}
+						individualTimesText={individualTimesText}
 					/>
 					<ModalSelect
 						selectModalVisible={selectModalVisible}
