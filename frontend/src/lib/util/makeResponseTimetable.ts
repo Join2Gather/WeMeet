@@ -1,6 +1,6 @@
-import type { time, timetable } from '../../interface';
+import type { individual, time, timetable } from '../../interface';
 import { hexToRGB } from './hexToRGB';
-
+import { Colors } from 'react-native-paper';
 export function makeIndividualTimetable(state: timetable) {
 	state.weekIndex.map((day, idx) =>
 		state.responseIndividual[day].map((d, idxNumber) => {
@@ -88,4 +88,45 @@ export function makeGroupTimeTableWith60(state: timetable) {
 				}
 			});
 		});
+}
+
+export function makeHomeTimetable(state: individual) {
+	state.weekIndex.map(
+		(day, idx) =>
+			state.everyTime[day]?.length &&
+			state.everyTime[day]?.map((d) => {
+				const startingMinute = Math.round(d.starting_minutes / 10);
+				const endMinute = Math.round(d.end_minutes / 10);
+
+				for (let i = d.starting_hours; i <= d.end_hours; i++) {
+					if (i === d.starting_hours) {
+						for (let j = startingMinute; j <= 6; j++) {
+							state.individualDates[idx].times[i][j].color = Colors.grey400;
+							state.individualDates[idx].times[i][j].isEveryTime = false;
+							state.individualDates[idx].times[i][j].isPicked = true;
+							state.individualDates[idx].times[i][j].mode = 'start';
+							state.individualDates[idx].times[i][j].borderBottom = false;
+							state.individualDates[idx].times[i][j].borderTop = false;
+						}
+					} else if (i === d.end_hours) {
+						for (let j = 0; j < endMinute; j++) {
+							state.individualDates[idx].times[i][j].color = Colors.grey400;
+							state.individualDates[idx].times[i][j].isEveryTime = false;
+							state.individualDates[idx].times[i][j].isPicked = true;
+							state.individualDates[idx].times[i][j].mode = 'start';
+							state.individualDates[idx].times[i][j].borderBottom = false;
+							state.individualDates[idx].times[i][j].borderTop = false;
+						}
+					} else {
+						for (let j = 0; j <= 6; j++) {
+							state.individualDates[idx].times[i][j].color = Colors.grey400;
+							state.individualDates[idx].times[i][j].isEveryTime = false;
+							state.individualDates[idx].times[i][j].isPicked = true;
+							state.individualDates[idx].times[i][j].borderBottom = false;
+							state.individualDates[idx].times[i][j].borderTop = false;
+						}
+					}
+				}
+			})
+	);
 }
