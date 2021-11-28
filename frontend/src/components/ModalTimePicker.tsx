@@ -10,10 +10,12 @@ import {
 	Platform,
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
 	changeAllColor,
 	changeConfirmTime,
+	getGroupDates,
+	getIndividualDates,
 	makeConfirmDates,
 	makePostIndividualDates,
 	postConfirm,
@@ -25,13 +27,13 @@ import {
 import dayjs from 'dayjs';
 import { Colors } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { App } from './Time';
 import { useIsDarkMode } from '../hooks';
+import { RootState } from '../store';
+import { getUserMe } from '../store/login';
+import { cloneINDates, initialIndividualTimetable } from '../store/individual';
 interface props {
 	modalVisible: boolean;
 	setModalVisible: React.Dispatch<React.SetStateAction<boolean>> | null;
-	start: number;
-	end: number;
 	mode: string;
 	setMode: React.Dispatch<React.SetStateAction<string>>;
 	postDatesPrepare?: boolean;
@@ -46,13 +48,13 @@ interface props {
 	isGroup: boolean;
 	date: Date;
 	setDate: React.Dispatch<React.SetStateAction<Date>>;
+	timeMode: string;
+	joinUri: string;
 }
 
 export function ModalTimePicker({
 	modalVisible,
 	setModalVisible,
-	start,
-	end,
 	mode,
 	setMode,
 	postDatesPrepare,
@@ -67,17 +69,20 @@ export function ModalTimePicker({
 	isGroup,
 	date,
 	setDate,
+	timeMode,
+	joinUri,
 }: props) {
+	const { postConfirmSuccess, confirmClubs, confirmDatesTimetable } =
+		useSelector(({ timetable, login, team }: RootState) => ({
+			postConfirmSuccess: timetable.postConfirmSuccess,
+			confirmClubs: login.confirmClubs,
+			confirmDatesTimetable: login.confirmDatesTimetable,
+		}));
 	const dispatch = useDispatch();
 
 	const [minute, setMinute] = useState(0);
 	const [hour, setHour] = useState(0);
 	const { isDark } = useIsDarkMode();
-	// useEffect(() => {
-	// 	console.log(start);
-	// 	date.setHours(start);
-	// 	setDate(new Date(date));
-	// }, [start]);
 	const onPressConfirm = useCallback(() => {
 		const timeHour = date.getHours();
 		const timeMinute = date.getMinutes();
@@ -124,17 +129,34 @@ export function ModalTimePicker({
 	// 개인 시간 전송
 	useEffect(() => {
 		if (postDatesPrepare && uri) {
-			dispatch(
-				postIndividualTime({
-					dates: postIndividualDates,
-					id,
-					token,
-					uri,
-					user,
-				})
-			);
+			if (timeMode === 'make')
+				dispatch(
+					postIndividualTime({
+						dates: postIndividualDates,
+						id,
+						token,
+						uri: joinUri,
+						user,
+					})
+				);
+			else
+				dispatch(
+					postIndividualTime({
+						dates: postIndividualDates,
+						id,
+						token,
+						uri,
+						user,
+					})
+				);
 		} else if (confirmDatesPrepare && uri) {
-			dispatch(postConfirm({ date: confirmDates, id, token, uri, user }));
+			if (timeMode === 'make') {
+				dispatch(
+					postConfirm({ date: confirmDates, id, token, uri: joinUri, user })
+				);
+			} else {
+				dispatch(postConfirm({ date: confirmDates, id, token, uri, user }));
+			}
 		}
 	}, [
 		postDatesPrepare,
@@ -144,8 +166,18 @@ export function ModalTimePicker({
 		token,
 		user,
 		confirmDates,
+		joinUri,
+		timeMode,
 	]);
-
+	useEffect(() => {
+		if (postConfirmSuccess) {
+			dispatch(getUserMe({ id, user, token }));
+			dispatch(initialIndividualTimetable());
+		}
+	}, [postConfirmSuccess]);
+	useEffect(() => {
+		dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
+	}, [confirmClubs, confirmDatesTimetable]);
 	return (
 		// <Modal
 		// 	animationType="fade"
