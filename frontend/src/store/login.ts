@@ -17,6 +17,11 @@ const initialState: Login = {
 	color: '',
 	peopleCount: 0,
 	response: '',
+	confirmDatesTimetable: [],
+	confirmClubs: [],
+	userMeSuccess: false,
+	startHour: 0,
+	endHour: 0,
 };
 
 const USER_ME = 'login/USER_ME';
@@ -50,14 +55,31 @@ export const loginSlice = createSlice({
 				state.uri = data.uri;
 				state.color = data.color;
 				state.peopleCount = data.people_count;
+				state.startHour = data.starting_hours;
+				state.endHour = data.end_hours;
 			}
 		},
 		USER_ME_SUCCESS: (state, action: PayloadAction<any>) => {
-			state.response = action.payload;
+			state.confirmClubs = [];
+			const { clubs, dates } = action.payload;
+			const confirmDatesTimetable = dates.filter(
+				(da: any) => !da.is_temporary_reserved
+			);
+			state.confirmDatesTimetable = confirmDatesTimetable.filter(
+				(day: any) => day.club !== null
+			);
+			state.confirmDatesTimetable.forEach((day: any) => {
+				const find = clubs.find((date: any) => date.id === day.club?.id);
+				if (find) {
+					day['color'] = find.color;
+					state.confirmClubs.push(find.color);
+				}
+			});
 			state.clubs = action.payload.clubs;
 			state.clubs.map((club) => {
 				club.name = decodeURIComponent(club.name);
 			});
+			state.userMeSuccess = true;
 		},
 		USER_ME_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
