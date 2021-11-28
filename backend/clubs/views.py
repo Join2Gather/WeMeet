@@ -189,7 +189,7 @@ class ClubDateView(APIView):
                 if club_starting_hours > starting_hours:
                     return JsonResponse(ErrorSerializer({'error': f"starting_hours muss greater or equal than club starting_hours ({starting_hours}, {club_starting_hours})"}).data, status=status.HTTP_400_BAD_REQUEST)
                 if club_end_hours < end_hours:
-                    return JsonResponse(ErrorSerializer({'error': f"end_hours muss less or equal than club starting_hours ({end_hours}, {club_end_hours})"}).data, status=status.HTTP_400_BAD_REQUEST)
+                    return JsonResponse(ErrorSerializer({'error': f"end_hours muss less or equal than club end_hours ({end_hours}, {club_end_hours})"}).data, status=status.HTTP_400_BAD_REQUEST)
 
         # 기존에 있던 시간표는 delete
         ProfileDates.objects.filter(profile=profile.id, club=club.id).delete()
