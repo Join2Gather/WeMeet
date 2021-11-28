@@ -5,39 +5,14 @@ import { useEffect } from 'react';
 import { cloneDates } from '../store/timetable';
 import { cloneIndividualDates } from '../store/individual';
 
-export function useMakeTimeTableWith60() {
-	const times: timeWith60 = {
-		0: [],
-		1: [],
-		2: [],
-		3: [],
-		4: [],
-		5: [],
-		6: [],
-		7: [],
-		8: [],
-		9: [],
-		10: [],
-		11: [],
-		12: [],
-		13: [],
-		14: [],
-		15: [],
-		16: [],
-		17: [],
-		18: [],
-		19: [],
-		20: [],
-		21: [],
-		22: [],
-		23: [],
-		24: [],
-	};
+export function useMakeTimeTableWith60(startHour: number, endHour: number) {
+	const times: timeWith60 = {};
 	const timesText: Array<string> = [];
-
-	for (let i = 0; i < 24; i++) {
+	console.log(startHour, endHour);
+	for (let i = startHour; i < endHour; i++) {
+		times[i] = [];
 		for (let j = 0; j <= 60; j += 10) {
-			if (j === 0 || j === 60) {
+			if (j === 0) {
 				times[i].push({
 					color: Colors.white,
 					isPicked: false,
@@ -64,14 +39,27 @@ export function useMakeTimeTableWith60() {
 			}
 		}
 
-		if (i <= 12) {
-			if (i % 2 === 0) {
-				if (i === 0) timesText.push('12 AM');
-				else timesText.push(`${i} AM`);
+		if (startHour % 2) {
+			if (i <= 12) {
+				if ((i + 1) % 2 === 0) {
+					if (i === 0) timesText.push('12 AM');
+					else timesText.push(`${i} AM`);
+				}
+			} else {
+				if ((i + 1) % 2 === 0) {
+					timesText.push(`${i - 12} PM`);
+				}
 			}
 		} else {
-			if (i % 2 === 0) {
-				timesText.push(`${i - 12} PM`);
+			if (i <= 12) {
+				if (i % 2 === 0) {
+					if (i === 0) timesText.push('12 AM');
+					else timesText.push(`${i} AM`);
+				}
+			} else {
+				if (i % 2 === 0) {
+					timesText.push(`${i - 12} PM`);
+				}
 			}
 		}
 	}
