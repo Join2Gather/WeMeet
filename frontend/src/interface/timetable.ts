@@ -1,4 +1,8 @@
-import type { responseTime, responseEveryTime } from './individual';
+import type {
+	responseTime,
+	confirmDatesType,
+	responseEveryTime,
+} from './individual';
 export interface timetable {
 	dates: make60[];
 	teamDatesWith60: make60[];
@@ -15,6 +19,7 @@ export interface timetable {
 	postIndividualDates: postIndividualDates;
 	postDatesPrepare: boolean;
 	confirmDatesPrepare: boolean;
+	postConfirmSuccess: boolean;
 	error: string;
 	isTimePicked: boolean;
 	isTimeNotExist: boolean;
@@ -22,6 +27,13 @@ export interface timetable {
 	color: string;
 	peopleCount: number;
 	confirmDates: confirmDates;
+	timeMode: string;
+	confirmDatesTimetable: confirmDatesType[];
+	confirmClubs: Array<string>;
+	startHour: number;
+	endHour: number;
+	makeReady: boolean;
+	timesText: Array<string>;
 }
 
 export type weekIndex = Array<string>;
@@ -84,31 +96,31 @@ export interface state_time {
 }
 
 export interface timeWith60 {
-	0: timeProps[];
-	1: timeProps[];
-	2: timeProps[];
-	3: timeProps[];
-	4: timeProps[];
-	5: timeProps[];
-	6: timeProps[];
-	7: timeProps[];
-	8: timeProps[];
-	9: timeProps[];
-	10: timeProps[];
-	11: timeProps[];
-	12: timeProps[];
-	13: timeProps[];
-	14: timeProps[];
-	15: timeProps[];
-	16: timeProps[];
-	17: timeProps[];
-	18: timeProps[];
-	19: timeProps[];
-	20: timeProps[];
-	21: timeProps[];
-	22: timeProps[];
-	23: timeProps[];
-	24: timeProps[];
+	// 0: timeProps[];
+	// 1: timeProps[];
+	// 2: timeProps[];
+	// 3: timeProps[];
+	// 4: timeProps[];
+	// 5: timeProps[];
+	// 6: timeProps[];
+	// 7: timeProps[];
+	// 8: timeProps[];
+	// 9: timeProps[];
+	// 10: timeProps[];
+	// 11: timeProps[];
+	// 12: timeProps[];
+	// 13: timeProps[];
+	// 14: timeProps[];
+	// 15: timeProps[];
+	// 16: timeProps[];
+	// 17: timeProps[];
+	// 18: timeProps[];
+	// 19: timeProps[];
+	// 20: timeProps[];
+	// 21: timeProps[];
+	// 22: timeProps[];
+	// 23: timeProps[];
+	// 24: timeProps[];
 	[prop: string]: timeProps[];
 }
 

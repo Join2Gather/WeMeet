@@ -12,6 +12,7 @@ import type {
 } from '../interface';
 import { Colors } from 'react-native-paper';
 import { useMakeTimeTableWith60 } from '../hooks';
+import { makeHomeTimetable } from '../lib/util';
 
 const POST_IMAGE = 'individual/POST_IMAGE';
 const LOGIN_EVERYTIME = 'individual/LOGIN_EVERYTIME';
@@ -34,7 +35,7 @@ export function* individualSaga() {
 	yield takeLatest(POST_EVERYTIME, postEveryTimeSaga);
 }
 
-const { defaultDatesWith60 } = useMakeTimeTableWith60();
+const { defaultDatesWith60, timesText } = useMakeTimeTableWith60(0, 25);
 
 const initialState: individual = {
 	individualDates: defaultDatesWith60,
@@ -51,6 +52,9 @@ const initialState: individual = {
 	weekIndex: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
 	loginSuccess: false,
 	cloneDateSuccess: false,
+	confirmDatesTimetable: [],
+	confirmClubs: [],
+	individualTimesText: timesText,
 };
 
 export const individualSlice = createSlice({
@@ -61,57 +65,64 @@ export const individualSlice = createSlice({
 		POST_IMAGE_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
+		cloneINDates: (
+			state,
+			action: PayloadAction<{
+				confirmDatesTimetable: any;
+				confirmClubs: Array<string>;
+			}>
+		) => {
+			state.confirmClubs = action.payload.confirmClubs;
+			state.confirmDatesTimetable = action.payload.confirmDatesTimetable;
+			state.confirmDatesTimetable?.length &&
+				state.confirmDatesTimetable.map((date, dIdx) => {
+					state.weekIndex.map((day, idx) => {
+						date[day].map((d) => {
+							const startingMinute = Math.round(d.starting_minutes / 10);
+							const endMinute = Math.round(d.end_minutes / 10);
+							for (let i = d.starting_hours; i <= d.end_hours; i++) {
+								if (i === d.starting_hours) {
+									console.log('color', date.color);
+									for (let j = startingMinute; j <= 6; j++) {
+										state.individualDates[idx].times[i][j].color = date.color;
+										state.individualDates[idx].times[i][j].isEveryTime = false;
+										state.individualDates[idx].times[i][j].isPicked = true;
+										state.individualDates[idx].times[i][j].mode = 'start';
+										state.individualDates[idx].times[i][j].borderBottom = false;
+										state.individualDates[idx].times[i][j].borderTop = false;
+									}
+								} else if (i === d.end_hours) {
+									for (let j = 0; j < endMinute; j++) {
+										state.individualDates[idx].times[i][j].color = date.color;
+										state.individualDates[idx].times[i][j].isEveryTime = false;
+										state.individualDates[idx].times[i][j].isPicked = true;
+										state.individualDates[idx].times[i][j].mode = 'start';
+										state.individualDates[idx].times[i][j].borderBottom = false;
+										state.individualDates[idx].times[i][j].borderTop = false;
+									}
+								} else {
+									for (let j = 0; j <= 6; j++) {
+										state.individualDates[idx].times[i][j].color = date.color;
+										state.individualDates[idx].times[i][j].isEveryTime = false;
+										state.individualDates[idx].times[i][j].isPicked = true;
+										state.individualDates[idx].times[i][j].borderBottom = false;
+										state.individualDates[idx].times[i][j].borderTop = false;
+									}
+								}
+							}
+						});
+					});
+				});
+		},
+		initialIndividualTimetable: (state) => {
+			state.individualDates = defaultDatesWith60;
+			makeHomeTimetable(state);
+		},
 		kakaoLogin: (state, action: PayloadAction<any>) => {
 			if (state.cloneDateSuccess) {
 				if (action.payload) {
 					state.everyTime = action.payload;
-					state.weekIndex.map(
-						(day, idx) =>
-							state.everyTime[day]?.length &&
-							state.everyTime[day]?.map((d) => {
-								const startingMinute = Math.round(d.starting_minutes / 10);
-								const endMinute = Math.round(d.end_minutes / 10);
-
-								for (let i = d.starting_hours; i <= d.end_hours; i++) {
-									if (i === d.starting_hours) {
-										for (let j = startingMinute; j <= 6; j++) {
-											state.individualDates[idx].times[i][j].color =
-												Colors.grey400;
-											state.individualDates[idx].times[i][j].isEveryTime =
-												false;
-											state.individualDates[idx].times[i][j].isPicked = true;
-											state.individualDates[idx].times[i][j].mode = 'start';
-											state.individualDates[idx].times[i][j].borderBottom =
-												false;
-											state.individualDates[idx].times[i][j].borderTop = false;
-										}
-									} else if (i === d.end_hours) {
-										for (let j = 0; j < endMinute; j++) {
-											state.individualDates[idx].times[i][j].color =
-												Colors.grey400;
-											state.individualDates[idx].times[i][j].isEveryTime =
-												false;
-											state.individualDates[idx].times[i][j].isPicked = true;
-											state.individualDates[idx].times[i][j].mode = 'start';
-											state.individualDates[idx].times[i][j].borderBottom =
-												false;
-											state.individualDates[idx].times[i][j].borderTop = false;
-										}
-									} else {
-										for (let j = 0; j <= 6; j++) {
-											state.individualDates[idx].times[i][j].color =
-												Colors.grey400;
-											state.individualDates[idx].times[i][j].isEveryTime =
-												false;
-											state.individualDates[idx].times[i][j].isPicked = true;
-											state.individualDates[idx].times[i][j].borderBottom =
-												false;
-											state.individualDates[idx].times[i][j].borderTop = false;
-										}
-									}
-								}
-							})
-					);
+					makeHomeTimetable(state);
 				}
 			}
 		},
@@ -132,6 +143,7 @@ export const individualSlice = createSlice({
 									state.individualDates[idx].times[i][j].isEveryTime = false;
 									state.individualDates[idx].times[i][j].isPicked = true;
 									state.individualDates[idx].times[i][j].mode = 'start';
+									state.individualDates[idx].times[i][j].borderTop = false;
 									state.individualDates[idx].times[i][j].borderBottom = false;
 								}
 							} else if (i === d.end_hours) {
@@ -141,6 +153,7 @@ export const individualSlice = createSlice({
 									state.individualDates[idx].times[i][j].isPicked = true;
 									state.individualDates[idx].times[i][j].mode = 'start';
 									state.individualDates[idx].times[i][j].borderTop = false;
+									state.individualDates[idx].times[i][j].borderBottom = false;
 								}
 							} else {
 								for (let j = 0; j <= 6; j++) {
@@ -162,7 +175,6 @@ export const individualSlice = createSlice({
 			state.cloneDateSuccess = true;
 		},
 		POST_EVERYTIME_SUCCESS: (state, action: PayloadAction<any>) => {
-			console.log(action.payload);
 			state.loginSuccess = false;
 		},
 		POST_EVERYTIME_FAILURE: (state, action: PayloadAction<any>) => {
@@ -172,7 +184,12 @@ export const individualSlice = createSlice({
 	extraReducers: {},
 });
 
-export const { cloneIndividualDates, LOGIN_EVERYTIME_SUCCESS, kakaoLogin } =
-	individualSlice.actions;
+export const {
+	cloneIndividualDates,
+	LOGIN_EVERYTIME_SUCCESS,
+	kakaoLogin,
+	cloneINDates,
+	initialIndividualTimetable,
+} = individualSlice.actions;
 
 export default individualSlice.reducer;

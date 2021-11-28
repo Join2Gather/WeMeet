@@ -1,5 +1,5 @@
 import type { make60 } from './timetable';
-
+import type { confirmDates } from './login';
 export interface individual {
 	individualDates: make60[];
 	error: string;
@@ -7,6 +7,9 @@ export interface individual {
 	weekIndex: Array<string>;
 	loginSuccess: boolean;
 	cloneDateSuccess: boolean;
+	confirmDatesTimetable: confirmDatesType[];
+	confirmClubs: Array<string>;
+	individualTimesText: Array<string>;
 }
 
 export interface postImageAPI {
@@ -47,6 +50,18 @@ export interface responseEveryTime {
 	fri: Array<responseTime>;
 	sat: Array<responseTime>;
 	[prop: string]: responseTime[];
+}
+
+export interface confirmDatesType {
+	sun: Array<responseTime>;
+	mon: Array<responseTime>;
+	tue: Array<responseTime>;
+	wed: Array<responseTime>;
+	thu: Array<responseTime>;
+	fri: Array<responseTime>;
+	sat: Array<responseTime>;
+	color: string;
+	[prop: string]: any;
 }
 
 export interface responseTime {

@@ -15,6 +15,7 @@ import { takeLatest } from '@redux-saga/core/effects';
 import { useMakeTimetable, useMakeTimeTableWith60 } from '../hooks';
 import { Alert } from 'react-native';
 import { makeGroupTimeTableWith60, makeIndividualTimetable } from '../lib/util';
+import { confirmDates } from '../interface/timetable';
 
 const GET_INDIVIDUAL = 'timetable/GET_INDIVIDUAL';
 const GET_GROUP = 'timetable/GET_GROUP';
@@ -58,11 +59,11 @@ export function* timetableSaga() {
 }
 
 const { defaultDates } = useMakeTimetable();
-const { defaultDatesWith60 } = useMakeTimeTableWith60();
+const { defaultDatesWith60 } = useMakeTimeTableWith60(0, 23);
 
 const initialState: timetable = {
-	dates: defaultDatesWith60,
-	teamDatesWith60: defaultDatesWith60,
+	dates: [],
+	teamDatesWith60: [],
 	startTime: 0.0,
 	endTime: 0.0,
 	selectTime: {
@@ -159,6 +160,14 @@ const initialState: timetable = {
 	isTimeNotExist: false,
 	color: '',
 	peopleCount: 0,
+	postConfirmSuccess: false,
+	timeMode: 'normal',
+	confirmClubs: [],
+	confirmDatesTimetable: [],
+	startHour: 0,
+	endHour: 0,
+	makeReady: false,
+	timesText: [],
 };
 
 export const timetableSlice = createSlice({
@@ -166,8 +175,11 @@ export const timetableSlice = createSlice({
 	initialState,
 	reducers: {
 		makeInitialTimetable: (state) => {
+			const { defaultDatesWith60, timesText } = useMakeTimeTableWith60(
+				state.startHour,
+				state.endHour
+			);
 			state.dates = defaultDatesWith60;
-
 			state.teamDatesWith60 = defaultDatesWith60;
 			state.postIndividualDates = {
 				sun: [],
@@ -178,9 +190,66 @@ export const timetableSlice = createSlice({
 				fri: [],
 				sat: [],
 			};
+			state.timesText = timesText;
+			state.makeReady = false;
 		},
-
+		getOtherConfirmDates: (
+			state,
+			action: PayloadAction<{
+				confirmDatesTimetable: any;
+				confirmClubs: Array<string>;
+			}>
+		) => {
+			state.confirmClubs = action.payload.confirmClubs;
+			state.confirmDatesTimetable = action.payload.confirmDatesTimetable;
+			state.confirmDatesTimetable.map((date, dIdx) => {
+				state.weekIndex.map((day, idx) => {
+					date[day].map((d) => {
+						const startingMinute = Math.round(d.starting_minutes / 10);
+						const endMinute = Math.round(d.end_minutes / 10);
+						for (let i = d.starting_hours; i <= d.end_hours; i++) {
+							if (i === d.starting_hours) {
+								for (let j = startingMinute; j <= 6; j++) {
+									state.dates[idx].times[i][j].color = date.color;
+									state.dates[idx].times[i][j].isEveryTime = false;
+									state.dates[idx].times[i][j].isPicked = true;
+									state.dates[idx].times[i][j].mode = 'start';
+									state.dates[idx].times[i][j].borderBottom = false;
+									state.dates[idx].times[i][j].borderTop = false;
+								}
+							} else if (i === d.end_hours) {
+								for (let j = 0; j < endMinute; j++) {
+									state.dates[idx].times[i][j].color = date.color;
+									state.dates[idx].times[i][j].isEveryTime = false;
+									state.dates[idx].times[i][j].isPicked = true;
+									state.dates[idx].times[i][j].mode = 'start';
+									state.dates[idx].times[i][j].borderBottom = false;
+									state.dates[idx].times[i][j].borderTop = false;
+								}
+							} else {
+								for (let j = 0; j <= 6; j++) {
+									state.dates[idx].times[i][j].color = date.color;
+									state.dates[idx].times[i][j].isEveryTime = false;
+									state.dates[idx].times[i][j].isPicked = true;
+									state.dates[idx].times[i][j].borderBottom = false;
+									state.dates[idx].times[i][j].borderTop = false;
+								}
+							}
+						}
+					});
+				});
+			});
+		},
 		GET_INDIVIDUAL_SUCCESS: (state, action: PayloadAction<any>) => {
+			state.responseIndividual = {
+				sun: [],
+				mon: [],
+				tue: [],
+				wed: [],
+				thu: [],
+				fri: [],
+				sat: [],
+			};
 			state.responseIndividual = action.payload;
 			makeIndividualTimetable(state);
 			if (state.everyTime) {
@@ -188,7 +257,6 @@ export const timetableSlice = createSlice({
 					state.everyTime[day].map((d) => {
 						const startingMinute = Math.round(d.starting_minutes / 10);
 						const endMinute = Math.round(d.end_minutes / 10);
-						console.log(startingMinute, endMinute);
 						for (let i = d.starting_hours; i <= d.end_hours; i++) {
 							if (i === d.starting_hours) {
 								for (let j = startingMinute; j <= 6; j++) {
@@ -227,6 +295,7 @@ export const timetableSlice = createSlice({
 		},
 		GET_GROUP_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.responseGroup = action.payload;
+
 			// makeGroupTimetable(state);
 			makeGroupTimeTableWith60(state);
 		},
@@ -242,8 +311,11 @@ export const timetableSlice = createSlice({
 			state.error = action.payload;
 		},
 		POST_CONFIRM_SUCCESS: (state, action: PayloadAction<any>) => {
-			console.log(action.payload);
 			state.confirmDatesPrepare = false;
+			state.postConfirmSuccess = true;
+		},
+		postConfirmMakeFalse: (state) => {
+			state.postConfirmSuccess = false;
 		},
 		POST_CONFIRM_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
@@ -399,19 +471,25 @@ export const timetableSlice = createSlice({
 							state.dates[state.dayIdx].times[i][j].isEveryTime = false;
 							state.dates[state.dayIdx].times[i][j].isPicked = true;
 							state.dates[state.dayIdx].times[i][j].mode = 'start';
+							state.dates[state.dayIdx].times[i][j].borderBottom = false;
+							state.dates[state.dayIdx].times[i][j].borderTop = false;
 						}
 					} else if (i === state.endTime) {
 						for (let j = 0; j <= endMinute; j++) {
 							state.dates[state.dayIdx].times[i][j].color = state.color;
 							state.dates[state.dayIdx].times[i][j].isEveryTime = false;
 							state.dates[state.dayIdx].times[i][j].isPicked = true;
-							state.dates[state.dayIdx].times[i][j].mode = 'start';
+							state.dates[state.dayIdx].times[i][j].mode = 'end';
+							state.dates[state.dayIdx].times[i][j].borderBottom = false;
+							state.dates[state.dayIdx].times[i][j].borderTop = false;
 						}
 					} else {
 						for (let j = 0; j <= 6; j++) {
 							state.dates[state.dayIdx].times[i][j].color = state.color;
 							state.dates[state.dayIdx].times[i][j].isEveryTime = false;
 							state.dates[state.dayIdx].times[i][j].isPicked = true;
+							state.dates[state.dayIdx].times[i][j].borderBottom = false;
+							state.dates[state.dayIdx].times[i][j].borderTop = false;
 						}
 					}
 				}
@@ -444,17 +522,28 @@ export const timetableSlice = createSlice({
 		},
 		getColor: (
 			state,
-			action: PayloadAction<{ color: string; peopleCount: number }>
+			action: PayloadAction<{
+				color: string;
+				peopleCount: number;
+				startHour: number;
+				endHour: number;
+			}>
 		) => {
 			state.color = action.payload.color;
 			state.peopleCount = action.payload.peopleCount;
-			if (state.color === '#FFFFFF' || '') {
-				state.color = Colors.blue500;
-			}
+			state.startHour = action.payload.startHour;
+			state.endHour = action.payload.endHour;
+			state.makeReady = true;
+			// if (state.color === '#FFFFFF' || '') {
+			// 	state.color = Colors.blue500;
+			// }
 		},
 		makeInitialTimePicked: (state) => {
 			state.isTimePicked = false;
 			state.isTimeNotExist = false;
+		},
+		setTimeMode: (state, action: PayloadAction<string>) => {
+			state.timeMode = action.payload;
 		},
 	},
 	extraReducers: {},
@@ -478,6 +567,9 @@ export const {
 	makeInitialTimePicked,
 	checkIsExist,
 	changeConfirmTime,
+	postConfirmMakeFalse,
+	setTimeMode,
+	getOtherConfirmDates,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;

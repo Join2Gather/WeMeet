@@ -22,7 +22,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import { findURI, getUserMe } from '../store/login';
-import { getColor } from '../store/timetable';
+import { getColor, setTimeMode } from '../store/timetable';
 interface props {
 	modalVisible: boolean;
 	setModalVisible: any;
@@ -59,6 +59,7 @@ export function ModalInput({
 	const dispatch = useDispatch();
 	// const [name, setName] = useState('2ff148e7-05b9-461e-a2c2-1d3ccce16ba9');
 	const [name, setName] = useState('');
+	const [code, setCode] = useState('');
 	const [mode, setMode] = useState('1');
 	const [color, setColor] = useState(Colors.red500);
 
@@ -74,23 +75,26 @@ export function ModalInput({
 		if (mode === '1') {
 			dispatch(initialError());
 			if (modalMode === 'join') {
-				dispatch(joinTeam({ id: id, token: token, user: user, uri: name }));
+				dispatch(joinTeam({ id: id, token: token, user: user, uri: code }));
 				setMode('loading');
 			} else if (modalMode === 'make') {
 				dispatch(inputTeamName(name));
 				dispatch(postTeamName({ user, id, name, token }));
 				setTimeout(() => {
 					setMode('loading');
-				}, 1000);
+				}, 500);
+				dispatch(setTimeMode('make'));
 			}
 		} else if (mode === '2') {
-			goTeamTime(name);
+			dispatch(setTimeMode('make'));
 			dispatch(changeColor({ color, id, token, uri: joinUri, user }));
 			setMode('1');
 			setModalVisible(false);
-			dispatch(getUserMe({ id, token, user }));
 			dispatch(findURI(name));
+			goTeamTime(name);
 			setColor(Colors.red500);
+			setName('');
+			dispatch(getUserMe({ id, token, user }));
 		}
 	}, [name, modalMode, mode, color, id, token, joinUri, user]);
 
@@ -110,6 +114,8 @@ export function ModalInput({
 		setMode('1');
 		setModalMode('make');
 		goTeamTime(joinName);
+		dispatch(getUserMe({ user, id, token }));
+		setCode('');
 	}, [joinName]);
 	return (
 		<Modal
@@ -177,8 +183,8 @@ export function ModalInput({
 										<TextInput
 											// onFocus={focus}
 											style={[styles.textInput, { color: Colors.black }]}
-											value={name}
-											onChangeText={(name) => setName((text) => name)}
+											value={code}
+											onChangeText={(code) => setCode((text) => code)}
 											placeholder="Enter your Code"
 											placeholderTextColor={Colors.grey600}
 										/>
@@ -221,7 +227,7 @@ export function ModalInput({
 						</>
 					)}
 					{mode === '3' && (
-						<Text style={[styles.titleText, { fontSize: 18 }]}>
+						<Text style={[styles.titleText, { fontSize: 17 }]}>
 							🎉 모임에 참여가 완료 되었습니다 {'\n'} 가능한 시간을 입력해주세요
 						</Text>
 					)}

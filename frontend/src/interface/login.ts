@@ -1,3 +1,5 @@
+import type { responseEveryTime } from './individual';
+
 export interface Login {
 	id: number;
 	name: string;
@@ -10,6 +12,11 @@ export interface Login {
 	color: string;
 	peopleCount: number;
 	response: '';
+	confirmDatesTimetable: Array<responseEveryTime>;
+	confirmClubs: Array<string>;
+	userMeSuccess: boolean;
+	startHour: number;
+	endHour: number;
 }
 
 export interface kakaoLoginAPI {
@@ -19,6 +26,17 @@ export interface kakaoLoginAPI {
 	token: string;
 	clubs: Array<any>;
 	kakaoDates: Array<any>;
+}
+
+export interface confirmDates {
+	sun: [];
+	mon: [];
+	tue: [];
+	wed: [];
+	thu: [];
+	fri: [];
+	sat: [];
+	[prop: string]: any;
 }
 
 export interface userMeAPI {

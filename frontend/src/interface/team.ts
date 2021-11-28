@@ -12,6 +12,7 @@ export interface responseTeamAPI {
 	name: string;
 	uri: string;
 	date: Object;
+	color: string;
 }
 
 export interface team {

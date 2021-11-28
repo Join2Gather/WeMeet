@@ -13,6 +13,7 @@ import {
 	// changeColor,
 	getGroupDates,
 	getIndividualDates,
+	getOtherConfirmDates,
 	makeInitialTimePicked,
 	makePostIndividualDates,
 	postIndividualTime,
@@ -28,6 +29,7 @@ import { ModalTimePicker } from './ModalTimePicker';
 const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 const boxHeight = 28;
+const inBoxHeight = 7;
 const lastBox = 25;
 
 interface props {
@@ -40,6 +42,7 @@ interface props {
 	uri?: string;
 	postDatesPrepare?: boolean;
 	confirmDatesPrepare?: boolean;
+	individualTimesText?: Array<string>;
 }
 
 export function Timetable({
@@ -52,6 +55,7 @@ export function Timetable({
 	uri,
 	postDatesPrepare,
 	confirmDatesPrepare,
+	individualTimesText,
 }: props) {
 	const {
 		dates,
@@ -67,6 +71,11 @@ export function Timetable({
 		joinTeamError,
 		teamDatesWith60,
 		isTimeNotExist,
+		timeMode,
+		joinUri,
+		confirmClubs,
+		confirmDatesTimetable,
+		timesText,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
@@ -82,6 +91,11 @@ export function Timetable({
 			joinTeamError: team.joinTeamError,
 			teamDatesWith60: timetable.teamDatesWith60,
 			isTimeNotExist: timetable.isTimeNotExist,
+			timeMode: timetable.timeMode,
+			joinUri: team.joinUri,
+			confirmClubs: login.confirmClubs,
+			confirmDatesTimetable: login.confirmDatesTimetable,
+			timesText: timetable.timesText,
 		})
 	);
 	const dispatch = useDispatch();
@@ -92,14 +106,31 @@ export function Timetable({
 	useEffect(() => {
 		if (!loadingJoin && !joinTeamError) {
 			if (uri && isGroup) {
-				dispatch(getGroupDates({ id: id, user: user, token: token, uri: uri }));
+				if (timeMode === 'make')
+					dispatch(getGroupDates({ id, user, token, uri: joinUri }));
+				else dispatch(getGroupDates({ id, user, token, uri }));
 			} else if (uri && !isGroup) {
-				dispatch(
-					getIndividualDates({ id: id, user: user, token: token, uri: uri })
-				);
+				if (timeMode == 'make')
+					dispatch(getIndividualDates({ id, user, token, uri: joinUri }));
+				else {
+					dispatch(getIndividualDates({ id, user, token, uri }));
+					dispatch(
+						getOtherConfirmDates({ confirmClubs, confirmDatesTimetable })
+					);
+				}
 			}
 		}
-	}, [uri, id, user, token, isGroup, loadingJoin, joinTeamError]);
+	}, [
+		uri,
+		id,
+		user,
+		token,
+		isGroup,
+		loadingJoin,
+		joinTeamError,
+		joinUri,
+		timeMode,
+	]);
 
 	useEffect(() => {
 		if (cloneDateSuccess) {
@@ -107,7 +138,7 @@ export function Timetable({
 			dispatch(cloneEveryTime(kakaoDates));
 		}
 	}, [cloneDateSuccess, kakaoDates]);
-	const { timesText } = useMakeTimetable();
+
 	const onSetStartHour = useCallback(
 		(idx: number, time: number, day: string) => {
 			dispatch(setStartHour(time));
@@ -165,6 +196,12 @@ export function Timetable({
 							<Text style={styles.timeText}>{time}</Text>
 						</View>
 					))}
+					{individualTimesText &&
+						individualTimesText.map((time, idx) => (
+							<View key={idx}>
+								<Text style={styles.timeText}>{time}</Text>
+							</View>
+						))}
 				</View>
 				<View style={styles.contentView}>
 					{isGroup ? (
@@ -190,7 +227,7 @@ export function Timetable({
 													key={t.minute}
 													style={{
 														backgroundColor: t.color,
-														height: boxHeight / 6,
+														height: boxHeight / inBoxHeight,
 														borderTopWidth:
 															Number(time) === lastBox - 1
 																? 0.2
@@ -198,7 +235,7 @@ export function Timetable({
 																? 0.2
 																: 0,
 														borderBottomWidth:
-															Number(time) === lastBox - 2 && tIdx === 5
+															Number(time) === lastBox - 2 && tIdx === 6
 																? 0.2
 																: 0,
 														borderLeftWidth:
@@ -228,7 +265,7 @@ export function Timetable({
 													key={t.minute}
 													style={{
 														backgroundColor: t.color,
-														height: boxHeight / 6,
+														height: boxHeight / inBoxHeight,
 														borderTopWidth:
 															Number(time) === lastBox - 1
 																? 0.2
@@ -236,7 +273,7 @@ export function Timetable({
 																? 0.2
 																: 0,
 														borderBottomWidth:
-															Number(time) === lastBox - 2 && tIdx === 5
+															Number(time) === lastBox - 2 && tIdx === 6
 																? 0.2
 																: 0,
 														borderLeftWidth:
@@ -269,7 +306,7 @@ export function Timetable({
 													key={t.minute}
 													style={{
 														backgroundColor: t.color,
-														height: boxHeight / 6,
+														height: boxHeight / inBoxHeight,
 														borderTopWidth:
 															Number(time) === lastBox - 1
 																? 0.2
@@ -277,7 +314,7 @@ export function Timetable({
 																? 0.2
 																: 0,
 														borderBottomWidth:
-															Number(time) === lastBox - 2 && tIdx === 5
+															Number(time) === lastBox - 2 && tIdx === 6
 																? 0.2
 																: 0,
 														borderLeftWidth:
@@ -315,8 +352,6 @@ export function Timetable({
 					<ModalTimePicker
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
-						start={start}
-						end={end}
 						mode={mode}
 						setMode={setMode}
 						id={id}
@@ -331,6 +366,8 @@ export function Timetable({
 						confirmDates={confirmDates}
 						date={date}
 						setDate={setDate}
+						timeMode={timeMode}
+						joinUri={joinUri}
 					/>
 				</View>
 			</View>
