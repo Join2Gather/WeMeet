@@ -182,6 +182,7 @@ export default function Home() {
 						individualDates={individualDates}
 						isGroup={false}
 						individualTimesText={individualTimesText}
+						endIdx={25}
 					/>
 					<ModalSelect
 						selectModalVisible={selectModalVisible}

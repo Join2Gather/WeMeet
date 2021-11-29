@@ -298,6 +298,7 @@ export default function TeamTime({ route }: Props) {
 						uri={uri}
 						postDatesPrepare={postDatesPrepare}
 						confirmDatesPrepare={confirmDatesPrepare}
+						color={color}
 					/>
 				</View>
 			</ScrollView>
