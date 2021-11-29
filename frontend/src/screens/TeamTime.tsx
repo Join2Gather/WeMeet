@@ -47,7 +47,7 @@ type TeamStackParamList = {
 };
 
 type Props = NativeStackScreenProps<TeamStackParamList, 'TeamTime'>;
-import { changeColor, shareUri } from '../store/team';
+import { changeColor, setModalMode, shareUri } from '../store/team';
 
 export default function TeamTime({ route }: Props) {
 	const {
@@ -117,14 +117,10 @@ export default function TeamTime({ route }: Props) {
 		}
 	}, [joinTeamError, loadingJoin, error]);
 
-	// useEffect(() => {
-	// 	if (color === '#FFFFFF' && uri) {
-	// 		dispatch(changeColor({ id, uri, token, user, color: Colors.blue500 }));
-	// 	}
-	// }, [color, uri, id, token, user]);
 	// useCallback
 	const goLeft = useCallback(() => {
 		navigation.goBack();
+		dispatch(setModalMode('make'));
 		dispatch(setTimeMode('normal'));
 	}, []);
 	const onPressPlus = useCallback(() => {
