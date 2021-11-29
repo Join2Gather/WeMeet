@@ -3,6 +3,9 @@ export interface requestTeamAPI {
 	id: number;
 	name: string;
 	token: string;
+	color: string;
+	startTime: number;
+	endTime: number;
 }
 
 interface days {}
@@ -27,6 +30,7 @@ export interface team {
 	postTeamError: boolean;
 	joinTeamError: boolean;
 	teamColor: string;
+	modalMode: string;
 }
 
 export interface shareUriAPI {
