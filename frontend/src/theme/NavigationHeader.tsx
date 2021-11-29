@@ -25,7 +25,13 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 	headerColor,
 }) => {
 	return (
-		<View style={[styles.view, viewStyle]}>
+		<View
+			style={[
+				styles.view,
+				viewStyle,
+				{ backgroundColor: headerColor ? headerColor : '#33aafc' },
+			]}
+		>
 			<View style={styles.flex}>{Left && Left()}</View>
 
 			<View style={styles.flex}>
