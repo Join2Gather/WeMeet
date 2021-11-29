@@ -538,6 +538,19 @@ export const timetableSlice = createSlice({
 			// 	state.color = Colors.blue500;
 			// }
 		},
+		makeTeamTime: (
+			state,
+			action: PayloadAction<{
+				startHour: number;
+				endHour: number;
+				color: string;
+			}>
+		) => {
+			state.startHour = action.payload.startHour;
+			state.endHour = action.payload.endHour;
+			state.color = action.payload.color;
+			state.makeReady = true;
+		},
 		makeInitialTimePicked: (state) => {
 			state.isTimePicked = false;
 			state.isTimeNotExist = false;
@@ -570,6 +583,7 @@ export const {
 	postConfirmMakeFalse,
 	setTimeMode,
 	getOtherConfirmDates,
+	makeTeamTime,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;
