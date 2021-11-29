@@ -53,6 +53,7 @@ const initialState: team = {
 	joinTeamError: false,
 	postTeamError: false,
 	teamColor: '',
+	modalMode: 'make',
 };
 
 export const teamSlice = createSlice({
@@ -106,11 +107,14 @@ export const teamSlice = createSlice({
 		initialJoinTeam: (state) => {
 			state.joinTeam = false;
 		},
+		setModalMode: (state, action: PayloadAction<string>) => {
+			state.modalMode = action.payload;
+		},
 	},
 	extraReducers: {},
 });
 
-export const { inputTeamName, initialError, initialJoinTeam } =
+export const { inputTeamName, initialError, initialJoinTeam, setModalMode } =
 	teamSlice.actions;
 
 export default teamSlice.reducer;
