@@ -17,12 +17,14 @@ import {
 	inputTeamName,
 	joinTeam,
 	postTeamName,
+	setModalMode,
 } from '../store/team';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import { findURI, getUserMe } from '../store/login';
-import { getColor, setTimeMode } from '../store/timetable';
+import { getColor, makeTeamTime, setTimeMode } from '../store/timetable';
+import { Button } from '../lib/util/Button';
 interface props {
 	modalVisible: boolean;
 	setModalVisible: any;
@@ -31,13 +33,13 @@ interface props {
 	token: string;
 	goTeamTime: Function;
 	modalMode: string;
-	setModalMode: React.Dispatch<React.SetStateAction<string>>;
 	loadingJoin: string[];
 	loadingChangeColor: string[];
 	joinTeamError: boolean;
 	postTeamError: boolean;
 	joinUri: string;
 	joinName: string;
+	makeReady: boolean;
 }
 
 export function ModalInput({
@@ -53,70 +55,103 @@ export function ModalInput({
 	joinTeamError,
 	joinUri,
 	postTeamError,
-	setModalMode,
 	joinName,
+	makeReady,
 }: props) {
 	const dispatch = useDispatch();
 	// const [name, setName] = useState('2ff148e7-05b9-461e-a2c2-1d3ccce16ba9');
 	const [name, setName] = useState('');
 	const [code, setCode] = useState('');
-	const [mode, setMode] = useState('1');
+	const [mode, setMode] = useState('initial');
 	const [color, setColor] = useState(Colors.red500);
+	const [startTime, setStartTime] = useState('9');
+	const [endTime, setEndTime] = useState('22');
 
 	// useEffect
 	useEffect(() => {
 		if (joinTeamError) setMode('joinError');
-		else if (mode === 'loading' && modalMode === 'join') setMode('3');
+		else if (mode === 'finish' && modalMode === 'join') setMode('joinSuccess');
 		if (postTeamError) setMode('makeError');
-		else if (mode === 'loading' && modalMode === 'make') setMode('2');
+		else if (mode === 'finish' && modalMode === 'make') setMode('makeSuccess');
 	}, [joinTeamError, postTeamError, mode, modalMode]);
+	useEffect(() => {
+		mode === 'send' && modeChange();
+	}, [mode]);
+
 	// useCallback
-	const onChangeInput = useCallback(() => {
-		if (mode === '1') {
+	const modeChange = useCallback(() => {
+		if (mode === 'send') {
 			dispatch(initialError());
+			setMode('loading');
 			if (modalMode === 'join') {
-				dispatch(joinTeam({ id: id, token: token, user: user, uri: code }));
-				setMode('loading');
+				dispatch(joinTeam({ id, token, user, uri: code }));
+				setTimeout(() => setMode('finish'), 500);
 			} else if (modalMode === 'make') {
 				dispatch(inputTeamName(name));
-				dispatch(postTeamName({ user, id, name, token }));
-				setTimeout(() => {
-					setMode('loading');
-				}, 500);
-				dispatch(setTimeMode('make'));
+				dispatch(
+					postTeamName({
+						color,
+						endTime: Number(endTime),
+						startTime: Number(startTime),
+						id,
+						token,
+						name,
+						user,
+					})
+				);
+				setTimeout(() => setMode('finish'), 500);
 			}
-		} else if (mode === '2') {
+		} else if (mode === 'close') {
 			dispatch(setTimeMode('make'));
-			dispatch(changeColor({ color, id, token, uri: joinUri, user }));
-			setMode('1');
+			setMode('initial');
 			setModalVisible(false);
-			dispatch(findURI(name));
-			goTeamTime(name);
-			setColor(Colors.red500);
-			setName('');
-			dispatch(getUserMe({ id, token, user }));
 		}
-	}, [name, modalMode, mode, color, id, token, joinUri, user]);
+	}, [name, modalMode, mode, color, id, token, joinUri, user, code]);
 
+	const onPressPrev = useCallback((mode) => {
+		setMode(mode);
+	}, []);
+	const onPressNext = useCallback((mode) => {
+		setMode(mode);
+	}, []);
 	const onCloseError = useCallback(() => {
-		setMode('1');
+		setMode('initial');
+		dispatch(setTimeMode('make'));
 		dispatch(initialError());
 		setModalVisible(false);
+		setColor(Colors.red500);
+		dispatch(getUserMe({ id, token, user }));
 	}, []);
 	const onPressClose = useCallback(() => {
-		setModalMode('make');
+		dispatch(initialError());
+		dispatch(getUserMe({ id, token, user }));
+		setModalVisible(false);
+		setMode('initial');
+		if (modalMode === 'join') {
+			goTeamTime(joinName);
+			setCode('');
+		} else if (modalMode === 'make') {
+			dispatch(findURI(name));
+			dispatch(
+				makeTeamTime({
+					startHour: Number(startTime),
+					endHour: Number(endTime),
+					color,
+				})
+			);
+			setColor(Colors.red500);
+			setStartTime('9');
+			setEndTime('22');
+			goTeamTime(name);
+			setName('');
+		}
+	}, [name, startTime, endTime, color, joinName]);
+	const onPressCloseButton = useCallback(() => {
+		dispatch(setModalMode('make'));
 		dispatch(initialError());
 		setModalVisible(false);
-		setMode('1');
+		setMode('initial');
 	}, []);
-	const onMoveTeamTime = useCallback(() => {
-		setModalVisible(false);
-		setMode('1');
-		setModalMode('make');
-		goTeamTime(joinName);
-		dispatch(getUserMe({ user, id, token }));
-		setCode('');
-	}, [joinName]);
 	return (
 		<Modal
 			animationType="fade"
@@ -128,7 +163,6 @@ export function ModalInput({
 		>
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
-					{loadingJoin && <ActivityIndicator size="large" />}
 					{!loadingJoin && (
 						<View
 							style={[
@@ -145,12 +179,12 @@ export function ModalInput({
 									marginLeft: '90%',
 									width: '9%',
 								}}
-								onPress={onPressClose}
+								onPress={onPressCloseButton}
 							>
 								<Icon
 									style={{ alignSelf: 'flex-end' }}
 									name="close"
-									size={28}
+									size={25}
 								/>
 							</TouchableHighlight>
 							{!loadingJoin && mode === 'makeError' && (
@@ -162,6 +196,11 @@ export function ModalInput({
 										color={Colors.red300}
 									/>
 									<Text style={styles.errorText}> 서버 오류</Text>
+									<Button
+										buttonNumber={1}
+										buttonText="확인"
+										onPressFunction={onCloseError}
+									/>
 								</View>
 							)}
 							{!loadingJoin && mode === 'joinError' && (
@@ -173,9 +212,14 @@ export function ModalInput({
 										color={Colors.red300}
 									/>
 									<Text style={styles.errorText}> 잘못된 공유 코드 입니다</Text>
+									<Button
+										buttonNumber={1}
+										buttonText="확인"
+										onPressFunction={onCloseError}
+									/>
 								</View>
 							)}
-							{mode === '1' && modalMode === 'join' && (
+							{mode === 'initial' && modalMode === 'join' && (
 								<>
 									<Text style={styles.titleText}>공유 코드를 입력하세요</Text>
 
@@ -189,11 +233,17 @@ export function ModalInput({
 											placeholderTextColor={Colors.grey600}
 										/>
 									</View>
+									<Button
+										buttonNumber={1}
+										buttonText="확인"
+										onPressWithParam={() => onPressNext('send')}
+										pressParam="send"
+									/>
 								</>
 							)}
-							{mode === '1' && modalMode === 'make' && (
+							{mode === 'initial' && modalMode === 'make' && (
 								<>
-									<Text style={styles.titleText}>모임명을 입력하세요</Text>
+									<Text style={styles.titleText}>1. 모임명을 입력하세요</Text>
 									<View style={[styles.textInputView]}>
 										<TextInput
 											// onFocus={focus}
@@ -204,11 +254,68 @@ export function ModalInput({
 											placeholderTextColor={Colors.grey600}
 										/>
 									</View>
+									<Button
+										buttonNumber={1}
+										buttonText={'확인'}
+										onPressWithParam={() => onPressNext('time')}
+										pressParam="time"
+									/>
 								</>
 							)}
 						</View>
 					)}
-					{mode === '2' && (
+					{mode === 'time' && (
+						<>
+							<Text style={styles.titleText}>모임 시간을 입력해 주세요</Text>
+							<Text style={[styles.titleUnderText]}>
+								[ 24시간 단위로 입력해 주세요 ]
+							</Text>
+							<View style={styles.rowView}>
+								<Text style={styles.timeInputText}>시작 시간 : </Text>
+								<View style={styles.timeInputView}>
+									<TextInput
+										// onFocus={focus}123
+										style={[styles.timeInput, { color: Colors.black }]}
+										value={startTime}
+										onChangeText={(hour) => setStartTime((text) => hour)}
+										placeholder="09"
+										placeholderTextColor={Colors.grey600}
+									/>
+								</View>
+							</View>
+							<View style={{ height: 10 }} />
+							<View style={styles.rowView}>
+								<Text style={styles.timeInputText}>종료 시간 : </Text>
+								<View style={styles.timeInputView}>
+									<TextInput
+										// onFocus={focus}
+										style={[styles.timeInput, { color: Colors.black }]}
+										value={endTime}
+										onChangeText={(hour) => setEndTime((text) => hour)}
+										placeholder="22"
+										placeholderTextColor={Colors.grey600}
+									/>
+								</View>
+							</View>
+							<View
+								style={{
+									borderWidth: 0.3,
+									width: '110%',
+									marginTop: 20,
+								}}
+							/>
+							<Button
+								buttonNumber={2}
+								buttonText={'이전'}
+								secondButtonText={'다음'}
+								onPressWithParam={() => onPressPrev('initial')}
+								secondOnPressWithParam={() => onPressNext('color')}
+								pressParam="initial"
+								secondParam="color"
+							/>
+						</>
+					)}
+					{mode === 'color' && (
 						<>
 							<Text style={styles.titleText}>모임 색상을 선택해 주세요 </Text>
 							<View
@@ -224,14 +331,60 @@ export function ModalInput({
 									hideSliders={true}
 								/>
 							</View>
+							<View
+								style={{
+									borderWidth: 0.3,
+									width: '110%',
+									marginTop: 20,
+								}}
+							/>
+							<Button
+								buttonNumber={2}
+								buttonText={'이전'}
+								secondButtonText={'다음'}
+								onPressWithParam={() => onPressPrev('time')}
+								secondOnPressWithParam={() => onPressNext('send')}
+								onPressFunction={() => modeChange()}
+								pressParam="time"
+								secondParam="send"
+							/>
 						</>
 					)}
-					{mode === '3' && (
-						<Text style={[styles.titleText, { fontSize: 17 }]}>
-							🎉 모임에 참여가 완료 되었습니다 {'\n'} 가능한 시간을 입력해주세요
-						</Text>
+					{mode === 'loading' && (
+						<>
+							<View style={{ height: 30 }} />
+							<ActivityIndicator size="large" color={Colors.blue500} />
+							<View style={{ height: 30 }} />
+						</>
 					)}
-					<View style={styles.buttonRowView}>
+					{mode === 'joinSuccess' && (
+						<>
+							<Text style={[styles.titleText, { fontSize: 17 }]}>
+								🎉 모임에 참여가 완료 되었습니다 {'\n'} 가능한 시간을
+								입력해주세요
+							</Text>
+							<Button
+								buttonNumber={1}
+								buttonText={'확인'}
+								onPressFunction={onPressClose}
+							/>
+						</>
+					)}
+					{mode === 'makeSuccess' && (
+						<>
+							<Text style={[styles.titleText, { fontSize: 17 }]}>
+								🎉 모임 생성 완료 되었습니다 {'\n'} 가능한 시간을 입력해주세요
+								{'\n'}
+							</Text>
+							<Button
+								buttonNumber={1}
+								buttonText={'확인'}
+								onPressFunction={onPressClose}
+							/>
+						</>
+					)}
+
+					{/* <View style={styles.buttonRowView}>
 						<TouchableHighlight
 							activeOpacity={0.1}
 							underlayColor={Colors.grey200}
@@ -246,7 +399,7 @@ export function ModalInput({
 						>
 							<Text style={styles.buttonText}>확인</Text>
 						</TouchableHighlight>
-					</View>
+					</View> */}
 				</View>
 			</View>
 		</Modal>
@@ -261,10 +414,16 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		marginTop: -20,
 	},
+	rowView: {
+		flexDirection: 'row',
+		alignContent: 'center',
+		justifyContent: 'center',
+		width: '50%',
+	},
 	modalView: {
-		margin: 10,
+		// margin: 10,
 		marginBottom: 60,
-		backgroundColor: 'white',
+		backgroundColor: Colors.white,
 		borderRadius: 13,
 		padding: 20,
 		alignItems: 'center',
@@ -275,13 +434,20 @@ const styles = StyleSheet.create({
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
-		width: '85%',
+		width: '90%',
 	},
 	titleText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareBold',
-		fontSize: 21,
+		fontSize: 20,
 		marginTop: 10,
+		marginBottom: 15,
+	},
+	titleUnderText: {
+		textAlign: 'center',
+		fontFamily: 'NanumSquareR',
+		fontSize: 13,
+		marginTop: 0,
 		marginBottom: 15,
 	},
 	errorView: {
@@ -300,48 +466,50 @@ const styles = StyleSheet.create({
 		width: '100%',
 	},
 	textInput: {
-		fontSize: 19,
-		flex: 1,
+		fontSize: 18,
+		// flex: 1,
 		fontFamily: 'NanumSquareR',
-		marginLeft: '0%',
 	},
 	textInputView: {
 		flexDirection: 'row',
-		paddingBottom: 0.7,
+		paddingBottom: 2,
+		backgroundColor: Colors.white,
+		// borderWidth: 1,
 		borderBottomWidth: 0.3,
 		width: '70%',
 		marginLeft: '15%',
 		padding: 10,
 	},
+	timeInputView: {
+		paddingBottom: 2,
+		backgroundColor: Colors.white,
+		flex: 0.5,
+		borderBottomWidth: 0.3,
+		marginLeft: '10%',
+		textAlign: 'center',
+	},
+	timeInputText: {
+		marginTop: 3,
+		fontSize: 14,
+		fontFamily: 'NanumSquareR',
+	},
+	timeInput: {
+		fontSize: 18,
+		// flex: 1,
+		fontFamily: 'NanumSquareR',
+		textAlign: 'center',
+	},
 	buttonText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 	},
-	buttonRowView: {
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignContent: 'center',
-		alignSelf: 'center',
-		marginTop: 10,
-		marginBottom: -13,
-	},
+
 	textStyle: {
 		color: 'white',
 		fontWeight: 'bold',
 		textAlign: 'center',
 	},
-	closeButtonStyle: {
-		padding: 15,
-		width: '80%',
-		height: '100%',
-		borderRadius: 13,
-	},
-	acceptButtonStyle: {
-		padding: 15,
-		width: '50%',
-		height: '100%',
-		borderRadius: 10,
-	},
+
 	modalText: {
 		// marginBottom: 15,
 		textAlign: 'center',
