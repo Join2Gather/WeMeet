@@ -82,7 +82,6 @@ export const individualSlice = createSlice({
 							const endMinute = Math.round(d.end_minutes / 10);
 							for (let i = d.starting_hours; i <= d.end_hours; i++) {
 								if (i === d.starting_hours) {
-									console.log('color', date.color);
 									for (let j = startingMinute; j <= 6; j++) {
 										state.individualDates[idx].times[i][j].color = date.color;
 										state.individualDates[idx].times[i][j].isEveryTime = false;
