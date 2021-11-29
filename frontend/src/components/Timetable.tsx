@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { Alert, StyleSheet } from 'react-native';
+import { Alert, StyleSheet, Dimensions } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { ModalMinute } from './ModalMinute';
@@ -31,7 +31,8 @@ const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const boxHeight = 28;
 const inBoxHeight = 7;
 const lastBox = 25;
-
+const screen = Dimensions.get('screen');
+const borderWidth = 0.3;
 interface props {
 	mode: string;
 	modalVisible: boolean;
@@ -43,6 +44,8 @@ interface props {
 	postDatesPrepare?: boolean;
 	confirmDatesPrepare?: boolean;
 	individualTimesText?: Array<string>;
+	endIdx?: number;
+	color?: string;
 }
 
 export function Timetable({
@@ -56,6 +59,8 @@ export function Timetable({
 	postDatesPrepare,
 	confirmDatesPrepare,
 	individualTimesText,
+	endIdx,
+	color,
 }: props) {
 	const {
 		dates,
@@ -76,6 +81,7 @@ export function Timetable({
 		confirmClubs,
 		confirmDatesTimetable,
 		timesText,
+		endHourTimetable,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
@@ -96,12 +102,17 @@ export function Timetable({
 			confirmClubs: login.confirmClubs,
 			confirmDatesTimetable: login.confirmDatesTimetable,
 			timesText: timetable.timesText,
+			endHourTimetable: timetable.endHour,
 		})
 	);
 	const dispatch = useDispatch();
 
 	const [date, setDate] = useState<Date>(new Date());
+	const [endHour, setEndHour] = useState(0);
 
+	useEffect(() => {
+		endIdx ? setEndHour(endIdx) : setEndHour(endHourTimetable);
+	}, [endIdx, endHourTimetable]);
 	// 최초 렌더링 개인 페이지 정보 받아오기
 	useEffect(() => {
 		if (!loadingJoin && !joinTeamError) {
@@ -145,7 +156,6 @@ export function Timetable({
 			date.setHours(time);
 			setDate(new Date(date));
 			setMode('startMinute');
-			setStart(time);
 			setModalVisible && setModalVisible(true);
 			dispatch(changeDayIdx(idx));
 			dispatch(setDay(day));
@@ -153,12 +163,6 @@ export function Timetable({
 		},
 		[isTimePicked, isGroup, date]
 	);
-
-	// const onMakeInitial = useCallback(() => {
-	// 	Alert.alert('이미 지정된 시간 입니다');
-	// 	setMode('normal');
-	// 	setModalVisible && setModalVisible(false);
-	// }, [isTimePicked]);
 	useEffect(() => {
 		if (isTimePicked || isTimeNotExist) {
 			setMode('normal');
@@ -166,13 +170,11 @@ export function Timetable({
 			dispatch(makeInitialTimePicked());
 		}
 	}, [isTimePicked, isTimeNotExist]);
-	const [start, setStart] = useState(0);
-	const [end, setEnd] = useState(0);
 	return (
 		<View style={styles.view}>
-			<View style={styles.rowView}>
+			<View style={styles.rowDayOfWeekView}>
 				<View style={styles.timeView}>
-					<View style={{ width: 30 }}></View>
+					<View style={styles.dayOfWeekView}></View>
 				</View>
 				<View style={styles.contentView}>
 					{dayOfWeek.map((dayText, idx) => (
@@ -190,18 +192,30 @@ export function Timetable({
 				</View>
 			</View>
 			<View style={styles.rowView}>
-				<View style={styles.timeView}>
-					{timesText.map((time, idx) => (
-						<View key={idx}>
-							<Text style={styles.timeText}>{time}</Text>
-						</View>
-					))}
-					{individualTimesText &&
-						individualTimesText.map((time, idx) => (
-							<View key={idx}>
-								<Text style={styles.timeText}>{time}</Text>
-							</View>
-						))}
+				<View style={[styles.timeView, {}]}>
+					{individualTimesText
+						? individualTimesText.map((time, idx) => (
+								<View
+									style={[
+										styles.timeEachView,
+										{ borderColor: color ? color : Colors.blue500 },
+									]}
+									key={idx}
+								>
+									<Text style={styles.timeText}>{time}</Text>
+								</View>
+						  ))
+						: timesText.map((time, idx) => (
+								<View
+									style={[
+										styles.timeEachView,
+										{ borderColor: color ? color : Colors.blue500 },
+									]}
+									key={idx}
+								>
+									<Text style={styles.timeText}>{time}</Text>
+								</View>
+						  ))}
 				</View>
 				<View style={styles.contentView}>
 					{isGroup ? (
@@ -210,12 +224,7 @@ export function Timetable({
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
 										<TouchableView
-											style={[
-												styles.boxView,
-												{
-													// borderTopWidth: Number(time) === 26 ? 10 : 0.2,
-												},
-											]}
+											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
 												mode === 'confirmMode' &&
@@ -229,19 +238,19 @@ export function Timetable({
 														backgroundColor: t.color,
 														height: boxHeight / inBoxHeight,
 														borderTopWidth:
-															Number(time) === lastBox - 1
-																? 0.2
+															Number(time) === endHour
+																? borderWidth
 																: t.borderBottom
-																? 0.2
+																? borderWidth
 																: 0,
 														borderBottomWidth:
-															Number(time) === lastBox - 2 && tIdx === 6
-																? 0.2
+															Number(time) === endHour - 1 && tIdx === 6
+																? borderWidth
 																: 0,
 														borderLeftWidth:
-															Number(time) === lastBox - 1 ? 0 : 0.2,
+															Number(time) === endHour ? 0 : borderWidth,
 														borderRightWidth:
-															Number(time) === lastBox - 1 ? 0 : 0.2,
+															Number(time) === endHour ? 0 : borderWidth,
 													}}
 												/>
 											))}
@@ -267,19 +276,19 @@ export function Timetable({
 														backgroundColor: t.color,
 														height: boxHeight / inBoxHeight,
 														borderTopWidth:
-															Number(time) === lastBox - 1
-																? 0.2
+															Number(time) === endHour
+																? borderWidth
 																: t.borderBottom
-																? 0.2
+																? borderWidth
 																: 0,
 														borderBottomWidth:
-															Number(time) === lastBox - 2 && tIdx === 6
-																? 0.2
+															Number(time) === endHour - 1 && tIdx === 6
+																? borderWidth
 																: 0,
 														borderLeftWidth:
-															Number(time) === lastBox - 1 ? 0 : 0.2,
+															Number(time) === endHour ? 0 : borderWidth,
 														borderRightWidth:
-															Number(time) === lastBox - 1 ? 0 : 0.2,
+															Number(time) === endHour ? 0 : borderWidth,
 													}}
 												/>
 											))}
@@ -308,19 +317,19 @@ export function Timetable({
 														backgroundColor: t.color,
 														height: boxHeight / inBoxHeight,
 														borderTopWidth:
-															Number(time) === lastBox - 1
-																? 0.2
+															Number(time) === endHour
+																? borderWidth
 																: t.borderBottom
-																? 0.2
+																? borderWidth
 																: 0,
 														borderBottomWidth:
-															Number(time) === lastBox - 2 && tIdx === 6
-																? 0.2
+															Number(time) === endHour - 1 && tIdx === 6
+																? borderWidth
 																: 0,
 														borderLeftWidth:
-															Number(time) === lastBox - 1 ? 0 : 0.2,
+															Number(time) === endHour ? 0 : borderWidth,
 														borderRightWidth:
-															Number(time) === lastBox - 1 ? 0 : 0.2,
+															Number(time) === endHour ? 0 : borderWidth,
 													}}
 												/>
 											))}
@@ -376,55 +385,48 @@ export function Timetable({
 }
 
 const styles = StyleSheet.create({
-	view: { flex: 1, flexDirection: 'column' },
+	view: { flex: 1, flexDirection: 'column', paddingTop: 25 },
 	contentView: {
 		flexDirection: 'row',
 		width: '90%',
 		justifyContent: 'space-evenly',
 	},
 	dayOfWeekView: {
-		// marginTop: '20%',
+		width: screen.width / 9,
 	},
 	dayOfText: {
-		width: 40,
 		textAlign: 'center',
-		paddingTop: 20,
 		fontFamily: 'NanumSquareR',
-		// height: 80,
 	},
 	timeView: {
-		top: '-9%',
+		width: screen.width / 13,
 	},
 	timeText: {
 		fontSize: 10,
 		alignSelf: 'flex-end',
 		textAlign: 'right',
-		width: '100%',
-		marginTop: 44,
 		fontFamily: 'NanumSquareR',
+		marginTop: 2,
 	},
 	columnView: {
 		flexDirection: 'column',
-		top: '3%',
 	},
 	rowView: {
 		flexDirection: 'row',
-		// width: '100%',
-		// textAlign: 'center',
-		// justifyContent: 'center',
-		// textAlignVertical: 'center',
+	},
+	rowDayOfWeekView: {
+		flexDirection: 'row',
+		paddingBottom: 10,
 	},
 	boxView: {
 		height: boxHeight,
-		// marginLeft: 10,
-		width: 41,
-		// flex: 3,
-		// borderWidth: 0.2,
-		// borderBottomWidth: 10,
-		// borderBottomColor: Colors.red800,
-		// borderColor: Colors.blue900,
-		// borderTopWidth: 0.2,
-		// borderBottomWidth: 0.2,
-		// borderRightWidth: 1,
+		width: screen.width / 9,
+	},
+	timeEachView: {
+		height: boxHeight * 2,
+		borderTopWidth: 2,
+		borderColor: Colors.blue500,
+		width: '100%',
+		alignSelf: 'flex-end',
 	},
 });
