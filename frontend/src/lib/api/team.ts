@@ -7,11 +7,21 @@ import type {
 } from '../../interface';
 import { makeHeader } from '../util/header';
 import axios from 'axios';
-export const postTeamName = ({ user, id, name, token }: requestTeamAPI) => {
+export const postTeamName = ({
+	user,
+	id,
+	name,
+	token,
+	color,
+	endTime,
+	startTime,
+}: requestTeamAPI) => {
 	const headers = makeHeader(token);
 	const data = JSON.stringify({
 		name: encodeURIComponent(name),
-		color: '#FFFF',
+		color: color,
+		starting_hours: startTime,
+		end_hours: endTime,
 	});
 	return client.post(`users/${user}/profiles/${id}/clubs`, data, { headers });
 };
