@@ -23,7 +23,7 @@ import { useAutoFocus, AutoFocusProvider } from '../contexts';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { initialError, postTeamName } from '../store/team';
+import { initialError, postTeamName, setModalMode } from '../store/team';
 import { ModalInput, Spinner } from '../components';
 import { NavigationHeader } from '../theme';
 import { useLayout, useMakeTimetable } from '../hooks';
@@ -48,7 +48,9 @@ export default function TeamList() {
 		teamColor,
 		joinUri,
 		loadingUserMe,
-	} = useSelector(({ login, team, loading }: RootState) => ({
+		makeReady,
+		modalMode,
+	} = useSelector(({ login, team, loading, timetable }: RootState) => ({
 		user: login.user,
 		id: login.id,
 		clubs: login.clubs,
@@ -62,9 +64,11 @@ export default function TeamList() {
 		teamColor: team.teamColor,
 		joinUri: team.joinUri,
 		loadingUserMe: loading['login/USER_ME'],
+		makeReady: timetable.makeReady,
+		modalMode: team.modalMode,
 	}));
 	const [dimensions, setDimensions] = useState({ window, screen });
-	const [modalMode, setModalMode] = useState('make');
+
 	const [modalVisible, setModalVisible] = useState(false);
 	const navigation = useNavigation();
 	const dispatch = useDispatch();
@@ -74,12 +78,8 @@ export default function TeamList() {
 		dispatch(getUserMe({ id, token, user }));
 	}, [joinTeam]);
 	useEffect(() => {
-		setModalMode('make');
+		dispatch(setModalMode('make'));
 	}, [joinTeamError]);
-	useEffect(() => {
-		dispatch(makeGroupColor(teamColor));
-		dispatch(getColor({ color: teamColor, peopleCount: 1 }));
-	}, [loadingChangeColor, teamColor]);
 	// useCallback
 	// Navigation 이동
 	const goTeamTime = useCallback(
@@ -102,17 +102,16 @@ export default function TeamList() {
 				});
 			}
 			dispatch(initialError());
-			setModalMode('make');
 		},
-		[modalMode]
+		[modalMode, makeReady]
 	);
 	// 모달 모드 분리
 	const onMakeTeamTime = useCallback(() => {
-		setModalMode('make');
+		dispatch(setModalMode('make'));
 		setModalVisible(true);
 	}, []);
 	const onJoinTeamTime = useCallback(() => {
-		setModalMode('join');
+		dispatch(setModalMode('join'));
 		setModalVisible(true);
 	}, []);
 	const onReload = useCallback(() => {
@@ -219,13 +218,13 @@ export default function TeamList() {
 					token={token}
 					goTeamTime={goTeamTime}
 					modalMode={modalMode}
-					setModalMode={setModalMode}
 					loadingJoin={loadingJoin}
 					postTeamError={postTeamError}
 					joinTeamError={joinTeamError}
 					joinUri={joinUri}
 					loadingChangeColor={loadingChangeColor}
 					joinName={joinName}
+					makeReady={makeReady}
 				/>
 			</View>
 
