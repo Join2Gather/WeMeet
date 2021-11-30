@@ -210,7 +210,7 @@ export const timetableSlice = createSlice({
 						for (let i = d.starting_hours; i <= d.end_hours; i++) {
 							if (i === d.starting_hours) {
 								for (let j = startingMinute; j <= 6; j++) {
-									state.dates[idx].times[i][j].color = date.color;
+									state.dates[idx].times[i][j].color = Colors.grey400;
 									state.dates[idx].times[i][j].isEveryTime = false;
 									state.dates[idx].times[i][j].isPicked = true;
 									state.dates[idx].times[i][j].mode = 'start';
@@ -219,7 +219,7 @@ export const timetableSlice = createSlice({
 								}
 							} else if (i === d.end_hours) {
 								for (let j = 0; j < endMinute; j++) {
-									state.dates[idx].times[i][j].color = date.color;
+									state.dates[idx].times[i][j].color = Colors.grey400;
 									state.dates[idx].times[i][j].isEveryTime = false;
 									state.dates[idx].times[i][j].isPicked = true;
 									state.dates[idx].times[i][j].mode = 'start';
@@ -228,7 +228,7 @@ export const timetableSlice = createSlice({
 								}
 							} else {
 								for (let j = 0; j <= 6; j++) {
-									state.dates[idx].times[i][j].color = date.color;
+									state.dates[idx].times[i][j].color = Colors.grey400;
 									state.dates[idx].times[i][j].isEveryTime = false;
 									state.dates[idx].times[i][j].isPicked = true;
 									state.dates[idx].times[i][j].borderBottom = false;

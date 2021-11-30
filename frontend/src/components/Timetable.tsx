@@ -308,6 +308,8 @@ export function Timetable({
 											onPress={() => {
 												mode === 'normal' &&
 													onSetStartHour(idx, Number(time), day.day);
+												mode === 'startMode' &&
+													onSetStartHour(idx, Number(time), day.day);
 											}}
 										>
 											{day.times[time].map((t, tIdx) => (
