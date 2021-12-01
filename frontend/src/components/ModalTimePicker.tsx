@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
 	changeAllColor,
 	changeConfirmTime,
+	postSnapShot,
 	getGroupDates,
 	getIndividualDates,
 	makeConfirmDates,
@@ -154,8 +155,10 @@ export function ModalTimePicker({
 				dispatch(
 					postConfirm({ date: confirmDates, id, token, uri: joinUri, user })
 				);
+				dispatch(postSnapShot({ uri: joinUri, id, token, user }));
 			} else {
 				dispatch(postConfirm({ date: confirmDates, id, token, uri, user }));
+				dispatch(postSnapShot({ uri, id, token, user }));
 			}
 		}
 	}, [
