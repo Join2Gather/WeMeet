@@ -1,11 +1,13 @@
 from typing import List
-from hypothesis.extra.django import TestCase, from_model
+from hypothesis.extra.django import from_model
 from hypothesis import given
 from hypothesis.strategies import text, lists, integers
 from django.http.response import JsonResponse
+from clubs.views import ClubConfirmRevertView
+from config.models import ProfileDatesToSnapshot
 from clubs.views import ClubView, ClubDateView
 from django.contrib.auth.models import User as Users
-from config.tests import MockRequestBaseTestCase, mock_request
+from config.tests import MockRequestBaseTestCase as TestCase, mock_request
 from clubs.views import ClubJoinView, ClubLeaveView, ClubColorView, ClubConfirmView, ClubSnapshotView
 from config.models import Profiles, Clubs, ClubEntries, UserModel, ProfileDates, ClubSnapshots, Dates
 from rest_framework.authtoken.models import Token
@@ -54,18 +56,17 @@ class ClubTestCase(TestCase):
         self.assertFalse(ClubEntries.objects.filter(
             profile=profile.id, club=club.id).exists())
 
-        join_response: JsonResponse = mock_request(user, token, params={'profile': profile.id,
-                                                                        'user': profile.user.id, 'uri': club.uri}, view_name='club_join_view', view=ClubJoinView)
+        join_response: JsonResponse = self.mock_request(user, token, params={'profile': profile.id,
+                                                                             'user': profile.user.id, 'uri': club.uri}, view_name='club_join_view', view=ClubJoinView, mode='post')
 
-        self.assertEquals(join_response.status_code, 200)
+        self.check_match_serializer_type(join_response, ClubJoinView.post)
 
         self.assertEquals(ClubEntries.objects.filter(
             profile=profile.id, club=club.id).count(), 1)
 
-        leave_response = mock_request(user, token, params={'profile': profile.id,
-                                                           'user': profile.user.id, 'uri': club.uri}, view_name='club_leave_view', view=ClubLeaveView)
-
-        self.assertEquals(leave_response.status_code, 200)
+        leave_response = self.mock_request(user, token, params={'profile': profile.id,
+                                                                'user': profile.user.id, 'uri': club.uri}, view_name='club_leave_view', view=ClubLeaveView, mode='post')
+        self.check_match_serializer_type(leave_response, ClubLeaveView.post)
 
         self.assertFalse(ClubEntries.objects.filter(
             profile=profile.id, club=club.id).exists())
@@ -91,10 +92,10 @@ class ClubTestCase(TestCase):
         user.save()
         club.save()
 
-        change_color_response: JsonResponse = mock_request(user, token, params={'profile': profile.id,
-                                                                                'user': profile.user.id, 'uri': club.uri}, data={'color': color}, view_name='club_color_view', view=ClubColorView, mode='put')
-
-        self.assertEquals(change_color_response.status_code, 200)
+        change_color_response: JsonResponse = self.mock_request(user, token, params={'profile': profile.id,
+                                                                                     'user': profile.user.id, 'uri': club.uri}, data={'color': color}, view_name='club_color_view', view=ClubColorView, mode='put')
+        self.check_match_serializer_type(
+            change_color_response, ClubColorView.put)
 
         club = Clubs.objects.get(id=club.id)
         self.assertEquals(club.color, color)
@@ -114,6 +115,9 @@ class SnapshotTestCase(TestCase):
         profile.save()
         for profile_date in profile_dates:
             profile_date.save()
+            profile_date_to_snapshot = ProfileDatesToSnapshot.objects.get_or_create(
+                profile_date=profile_date, snapshot=None)[0]
+            profile_date_to_snapshot.save()
 
         user = profile.user
         token = get_token(profile, key)
@@ -123,38 +127,48 @@ class SnapshotTestCase(TestCase):
         club = Clubs.objects.get(id=1)
 
         def confirm_request():
-            return mock_request(
+            return self.mock_request(
                 user, token, params={'profile': profile.id,
                                      'user': profile.user.id, 'uri': club.uri}, view_name='club_confirm_view', view=ClubConfirmView, mode='post')
 
         def snapshot_request():
-            return mock_request(
+            return self.mock_request(
                 user, token, params={'profile': profile.id,
                                      'user': profile.user.id, 'uri': club.uri}, view_name='club_snapshot_view', view=ClubSnapshotView, mode='get')
 
         def delete_request():
-            return mock_request(
+            return self.mock_request(
                 user, token, params={'profile': profile.id,
                                      'user': profile.user.id, 'uri': club.uri}, view_name='club_snapshot_view', view=ClubSnapshotView, mode='delete')
 
-        confirm_response: JsonResponse = confirm_request()
-        snapshots = ClubSnapshots.objects.filter(club=club.id)
+        def revert_request():
+            return self.mock_request(
+                user, token, params={'profile': profile.id,
+                                     'user': profile.user.id, 'uri': club.uri}, view_name='club_confirm_revert_view', view=ClubConfirmRevertView, mode='post')
 
-        self.assertEquals(confirm_response.status_code, 200)
+        confirm_response: JsonResponse = confirm_request()
+        snapshots = ClubSnapshots.objects.filter(
+            profile=profile.id, club=club.id)
+
+        self.check_match_serializer_type(
+            confirm_response, ClubConfirmView.post)
         self.assertEquals(snapshots.count(), 1)
 
         confirm_response: JsonResponse = confirm_request()
-        snapshots = ClubSnapshots.objects.filter(club=club.id)
+        snapshots = ClubSnapshots.objects.filter(
+            profile=profile.id, club=club.id)
 
-        self.assertEquals(confirm_response.status_code, 200)
+        self.check_match_serializer_type(
+            confirm_response, ClubConfirmView.post)
         self.assertEquals(snapshots.count(), 1)
 
         snapshot = snapshots.get()
 
         snapshot_profile_dates = ProfileDates.objects.filter(
-            snapshot=snapshot.id)
+            profiledatestosnapshot__snapshot=snapshot)
 
-        clubs_profile_dates = ProfileDates.objects.filter(club=club.id)
+        clubs_profile_dates = ProfileDates.objects.filter(
+            profile=profile, club=club, profiledatestosnapshot__snapshot=None)
 
         snapshot_dates = list(
             snapshot_profile_dates.values_list('date', flat=True))
@@ -167,26 +181,39 @@ class SnapshotTestCase(TestCase):
         self.assertEquals(snapshot_dates, clubs_dates)
 
         snapshot_response: JsonResponse = snapshot_request()
-        self.assertEquals(snapshot_response.status_code, 200)
+        self.check_match_serializer_type(
+            snapshot_response, ClubSnapshotView.get)
 
         res: dict = json.loads(snapshot_response.content)
         self.assertNotEquals(res, {})
 
+        revert_response: JsonResponse = revert_request()
+        self.check_match_serializer_type(
+            revert_response, ClubConfirmRevertView.post)
+
+        normal_dates = ProfileDates.objects.filter(
+            profile=profile, club=club, profiledatestosnapshot__snapshot=None)
+        snapshot_dates = ProfileDates.objects.filter(
+            profile=profile, club=club, profiledatestosnapshot__snapshot=snapshot)
+
+        self.assertEquals(list(normal_dates), list(snapshot_dates))
+
         delete_respose: JsonResponse = delete_request()
-        self.assertEquals(delete_respose.status_code, 200)
+        self.check_match_serializer_type(
+            delete_respose, ClubSnapshotView.delete)
 
         snapshot_profile_dates = ProfileDates.objects.filter(
-            snapshot=snapshot.id)
+            profiledatestosnapshot__snapshot=snapshot)
 
         self.assertFalse(snapshot_profile_dates.exists())
 
-        snapshots = ClubSnapshots.objects.filter(club=club.id)
+        snapshots = ClubSnapshots.objects.filter(club=club)
         self.assertFalse(snapshots.exists())
 
 
-class ClubHoursTestCase(MockRequestBaseTestCase):
+class ClubHoursTestCase(TestCase):
 
-    @given(from_model(Profiles, user=from_model(Users)), text(),
+    @given(from_model(Profiles, user=from_model(Users)), text().filter(lambda x: x and '\x00' != x),
            integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100), integers(min_value=-100, max_value=100))
     def test_club_starting_end_hours(self, profile: Profiles, name: str,
                                      starting_hours: int, end_hours: int, date_starting_hours: int, date_starting_minutes: int, date_end_hours: int, date_end_minutes: int):
@@ -221,21 +248,21 @@ class ClubHoursTestCase(MockRequestBaseTestCase):
         expected_count = int(response_status == status.HTTP_200_OK)
 
         clubs = Clubs.objects.filter(name=name, color=color,
-                                     starting_hours=starting_hours, end_hours=end_hours).count()
+                                     starting_hours=starting_hours, end_hours=end_hours)
 
-        self.assertEquals(clubs, expected_count)
+        self.assertEquals(clubs.count(), expected_count)
 
         if expected_count == 0:
             return
 
         club = clubs.get()
 
-        res = self.mock_request(user, token, params={'user': user.id, 'profile': profile.id, 'uri': club.uri}, data={
+        res = self.mock_request(user, token, params={'user': user.id, 'profile': profile.id, 'uri': club.uri}, data={'mon': [{
             'starting_hours': date_starting_hours,
             'starting_minutes': date_starting_minutes,
             'end_hours': date_end_hours,
             'end_minutes': date_end_minutes
-        }, view_name='club_date_view', view=ClubDateView, mode='post')
+        }]}, view_name='club_date_view', view=ClubDateView, mode='post')
 
         response_status = status.HTTP_200_OK
         if OOB_hour(date_starting_hours) or OOB_hour(date_end_hours) or OOB_min(date_starting_minutes) or OOB_min(date_end_minutes) \
@@ -244,4 +271,4 @@ class ClubHoursTestCase(MockRequestBaseTestCase):
             response_status = status.HTTP_400_BAD_REQUEST
 
         self.check_match_serializer_type(
-            res, ClubView.post, status=response_status)
+            res, ClubDateView.post, status=response_status)

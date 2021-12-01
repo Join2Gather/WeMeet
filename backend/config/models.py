@@ -39,7 +39,10 @@ class Clubs(models.Model):
 
 
 class ClubSnapshots(models.Model):
-    club = models.ForeignKey(Clubs, on_delete=models.CASCADE)
+    club = models.ForeignKey(
+        Clubs, on_delete=models.CASCADE, null=True, default=None)
+    profile = models.ForeignKey(
+        Profiles, on_delete=models.CASCADE, null=True, default=None)
     created_date = models.DateTimeField(auto_now_add=True)
 
 
@@ -83,12 +86,23 @@ class ProfileDates(models.Model):
     profile = models.ForeignKey(Profiles, on_delete=models.CASCADE)
     date = models.ForeignKey(Dates, on_delete=models.CASCADE)
     club = models.ForeignKey(Clubs, on_delete=models.CASCADE, null=True)
-    snapshot = models.ForeignKey(
-        ClubSnapshots, on_delete=models.CASCADE, null=True, default=None)
 
     class Meta:
         db_table = 'profile_dates'
         verbose_name = 'Profile date'
 
     def __str__(self):
-        return f"{self.profile} -> {self.club} ({self.date})"
+        snapshots = [
+            e.id for e in ProfileDatesToSnapshot.objects.filter(profile_date=self)]
+
+        return f"{self.profile} -> {self.club} date ({self.date}) snapshots ({snapshots})"
+
+
+class ProfileDatesToSnapshot(models.Model):
+    profile_date = models.ForeignKey(
+        ProfileDates, on_delete=models.CASCADE)
+    snapshot = models.ForeignKey(
+        ClubSnapshots, on_delete=models.CASCADE, null=True, default=None)
+
+    def __str__(self):
+        return f"profile_date {self.profile_date.id} -> snapshot {self.snapshot.id if self.snapshot else None}"

@@ -182,7 +182,7 @@ class ClubsWithDateCalculator(DateCalculator):
 class SnapshotWithDateCalculator(ClubsWithDateCalculator):
     @ property
     def filter_expression(self):
-        return {'snapshot': self.obj.id}
+        return {'profiledatestosnapshot__snapshot': self.obj.id}
 
 
 class ClubAvailableTimeSerializer(serializers.ModelSerializer):
@@ -205,7 +205,7 @@ class ClubAvailableTimeSerializer(serializers.ModelSerializer):
         } for day in constants.week}
 
         profile_dates = ProfileDates.objects.filter(
-            club=obj.id).select_related('date', 'profile')
+            club=obj.id, profiledatestosnapshot_snapshot=None).select_related('date', 'profile')
         profile_dates = profile_dates.distinct()
 
         for profile_date in profile_dates:

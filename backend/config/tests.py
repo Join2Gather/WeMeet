@@ -219,7 +219,7 @@ class MockRequestMixin():
         return Token.objects.create(key=key, user=user)
 
     def check_match_serializer_type(self: TestCase, res: JsonResponse, method: Callable, *, status=status.HTTP_200_OK):
-        self.assertEquals(res.status_code, status)
+        self.assertEquals(res.status_code, status, res.content)
 
         parsed_res = json.loads(res.content)
 
@@ -230,7 +230,7 @@ class MockRequestMixin():
         self.assertNotEquals(srl, None)
 
         serialized_res = srl(data=parsed_res)
-        self.assertTrue(serialized_res.is_valid())
+        self.assertTrue(serialized_res.is_valid(), serialized_res.errors)
 
 
 class MockRequestBaseTestCase(TestCase, MockRequestMixin):
