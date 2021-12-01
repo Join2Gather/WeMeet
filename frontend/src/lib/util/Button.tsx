@@ -47,15 +47,13 @@ export function Button({
 					<TouchableHighlight
 						activeOpacity={0.1}
 						underlayColor={Colors.grey200}
-						style={[styles.twoButtonStyle]}
+						style={[styles.twoButtonStyle, { borderBottomLeftRadius: 13 }]}
 						onPress={() => {
 							onPressFunction && onPressFunction();
 							onPressWithParam && pressParam && onPressWithParam(pressParam);
 						}}
 					>
-						<Text style={[styles.buttonText, { borderBottomRightRadius: 13 }]}>
-							{buttonText}
-						</Text>
+						<Text style={[styles.buttonText]}>{buttonText}</Text>
 					</TouchableHighlight>
 					<View
 						style={{
@@ -99,7 +97,7 @@ const styles = StyleSheet.create({
 	},
 	twoButtonStyle: {
 		padding: 15,
-		width: '56%',
+		width: '57%',
 		height: '100%',
 		paddingLeft: 10,
 		paddingRight: 10,
@@ -107,6 +105,7 @@ const styles = StyleSheet.create({
 	buttonWithTwoView: {
 		flexDirection: 'row',
 		marginBottom: -20,
+		marginLeft: 1,
 	},
 	buttonText: {
 		textAlign: 'center',
