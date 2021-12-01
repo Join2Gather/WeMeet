@@ -5,6 +5,7 @@ import type {
 	postIndividualDatesAPI,
 	requestGroupDatesAPI,
 	requestIndividualDatesAPI,
+	getSnapShotAPI,
 	timetable,
 } from '../interface';
 import { Colors } from 'react-native-paper';
@@ -21,6 +22,8 @@ const GET_INDIVIDUAL = 'timetable/GET_INDIVIDUAL';
 const GET_GROUP = 'timetable/GET_GROUP';
 const POST_INDIVIDUAL = 'timetable/POST_INDIVIDUAL';
 const POST_CONFIRM = 'timetable/POST_CONFIRM';
+const GET_SNAPSHOT = 'timetable/GET_SNAPSHOT';
+const POST_SNAPSHOT = 'timetable/POST_SNAPSHOT';
 
 export const getIndividualDates = createAction(
 	GET_INDIVIDUAL,
@@ -39,6 +42,14 @@ export const postConfirm = createAction(
 	POST_CONFIRM,
 	(data: postConfirmAPI) => data
 );
+export const getSnapShot = createAction(
+	GET_SNAPSHOT,
+	(data: getSnapShotAPI) => data
+);
+export const postSnapShot = createAction(
+	POST_SNAPSHOT,
+	(data: getSnapShotAPI) => data
+);
 
 const getIndividualSaga = createRequestSaga(
 	GET_INDIVIDUAL,
@@ -50,12 +61,16 @@ const postIndividualSaga = createRequestSaga(
 	api.postIndividualTime
 );
 const postConfirmSaga = createRequestSaga(POST_CONFIRM, api.postConfirm);
+const getSnapShotSaga = createRequestSaga(GET_SNAPSHOT, api.getSnapShot);
+const postSnapShotSaga = createRequestSaga(POST_SNAPSHOT, api.confirmSnapShot);
 
 export function* timetableSaga() {
 	yield takeLatest(GET_INDIVIDUAL, getIndividualSaga);
 	yield takeLatest(GET_GROUP, getGroupSaga);
 	yield takeLatest(POST_INDIVIDUAL, postIndividualSaga);
 	yield takeLatest(POST_CONFIRM, postConfirmSaga);
+	yield takeLatest(GET_SNAPSHOT, getSnapShotSaga);
+	yield takeLatest(POST_CONFIRM, postSnapShotSaga);
 }
 
 const { defaultDates } = useMakeTimetable();
@@ -202,7 +217,7 @@ export const timetableSlice = createSlice({
 		) => {
 			state.confirmClubs = action.payload.confirmClubs;
 			state.confirmDatesTimetable = action.payload.confirmDatesTimetable;
-			state.confirmDatesTimetable.map((date, dIdx) => {
+			state.confirmDatesTimetable.map((date) => {
 				state.weekIndex.map((day, idx) => {
 					date[day].map((d) => {
 						const startingMinute = Math.round(d.starting_minutes / 10);
@@ -210,29 +225,35 @@ export const timetableSlice = createSlice({
 						for (let i = d.starting_hours; i <= d.end_hours; i++) {
 							if (i === d.starting_hours) {
 								for (let j = startingMinute; j <= 6; j++) {
-									state.dates[idx].times[i][j].color = Colors.grey400;
-									state.dates[idx].times[i][j].isEveryTime = false;
-									state.dates[idx].times[i][j].isPicked = true;
-									state.dates[idx].times[i][j].mode = 'start';
-									state.dates[idx].times[i][j].borderBottom = false;
-									state.dates[idx].times[i][j].borderTop = false;
+									if (state.dates[idx].times[i]) {
+										state.dates[idx].times[i][j].color = Colors.grey400;
+										state.dates[idx].times[i][j].isEveryTime = false;
+										state.dates[idx].times[i][j].isPicked = true;
+										state.dates[idx].times[i][j].mode = 'start';
+										state.dates[idx].times[i][j].borderBottom = false;
+										state.dates[idx].times[i][j].borderTop = false;
+									}
 								}
 							} else if (i === d.end_hours) {
 								for (let j = 0; j < endMinute; j++) {
-									state.dates[idx].times[i][j].color = Colors.grey400;
-									state.dates[idx].times[i][j].isEveryTime = false;
-									state.dates[idx].times[i][j].isPicked = true;
-									state.dates[idx].times[i][j].mode = 'start';
-									state.dates[idx].times[i][j].borderBottom = false;
-									state.dates[idx].times[i][j].borderTop = false;
+									if (state.dates[idx].times[i]) {
+										state.dates[idx].times[i][j].color = Colors.grey400;
+										state.dates[idx].times[i][j].isEveryTime = false;
+										state.dates[idx].times[i][j].isPicked = true;
+										state.dates[idx].times[i][j].mode = 'start';
+										state.dates[idx].times[i][j].borderBottom = false;
+										state.dates[idx].times[i][j].borderTop = false;
+									}
 								}
 							} else {
 								for (let j = 0; j <= 6; j++) {
-									state.dates[idx].times[i][j].color = Colors.grey400;
-									state.dates[idx].times[i][j].isEveryTime = false;
-									state.dates[idx].times[i][j].isPicked = true;
-									state.dates[idx].times[i][j].borderBottom = false;
-									state.dates[idx].times[i][j].borderTop = false;
+									if (state.dates[idx].times[i]) {
+										state.dates[idx].times[i][j].color = Colors.grey400;
+										state.dates[idx].times[i][j].isEveryTime = false;
+										state.dates[idx].times[i][j].isPicked = true;
+										state.dates[idx].times[i][j].borderBottom = false;
+										state.dates[idx].times[i][j].borderTop = false;
+									}
 								}
 							}
 						}
@@ -313,6 +334,12 @@ export const timetableSlice = createSlice({
 		POST_CONFIRM_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.confirmDatesPrepare = false;
 			state.postConfirmSuccess = true;
+		},
+		GET_SNAPSHOT_SUCCESS: (state, action: PayloadAction<any>) => {
+			console.log(action.payload);
+		},
+		GET_SNAPSHOT_FAILURE: (state, action: PayloadAction<any>) => {
+			state.error = action.payload;
 		},
 		postConfirmMakeFalse: (state) => {
 			state.postConfirmSuccess = false;

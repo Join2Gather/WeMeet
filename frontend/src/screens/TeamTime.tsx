@@ -14,6 +14,7 @@ import {SafeAreaView, View, UnderlineText,TopBar,
 NavigationHeader,  Text} from '../theme';
 import Icon from 'react-native-vector-icons/Fontisto';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AntIcon from 'react-native-vector-icons/MaterialIcons';
 import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
 import { Timetable, Spinner } from '../components';
 import { Colors } from 'react-native-paper';
@@ -48,6 +49,7 @@ type TeamStackParamList = {
 
 type Props = NativeStackScreenProps<TeamStackParamList, 'TeamTime'>;
 import { changeColor, setModalMode, shareUri } from '../store/team';
+import { ModalSetting } from '../components/ModalSetting';
 
 export default function TeamTime({ route }: Props) {
 	const {
@@ -95,6 +97,7 @@ export default function TeamTime({ route }: Props) {
 
 	//modal
 	const [modalVisible, setModalVisible] = useState(false);
+	const [settingModalVisible, setSettingModalVisible] = useState(false);
 	const [mode, setMode] = useState('normal');
 
 	// useEffect
@@ -179,6 +182,15 @@ export default function TeamTime({ route }: Props) {
 								color={Colors.white}
 								style={{ paddingTop: 3 }}
 								onPress={onShareURI}
+							/>
+						)}
+						thirdRight={() => (
+							<AntIcon
+								name="settings"
+								size={25}
+								color={Colors.white}
+								style={{ paddingTop: 1 }}
+								onPress={() => setSettingModalVisible(true)}
 							/>
 						)}
 					/>
@@ -295,6 +307,15 @@ export default function TeamTime({ route }: Props) {
 						postDatesPrepare={postDatesPrepare}
 						confirmDatesPrepare={confirmDatesPrepare}
 						color={color}
+					/>
+					<ModalSetting
+						settingModalVisible={settingModalVisible}
+						setSettingModalVisible={setSettingModalVisible}
+						id={id}
+						token={token}
+						user={user}
+						color={color}
+						uri={uri}
 					/>
 				</View>
 			</ScrollView>

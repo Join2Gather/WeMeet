@@ -192,6 +192,15 @@ export interface postConfirmAPI {
 	token: string;
 }
 
+// 스냅샷 받아오기
+
+export interface getSnapShotAPI {
+	id: number;
+	user: number;
+	uri: string;
+	token: string;
+}
+
 export interface post_time {
 	starting_hours: number;
 	starting_minutes: number;

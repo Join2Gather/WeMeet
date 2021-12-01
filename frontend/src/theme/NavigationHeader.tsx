@@ -10,6 +10,7 @@ export type NavigationHeaderProps = {
 	Left?: () => ReactNode;
 	Right?: () => ReactNode;
 	secondRight?: () => ReactNode;
+	thirdRight?: () => ReactNode;
 	headerColor?: string;
 	viewStyle?: StyleProp<ViewStyle>;
 	titleStyle?: StyleProp<TextStyle>;
@@ -20,6 +21,7 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 	Left,
 	Right,
 	secondRight,
+	thirdRight,
 	viewStyle,
 	titleStyle,
 	headerColor,
@@ -43,6 +45,8 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 					{ flexDirection: 'row', justifyContent: 'flex-end' },
 				]}
 			>
+				{thirdRight && thirdRight()}
+				<View style={{ flex: 0.3, backgroundColor: 'transparent' }}></View>
 				{secondRight && secondRight()}
 				<View style={{ flex: 0.2, backgroundColor: 'transparent' }}></View>
 				{Right && Right()}
