@@ -17,7 +17,7 @@ export function SocialWebview({ closeSocialModal, source }: any) {
 
 	useEffect(() => {
 		return () => {
-			dispatch(kakaoLogin(data.kakaoDates));
+			data && dispatch(kakaoLogin(data.kakaoDates));
 		};
 	}, []);
 	const _handleMessage = async (event: any) => {

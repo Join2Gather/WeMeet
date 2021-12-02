@@ -33,10 +33,10 @@ import { RootState } from '../store';
 import { getUserMe } from '../store/login';
 import { cloneINDates, initialIndividualTimetable } from '../store/individual';
 interface props {
-	modalVisible: boolean;
-	setModalVisible: React.Dispatch<React.SetStateAction<boolean>> | null;
-	mode: string;
-	setMode: React.Dispatch<React.SetStateAction<string>>;
+	modalVisible?: boolean;
+	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>> | null;
+	mode?: string;
+	setMode?: React.Dispatch<React.SetStateAction<string>>;
 	postDatesPrepare?: boolean;
 	confirmDatesPrepare?: boolean;
 	token: string;
@@ -46,7 +46,7 @@ interface props {
 	postIndividualDates: any;
 	confirmDates: any;
 	isTimePicked?: boolean;
-	isGroup: boolean;
+	isGroup?: boolean;
 	date: Date;
 	setDate: React.Dispatch<React.SetStateAction<Date>>;
 	timeMode: string;
@@ -94,7 +94,7 @@ export function ModalTimePicker({
 
 		if (mode === 'startMinute') {
 			dispatch(setStartMin(timeMinute));
-			setMode('endMode');
+			setMode && setMode('endMode');
 			setModalVisible && setModalVisible(true);
 		} else {
 			if (isGroup) {
@@ -112,7 +112,7 @@ export function ModalTimePicker({
 					dispatch(makePostIndividualDates());
 				}
 			}
-			setMode('normal');
+			setMode && setMode('normal');
 			setModalVisible && setModalVisible(false);
 		}
 	}, [minute, mode, hour, isGroup, date]);
@@ -120,11 +120,11 @@ export function ModalTimePicker({
 	// 닫기 버튼
 	const onPressClose = useCallback(() => {
 		setModalVisible && setModalVisible(false);
-		setMode('normal');
+		setMode && setMode('normal');
 	}, [setModalVisible, modalVisible]);
 	// 이전 모드
 	const onPressPrevMode = useCallback(() => {
-		setMode('startMinute');
+		setMode && setMode('startMinute');
 		// setModalVisible(false);
 	}, []);
 	// 개인 시간 전송

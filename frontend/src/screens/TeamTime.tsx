@@ -60,6 +60,7 @@ export default function TeamTime({ route }: Props) {
 		confirmDatesPrepare,
 		loadingIndividual,
 		loadingGroup,
+		loadingChangeColor,
 		joinName,
 		joinUri,
 		loadingJoin,
@@ -69,6 +70,8 @@ export default function TeamTime({ route }: Props) {
 		startHour,
 		endHour,
 		makeReady,
+		createdDate,
+		snapShotDate,
 	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
 		uri: login.uri,
 		color: login.color,
@@ -78,6 +81,7 @@ export default function TeamTime({ route }: Props) {
 		loadingIndividual: loading['timetable/GET_INDIVIDUAL'],
 		loadingGroup: loading['timetable/GET_GROUP'],
 		loadingJoin: loading['team/JOIN_TEAM'],
+		loadingChangeColor: loading['team/CHANGE_COLOR'],
 		joinName: team.joinName,
 		joinUri: team.joinUri,
 		joinTeamError: team.joinTeamError,
@@ -86,6 +90,8 @@ export default function TeamTime({ route }: Props) {
 		startHour: login.startHour,
 		endHour: login.endHour,
 		makeReady: timetable.makeReady,
+		createdDate: timetable.createdDate,
+		snapShotDate: timetable.snapShotDate,
 	}));
 	// navigation
 	const { name, id, user, token, modalMode } = route.params;
@@ -125,13 +131,6 @@ export default function TeamTime({ route }: Props) {
 		navigation.goBack();
 		dispatch(setModalMode('make'));
 		dispatch(setTimeMode('normal'));
-	}, []);
-	const onPressPlus = useCallback(() => {
-		setMode('startMode');
-		dispatch(setStartHour(0));
-		dispatch(setStartMin(0));
-		dispatch(setEndHour(0));
-		dispatch(setEndMin(0));
 	}, []);
 	// 공유하기 버튼
 	const onShareURI = useCallback(() => {
@@ -176,15 +175,6 @@ export default function TeamTime({ route }: Props) {
 							)
 						}
 						secondRight={() => (
-							<FontAwesome
-								name="user-plus"
-								size={20}
-								color={Colors.white}
-								style={{ paddingTop: 3 }}
-								onPress={onShareURI}
-							/>
-						)}
-						thirdRight={() => (
 							<AntIcon
 								name="settings"
 								size={25}
@@ -316,6 +306,10 @@ export default function TeamTime({ route }: Props) {
 						user={user}
 						color={color}
 						uri={uri}
+						loadingChangeColor={loadingChangeColor}
+						createdDate={createdDate}
+						name={name}
+						onShareURI={onShareURI}
 					/>
 				</View>
 			</ScrollView>

@@ -1,12 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Login from './Login';
 import TabNavigator from './TabNavigator';
 import DrawerContent from './DrawerContent';
 
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
+import { useNavigation } from '@react-navigation/native';
+
 const Drawer = createDrawerNavigator();
 
 export default function MainNavigator() {
+	const { token } = useSelector(({ login }: RootState) => ({
+		token: login.token,
+	}));
+	const navigation = useNavigation();
+	useEffect(() => {
+		if (token) {
+			navigation.navigate('TabNavigator');
+		}
+	}, [token]);
 	return (
 		<Drawer.Navigator
 			screenOptions={{ headerShown: false }}

@@ -6,6 +6,7 @@ import type {
 export interface timetable {
 	dates: make60[];
 	teamDatesWith60: make60[];
+	snapShotDate: make60[];
 	startTime: number;
 	endTime: number;
 	startMinute: number;
@@ -34,6 +35,8 @@ export interface timetable {
 	endHour: number;
 	makeReady: boolean;
 	timesText: Array<string>;
+	snapShotError: boolean;
+	createdDate: string;
 }
 
 export type weekIndex = Array<string>;
@@ -228,6 +231,11 @@ export interface responseTeamTimetable {
 	fri: groupTime;
 	sat: groupTime;
 	[prop: string]: groupTime;
+}
+
+export interface responseSnapShotTimetable {
+	dates: responseIndividualTimetable;
+	created_date: string;
 }
 
 export interface groupTime {

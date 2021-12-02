@@ -61,7 +61,7 @@ export default function TeamList() {
 		postTeamError: team.postTeamError,
 		loadingJoin: loading['team/JOIN_TEAM'],
 		loadingChangeColor: loading['team/CHANGE_COLOR'],
-		teamColor: team.teamColor,
+		teamColor: timetable.color,
 		joinUri: team.joinUri,
 		loadingUserMe: loading['login/USER_ME'],
 		makeReady: timetable.makeReady,
@@ -76,7 +76,7 @@ export default function TeamList() {
 	// useEffect
 	useEffect(() => {
 		dispatch(getUserMe({ id, token, user }));
-	}, [joinTeam]);
+	}, [joinTeam, teamColor]);
 	useEffect(() => {
 		dispatch(setModalMode('make'));
 	}, [joinTeamError]);

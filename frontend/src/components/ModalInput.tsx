@@ -243,7 +243,7 @@ export function ModalInput({
 							)}
 							{mode === 'initial' && modalMode === 'make' && (
 								<>
-									<Text style={styles.titleText}>1. 모임명을 입력하세요</Text>
+									<Text style={styles.titleText}>모임명을 입력하세요</Text>
 									<View style={[styles.textInputView]}>
 										<TextInput
 											// onFocus={focus}
