@@ -34,12 +34,13 @@ const lastBox = 25;
 const screen = Dimensions.get('screen');
 const borderWidth = 0.3;
 interface props {
-	mode: string;
-	modalVisible: boolean;
-	setModalVisible: React.Dispatch<React.SetStateAction<boolean>> | null;
-	setMode: React.Dispatch<React.SetStateAction<string>>;
-	isGroup: boolean;
+	mode?: string;
+	modalVisible?: boolean;
+	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>> | null;
+	setMode?: React.Dispatch<React.SetStateAction<string>>;
+	isGroup?: boolean;
 	individualDates?: make60[];
+	snapShotDate?: make60[];
 	uri?: string;
 	postDatesPrepare?: boolean;
 	confirmDatesPrepare?: boolean;
@@ -55,6 +56,7 @@ export function Timetable({
 	setMode,
 	isGroup,
 	individualDates,
+	snapShotDate,
 	uri,
 	postDatesPrepare,
 	confirmDatesPrepare,
@@ -155,7 +157,7 @@ export function Timetable({
 			dispatch(setStartHour(time));
 			date.setHours(time);
 			setDate(new Date(date));
-			setMode('startMinute');
+			setMode && setMode('startMinute');
 			setModalVisible && setModalVisible(true);
 			dispatch(changeDayIdx(idx));
 			dispatch(setDay(day));
@@ -165,7 +167,7 @@ export function Timetable({
 	);
 	useEffect(() => {
 		if (isTimePicked || isTimeNotExist) {
-			setMode('normal');
+			setMode && setMode('normal');
 			setModalVisible && setModalVisible(false);
 			dispatch(makeInitialTimePicked());
 		}
@@ -268,6 +270,46 @@ export function Timetable({
 											style={[styles.boxView]}
 											key={time}
 											onPress={() => console.log(time)}
+										>
+											{day.times[time].map((t, tIdx) => (
+												<View
+													key={t.minute}
+													style={{
+														backgroundColor: t.color,
+														height: boxHeight / inBoxHeight,
+														borderTopWidth:
+															Number(time) === endHour
+																? borderWidth
+																: t.borderBottom
+																? borderWidth
+																: 0,
+														borderBottomWidth:
+															Number(time) === endHour - 1 && tIdx === 6
+																? borderWidth
+																: 0,
+														borderLeftWidth:
+															Number(time) === endHour ? 0 : borderWidth,
+														borderRightWidth:
+															Number(time) === endHour ? 0 : borderWidth,
+													}}
+												/>
+											))}
+										</TouchableView>
+									))}
+								</View>
+							))}
+						</>
+					) : snapShotDate ? (
+						<>
+							{snapShotDate.map((day, idx) => (
+								<View style={styles.columnView} key={day.day}>
+									{Object.keys(day.times).map((time) => (
+										<TouchableView
+											style={[styles.boxView]}
+											key={time}
+											onPress={() => {
+												console.log('hi');
+											}}
 										>
 											{day.times[time].map((t, tIdx) => (
 												<View
