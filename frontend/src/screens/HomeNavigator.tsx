@@ -5,7 +5,7 @@ import { useNavigationHorizontalInterpolator } from '../hooks';
 import TeamList from './TeamList';
 import TeamTime from './TeamTime';
 import HomeRight from './HomeRight';
-
+import SnapShot from './SnapShot';
 const Stack = createStackNavigator();
 
 export default function MainNavigator() {
@@ -27,11 +27,9 @@ export default function MainNavigator() {
 	return (
 		<Stack.Navigator screenOptions={{ headerShown: false }}>
 			<Stack.Screen name="TeamList" component={TeamList} />
-			<Stack.Screen
-				name="TeamTime"
-				component={TeamTime}
-				options={leftOptions}
-			/>
+			<Stack.Screen name="TeamTime" component={TeamTime} />
+			<Stack.Screen name="SnapShot" component={SnapShot} />
+
 			{/* <Stack.Screen
 				name="HomeRight"
 				component={HomeRight}
