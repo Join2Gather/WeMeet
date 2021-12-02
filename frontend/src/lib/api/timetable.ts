@@ -88,9 +88,10 @@ export const getSnapShot = ({ id, uri, user, token }: getSnapShotAPI) => {
 // 스냅샷 생성
 export const confirmSnapShot = ({ id, uri, user, token }: getSnapShotAPI) => {
 	const headers = makeHeader(token);
-
-	return axios.get(
+	const data = null;
+	return axios.post(
 		`${API_URL}users/${user}/profiles/${id}/clubs/${uri}/confirm`,
+		data,
 		{ headers }
 	);
 };
