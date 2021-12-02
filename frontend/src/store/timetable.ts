@@ -6,6 +6,7 @@ import type {
 	requestGroupDatesAPI,
 	requestIndividualDatesAPI,
 	getSnapShotAPI,
+	responseSnapShotTimetable,
 	timetable,
 } from '../interface';
 import { Colors } from 'react-native-paper';
@@ -79,6 +80,7 @@ const { defaultDatesWith60 } = useMakeTimeTableWith60(0, 23);
 const initialState: timetable = {
 	dates: [],
 	teamDatesWith60: [],
+	snapShotDate: [],
 	startTime: 0.0,
 	endTime: 0.0,
 	selectTime: {
@@ -183,6 +185,8 @@ const initialState: timetable = {
 	endHour: 0,
 	makeReady: false,
 	timesText: [],
+	snapShotError: false,
+	createdDate: '',
 };
 
 export const timetableSlice = createSlice({
@@ -196,6 +200,7 @@ export const timetableSlice = createSlice({
 			);
 			state.dates = defaultDatesWith60;
 			state.teamDatesWith60 = defaultDatesWith60;
+			state.snapShotDate = defaultDatesWith60;
 			state.postIndividualDates = {
 				sun: [],
 				mon: [],
@@ -335,10 +340,55 @@ export const timetableSlice = createSlice({
 			state.confirmDatesPrepare = false;
 			state.postConfirmSuccess = true;
 		},
-		GET_SNAPSHOT_SUCCESS: (state, action: PayloadAction<any>) => {
-			console.log(action.payload);
+		GET_SNAPSHOT_SUCCESS: (
+			state,
+			action: PayloadAction<responseSnapShotTimetable>
+		) => {
+			const { created_date, dates } = action.payload;
+			state.createdDate = created_date.slice(0, 10);
+			state.weekIndex.map((day, idx) =>
+				dates[day].map((d) => {
+					const startingMinute = Math.round(d.starting_minutes / 10);
+					const endMinute = Math.round(d.end_minutes / 10);
+					for (let i = d.starting_hours; i <= d.end_hours; i++) {
+						if (i === d.starting_hours) {
+							for (let j = startingMinute; j <= 6; j++) {
+								state.snapShotDate[idx].times[i][j].color = state.color;
+								state.snapShotDate[idx].times[i][j].isEveryTime = false;
+								state.snapShotDate[idx].times[i][j].isPicked = true;
+								state.snapShotDate[idx].times[i][j].mode = 'start';
+								state.snapShotDate[idx].times[i][j].borderTop = false;
+								state.snapShotDate[idx].times[i][j].borderBottom = false;
+							}
+						} else if (i === d.end_hours) {
+							for (let j = 0; j < endMinute; j++) {
+								state.snapShotDate[idx].times[i][j].color = state.color;
+								state.snapShotDate[idx].times[i][j].isEveryTime = false;
+								state.snapShotDate[idx].times[i][j].isPicked = true;
+								state.snapShotDate[idx].times[i][j].mode = 'start';
+								state.snapShotDate[idx].times[i][j].borderTop = false;
+								state.snapShotDate[idx].times[i][j].borderBottom = false;
+							}
+						} else {
+							for (let j = 0; j <= 6; j++) {
+								state.snapShotDate[idx].times[i][j].color = state.color;
+								state.snapShotDate[idx].times[i][j].isEveryTime = false;
+								state.snapShotDate[idx].times[i][j].isPicked = true;
+								state.snapShotDate[idx].times[i][j].borderTop = false;
+								state.snapShotDate[idx].times[i][j].borderBottom = false;
+							}
+						}
+					}
+				})
+			);
 		},
 		GET_SNAPSHOT_FAILURE: (state, action: PayloadAction<any>) => {
+			state.snapShotError = action.payload;
+		},
+		POST_SNAPSHOT_SUCCESS: (state, action: PayloadAction<any>) => {
+			console.log(action.payload);
+		},
+		POST_SNAPSHOT_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
 		postConfirmMakeFalse: (state) => {
@@ -585,6 +635,9 @@ export const timetableSlice = createSlice({
 		setTimeMode: (state, action: PayloadAction<string>) => {
 			state.timeMode = action.payload;
 		},
+		changeTimetableColor: (state, action: PayloadAction<string>) => {
+			state.color = action.payload;
+		},
 	},
 	extraReducers: {},
 });
@@ -611,6 +664,7 @@ export const {
 	setTimeMode,
 	getOtherConfirmDates,
 	makeTeamTime,
+	changeTimetableColor,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;
