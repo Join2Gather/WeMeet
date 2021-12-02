@@ -86,12 +86,17 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignContent: 'center',
 		alignSelf: 'center',
-		marginTop: 10,
-		marginBottom: -14,
+		marginBottom: -20,
+		width: '50%',
+	},
+	buttonWithTwoView: {
+		flexDirection: 'row',
+		marginBottom: -20,
+		marginLeft: 1,
 	},
 	closeButtonStyle: {
 		padding: 15,
-		width: '80%',
+		width: '100%',
 		height: '100%',
 		borderRadius: 13,
 	},
@@ -102,13 +107,10 @@ const styles = StyleSheet.create({
 		paddingLeft: 10,
 		paddingRight: 10,
 	},
-	buttonWithTwoView: {
-		flexDirection: 'row',
-		marginBottom: -20,
-		marginLeft: 1,
-	},
+
 	buttonText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
+		fontSize: 14,
 	},
 });
