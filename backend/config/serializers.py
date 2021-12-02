@@ -205,7 +205,7 @@ class ClubAvailableTimeSerializer(serializers.ModelSerializer):
         } for day in constants.week}
 
         profile_dates = ProfileDates.objects.filter(
-            club=obj.id, profiledatestosnapshot_snapshot=None).select_related('date', 'profile')
+            club=obj.id, profiledatestosnapshot__snapshot=None).select_related('date', 'profile')
         profile_dates = profile_dates.distinct()
 
         for profile_date in profile_dates:
