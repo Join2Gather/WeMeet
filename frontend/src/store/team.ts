@@ -53,7 +53,7 @@ const initialState: team = {
 	joinTeamError: false,
 	postTeamError: false,
 	teamColor: '',
-	modalMode: 'make',
+	modalMode: 'normal',
 };
 
 export const teamSlice = createSlice({
