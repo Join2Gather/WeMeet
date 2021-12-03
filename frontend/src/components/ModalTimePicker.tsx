@@ -1,22 +1,11 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import {
-	Alert,
-	Modal,
-	StyleSheet,
-	Text,
-	TouchableHighlight,
-	View,
-	TextInput,
-	Platform,
-} from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import {
 	changeAllColor,
 	changeConfirmTime,
 	postSnapShot,
-	getGroupDates,
-	getIndividualDates,
 	makeConfirmDates,
 	makePostIndividualDates,
 	postConfirm,
@@ -25,13 +14,12 @@ import {
 	setEndMin,
 	setStartMin,
 } from '../store/timetable';
-import dayjs from 'dayjs';
 import { Colors } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useIsDarkMode } from '../hooks';
 import { RootState } from '../store';
 import { getUserMe } from '../store/login';
 import { cloneINDates, initialIndividualTimetable } from '../store/individual';
+import { cos } from 'react-native-reanimated';
 interface props {
 	modalVisible?: boolean;
 	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>> | null;
@@ -80,7 +68,6 @@ export function ModalTimePicker({
 			confirmDatesTimetable: login.confirmDatesTimetable,
 		}));
 	const dispatch = useDispatch();
-
 	const [minute, setMinute] = useState(0);
 	const [hour, setHour] = useState(0);
 	const { isDark } = useIsDarkMode();
@@ -108,7 +95,7 @@ export function ModalTimePicker({
 				{
 					dispatch(setEndMin(timeMinute));
 					dispatch(setEndHour(timeHour));
-					dispatch(changeAllColor());
+					// dispatch(changeAllColor());
 					dispatch(makePostIndividualDates());
 				}
 			}
@@ -221,19 +208,22 @@ export function ModalTimePicker({
 		// 					? '시작 시간을 입력하세요'
 		// 					: '종료 시간을 입력하세요'}
 		// 			</Text>
-		<DateTimePickerModal
-			confirmTextIOS="확인"
-			cancelTextIOS="취소"
-			display="spinner"
-			isVisible={modalVisible}
-			mode="time"
-			date={date}
-			// isDarkModeEnabled={false}
-			onChange={(date) => setDate(date)}
-			textColor={isDark ? Colors.white : Colors.black}
-			onConfirm={onPressConfirm}
-			onCancel={onPressClose}
-		/>
+		<View>
+			<DateTimePickerModal
+				confirmTextIOS="확인"
+				cancelTextIOS="취소"
+				display="spinner"
+				isVisible={modalVisible}
+				mode="datetime"
+				date={date}
+				// isDarkModeEnabled={false}
+				renderToHardwareTextureAndroid={true}
+				onChange={(date) => setDate(date)}
+				textColor={isDark ? Colors.white : Colors.black}
+				onConfirm={onPressConfirm}
+				onCancel={onPressClose}
+			/>
+		</View>
 		// <View style={{ height: 100 }} />
 		/* <View style={{ flex: 1 }}>
 						<DateTimePicker
