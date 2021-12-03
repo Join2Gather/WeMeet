@@ -7,7 +7,7 @@ export interface Login {
 	token: string;
 	clubs: Array<any>;
 	kakaoDates: Array<any>;
-	uri?: string;
+	uri: string;
 	error: string;
 	color: string;
 	peopleCount: number;
@@ -17,6 +17,7 @@ export interface Login {
 	userMeSuccess: boolean;
 	startHour: number;
 	endHour: number;
+	dates: any;
 }
 
 export interface kakaoLoginAPI {
@@ -26,6 +27,7 @@ export interface kakaoLoginAPI {
 	token: string;
 	clubs: Array<any>;
 	kakaoDates: Array<any>;
+	dates: any;
 }
 
 export interface confirmDates {
