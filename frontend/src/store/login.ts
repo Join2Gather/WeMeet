@@ -22,6 +22,7 @@ const initialState: Login = {
 	userMeSuccess: false,
 	startHour: 0,
 	endHour: 0,
+	dates: [],
 };
 
 const USER_ME = 'login/USER_ME';
@@ -49,8 +50,16 @@ export const loginSlice = createSlice({
 			});
 			state.kakaoDates = action.payload.kakaoDates;
 		},
-		findURI: (state, action: PayloadAction<string>) => {
-			const data = state.clubs.find((club) => club.name === action.payload);
+		findTeam: (
+			state,
+			action: PayloadAction<{ uri?: string; name?: string }>
+		) => {
+			let data;
+			if (action.payload.name) {
+				data = state.clubs.find((club) => club.name === action.payload.name);
+			} else if (action.payload.uri) {
+				data = state.clubs.find((club) => club.uri === action.payload.uri);
+			}
 			if (data) {
 				state.uri = data.uri;
 				state.color = data.color;
@@ -84,9 +93,6 @@ export const loginSlice = createSlice({
 		USER_ME_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
-		putURI: (state, action: PayloadAction<string>) => {
-			state.uri = action.payload;
-		},
 		makeGroupColor: (state, action: PayloadAction<string>) => {
 			state.color = action.payload;
 		},
@@ -94,7 +100,6 @@ export const loginSlice = createSlice({
 	extraReducers: {},
 });
 
-export const { getSocialLogin, findURI, putURI, makeGroupColor } =
-	loginSlice.actions;
+export const { getSocialLogin, findTeam, makeGroupColor } = loginSlice.actions;
 
 export default loginSlice.reducer;

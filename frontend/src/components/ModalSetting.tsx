@@ -37,6 +37,7 @@ interface props {
 	createdDate: string;
 	name: string;
 	onShareURI: () => void;
+	snapShotError: boolean;
 }
 
 export function ModalSetting({
@@ -50,6 +51,7 @@ export function ModalSetting({
 	createdDate,
 	name,
 	onShareURI,
+	snapShotError,
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
@@ -259,7 +261,7 @@ export function ModalSetting({
 								buttonNumber={2}
 								buttonText={'이전'}
 								secondButtonText={'확인'}
-								onPressWithParam={() => onPressSetMode('initial')}
+								onPressWithParam={() => setMode('initial')}
 								pressParam="initial"
 								secondOnPressFunction={() => onPressChangeColor()}
 							/>
@@ -273,31 +275,55 @@ export function ModalSetting({
 							<View style={styles.blankView} />
 							<View style={[styles.backgroundView]}>
 								<View style={styles.columnView}>
-									<TouchableHighlight
-										activeOpacity={1}
-										underlayColor={Colors.grey300}
-										onPress={goSnapShotPage}
-										style={styles.touchButtonStyle}
-									>
-										<View style={styles.rowView}>
-											<Font5Icon
-												name="save"
-												size={23}
-												color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
-											/>
-											<Text style={styles.touchText}>{createdDate}</Text>
-											<View style={styles.iconView}>
-												<Font5Icon
-													name="angle-right"
-													size={19}
-													color={Colors.black}
-												/>
+									{snapShotError && (
+										<TouchableHighlight
+											activeOpacity={1}
+											underlayColor={Colors.grey300}
+											// onPress={goSnapShotPage}
+											style={styles.touchButtonStyle}
+										>
+											<View style={styles.rowView}>
+												<Font5Icon name="ban" size={23} color={Colors.red500} />
+												<Text style={styles.touchText}>
+													저장된 시간이 없습니다
+												</Text>
 											</View>
+										</TouchableHighlight>
+									)}
+									{!snapShotError && (
+										<View>
+											<TouchableHighlight
+												activeOpacity={1}
+												underlayColor={Colors.grey300}
+												onPress={goSnapShotPage}
+												style={styles.touchButtonStyle}
+											>
+												<View style={styles.rowView}>
+													<Font5Icon
+														name="save"
+														size={23}
+														color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+													/>
+													<Text style={styles.touchText}>{createdDate}</Text>
+													<View style={styles.iconView}>
+														<Font5Icon
+															name="angle-right"
+															size={19}
+															color={Colors.black}
+														/>
+													</View>
+												</View>
+											</TouchableHighlight>
 										</View>
-									</TouchableHighlight>
+									)}
 								</View>
 							</View>
-							<Button buttonNumber={1} buttonText={'이전'} />
+							<Button
+								buttonNumber={1}
+								buttonText={'이전'}
+								onPressWithParam={() => setMode('initial')}
+								pressParam="initial"
+							/>
 						</>
 					)}
 					{mode === 'loading' ||

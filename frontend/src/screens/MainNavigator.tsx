@@ -4,19 +4,24 @@ import Login from './Login';
 import TabNavigator from './TabNavigator';
 import DrawerContent from './DrawerContent';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { useNavigation } from '@react-navigation/native';
+import { getUserMe } from '../store/login';
 
 const Drawer = createDrawerNavigator();
 
 export default function MainNavigator() {
-	const { token } = useSelector(({ login }: RootState) => ({
+	const { token, id, user } = useSelector(({ login }: RootState) => ({
 		token: login.token,
+		id: login.id,
+		user: login.user,
 	}));
+	const dispatch = useDispatch();
 	const navigation = useNavigation();
 	useEffect(() => {
 		if (token) {
+			dispatch(getUserMe({ id, token, user }));
 			navigation.navigate('TabNavigator');
 		}
 	}, [token]);

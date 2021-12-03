@@ -1,22 +1,16 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { Alert, StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { ModalMinute } from './ModalMinute';
-import { useMakeTimetable } from '../hooks';
 import {
-	changeAllColor,
 	changeDayIdx,
 	checkIsBlank,
 	checkIsExist,
 	cloneEveryTime,
-	// changeColor,
 	getGroupDates,
 	getIndividualDates,
 	getOtherConfirmDates,
 	makeInitialTimePicked,
-	makePostIndividualDates,
-	postIndividualTime,
 	setDay,
 	setEndHour,
 	setStartHour,
@@ -122,15 +116,28 @@ export function Timetable({
 				if (timeMode === 'make')
 					dispatch(getGroupDates({ id, user, token, uri: joinUri }));
 				else dispatch(getGroupDates({ id, user, token, uri }));
+				isGroup &&
+					dispatch(
+						getOtherConfirmDates({
+							confirmClubs,
+							confirmDatesTimetable,
+							isGroup,
+						})
+					);
 			} else if (uri && !isGroup) {
 				if (timeMode == 'make')
 					dispatch(getIndividualDates({ id, user, token, uri: joinUri }));
 				else {
 					dispatch(getIndividualDates({ id, user, token, uri }));
-					dispatch(
-						getOtherConfirmDates({ confirmClubs, confirmDatesTimetable })
-					);
 				}
+				isGroup &&
+					dispatch(
+						getOtherConfirmDates({
+							confirmClubs,
+							confirmDatesTimetable,
+							isGroup,
+						})
+					);
 			}
 		}
 	}, [

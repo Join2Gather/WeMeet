@@ -22,8 +22,8 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import Material from 'react-native-vector-icons/MaterialIcons';
-import { findURI, getUserMe } from '../store/login';
-import { getColor, makeTeamTime, setTimeMode } from '../store/timetable';
+import { getUserMe } from '../store/login';
+import { makeTeamTime, setTimeMode } from '../store/timetable';
 import { Button } from '../lib/util/Button';
 interface props {
 	modalVisible: boolean;
@@ -128,15 +128,16 @@ export function ModalInput({
 		setModalVisible(false);
 		setMode('initial');
 		if (modalMode === 'join') {
-			goTeamTime(joinName);
+			const uri = joinUri;
+			goTeamTime(uri);
 			setCode('');
 		} else if (modalMode === 'make') {
-			dispatch(findURI(name));
 			dispatch(
 				makeTeamTime({
 					startHour: Number(startTime),
 					endHour: Number(endTime),
 					color,
+					peopleCount: 1,
 				})
 			);
 			setColor(Colors.red500);
