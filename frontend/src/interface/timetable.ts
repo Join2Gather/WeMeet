@@ -37,6 +37,7 @@ export interface timetable {
 	timesText: Array<string>;
 	snapShotError: boolean;
 	createdDate: string;
+	reload: boolean;
 }
 
 export type weekIndex = Array<string>;
