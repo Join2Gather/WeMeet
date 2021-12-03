@@ -1,36 +1,24 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import {
-	StyleSheet,
-	View,
-	Text,
-	FlatList,
-	Platform,
-	Dimensions,
-	Alert,
-} from 'react-native';
+import { StyleSheet, View, Text, FlatList, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import {
 	SafeAreaView,
-	UnderlineText,
-	TextInput,
 	TouchableView,
 	TopBar,
 	MaterialCommunityIcon as Icon,
 } from '../theme/navigation';
 import Icons from 'react-native-vector-icons/AntDesign';
-import { useAutoFocus, AutoFocusProvider } from '../contexts';
-import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { initialError, postTeamName, setModalMode } from '../store/team';
+import { initialError, setModalMode } from '../store/team';
 import { ModalInput, Spinner } from '../components';
 import { NavigationHeader } from '../theme';
-import { useLayout, useMakeTimetable } from '../hooks';
-import { cloneDates, getColor } from '../store/timetable';
 import FontAweSome from 'react-native-vector-icons/FontAwesome5';
 import Material from 'react-native-vector-icons/MaterialCommunityIcons';
-import { getUserMe, makeGroupColor } from '../store/login';
+import { findTeam, getUserMe } from '../store/login';
+import { Colors } from 'react-native-paper';
+import { makeTeamTime } from '../store/timetable';
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
 export default function TeamList() {
@@ -50,6 +38,10 @@ export default function TeamList() {
 		loadingUserMe,
 		makeReady,
 		modalMode,
+		color,
+		peopleCount,
+		startHour,
+		endHour,
 	} = useSelector(({ login, team, loading, timetable }: RootState) => ({
 		user: login.user,
 		id: login.id,
@@ -66,6 +58,10 @@ export default function TeamList() {
 		loadingUserMe: loading['login/USER_ME'],
 		makeReady: timetable.makeReady,
 		modalMode: team.modalMode,
+		color: login.color,
+		peopleCount: login.peopleCount,
+		startHour: login.startHour,
+		endHour: login.endHour,
 	}));
 	const [dimensions, setDimensions] = useState({ window, screen });
 
@@ -78,21 +74,19 @@ export default function TeamList() {
 		dispatch(getUserMe({ id, token, user }));
 	}, [joinTeam, teamColor]);
 	useEffect(() => {
-		dispatch(setModalMode('make'));
+		dispatch(setModalMode('normal'));
 	}, [joinTeamError]);
 	// useCallback
 	// Navigation 이동
 	const goTeamTime = useCallback(
-		(name) => {
+		(name?: string, uri?: string) => {
 			if (modalMode === 'join') {
-				navigation.navigate('TeamTime', {
-					name,
-					user,
-					id,
-					token,
-					modalMode,
-				});
+				dispatch(findTeam({ uri }));
 			} else {
+				dispatch(findTeam({ name }));
+			}
+			dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
+			setTimeout(() => {
 				navigation.navigate('TeamTime', {
 					name,
 					user,
@@ -100,7 +94,7 @@ export default function TeamList() {
 					token,
 					modalMode,
 				});
-			}
+			}, 100);
 			dispatch(initialError());
 		},
 		[modalMode, makeReady]
@@ -142,7 +136,7 @@ export default function TeamList() {
 					)}
 				/>
 				<Text style={styles.headerUnderText}>Plan list</Text>
-				{!clubs && (
+				{!clubs.length && (
 					<TouchableView
 						style={[
 							styles.teamListTouchableView,
