@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
+// import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import {
 	changeAllColor,
@@ -13,6 +13,7 @@ import {
 	setEndHour,
 	setEndMin,
 	setStartMin,
+	setStartHour,
 } from '../store/timetable';
 import { Colors } from 'react-native-paper';
 import { useIsDarkMode } from '../hooks';
@@ -20,6 +21,7 @@ import { RootState } from '../store';
 import { getUserMe } from '../store/login';
 import { cloneINDates, initialIndividualTimetable } from '../store/individual';
 import { cos } from 'react-native-reanimated';
+import DatePicker from 'react-native-date-picker';
 interface props {
 	modalVisible?: boolean;
 	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>> | null;
@@ -68,45 +70,67 @@ export function ModalTimePicker({
 			confirmDatesTimetable: login.confirmDatesTimetable,
 		}));
 	const dispatch = useDispatch();
-	const [minute, setMinute] = useState(0);
-	const [hour, setHour] = useState(0);
-	const { isDark } = useIsDarkMode();
-	const onPressConfirm = useCallback(() => {
-		const timeHour = date.getHours();
-		const timeMinute = date.getMinutes();
-		// setDate(new Date(dayjsDate));
+	// const [minute, setMinute] = useState(0);
+	// const [hour, setHour] = useState(0);
+	const [secondVisible, setSecond] = useState(false);
+	const [firstVisible, setFirst] = useState(false);
 
-		setHour(date.getHours());
-		setMinute(date.getMinutes());
+	useEffect(() => {
+		if (modalVisible) setFirst(true);
+	}, [modalVisible]);
+	const onPressEndConfirm = useCallback(
+		(date) => {
+			setSecond(false);
+			setMode && setMode('normal');
+			setModalVisible && setModalVisible(false);
+			const timeHour = date.getHours();
+			const timeMinute = date.getMinutes();
 
-		if (mode === 'startMinute') {
-			dispatch(setStartMin(timeMinute));
-			setMode && setMode('endMode');
-			setModalVisible && setModalVisible(true);
-		} else {
+			// setHour(timeHour);
+			// setMinute(timeMinute);
+			console.log(timeHour, timeMinute);
 			if (isGroup) {
 				{
-					// dispatch(setEndMin(Number(date.getMinutes)));
 					dispatch(setEndHour(timeHour));
+					dispatch(setEndMin(timeMinute));
 					dispatch(changeConfirmTime());
 					dispatch(makeConfirmDates());
 				}
 			} else {
 				{
-					dispatch(setEndMin(timeMinute));
 					dispatch(setEndHour(timeHour));
-					// dispatch(changeAllColor());
+					dispatch(setEndMin(timeMinute));
 					dispatch(makePostIndividualDates());
 				}
 			}
-			setMode && setMode('normal');
+		},
+		[isGroup]
+	);
+
+	const onPressConfirm = useCallback(
+		(date) => {
+			const timeHour = date.getHours();
+			const timeMinute = date.getMinutes();
+			console.log('start', timeHour, timeMinute);
+			// setHour(date.getHours());
+			// setMinute(date.getMinutes());
 			setModalVisible && setModalVisible(false);
-		}
-	}, [minute, mode, hour, isGroup, date]);
+			dispatch(setStartHour(timeHour));
+			dispatch(setStartMin(timeMinute));
+			setMode && setMode('endMode');
+			setTimeout(() => {
+				setSecond(true);
+			}, 100);
+		},
+		[mode, isGroup, date, modalVisible]
+	);
 
 	// 닫기 버튼
 	const onPressClose = useCallback(() => {
+		setFirst(false);
+		setSecond(false);
 		setModalVisible && setModalVisible(false);
+
 		setMode && setMode('normal');
 	}, [setModalVisible, modalVisible]);
 	// 이전 모드
@@ -169,131 +193,43 @@ export function ModalTimePicker({
 		dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
 	}, [confirmClubs, confirmDatesTimetable]);
 	return (
-		// <Modal
-		// 	animationType="fade"
-		// 	transparent={true}
-		// 	visible={modalVisible}
-		// 	onRequestClose={() => {
-		// 		Alert.alert('Modal has been closed.');
-		// 	}}
-		// >
-		// 	<View style={styles.centeredView}>
-		// 		<View style={styles.modalView}>
-		// 			<View
-		// 				style={[
-		// 					styles.textView,
-		// 					{
-		// 						marginBottom: 10,
-		// 					},
-		// 				]}
-		// 			/>
-		// 			{/* <TouchableHighlight
-		// 				activeOpacity={1}
-		// 				underlayColor={Colors.white}
-		// 				style={{
-		// 					// position: 'absolute',
-		// 					marginLeft: '90%',
-		// 					width: '9%',
-		// 					marginBottom: 10,
-		// 					// backgroundColor: 'blue',
-		// 				}}
-		// 				onPress={() => {
-		// 					onPressClose();
-		// 				}}
-		// 			>
-		// 				<Icon style={{ alignSelf: 'flex-end' }} name="close" size={28} />
-		// 			</TouchableHighlight> */}
-		// 			<Text style={styles.titleText}>
-		// 				{mode === 'startMinute'
-		// 					? '시작 시간을 입력하세요'
-		// 					: '종료 시간을 입력하세요'}
-		// 			</Text>
-		<View>
-			<DateTimePickerModal
-				confirmTextIOS="확인"
-				cancelTextIOS="취소"
-				display="spinner"
-				isVisible={modalVisible}
-				mode="datetime"
+		<>
+			<DatePicker
+				modal
+				open={firstVisible}
 				date={date}
-				// isDarkModeEnabled={false}
-				renderToHardwareTextureAndroid={true}
-				onChange={(date) => setDate(date)}
-				textColor={isDark ? Colors.white : Colors.black}
-				onConfirm={onPressConfirm}
+				mode="time"
+				onConfirm={(date) => {
+					setFirst(false);
+					onPressConfirm(date);
+				}}
+				onDateChange={(date) => setDate(date)}
 				onCancel={onPressClose}
+				androidVariant={'iosClone'}
+				minuteInterval={5}
+				title="시작 시간 설정"
+				confirmText="확인"
+				cancelText="취소"
 			/>
-		</View>
-		// <View style={{ height: 100 }} />
-		/* <View style={{ flex: 1 }}>
-						<DateTimePicker
-							testID="dateTimePicker"
-							value={dates}
-							mode={'countdown'}
-							is24Hour={true}
-							display="clock"
-							onChange={onChange}
-							// style={{ flex: 1 }}
-						/>
-					</View> */
+			<DatePicker
+				modal
+				open={secondVisible}
+				date={date}
+				mode="time"
+				onConfirm={(date) => {
+					setSecond(false);
 
-		/* {mode === 'endMode' ? (
-						<>
-							<View
-								style={{
-									marginTop: 0,
-									borderTopColor: Colors.grey800,
-									borderWidth: 0.3,
-									width: '105%',
-								}}
-							></View>
-							<View style={{ flexDirection: 'row' }}>
-								<View style={[styles.buttonRowView, { flex: 1 }]}>
-									<TouchableHighlight
-										activeOpacity={0.1}
-										underlayColor={Colors.grey200}
-										style={styles.closeButtonStyle}
-										onPress={() => {
-											onPressPrevMode();
-											// setModalVisible(false);
-										}}
-									>
-										<Text style={styles.buttonText}>이전</Text>
-									</TouchableHighlight>
-								</View>
-								<View style={[styles.buttonRowView, { flex: 1 }]}>
-									<TouchableHighlight
-										activeOpacity={0.1}
-										underlayColor={Colors.grey200}
-										style={styles.closeButtonStyle}
-										onPress={() => {
-											onPressConfirm();
-											// setModalVisible(false);
-										}}
-									>
-										<Text style={styles.buttonText}>확인</Text>
-									</TouchableHighlight>
-								</View>
-							</View>
-						</>
-					) : (
-						<View style={styles.buttonRowView}>
-							<TouchableHighlight
-								activeOpacity={0.1}
-								underlayColor={Colors.grey200}
-								style={styles.closeButtonStyle}
-								onPress={() => {
-									onPressConfirm();
-									// setModalVisible(false);
-								}}
-							>
-								<Text style={styles.buttonText}>확인</Text>
-							</TouchableHighlight>
-						</View>
-					)} */
-		// 		</View>
-		// 	</View>
-		// </Modal>
+					onPressEndConfirm(date);
+				}}
+				onDateChange={(date) => setDate(date)}
+				onCancel={onPressClose}
+				androidVariant={'iosClone'}
+				minuteInterval={5}
+				title="종료 시간 설정"
+				confirmText="확인"
+				cancelText="취소"
+			/>
+		</>
 	);
 }
 
