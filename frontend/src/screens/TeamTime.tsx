@@ -1,40 +1,24 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import {
-	StyleSheet,
-	FlatList,
-	TouchableOpacity,
-	Alert,
-	ScrollView,
-} from 'react-native';
-import { useNavigation, DrawerActions } from '@react-navigation/native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 // prettier-ignore
-import {SafeAreaView, View, UnderlineText,TopBar,
-    TouchableView,
+import {SafeAreaView, View, 
 NavigationHeader,  Text} from '../theme';
 import Icon from 'react-native-vector-icons/Fontisto';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntIcon from 'react-native-vector-icons/MaterialIcons';
-import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
 import { Timetable, Spinner } from '../components';
 import { Colors } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-	cloneDates,
-	getColor,
-	makeInitialTimePicked,
 	makeInitialTimetable,
-	setEndHour,
-	setEndMin,
-	setStartHour,
-	setStartMin,
+	makeTeamTime,
 	setTimeMode,
 } from '../store/timetable';
 import { RootState } from '../store';
-import { findURI, putURI } from '../store/login';
-import { useMakeTimetable } from '../hooks';
-import FontAwesome from 'react-native-vector-icons/FontAwesome5';
+import { findTeam } from '../store/login';
 
 type TeamStackParamList = {
 	TeamTime: {
@@ -43,12 +27,11 @@ type TeamStackParamList = {
 		id: number;
 		token: string;
 		modalMode: string;
-		setModalMode: any;
 	};
 };
 
 type Props = NativeStackScreenProps<TeamStackParamList, 'TeamTime'>;
-import { changeColor, setModalMode, shareUri } from '../store/team';
+import { setModalMode, shareUri } from '../store/team';
 import { ModalSetting } from '../components/ModalSetting';
 
 export default function TeamTime({ route }: Props) {
@@ -66,12 +49,11 @@ export default function TeamTime({ route }: Props) {
 		loadingJoin,
 		joinTeamError,
 		error,
-		isTimePicked,
 		startHour,
 		endHour,
 		makeReady,
 		createdDate,
-		snapShotDate,
+		snapShotError,
 	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
 		uri: login.uri,
 		color: login.color,
@@ -86,12 +68,11 @@ export default function TeamTime({ route }: Props) {
 		joinUri: team.joinUri,
 		joinTeamError: team.joinTeamError,
 		error: team.error,
-		isTimePicked: timetable.isTimePicked,
 		startHour: login.startHour,
 		endHour: login.endHour,
 		makeReady: timetable.makeReady,
 		createdDate: timetable.createdDate,
-		snapShotDate: timetable.snapShotDate,
+		snapShotError: timetable.snapShotError,
 	}));
 	// navigation
 	const { name, id, user, token, modalMode } = route.params;
@@ -108,17 +89,19 @@ export default function TeamTime({ route }: Props) {
 
 	// useEffect
 	useEffect(() => {
-		dispatch(getColor({ color, peopleCount, startHour, endHour }));
-	}, [color, peopleCount, startHour, endHour]);
+		modalMode !== 'make' &&
+			dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
+	}, [color, peopleCount, startHour, endHour, modalMode]);
 	// initial
 	useEffect(() => {
 		makeReady && dispatch(makeInitialTimetable());
 	}, [name, makeReady]);
 	// URI 찾아오기 로직
-	useEffect(() => {
-		if (modalMode === 'make') dispatch(findURI(name));
-		else dispatch(putURI(joinUri));
-	}, [name, modalMode, joinUri]);
+	// useEffect(() => {
+	// 	if (modalMode === 'normal') dispatch(findURI(name));
+	// 	else if (modalMode === 'make') dispatch(findURI(name));
+	// 	else dispatch(putURI(joinUri));
+	// }, [name, modalMode, joinUri]);
 	// 에러 있으면 목록 페이지로 이동
 	useEffect(() => {
 		if (joinTeamError || error !== '') {
@@ -129,14 +112,14 @@ export default function TeamTime({ route }: Props) {
 	// useCallback
 	const goLeft = useCallback(() => {
 		navigation.goBack();
-		dispatch(setModalMode('make'));
+		dispatch(setModalMode('normal'));
 		dispatch(setTimeMode('normal'));
 	}, []);
 	// 공유하기 버튼
 	const onShareURI = useCallback(() => {
-		if (modalMode === 'make' && uri)
-			dispatch(shareUri({ id, user, token, uri }));
-		else dispatch(shareUri({ id, user, token, uri: joinUri }));
+		if (modalMode === 'join')
+			dispatch(shareUri({ id, token, user, uri: joinUri }));
+		else dispatch(shareUri({ id, token, user, uri }));
 	}, [id, user, token, uri, joinUri]);
 	return (
 		<SafeAreaView style={{ backgroundColor: Colors.white }}>
@@ -310,6 +293,7 @@ export default function TeamTime({ route }: Props) {
 						createdDate={createdDate}
 						name={name}
 						onShareURI={onShareURI}
+						snapShotError={snapShotError}
 					/>
 				</View>
 			</ScrollView>
@@ -338,13 +322,8 @@ const styles = StyleSheet.create({
 		// height: 20,
 	},
 	modeDescriptionText: {
-		// width: '100%',
 		flexDirection: 'row',
-		// justifyContent: 'space-around',
-		// alignContent: 'space-around',
 		alignSelf: 'center',
-		// marginTop: 35,
-		// marginLeft: '30%',
 	},
 	iconText: {
 		fontFamily: 'NanumSquareR',
@@ -361,7 +340,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignContent: 'center',
 		justifyContent: 'center',
-		// marginTop: 24,
 	},
 	infoText: {
 		fontFamily: 'NanumSquareR',
