@@ -33,6 +33,7 @@ export function SocialWebview({ closeSocialModal, source }: any) {
 			id: result.profiles[0].id,
 			clubs: result.profiles[0].clubs,
 			kakaoDates: date,
+			dates: result.profiles[0].dates,
 		};
 		// let userToken = result.Authorization;
 
