@@ -243,3 +243,10 @@ export interface groupTime {
 	count: Array<number>;
 	avail_people: string[];
 }
+
+export interface makeTeam {
+	startHour: number;
+	endHour: number;
+	color: string;
+	peopleCount: number;
+}
