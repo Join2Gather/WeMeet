@@ -194,6 +194,7 @@ const initialState: timetable = {
 	timesText: [],
 	snapShotError: false,
 	createdDate: '',
+	reload: false,
 };
 
 export const timetableSlice = createSlice({
@@ -255,6 +256,7 @@ export const timetableSlice = createSlice({
 			state.responseIndividual = action.payload;
 			makeIndividualTimetable(state);
 			addEveryTime(state, state.dates);
+			state.reload = false;
 		},
 		GET_INDIVIDUAL_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
@@ -272,6 +274,7 @@ export const timetableSlice = createSlice({
 			state.responseIndividual = action.payload;
 			// state.loginSuccess = true;
 			state.postDatesPrepare = false;
+			state.reload = true;
 		},
 		POST_INDIVIDUAL_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;

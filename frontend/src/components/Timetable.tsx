@@ -19,7 +19,8 @@ import type { make_days, make60 } from '../interface';
 import { View, Text, TouchableView } from '../theme';
 import { RootState } from '../store';
 import { kakaoLogin } from '../store/individual';
-import { ModalTimePicker } from './ModalTimePicker';
+import { ModalTimePicker } from '.';
+// import { ModalTimePicker } from './ModalTimePicker';
 const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 const boxHeight = 28;
@@ -78,6 +79,7 @@ export function Timetable({
 		confirmDatesTimetable,
 		timesText,
 		endHourTimetable,
+		reload,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
@@ -99,6 +101,7 @@ export function Timetable({
 			confirmDatesTimetable: login.confirmDatesTimetable,
 			timesText: timetable.timesText,
 			endHourTimetable: timetable.endHour,
+			reload: timetable.reload,
 		})
 	);
 	const dispatch = useDispatch();
@@ -150,6 +153,7 @@ export function Timetable({
 		joinTeamError,
 		joinUri,
 		timeMode,
+		reload,
 	]);
 
 	useEffect(() => {
