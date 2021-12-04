@@ -31,6 +31,7 @@ export interface team {
 	joinTeamError: boolean;
 	teamColor: string;
 	modalMode: string;
+	leaveTeamOK: boolean;
 }
 
 export interface shareUriAPI {
