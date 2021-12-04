@@ -13,10 +13,11 @@ import {
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
+import FontIcon from 'react-native-vector-icons/FontAwesome';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
-import { changeColor, setModalMode } from '../store/team';
+import { changeColor, leaveTeam, setModalMode } from '../store/team';
 import { Button } from '../lib/util/Button';
 import { changeTimetableColor, getSnapShot } from '../store/timetable';
 import { getUserMe, makeGroupColor } from '../store/login';
@@ -72,6 +73,11 @@ export function ModalSetting({
 			setTimeout(() => {
 				setMode('snapShot');
 			}, 500);
+		} else if (mode === 'loadingLeave') {
+			setTimeout(() => {
+				setMode('successLeave');
+			}, 500);
+			dispatch(getUserMe({ id, token, user }));
 		}
 	}, [mode]);
 
@@ -106,10 +112,20 @@ export function ModalSetting({
 		setSettingModalVisible(false);
 		setMode('initial');
 	}, [pickColor]);
+
 	const goSnapShotPage = useCallback(() => {
 		setSettingModalVisible(false);
 		setModalMode('initial');
 		navigation.navigate('SnapShot', { name, color });
+	}, []);
+	const onPressLeaveTeam = useCallback(() => {
+		uri && dispatch(leaveTeam({ id, token, uri, user }));
+		setMode('loadingLeave');
+	}, []);
+	const onCloseLeaveTeam = useCallback(() => {
+		setMode('initial');
+		navigation.goBack();
+		setSettingModalVisible(false);
 	}, []);
 	return (
 		<Modal
@@ -212,10 +228,33 @@ export function ModalSetting({
 										<View style={styles.rowView}>
 											<Font5Icon
 												name="cloud-download-alt"
-												size={19}
+												size={17}
 												color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
 											/>
 											<Text style={styles.touchText}>저장 시간 불러오기</Text>
+											<View style={styles.iconView}>
+												<Font5Icon
+													name="angle-right"
+													size={19}
+													color={Colors.black}
+												/>
+											</View>
+										</View>
+									</TouchableHighlight>
+									<View style={styles.blankView} />
+									<TouchableHighlight
+										activeOpacity={1}
+										underlayColor={Colors.grey300}
+										onPress={onPressLeaveTeam}
+										style={styles.touchButtonStyle}
+									>
+										<View style={styles.rowView}>
+											<FontIcon
+												name="close"
+												size={25}
+												color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+											/>
+											<Text style={styles.touchText}>모임에서 나가기</Text>
 											<View style={styles.iconView}>
 												<Font5Icon
 													name="angle-right"
@@ -327,7 +366,8 @@ export function ModalSetting({
 						</>
 					)}
 					{mode === 'loading' ||
-						(mode === 'loadingSave' && (
+						mode === 'loadingSave' ||
+						(mode === 'loadingLeave' && (
 							<>
 								<View style={styles.blankView} />
 								<ActivityIndicator size={'large'} color={color} />
@@ -354,6 +394,29 @@ export function ModalSetting({
 								buttonNumber={1}
 								buttonText="확인"
 								onPressFunction={onFinishChangeColor}
+							/>
+						</>
+					)}
+					{mode === 'successLeave' && (
+						<>
+							<View style={styles.blankView} />
+							<View style={styles.rowView}>
+								<Font5Icon
+									name="check-circle"
+									size={19}
+									color={Colors.green500}
+								/>
+								<Text style={styles.touchText}>
+									{' '}
+									변경 사항이 저장 되었습니다
+								</Text>
+							</View>
+							<View style={styles.blankView} />
+							<View style={styles.buttonOverLine} />
+							<Button
+								buttonNumber={1}
+								buttonText="확인"
+								onPressFunction={onCloseLeaveTeam}
 							/>
 						</>
 					)}
@@ -417,6 +480,11 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
 		marginLeft: 10,
+		justifyContent: 'center',
+		textAlignVertical: 'center',
+		// alignSelf: 'center',
+		// alignContent: 'center',
+		// alignItems: 'center',
 	},
 	titleText: {
 		fontSize: 20,
@@ -436,6 +504,10 @@ const styles = StyleSheet.create({
 	touchButtonStyle: {
 		padding: 5,
 		borderRadius: 10,
+		// alignItems: 'center',
+		// alignContent: 'center',
+		// alignSelf: 'center',
+		justifyContent: 'center',
 	},
 	buttonOverLine: {
 		borderWidth: 0.4,
