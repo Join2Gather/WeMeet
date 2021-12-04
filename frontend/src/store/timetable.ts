@@ -81,13 +81,11 @@ export function* timetableSaga() {
 	yield takeLatest(POST_CONFIRM, postSnapShotSaga);
 }
 
-const { defaultDates } = useMakeTimetable();
-const { defaultDatesWith60 } = useMakeTimeTableWith60(0, 23);
-
 const initialState: timetable = {
 	dates: [],
 	teamDatesWith60: [],
 	snapShotDate: [],
+	teamConfirmDate: [],
 	startTime: 0.0,
 	endTime: 0.0,
 	selectTime: {
@@ -217,6 +215,7 @@ export const timetableSlice = createSlice({
 			state.dates = defaultDatesWith60;
 			state.teamDatesWith60 = defaultDatesWith60;
 			state.snapShotDate = defaultDatesWith60;
+			state.teamConfirmDate = defaultDatesWith60;
 			state.postIndividualDates = {
 				sun: [],
 				mon: [],
@@ -240,7 +239,7 @@ export const timetableSlice = createSlice({
 			state.confirmClubs = action.payload.confirmClubs;
 			state.confirmDatesTimetable = action.payload.confirmDatesTimetable;
 			action.payload.isGroup
-				? makeConfirmWith(state, state.teamDatesWith60)
+				? makeConfirmWith(state, state.teamConfirmDate)
 				: makeConfirmWith(state, state.dates);
 		},
 		GET_INDIVIDUAL_SUCCESS: (state, action: PayloadAction<any>) => {
@@ -263,9 +262,9 @@ export const timetableSlice = createSlice({
 		},
 		GET_GROUP_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.responseGroup = action.payload;
-
-			makeGroupTimeTableWith60(state);
-			addEveryTime(state, state.teamDatesWith60);
+			makeGroupTimeTableWith60(state, state.teamDatesWith60);
+			makeGroupTimeTableWith60(state, state.teamConfirmDate);
+			addEveryTime(state, state.teamConfirmDate);
 		},
 		GET_GROUP_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;

@@ -41,7 +41,7 @@ export function makeIndividualTimetable(state: timetable) {
 	);
 }
 
-export function makeGroupTimeTableWith60(state: timetable) {
+export function makeGroupTimeTableWith60(state: timetable, dates: any) {
 	const result = hexToRGB(state.color);
 
 	result &&
@@ -55,34 +55,34 @@ export function makeGroupTimeTableWith60(state: timetable) {
 				for (let i = d.starting_hours; i <= d.end_hours; i++) {
 					if (i === d.starting_hours) {
 						for (let j = startingMinute; j <= 6; j++) {
-							state.teamDatesWith60[idx].times[i][
+							dates[idx].times[i][
 								j
 							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
-							state.teamDatesWith60[idx].times[i][j].isEveryTime = false;
-							state.teamDatesWith60[idx].times[i][j].isPicked = true;
-							state.teamDatesWith60[idx].times[i][j].mode = 'start';
-							state.teamDatesWith60[idx].times[i][j].borderTop = false;
-							state.teamDatesWith60[idx].times[i][j].borderBottom = false;
+							dates[idx].times[i][j].isEveryTime = false;
+							dates[idx].times[i][j].isPicked = true;
+							dates[idx].times[i][j].mode = 'start';
+							dates[idx].times[i][j].borderTop = false;
+							dates[idx].times[i][j].borderBottom = false;
 						}
 					} else if (i === d.end_hours) {
 						for (let j = 0; j <= endMinute; j++) {
-							state.teamDatesWith60[idx].times[i][
+							dates[idx].times[i][
 								j
 							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
-							state.teamDatesWith60[idx].times[i][j].isEveryTime = false;
-							state.teamDatesWith60[idx].times[i][j].isPicked = true;
-							state.teamDatesWith60[idx].times[i][j].mode = 'start';
-							state.teamDatesWith60[idx].times[i][j].borderTop = false;
-							state.teamDatesWith60[idx].times[i][j].borderBottom = false;
+							dates[idx].times[i][j].isEveryTime = false;
+							dates[idx].times[i][j].isPicked = true;
+							dates[idx].times[i][j].mode = 'start';
+							dates[idx].times[i][j].borderTop = false;
+							dates[idx].times[i][j].borderBottom = false;
 						}
 					} else {
 						for (let j = 0; j <= 6; j++) {
-							state.teamDatesWith60[idx].times[i][
+							dates[idx].times[i][
 								j
 							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
-							state.teamDatesWith60[idx].times[i][j].isEveryTime = false;
-							state.teamDatesWith60[idx].times[i][j].borderTop = false;
-							state.teamDatesWith60[idx].times[i][j].borderBottom = false;
+							dates[idx].times[i][j].isEveryTime = false;
+							dates[idx].times[i][j].borderTop = false;
+							dates[idx].times[i][j].borderBottom = false;
 						}
 					}
 				}

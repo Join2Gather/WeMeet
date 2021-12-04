@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useEffect } from 'react';
-import { StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 // prettier-ignore
 import {SafeAreaView, View, 
@@ -8,7 +8,8 @@ NavigationHeader,  Text} from '../theme';
 import Icon from 'react-native-vector-icons/Fontisto';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntIcon from 'react-native-vector-icons/MaterialIcons';
-import { Timetable, Spinner } from '../components';
+import { Spinner } from '../components';
+import { Timetable } from '../components/Timetable';
 import { Colors } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
@@ -110,6 +111,17 @@ export default function TeamTime({ route }: Props) {
 	}, [joinTeamError, loadingJoin, error]);
 
 	// useCallback
+	const goConfirmPage = useCallback(() => {
+		Alert.alert('알림', '시간표를 확정 하시겠습니까?', [
+			{ text: '취소', onPress: () => {} },
+			{
+				text: '확인',
+				onPress: () => {
+					navigation.navigate('SnapShot', { name, color, timeMode: 'confirm' });
+				},
+			},
+		]);
+	}, [name, color]);
 	const goLeft = useCallback(() => {
 		navigation.goBack();
 		dispatch(setModalMode('normal'));
@@ -145,7 +157,7 @@ export default function TeamTime({ route }: Props) {
 									size={27}
 									color={Colors.white}
 									style={{ paddingTop: 1 }}
-									onPress={() => setMode('confirmMode')}
+									onPress={goConfirmPage}
 								/>
 							) : (
 								<MIcon
@@ -183,16 +195,6 @@ export default function TeamTime({ route }: Props) {
 											style={styles.touchableBoxView}
 											onPress={() => setGroupMode(true)}
 										>
-											{/* <View
-												style={[
-													styles.boxButtonView,
-													{
-														backgroundColor: isGroup
-															? Colors.blue400
-															: Colors.white,
-													},
-												]}
-											/> */}
 											<MIcon
 												name={
 													isGroup
@@ -377,6 +379,7 @@ const styles = StyleSheet.create({
 		fontSize: 15,
 		letterSpacing: -1,
 		height: 40,
+		marginTop: 20,
 	},
 	loadingText: {
 		fontFamily: 'NanumSquareR',

@@ -8,32 +8,34 @@ NavigationHeader,  Text} from '../theme';
 import Icon from 'react-native-vector-icons/Fontisto';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { Timetable } from '../components';
+import { Timetable } from '../components/Timetable';
 import { Colors } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
 
-type TeamStackParamList = {
-	TeamTime: {
+type SnapStackParamList = {
+	SnapShot: {
 		name: string;
-		user: number;
-		id: number;
-		token: string;
 		color: string;
-		modalMode: string;
-		setModalMode: any;
+		timeMode: string;
 	};
 };
 
-type Props = NativeStackScreenProps<TeamStackParamList, 'TeamTime'>;
+type Props = NativeStackScreenProps<SnapStackParamList, 'SnapShot'>;
 import { RootState } from '../store';
 
 export default function SnapShot({ route }: Props) {
-	const { snapShotDate } = useSelector(({ timetable }: RootState) => ({
-		snapShotDate: timetable.snapShotDate,
-	}));
+	const { snapShotDate, teamConfirmDate } = useSelector(
+		({ timetable }: RootState) => ({
+			snapShotDate: timetable.snapShotDate,
+			teamConfirmDate: timetable.teamConfirmDate,
+		})
+	);
+	// useState
+	const [mode, setMode] = useState('confirmMode');
+
 	// navigation
-	const { name, color } = route.params;
+	const { name, color, timeMode } = route.params;
 	const navigation = useNavigation();
 	const dispatch = useDispatch();
 	//modal
@@ -88,7 +90,11 @@ export default function SnapShot({ route }: Props) {
 						</View>
 					</View>
 				</View>
-				<Timetable snapShotDate={snapShotDate} color={color} />
+				{timeMode === 'confirm' ? (
+					<Timetable teamConfirmDate={teamConfirmDate} color={color} />
+				) : (
+					<Timetable snapShotDate={snapShotDate} color={color} />
+				)}
 			</ScrollView>
 		</SafeAreaView>
 	);
