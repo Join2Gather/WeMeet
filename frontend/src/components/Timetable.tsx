@@ -42,6 +42,7 @@ interface props {
 	individualTimesText?: Array<string>;
 	endIdx?: number;
 	color?: string;
+	teamConfirmDate?: make60[];
 }
 
 export function Timetable({
@@ -58,6 +59,7 @@ export function Timetable({
 	individualTimesText,
 	endIdx,
 	color,
+	teamConfirmDate,
 }: props) {
 	const {
 		dates,
@@ -320,6 +322,49 @@ export function Timetable({
 											key={time}
 											onPress={() => {
 												console.log('hi');
+											}}
+										>
+											{day.times[time].map((t, tIdx) => (
+												<View
+													key={t.minute}
+													style={{
+														backgroundColor: t.color,
+														height: boxHeight / inBoxHeight,
+														borderTopWidth:
+															Number(time) === endHour
+																? borderWidth
+																: t.borderBottom
+																? borderWidth
+																: 0,
+														borderBottomWidth:
+															Number(time) === endHour - 1 && tIdx === 6
+																? borderWidth
+																: 0,
+														borderLeftWidth:
+															Number(time) === endHour ? 0 : borderWidth,
+														borderRightWidth:
+															Number(time) === endHour ? 0 : borderWidth,
+													}}
+												/>
+											))}
+										</TouchableView>
+									))}
+								</View>
+							))}
+						</>
+					) : teamConfirmDate ? (
+						<>
+							{teamConfirmDate.map((day, idx) => (
+								<View style={styles.columnView} key={day.day}>
+									{Object.keys(day.times).map((time) => (
+										<TouchableView
+											style={[styles.boxView]}
+											key={time}
+											onPress={() => {
+												mode === 'normal' &&
+													onSetStartHour(idx, Number(time), day.day);
+												mode === 'startMode' &&
+													onSetStartHour(idx, Number(time), day.day);
 											}}
 										>
 											{day.times[time].map((t, tIdx) => (
