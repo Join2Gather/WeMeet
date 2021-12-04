@@ -16,6 +16,7 @@ import { Alert } from 'react-native';
 const POST_TEAM = 'team/POST_TEAM';
 const SHARE_URI = 'team/SHARE_URI';
 const JOIN_TEAM = 'team/JOIN_TEAM';
+const LEAVE_TEAM = 'team/LEAVE_TEAM';
 const CHANGE_COLOR = 'team/CHANGE_COLOR';
 
 export const postTeamName = createAction(
@@ -24,6 +25,7 @@ export const postTeamName = createAction(
 );
 export const shareUri = createAction(SHARE_URI, (data: shareUriAPI) => data);
 export const joinTeam = createAction(JOIN_TEAM, (data: joinTeamAPI) => data);
+export const leaveTeam = createAction(LEAVE_TEAM, (data: joinTeamAPI) => data);
 export const changeColor = createAction(
 	CHANGE_COLOR,
 	(data: changeColorAPI) => data
@@ -32,12 +34,14 @@ export const changeColor = createAction(
 const postTeamSaga = createRequestSaga(POST_TEAM, api.postTeamName);
 const shareURISaga = createRequestSaga(SHARE_URI, api.shareUri);
 const joinTeamSaga = createRequestSaga(JOIN_TEAM, api.joinTeam);
+const leaveTeamSaga = createRequestSaga(LEAVE_TEAM, api.leaveTeam);
 const changeColorSaga = createRequestSaga(CHANGE_COLOR, api.changeColor);
 
 export function* teamSaga() {
 	yield takeLatest(POST_TEAM, postTeamSaga);
 	yield takeLatest(SHARE_URI, shareURISaga);
 	yield takeLatest(JOIN_TEAM, joinTeamSaga);
+	yield takeLatest(LEAVE_TEAM, leaveTeamSaga);
 	yield takeLatest(CHANGE_COLOR, changeColorSaga);
 }
 
@@ -54,6 +58,7 @@ const initialState: team = {
 	postTeamError: false,
 	teamColor: '',
 	modalMode: 'normal',
+	leaveTeamOK: false,
 };
 
 export const teamSlice = createSlice({
@@ -89,6 +94,12 @@ export const teamSlice = createSlice({
 			state.joinTeamError = true;
 			state.joinName = '';
 			state.joinUri = '';
+		},
+		LEAVE_TEAM_SUCCESS: (state) => {
+			state.leaveTeamOK = true;
+		},
+		LEAVE_TEAM_FAILURE: (state, action: PayloadAction<any>) => {
+			state.error = action.payload;
 		},
 		CHANGE_COLOR_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.teamColor = action.payload.color;
