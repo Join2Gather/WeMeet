@@ -7,6 +7,7 @@ export interface timetable {
 	dates: make60[];
 	teamDatesWith60: make60[];
 	snapShotDate: make60[];
+	teamConfirmDate: make60[];
 	startTime: number;
 	endTime: number;
 	startMinute: number;
