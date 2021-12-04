@@ -1,9 +1,8 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 // import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-	changeAllColor,
 	changeConfirmTime,
 	postSnapShot,
 	makeConfirmDates,
@@ -16,11 +15,9 @@ import {
 	setStartHour,
 } from '../store/timetable';
 import { Colors } from 'react-native-paper';
-import { useIsDarkMode } from '../hooks';
 import { RootState } from '../store';
 import { getUserMe } from '../store/login';
 import { cloneINDates, initialIndividualTimetable } from '../store/individual';
-import { cos } from 'react-native-reanimated';
 import DatePicker from 'react-native-date-picker';
 interface props {
 	modalVisible?: boolean;
@@ -85,9 +82,6 @@ export function ModalTimePicker({
 			setModalVisible && setModalVisible(false);
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
-
-			// setHour(timeHour);
-			// setMinute(timeMinute);
 			console.log(timeHour, timeMinute);
 			if (isGroup) {
 				{
@@ -218,7 +212,6 @@ export function ModalTimePicker({
 				mode="time"
 				onConfirm={(date) => {
 					setSecond(false);
-
 					onPressEndConfirm(date);
 				}}
 				onDateChange={(date) => setDate(date)}
@@ -248,7 +241,7 @@ const styles = StyleSheet.create({
 		borderRadius: 13,
 		padding: 15,
 		alignItems: 'center',
-		// shadowColor: '#000',
+
 		shadowColor: 'black',
 		shadowOffset: {
 			width: 1,
@@ -256,7 +249,7 @@ const styles = StyleSheet.create({
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
-		// elevation: 5,
+
 		width: '94%',
 	},
 	titleText: {
@@ -279,20 +272,15 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 		fontFamily: 'NanumSquareR',
 		marginTop: 4,
-		// flex: 1,
-		// backgroundColor: Colors.red100,
 	},
 	textInput: {
 		fontSize: 22,
 		flex: 0.6,
 		fontFamily: 'NanumSquareR',
-		// marginTop: -2,
+
 		alignSelf: 'center',
 		borderWidth: 0.3,
 		padding: 2,
-		// marginTop: -4,
-		// marginLeft: -3,
-		// marginRight: -3,
 		textAlign: 'center',
 
 		borderColor: Colors.blue300,
@@ -315,10 +303,6 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		marginTop: 10,
 		marginBottom: 0,
-		// flex: 1,
-		// flexGrow: 0.5,
-		// flexShrink: 0.5,
-		// backgroundColor: Colors.red200,
 	},
 	textStyle: {
 		color: 'white',
@@ -326,26 +310,20 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 	closeButtonStyle: {
-		// width: '40%',
-		// height: '100%',
 		borderRadius: 8,
-		// backgroundColor: Colors.blue300,
+
 		padding: 12,
 		flex: 1,
 	},
 	acceptButtonStyle: {
 		padding: 15,
-		// width: '50%',
-		// height: '100%',
+
 		borderRadius: 10,
-		// backgroundColor: Colors.blue400,
 	},
 	modalText: {
-		// marginBottom: 15,
 		textAlign: 'center',
 	},
 	verticalLine: {
-		// height: '50%',
 		borderLeftWidth: 0.16,
 		width: 1,
 	},
