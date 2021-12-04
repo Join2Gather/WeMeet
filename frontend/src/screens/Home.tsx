@@ -12,7 +12,8 @@ import { useNavigation, DrawerActions } from '@react-navigation/native';
 import {SafeAreaView, View, UnderlineText,TopBar,
 NavigationHeader, MaterialCommunityIcon as Icon, Text} from '../theme';
 import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
-import { LeftRightNavigation, Spinner, Timetable } from '../components';
+import { LeftRightNavigation, Spinner, ModalSelect } from '../components';
+import { Timetable } from '../components/Timetable';
 import type { LeftRightNavigationMethods } from '../components';
 import { Colors } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
@@ -23,7 +24,6 @@ import {
 	cloneIndividualDates,
 	postImage,
 } from '../store/individual';
-import { ModalSelect } from '../components';
 import * as FileSystem from 'expo-file-system';
 import { useMakeTimetable } from '../hooks';
 import { getUserMe } from '../store/login';
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignContent: 'center',
 		justifyContent: 'center',
-		// marginLeft: 20,
+
 		marginTop: 26,
 	},
 	viewHeight: {
