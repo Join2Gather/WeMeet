@@ -8,3 +8,4 @@ export * from './ModalMinute';
 export * from './ModalSelect';
 export * from './Spinner';
 export * from './ModalTimePicker';
+export * from './ModalTime';
