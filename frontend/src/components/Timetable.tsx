@@ -7,6 +7,7 @@ import {
 	checkIsBlank,
 	checkIsExist,
 	cloneEveryTime,
+	findTimeFromResponse,
 	getGroupDates,
 	getIndividualDates,
 	getOtherConfirmDates,
@@ -15,11 +16,11 @@ import {
 	setEndHour,
 	setStartHour,
 } from '../store/timetable';
-import type { make_days, make60 } from '../interface';
+import type { make_days, make60, timeType } from '../interface';
 import { View, Text, TouchableView } from '../theme';
 import { RootState } from '../store';
 import { kakaoLogin } from '../store/individual';
-import { ModalTimePicker } from '.';
+import { ModalTime, ModalTimePicker } from '.';
 // import { ModalTimePicker } from './ModalTimePicker';
 const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
@@ -43,6 +44,12 @@ interface props {
 	endIdx?: number;
 	color?: string;
 	teamConfirmDate?: make60[];
+}
+
+interface modalData {
+	people: Array<string>;
+	startTime: timeType;
+	endTime: timeType;
 }
 
 export function Timetable({
@@ -82,6 +89,7 @@ export function Timetable({
 		timesText,
 		endHourTimetable,
 		reload,
+		findTime,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
@@ -104,12 +112,24 @@ export function Timetable({
 			timesText: timetable.timesText,
 			endHourTimetable: timetable.endHour,
 			reload: timetable.reload,
+			findTime: timetable.finTime,
 		})
 	);
 	const dispatch = useDispatch();
-
+	const [timeModalVisible, setTimeModalVisible] = useState(false);
 	const [date, setDate] = useState<Date>(new Date());
 	const [endHour, setEndHour] = useState(0);
+	const [modalData, setModalData] = useState<modalData>({
+		people: [],
+		startTime: {
+			hour: 0,
+			minute: 0,
+		},
+		endTime: {
+			hour: 0,
+			minute: 0,
+		},
+	});
 
 	useEffect(() => {
 		endIdx ? setEndHour(endIdx) : setEndHour(endHourTimetable);
@@ -164,7 +184,13 @@ export function Timetable({
 			dispatch(cloneEveryTime(kakaoDates));
 		}
 	}, [cloneDateSuccess, kakaoDates]);
+	const onPressGroupTime = useCallback((time: number, day: string) => {
+		dispatch(findTimeFromResponse({ time, day }));
 
+		setTimeout(() => {
+			setTimeModalVisible && setTimeModalVisible(true);
+		}, 100);
+	}, []);
 	const onSetStartHour = useCallback(
 		(idx: number, time: number, day: string) => {
 			dispatch(setStartHour(time));
@@ -244,6 +270,8 @@ export function Timetable({
 											onPress={() => {
 												mode === 'confirmMode' &&
 													onSetStartHour(idx, Number(time), day.day);
+												mode === 'normal' &&
+													onPressGroupTime(Number(time), day.day);
 											}}
 										>
 											{day.times[time].map((t, tIdx) => (
@@ -440,24 +468,12 @@ export function Timetable({
 						</>
 					)}
 
-					{/* <ModalMinute
-						modalVisible={modalVisible}
-						setModalVisible={setModalVisible}
-						start={start}
-						end={end}
-						mode={mode}
-						setMode={setMode}
-						id={id}
-						postIndividualDates={postIndividualDates}
-						token={token}
-						uri={uri}
-						user={user}
-						postDatesPrepare={postDatesPrepare}
-						confirmDatesPrepare={confirmDatesPrepare}
-						isTimePicked={isTimePicked}
-						isGroup={isGroup}
-						confirmDates={confirmDates}
-					/> */}
+					<ModalTime
+						color={color}
+						setTimeModalVisible={setTimeModalVisible}
+						timeModalVisible={timeModalVisible}
+						findTime={findTime}
+					/>
 					<ModalTimePicker
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
