@@ -193,6 +193,7 @@ const initialState: timetable = {
 	snapShotError: false,
 	createdDate: '',
 	reload: false,
+	finTime: [],
 };
 
 export const timetableSlice = createSlice({
@@ -520,6 +521,32 @@ export const timetableSlice = createSlice({
 		changeTimetableColor: (state, action: PayloadAction<string>) => {
 			state.color = action.payload;
 		},
+		findTimeFromResponse: (
+			state,
+			action: PayloadAction<{ day: string; time: number }>
+		) => {
+			const day = action.payload.day;
+			const time = action.payload.time;
+			state.finTime = [];
+
+			state.responseGroup[day].avail_time.forEach((t, idx) => {
+				if (t.starting_hours <= time && t.end_hours >= time) {
+					const data = {
+						people: state.responseGroup[day].avail_people[idx],
+						startTime: {
+							hour: t.starting_hours,
+							minute: t.starting_minutes,
+						},
+						endTime: {
+							hour: t.end_hours,
+							minute: t.end_minutes,
+						},
+						selectTime: time,
+					};
+					state.finTime.push(data);
+				}
+			});
+		},
 	},
 	extraReducers: {},
 });
@@ -546,6 +573,7 @@ export const {
 	getOtherConfirmDates,
 	makeTeamTime,
 	changeTimetableColor,
+	findTimeFromResponse,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;
