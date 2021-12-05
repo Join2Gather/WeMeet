@@ -39,6 +39,7 @@ export interface timetable {
 	snapShotError: boolean;
 	createdDate: string;
 	reload: boolean;
+	finTime: findTime[];
 }
 
 export type weekIndex = Array<string>;
@@ -101,31 +102,6 @@ export interface state_time {
 }
 
 export interface timeWith60 {
-	// 0: timeProps[];
-	// 1: timeProps[];
-	// 2: timeProps[];
-	// 3: timeProps[];
-	// 4: timeProps[];
-	// 5: timeProps[];
-	// 6: timeProps[];
-	// 7: timeProps[];
-	// 8: timeProps[];
-	// 9: timeProps[];
-	// 10: timeProps[];
-	// 11: timeProps[];
-	// 12: timeProps[];
-	// 13: timeProps[];
-	// 14: timeProps[];
-	// 15: timeProps[];
-	// 16: timeProps[];
-	// 17: timeProps[];
-	// 18: timeProps[];
-	// 19: timeProps[];
-	// 20: timeProps[];
-	// 21: timeProps[];
-	// 22: timeProps[];
-	// 23: timeProps[];
-	// 24: timeProps[];
 	[prop: string]: timeProps[];
 }
 
@@ -139,8 +115,22 @@ export interface timeProps {
 	borderColor: string;
 	borderTop: boolean;
 	borderBottom: boolean;
+	people?: Array<string>;
+	startTime?: timeType;
+	endTime?: timeType;
 }
 
+export interface findTime {
+	people: string[];
+	startTime: timeType;
+	endTime: timeType;
+	selectTime: number;
+}
+
+export interface timeType {
+	hour: number;
+	minute: number;
+}
 export interface postIndividualDates {
 	sun: post_time[];
 	mon: post_time[];
@@ -243,7 +233,8 @@ export interface responseSnapShotTimetable {
 export interface groupTime {
 	avail_time: responseTime[];
 	count: Array<number>;
-	avail_people: string[];
+	avail_people: any;
+	idx?: number;
 }
 
 export interface makeTeam {
