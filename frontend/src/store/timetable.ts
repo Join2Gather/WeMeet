@@ -194,6 +194,7 @@ const initialState: timetable = {
 	createdDate: '',
 	reload: false,
 	finTime: [],
+	teamName: '',
 };
 
 export const timetableSlice = createSlice({
@@ -226,8 +227,20 @@ export const timetableSlice = createSlice({
 				fri: [],
 				sat: [],
 			};
+
 			state.timesText = timesText;
 			state.makeReady = true;
+		},
+		makeInitialConfirmTime: (state) => {
+			state.confirmDates = {
+				sun: [],
+				mon: [],
+				tue: [],
+				wed: [],
+				thu: [],
+				fri: [],
+				sat: [],
+			};
 		},
 		getOtherConfirmDates: (
 			state,
@@ -282,6 +295,7 @@ export const timetableSlice = createSlice({
 		POST_CONFIRM_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.confirmDatesPrepare = false;
 			state.postConfirmSuccess = true;
+			state.responseGroup = action.payload;
 		},
 		GET_SNAPSHOT_SUCCESS: (
 			state,
@@ -394,46 +408,46 @@ export const timetableSlice = createSlice({
 				}
 			}
 
-			// if (!state.isTimeNotExist) {
-			// 	for (let i = state.startTime; i <= state.endTime; i++) {
-			// 		if (i === state.startTime) {
-			// 			for (let j = startingMinute; j <= 6; j++) {
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].color =
-			// 					state.color;
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].isEveryTime =
-			// 					false;
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].isPicked = true;
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].mode = 'start';
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].borderColor =
-			// 					state.color;
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].borderWidth = 1;
-			// 			}
-			// 		} else if (i === state.endTime) {
-			// 			for (let j = 0; j <= endMinute; j++) {
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].color =
-			// 					state.color;
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].isEveryTime =
-			// 					false;
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].isPicked = true;
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].mode = 'start';
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].borderColor =
-			// 					state.color;
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].borderWidth = 1;
-			// 			}
-			// 		} else {
-			// 			for (let j = 0; j <= 6; j++) {
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].color =
-			// 					state.color;
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].isEveryTime =
-			// 					false;
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].isPicked = true;
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].borderColor =
-			// 					state.color;
-			// 				state.teamDatesWith60[state.dayIdx].times[i][j].borderWidth = 1;
-			// 			}
-			// 		}
-			// 	}
-			// }
+			if (!state.isTimeNotExist) {
+				for (let i = state.startTime; i <= state.endTime; i++) {
+					if (i === state.startTime) {
+						for (let j = startingMinute; j <= 6; j++) {
+							state.teamConfirmDate[state.dayIdx].times[i][j].color =
+								state.color;
+							state.teamConfirmDate[state.dayIdx].times[i][j].isEveryTime =
+								false;
+							state.teamConfirmDate[state.dayIdx].times[i][j].isPicked = true;
+							state.teamConfirmDate[state.dayIdx].times[i][j].mode = 'start';
+							state.teamConfirmDate[state.dayIdx].times[i][j].borderColor =
+								state.color;
+							state.teamConfirmDate[state.dayIdx].times[i][j].borderWidth = 5;
+						}
+					} else if (i === state.endTime) {
+						for (let j = 0; j <= endMinute; j++) {
+							state.teamConfirmDate[state.dayIdx].times[i][j].color =
+								state.color;
+							state.teamConfirmDate[state.dayIdx].times[i][j].isEveryTime =
+								false;
+							state.teamConfirmDate[state.dayIdx].times[i][j].isPicked = true;
+							state.teamConfirmDate[state.dayIdx].times[i][j].mode = 'start';
+							state.teamConfirmDate[state.dayIdx].times[i][j].borderColor =
+								state.color;
+							state.teamConfirmDate[state.dayIdx].times[i][j].borderWidth = 5;
+						}
+					} else {
+						for (let j = 0; j <= 6; j++) {
+							state.teamConfirmDate[state.dayIdx].times[i][j].color =
+								state.color;
+							state.teamConfirmDate[state.dayIdx].times[i][j].isEveryTime =
+								false;
+							state.teamConfirmDate[state.dayIdx].times[i][j].isPicked = true;
+							state.teamConfirmDate[state.dayIdx].times[i][j].borderColor =
+								state.color;
+							state.teamConfirmDate[state.dayIdx].times[i][j].borderWidth = 5;
+						}
+					}
+				}
+			}
 		},
 		changeAllColor: (state) => {
 			const startingMinute = Math.round(state.startMinute / 10);
@@ -453,37 +467,46 @@ export const timetableSlice = createSlice({
 					}
 				}
 			}
-			// if (!state.isTimePicked) {
-			// 	for (let i = state.startTime; i <= state.endTime; i++) {
-			// 		if (i === state.startTime) {
-			// 			for (let j = startingMinute; j <= 6; j++) {
-			// 				state.dates[state.dayIdx].times[i][j].color = state.color;
-			// 				state.dates[state.dayIdx].times[i][j].isEveryTime = false;
-			// 				state.dates[state.dayIdx].times[i][j].isPicked = true;
-			// 				state.dates[state.dayIdx].times[i][j].mode = 'start';
-			// 				state.dates[state.dayIdx].times[i][j].borderBottom = false;
-			// 				state.dates[state.dayIdx].times[i][j].borderTop = false;
-			// 			}
-			// 		} else if (i === state.endTime) {
-			// 			for (let j = 0; j <= endMinute; j++) {
-			// 				state.dates[state.dayIdx].times[i][j].color = state.color;
-			// 				state.dates[state.dayIdx].times[i][j].isEveryTime = false;
-			// 				state.dates[state.dayIdx].times[i][j].isPicked = true;
-			// 				state.dates[state.dayIdx].times[i][j].mode = 'end';
-			// 				state.dates[state.dayIdx].times[i][j].borderBottom = false;
-			// 				state.dates[state.dayIdx].times[i][j].borderTop = false;
-			// 			}
-			// 		} else {
-			// 			for (let j = 0; j <= 6; j++) {
-			// 				state.dates[state.dayIdx].times[i][j].color = state.color;
-			// 				state.dates[state.dayIdx].times[i][j].isEveryTime = false;
-			// 				state.dates[state.dayIdx].times[i][j].isPicked = true;
-			// 				state.dates[state.dayIdx].times[i][j].borderBottom = false;
-			// 				state.dates[state.dayIdx].times[i][j].borderTop = false;
-			// 			}
-			// 		}
-			// 	}
-			// }
+			if (!state.isTimePicked) {
+				for (let i = state.startTime; i <= state.endTime; i++) {
+					if (i === state.startTime) {
+						for (let j = startingMinute; j <= 6; j++) {
+							state.teamConfirmDate[state.dayIdx].times[i][j].color =
+								state.color;
+							state.teamConfirmDate[state.dayIdx].times[i][j].isEveryTime =
+								false;
+							state.teamConfirmDate[state.dayIdx].times[i][j].isPicked = true;
+							state.teamConfirmDate[state.dayIdx].times[i][j].mode = 'start';
+							state.teamConfirmDate[state.dayIdx].times[i][j].borderBottom =
+								false;
+							state.teamConfirmDate[state.dayIdx].times[i][j].borderTop = false;
+						}
+					} else if (i === state.endTime) {
+						for (let j = 0; j <= endMinute; j++) {
+							state.teamConfirmDate[state.dayIdx].times[i][j].color =
+								state.color;
+							state.teamConfirmDate[state.dayIdx].times[i][j].isEveryTime =
+								false;
+							state.teamConfirmDate[state.dayIdx].times[i][j].isPicked = true;
+							state.teamConfirmDate[state.dayIdx].times[i][j].mode = 'end';
+							state.teamConfirmDate[state.dayIdx].times[i][j].borderBottom =
+								false;
+							state.teamConfirmDate[state.dayIdx].times[i][j].borderTop = false;
+						}
+					} else {
+						for (let j = 0; j <= 6; j++) {
+							state.teamConfirmDate[state.dayIdx].times[i][j].color =
+								state.color;
+							state.teamConfirmDate[state.dayIdx].times[i][j].isEveryTime =
+								false;
+							state.teamConfirmDate[state.dayIdx].times[i][j].isPicked = true;
+							state.teamConfirmDate[state.dayIdx].times[i][j].borderBottom =
+								false;
+							state.teamConfirmDate[state.dayIdx].times[i][j].borderTop = false;
+						}
+					}
+				}
+			}
 		},
 		makePostIndividualDates: (state) => {
 			if (!state.isTimePicked) {
@@ -505,6 +528,8 @@ export const timetableSlice = createSlice({
 					end_minutes: state.endMinute,
 				});
 			}
+		},
+		makeConfirmPrepare: (state) => {
 			state.confirmDatesPrepare = true;
 		},
 		cloneEveryTime: (state, action: PayloadAction<any>) => {
@@ -547,6 +572,9 @@ export const timetableSlice = createSlice({
 				}
 			});
 		},
+		setTeamName: (state, action: PayloadAction<string>) => {
+			state.teamName = action.payload;
+		},
 	},
 	extraReducers: {},
 });
@@ -562,6 +590,7 @@ export const {
 	setDay,
 	makePostIndividualDates,
 	makeConfirmDates,
+	makeConfirmPrepare,
 	makeInitialTimetable,
 	changeDayIdx,
 	cloneEveryTime,
@@ -574,6 +603,8 @@ export const {
 	makeTeamTime,
 	changeTimetableColor,
 	findTimeFromResponse,
+	setTeamName,
+	makeInitialConfirmTime,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;
