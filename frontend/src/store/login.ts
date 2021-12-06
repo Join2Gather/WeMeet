@@ -81,6 +81,7 @@ export const loginSlice = createSlice({
 				const find = clubs.find((date: any) => date.id === day.club?.id);
 				if (find) {
 					day['color'] = find.color;
+					day.club.name = decodeURIComponent(day.club.name);
 					state.confirmClubs.push(find.color);
 				}
 			});
