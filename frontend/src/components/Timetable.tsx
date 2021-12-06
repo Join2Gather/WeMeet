@@ -35,6 +35,7 @@ interface props {
 	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>> | null;
 	setMode?: React.Dispatch<React.SetStateAction<string>>;
 	isGroup?: boolean;
+	isConfirm?: boolean;
 	individualDates?: make60[];
 	snapShotDate?: make60[];
 	uri?: string;
@@ -58,6 +59,7 @@ export function Timetable({
 	setModalVisible,
 	setMode,
 	isGroup,
+	isConfirm,
 	individualDates,
 	snapShotDate,
 	uri,
@@ -141,28 +143,26 @@ export function Timetable({
 				if (timeMode === 'make')
 					dispatch(getGroupDates({ id, user, token, uri: joinUri }));
 				else dispatch(getGroupDates({ id, user, token, uri }));
-				isGroup &&
-					dispatch(
-						getOtherConfirmDates({
-							confirmClubs,
-							confirmDatesTimetable,
-							isGroup,
-						})
-					);
+				dispatch(
+					getOtherConfirmDates({
+						confirmClubs,
+						confirmDatesTimetable,
+						isGroup,
+					})
+				);
 			} else if (uri && !isGroup) {
 				if (timeMode == 'make')
 					dispatch(getIndividualDates({ id, user, token, uri: joinUri }));
 				else {
 					dispatch(getIndividualDates({ id, user, token, uri }));
 				}
-				isGroup &&
-					dispatch(
-						getOtherConfirmDates({
-							confirmClubs,
-							confirmDatesTimetable,
-							isGroup,
-						})
-					);
+				dispatch(
+					getOtherConfirmDates({
+						confirmClubs,
+						confirmDatesTimetable,
+						isGroup: false,
+					})
+				);
 			}
 		}
 	}, [
@@ -176,6 +176,7 @@ export function Timetable({
 		joinUri,
 		timeMode,
 		reload,
+		confirmDatesPrepare,
 	]);
 
 	useEffect(() => {
@@ -200,9 +201,9 @@ export function Timetable({
 			setModalVisible && setModalVisible(true);
 			dispatch(changeDayIdx(idx));
 			dispatch(setDay(day));
-			isGroup ? dispatch(checkIsExist()) : dispatch(checkIsBlank());
+			isConfirm ? dispatch(checkIsExist()) : dispatch(checkIsBlank());
 		},
-		[isTimePicked, isGroup, date]
+		[isTimePicked, isGroup, date, isConfirm]
 	);
 	useEffect(() => {
 		if (isTimePicked || isTimeNotExist) {
@@ -211,6 +212,7 @@ export function Timetable({
 			dispatch(makeInitialTimePicked());
 		}
 	}, [isTimePicked, isTimeNotExist]);
+
 	return (
 		<View style={styles.view}>
 			<View style={styles.rowDayOfWeekView}>
@@ -389,10 +391,7 @@ export function Timetable({
 											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
-												mode === 'normal' &&
-													onSetStartHour(idx, Number(time), day.day);
-												mode === 'startMode' &&
-													onSetStartHour(idx, Number(time), day.day);
+												onSetStartHour(idx, Number(time), day.day);
 											}}
 										>
 											{day.times[time].map((t, tIdx) => (
@@ -487,7 +486,7 @@ export function Timetable({
 						postDatesPrepare={postDatesPrepare}
 						confirmDatesPrepare={confirmDatesPrepare}
 						isTimePicked={isTimePicked}
-						isGroup={isGroup}
+						isConfirm={isConfirm}
 						confirmDates={confirmDates}
 						date={date}
 						setDate={setDate}
