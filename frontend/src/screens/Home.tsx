@@ -111,69 +111,63 @@ export default function Home() {
 	};
 
 	return (
-		<SafeAreaView style={{ backgroundColor: Colors.white }}>
-			<ScrollView>
-				<View style={[styles.view]}>
-					<NavigationHeader
-						title="내 일정 등록하기"
-						Left={() => (
-							<Icon
-								name="timetable"
-								size={28}
-								color={Colors.white}
-								style={{ paddingTop: 1 }}
-								onPress={() => setSelectModalVisible(true)}
-							/>
-						)}
-						Right={() => (
-							<Icon
-								name="plus"
-								size={28}
-								color={Colors.white}
-								style={{ paddingTop: 1 }}
-								onPress={onPressPlus}
-							/>
-						)}
-					/>
+		<SafeAreaView style={{ backgroundColor: '#33aafc' }}>
+			<View style={[styles.view]}>
+				<NavigationHeader
+					title="내 일정 등록하기"
+					Left={() => (
+						<Icon
+							name="timetable"
+							size={28}
+							color={Colors.white}
+							style={{ paddingTop: 1 }}
+							onPress={() => setSelectModalVisible(true)}
+						/>
+					)}
+					Right={() => (
+						<Icon
+							name="plus"
+							size={28}
+							color={Colors.white}
+							style={{ paddingTop: 1 }}
+							onPress={onPressPlus}
+						/>
+					)}
+				/>
 
-					<View style={styles.viewHeight}>
-						<Text style={styles.titleText}>make your plan</Text>
-						<Spinner loading={postEveryTime} />
-						<View style={styles.rowView}>
-							{mode === '0' && (
-								<>
-									<View
-										style={[
-											styles.boxView,
-											{ backgroundColor: Colors.blue400 },
-										]}
-									/>
-									<Text style={styles.infoText}>모임 일정</Text>
-									<View
-										style={[
-											styles.boxView,
-											{ backgroundColor: Colors.grey300 },
-										]}
-									/>
-									<Text style={styles.infoText}>개인 일정</Text>
-									<View
-										style={[styles.boxView, { backgroundColor: Colors.white }]}
-									/>
-									<Text style={styles.infoText}>비어있는 일정</Text>
-								</>
-							)}
-							{mode === '1' && (
-								<>
-									<Text style={styles.stepText}>1. 시작 시간 터치</Text>
-								</>
-							)}
-							{mode === '3' && (
-								<>
-									<Text style={styles.stepText}>3. 종료 시간 터치</Text>
-								</>
-							)}
-						</View>
+				<View style={styles.viewHeight}>
+					<Text style={styles.titleText}>make your plan</Text>
+					<Spinner loading={postEveryTime} />
+					<View style={styles.rowView}>
+						{mode === '0' && (
+							<>
+								<View
+									style={[styles.boxView, { backgroundColor: Colors.blue400 }]}
+								/>
+								<Text style={styles.infoText}>모임 일정</Text>
+								<View
+									style={[styles.boxView, { backgroundColor: Colors.grey300 }]}
+								/>
+								<Text style={styles.infoText}>개인 일정</Text>
+								<View
+									style={[styles.boxView, { backgroundColor: Colors.white }]}
+								/>
+								<Text style={styles.infoText}>비어있는 일정</Text>
+							</>
+						)}
+						{mode === '1' && (
+							<>
+								<Text style={styles.stepText}>1. 시작 시간 터치</Text>
+							</>
+						)}
+						{mode === '3' && (
+							<>
+								<Text style={styles.stepText}>3. 종료 시간 터치</Text>
+							</>
+						)}
 					</View>
+				</View>
+				<ScrollView style={{ backgroundColor: Colors.white }}>
 					<Timetable
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
@@ -188,8 +182,8 @@ export default function Home() {
 						selectModalVisible={selectModalVisible}
 						setSelectModalVisible={setSelectModalVisible}
 					/>
-				</View>
-			</ScrollView>
+				</ScrollView>
+			</View>
 		</SafeAreaView>
 	);
 }

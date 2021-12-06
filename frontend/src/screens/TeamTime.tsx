@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
 	makeInitialTimetable,
 	makeTeamTime,
+	setTeamName,
 	setTimeMode,
 } from '../store/timetable';
 import { RootState } from '../store';
@@ -97,6 +98,10 @@ export default function TeamTime({ route }: Props) {
 	useEffect(() => {
 		makeReady && dispatch(makeInitialTimetable());
 	}, [name, makeReady]);
+	useEffect(() => {
+		if (modalMode === 'join') dispatch(setTeamName(joinName));
+		else dispatch(setTeamName(name));
+	}, [name, joinName]);
 	// URI 찾아오기 로직
 	// useEffect(() => {
 	// 	if (modalMode === 'normal') dispatch(findURI(name));
@@ -117,7 +122,13 @@ export default function TeamTime({ route }: Props) {
 			{
 				text: '확인',
 				onPress: () => {
-					navigation.navigate('SnapShot', { name, color, timeMode: 'confirm' });
+					navigation.navigate('SnapShot', {
+						name,
+						color,
+						timetableMode: 'confirm',
+						isConfirm: true,
+						uri,
+					});
 				},
 			},
 		]);
@@ -134,8 +145,8 @@ export default function TeamTime({ route }: Props) {
 		else dispatch(shareUri({ id, token, user, uri }));
 	}, [id, user, token, uri, joinUri]);
 	return (
-		<SafeAreaView style={{ backgroundColor: Colors.white }}>
-			<ScrollView>
+		<>
+			<SafeAreaView style={{ backgroundColor: color }}>
 				<View style={[styles.view]}>
 					<NavigationHeader
 						headerColor={color}
@@ -272,34 +283,36 @@ export default function TeamTime({ route }: Props) {
 							)}
 						</View>
 					</View>
-					<Timetable
-						mode={mode}
-						setMode={setMode}
-						modalVisible={modalVisible}
-						setModalVisible={setModalVisible}
-						isGroup={isGroup}
-						uri={uri}
-						postDatesPrepare={postDatesPrepare}
-						confirmDatesPrepare={confirmDatesPrepare}
-						color={color}
-					/>
-					<ModalSetting
-						settingModalVisible={settingModalVisible}
-						setSettingModalVisible={setSettingModalVisible}
-						id={id}
-						token={token}
-						user={user}
-						color={color}
-						uri={uri}
-						loadingChangeColor={loadingChangeColor}
-						createdDate={createdDate}
-						name={name}
-						onShareURI={onShareURI}
-						snapShotError={snapShotError}
-					/>
+					<ScrollView style={{ backgroundColor: Colors.white }}>
+						<Timetable
+							mode={mode}
+							setMode={setMode}
+							modalVisible={modalVisible}
+							setModalVisible={setModalVisible}
+							isGroup={isGroup}
+							uri={uri}
+							postDatesPrepare={postDatesPrepare}
+							confirmDatesPrepare={confirmDatesPrepare}
+							color={color}
+						/>
+						<ModalSetting
+							settingModalVisible={settingModalVisible}
+							setSettingModalVisible={setSettingModalVisible}
+							id={id}
+							token={token}
+							user={user}
+							color={color}
+							uri={uri}
+							loadingChangeColor={loadingChangeColor}
+							createdDate={createdDate}
+							name={name}
+							onShareURI={onShareURI}
+							snapShotError={snapShotError}
+						/>
+					</ScrollView>
 				</View>
-			</ScrollView>
-		</SafeAreaView>
+			</SafeAreaView>
+		</>
 	);
 }
 const styles = StyleSheet.create({
