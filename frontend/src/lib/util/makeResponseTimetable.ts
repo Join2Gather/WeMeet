@@ -172,42 +172,44 @@ export function addEveryTime(state: timetable, date: any) {
 }
 
 export function makeConfirmWith(state: timetable, dates: any) {
-	state.confirmDatesTimetable.map((date) => {
+	state.confirmDatesTimetable.map((date, idxNumber) => {
 		state.weekIndex.map((day, idx) => {
 			date[day].map((d: any) => {
 				const startingMinute = Math.round(d.starting_minutes / 10);
 				const endMinute = Math.round(d.end_minutes / 10);
-				for (let i = d.starting_hours; i <= d.end_hours; i++) {
-					if (i === d.starting_hours) {
-						for (let j = startingMinute; j <= 6; j++) {
-							if (dates[idx].times[i]) {
-								dates[idx].times[i][j].color = Colors.grey400;
-								dates[idx].times[i][j].isEveryTime = false;
-								dates[idx].times[i][j].isPicked = true;
-								dates[idx].times[i][j].mode = 'start';
-								dates[idx].times[i][j].borderBottom = false;
-								dates[idx].times[i][j].borderTop = false;
+				if (state.teamName !== date.club.name) {
+					for (let i = d.starting_hours; i <= d.end_hours; i++) {
+						if (i === d.starting_hours) {
+							for (let j = startingMinute; j <= 6; j++) {
+								if (dates[idx].times[i]) {
+									dates[idx].times[i][j].color = Colors.grey400;
+									dates[idx].times[i][j].isEveryTime = false;
+									dates[idx].times[i][j].isPicked = true;
+									dates[idx].times[i][j].mode = 'start';
+									dates[idx].times[i][j].borderBottom = false;
+									dates[idx].times[i][j].borderTop = false;
+								}
 							}
-						}
-					} else if (i === d.end_hours) {
-						for (let j = 0; j < endMinute; j++) {
-							if (dates[idx].times[i]) {
-								dates[idx].times[i][j].color = Colors.grey400;
-								dates[idx].times[i][j].isEveryTime = false;
-								dates[idx].times[i][j].isPicked = true;
-								dates[idx].times[i][j].mode = 'start';
-								dates[idx].times[i][j].borderBottom = false;
-								dates[idx].times[i][j].borderTop = false;
+						} else if (i === d.end_hours) {
+							for (let j = 0; j < endMinute; j++) {
+								if (dates[idx].times[i]) {
+									dates[idx].times[i][j].color = Colors.grey400;
+									dates[idx].times[i][j].isEveryTime = false;
+									dates[idx].times[i][j].isPicked = true;
+									dates[idx].times[i][j].mode = 'start';
+									dates[idx].times[i][j].borderBottom = false;
+									dates[idx].times[i][j].borderTop = false;
+								}
 							}
-						}
-					} else {
-						for (let j = 0; j <= 6; j++) {
-							if (dates[idx].times[i]) {
-								dates[idx].times[i][j].color = Colors.grey400;
-								dates[idx].times[i][j].isEveryTime = false;
-								dates[idx].times[i][j].isPicked = true;
-								dates[idx].times[i][j].borderBottom = false;
-								dates[idx].times[i][j].borderTop = false;
+						} else {
+							for (let j = 0; j <= 6; j++) {
+								if (dates[idx].times[i]) {
+									dates[idx].times[i][j].color = Colors.grey400;
+									dates[idx].times[i][j].isEveryTime = false;
+									dates[idx].times[i][j].isPicked = true;
+									dates[idx].times[i][j].borderBottom = false;
+									dates[idx].times[i][j].borderTop = false;
+								}
 							}
 						}
 					}

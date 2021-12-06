@@ -40,6 +40,7 @@ export interface timetable {
 	createdDate: string;
 	reload: boolean;
 	finTime: findTime[];
+	teamName: string;
 }
 
 export type weekIndex = Array<string>;

@@ -61,6 +61,9 @@ export interface confirmDatesType {
 	fri: Array<responseTime>;
 	sat: Array<responseTime>;
 	color: string;
+	club: {
+		name: string;
+	};
 	[prop: string]: any;
 }
 

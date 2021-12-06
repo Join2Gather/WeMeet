@@ -65,9 +65,9 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'space-around',
 		backgroundColor: '#33aafc',
-		borderBottomEndRadius: 13,
-		borderBottomLeftRadius: 13,
-		height: 45,
+		borderBottomEndRadius: 15,
+		borderBottomLeftRadius: 15,
+		height: 50,
 	},
 	title: {
 		marginTop: 3,

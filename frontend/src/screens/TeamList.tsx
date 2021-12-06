@@ -112,8 +112,15 @@ export default function TeamList() {
 		dispatch(getUserMe({ id, user, token }));
 	}, []);
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }}>
-			<View style={[styles.view, { opacity: modalVisible ? 0.2 : 1 }]}>
+		<SafeAreaView
+			style={{ backgroundColor: modalVisible ? Colors.white : '#33aafc' }}
+		>
+			<View
+				style={[
+					styles.view,
+					{ opacity: modalVisible ? 0.2 : 1, backgroundColor: Colors.white },
+				]}
+			>
 				<NavigationHeader
 					title="모임 목록"
 					Left={() => (
@@ -150,7 +157,7 @@ export default function TeamList() {
 				<Spinner loading={loadingUserMe} />
 				<FlatList
 					style={{
-						height: dimensions.screen.height * 0.55,
+						height: dimensions.screen.height * 0.6,
 						flexGrow: 0,
 					}}
 					data={clubs}
@@ -220,14 +227,13 @@ export default function TeamList() {
 					joinName={joinName}
 					makeReady={makeReady}
 				/>
+				<TouchableView
+					style={[styles.touchableView, { backgroundColor: '#017bff' }]}
+					onPress={onJoinTeamTime}
+				>
+					<Text style={styles.loginText}>모임 참여</Text>
+				</TouchableView>
 			</View>
-
-			<TouchableView
-				style={[styles.touchableView, { backgroundColor: '#017bff' }]}
-				onPress={onJoinTeamTime}
-			>
-				<Text style={styles.loginText}>모임 참여</Text>
-			</TouchableView>
 		</SafeAreaView>
 	);
 }
@@ -238,7 +244,7 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareR',
 		fontSize: 16,
 		marginTop: 13,
-		marginBottom: 39,
+		marginBottom: 20,
 		letterSpacing: -0.3,
 		textAlign: 'center',
 		backgroundColor: 'white',
@@ -301,13 +307,14 @@ const styles = StyleSheet.create({
 	textInputView: { marginTop: 5, borderRadius: 10 },
 	touchableView: {
 		flexDirection: 'row',
-		height: 45,
+		height: 50,
+		marginBottom: 50,
 		borderRadius: 10,
 		width: '65%',
 		justifyContent: 'center',
 		alignItems: 'center',
 		shadowColor: 'black',
-
+		backgroundColor: Colors.white,
 		shadowOffset: {
 			width: 1,
 			height: 1,

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 // prettier-ignore
 import {SafeAreaView, View,
@@ -17,34 +17,118 @@ type SnapStackParamList = {
 	SnapShot: {
 		name: string;
 		color: string;
-		timeMode: string;
+		timetableMode: string;
+		isConfirm: boolean;
+		uri: string;
 	};
 };
 
 type Props = NativeStackScreenProps<SnapStackParamList, 'SnapShot'>;
 import { RootState } from '../store';
+import {
+	getGroupDates,
+	getIndividualDates,
+	getOtherConfirmDates,
+	makeConfirmPrepare,
+	makeInitialConfirmTime,
+	makeTeamTime,
+	postConfirm,
+	postSnapShot,
+} from '../store/timetable';
+import { initialIndividualTimetable } from '../store/individual';
+import team from '../store/team';
+import { ModalLoading } from '../components/ModalLoading';
 
 export default function SnapShot({ route }: Props) {
-	const { snapShotDate, teamConfirmDate } = useSelector(
-		({ timetable }: RootState) => ({
-			snapShotDate: timetable.snapShotDate,
-			teamConfirmDate: timetable.teamConfirmDate,
-		})
-	);
+	const {
+		snapShotDate,
+		teamConfirmDate,
+		peopleCount,
+		startHour,
+		endHour,
+		user,
+		id,
+		token,
+		timeMode,
+		confirmDates,
+		joinUri,
+		confirmClubs,
+		confirmDatesTimetable,
+	} = useSelector(({ timetable, login, team }: RootState) => ({
+		snapShotDate: timetable.snapShotDate,
+		teamConfirmDate: timetable.teamConfirmDate,
+		peopleCount: login.peopleCount,
+		startHour: login.startHour,
+		endHour: login.endHour,
+		user: login.user,
+		id: login.id,
+		token: login.token,
+		timeMode: timetable.timeMode,
+		confirmDates: timetable.confirmDates,
+		joinUri: team.joinUri,
+		confirmClubs: login.confirmClubs,
+		confirmDatesTimetable: login.confirmDatesTimetable,
+	}));
 	// useState
-	const [mode, setMode] = useState('confirmMode');
-
+	const [mode, setMode] = useState('initial');
+	const [modalVisible, setModalVisible] = useState(false);
+	const [loadingVisible, setLoadingVisible] = useState(false);
 	// navigation
-	const { name, color, timeMode } = route.params;
+	const { name, color, timetableMode, isConfirm, uri } = route.params;
 	const navigation = useNavigation();
 	const dispatch = useDispatch();
 	//modal
-
+	// useEffect
+	useEffect(() => {
+		if (mode === 'loading') {
+			setTimeout(() => {
+				if (timeMode === 'make') {
+					dispatch(getGroupDates({ id, user, token, uri: joinUri }));
+					dispatch(getIndividualDates({ id, user, token, uri: joinUri }));
+				} else {
+					dispatch(getGroupDates({ id, user, token, uri }));
+					dispatch(getIndividualDates({ id, user, token, uri }));
+				}
+				dispatch(
+					getOtherConfirmDates({
+						confirmClubs,
+						confirmDatesTimetable,
+						isGroup: true,
+					})
+				);
+				dispatch(
+					getOtherConfirmDates({
+						confirmClubs,
+						confirmDatesTimetable,
+						isGroup: false,
+					})
+				);
+				dispatch(makeInitialConfirmTime());
+				setMode('success');
+			}, 500);
+		}
+	}, [mode, timeMode]);
 	// useCallback
 	const goLeft = useCallback(() => {
 		navigation.goBack();
 	}, []);
-
+	const onPressConfirm = useCallback(() => {
+		setLoadingVisible(true);
+	}, []);
+	const onPressOk = useCallback(() => {
+		dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
+		dispatch(makeConfirmPrepare());
+		if (timeMode === 'make') {
+			dispatch(
+				postConfirm({ date: confirmDates, id, token, uri: joinUri, user })
+			);
+			dispatch(postSnapShot({ uri: joinUri, id, token, user }));
+		} else {
+			dispatch(postConfirm({ date: confirmDates, id, token, uri, user }));
+			dispatch(postSnapShot({ uri, id, token, user }));
+		}
+		setMode('loading');
+	}, [confirmDates, timeMode, joinUri]);
 	return (
 		<SafeAreaView style={{ backgroundColor: Colors.white }}>
 			<ScrollView>
@@ -68,6 +152,7 @@ export default function SnapShot({ route }: Props) {
 								size={27}
 								color={Colors.white}
 								style={{ paddingTop: 1 }}
+								onPress={onPressConfirm}
 							/>
 						)}
 					/>
@@ -90,11 +175,26 @@ export default function SnapShot({ route }: Props) {
 						</View>
 					</View>
 				</View>
-				{timeMode === 'confirm' ? (
-					<Timetable teamConfirmDate={teamConfirmDate} color={color} />
+				{timetableMode === 'confirm' ? (
+					<Timetable
+						teamConfirmDate={teamConfirmDate}
+						color={color}
+						isConfirm={isConfirm}
+						modalVisible={modalVisible}
+						setModalVisible={setModalVisible}
+					/>
 				) : (
 					<Timetable snapShotDate={snapShotDate} color={color} />
 				)}
+				<ModalLoading
+					loadingVisible={loadingVisible}
+					setLoadingVisible={setLoadingVisible}
+					color={color}
+					mode={mode}
+					setMode={setMode}
+					onPressOk={onPressOk}
+					goLeft={goLeft}
+				/>
 			</ScrollView>
 		</SafeAreaView>
 	);
