@@ -33,7 +33,7 @@ interface props {
 	postIndividualDates: any;
 	confirmDates: any;
 	isTimePicked?: boolean;
-	isGroup?: boolean;
+	isConfirm?: boolean;
 	date: Date;
 	setDate: React.Dispatch<React.SetStateAction<Date>>;
 	timeMode: string;
@@ -54,7 +54,7 @@ export function ModalTimePicker({
 	postIndividualDates,
 	confirmDates,
 	isTimePicked,
-	isGroup,
+	isConfirm,
 	date,
 	setDate,
 	timeMode,
@@ -83,7 +83,7 @@ export function ModalTimePicker({
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
 			console.log(timeHour, timeMinute);
-			if (isGroup) {
+			if (isConfirm) {
 				{
 					dispatch(setEndHour(timeHour));
 					dispatch(setEndMin(timeMinute));
@@ -98,7 +98,7 @@ export function ModalTimePicker({
 				}
 			}
 		},
-		[isGroup]
+		[isConfirm]
 	);
 
 	const onPressConfirm = useCallback(
@@ -116,7 +116,7 @@ export function ModalTimePicker({
 				setSecond(true);
 			}, 100);
 		},
-		[mode, isGroup, date, modalVisible]
+		[mode, isConfirm, date, modalVisible]
 	);
 
 	// 닫기 버튼
@@ -155,16 +155,6 @@ export function ModalTimePicker({
 						user,
 					})
 				);
-		} else if (confirmDatesPrepare && uri) {
-			if (timeMode === 'make') {
-				dispatch(
-					postConfirm({ date: confirmDates, id, token, uri: joinUri, user })
-				);
-				dispatch(postSnapShot({ uri: joinUri, id, token, user }));
-			} else {
-				dispatch(postConfirm({ date: confirmDates, id, token, uri, user }));
-				dispatch(postSnapShot({ uri, id, token, user }));
-			}
 		}
 	}, [
 		postDatesPrepare,
