@@ -19,6 +19,8 @@ import Material from 'react-native-vector-icons/MaterialCommunityIcons';
 import { findTeam, getUserMe } from '../store/login';
 import { Colors } from 'react-native-paper';
 import { makeTeamTime } from '../store/timetable';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
 export default function TeamList() {
@@ -42,6 +44,7 @@ export default function TeamList() {
 		peopleCount,
 		startHour,
 		endHour,
+		individualColor,
 	} = useSelector(({ login, team, loading, timetable }: RootState) => ({
 		user: login.user,
 		id: login.id,
@@ -62,6 +65,7 @@ export default function TeamList() {
 		peopleCount: login.peopleCount,
 		startHour: login.startHour,
 		endHour: login.endHour,
+		individualColor: login.individualColor,
 	}));
 	const [dimensions, setDimensions] = useState({ window, screen });
 
@@ -85,8 +89,9 @@ export default function TeamList() {
 			} else {
 				dispatch(findTeam({ name }));
 			}
-			dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
+
 			setTimeout(() => {
+				dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
 				navigation.navigate('TeamTime', {
 					name,
 					user,
@@ -94,7 +99,7 @@ export default function TeamList() {
 					token,
 					modalMode,
 				});
-			}, 100);
+			}, 500);
 			dispatch(initialError());
 		},
 		[modalMode, makeReady]
@@ -113,7 +118,7 @@ export default function TeamList() {
 	}, []);
 	return (
 		<SafeAreaView
-			style={{ backgroundColor: modalVisible ? Colors.white : '#33aafc' }}
+			style={{ backgroundColor: modalVisible ? Colors.white : individualColor }}
 		>
 			<View
 				style={[
@@ -123,9 +128,10 @@ export default function TeamList() {
 			>
 				<NavigationHeader
 					title="모임 목록"
+					headerColor={individualColor}
 					Left={() => (
-						<Material
-							name="reload"
+						<FontAwesome5Icon
+							name="redo-alt"
 							size={25}
 							color={Colors.white}
 							style={{ paddingTop: 1 }}
@@ -133,9 +139,9 @@ export default function TeamList() {
 						/>
 					)}
 					Right={() => (
-						<FontAweSome
+						<FontAwesome5Icon
 							name="plus"
-							size={22}
+							size={25}
 							color={Colors.white}
 							style={{ paddingTop: 1 }}
 							onPress={onMakeTeamTime}
@@ -154,7 +160,7 @@ export default function TeamList() {
 						<Text style={styles.teamTitle}>아직 아무런 모임이 없네요 😭</Text>
 					</TouchableView>
 				)}
-				<Spinner loading={loadingUserMe} />
+				{/* <Spinner loading={loadingUserMe} /> */}
 				<FlatList
 					style={{
 						height: dimensions.screen.height * 0.6,

@@ -32,6 +32,9 @@ export interface team {
 	teamColor: string;
 	modalMode: string;
 	leaveTeamOK: boolean;
+	startHour: number;
+	endHour: number;
+	peopleCount: number;
 }
 
 export interface shareUriAPI {

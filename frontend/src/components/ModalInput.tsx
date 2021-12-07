@@ -61,7 +61,7 @@ export function ModalInput({
 	const dispatch = useDispatch();
 	// const [name, setName] = useState('2ff148e7-05b9-461e-a2c2-1d3ccce16ba9');
 	const [name, setName] = useState('');
-	const [code, setCode] = useState('');
+	const [code, setCode] = useState('ddb6984a-e7b4-4ff0-91f7-2d9fc0044532');
 	const [mode, setMode] = useState('initial');
 	const [color, setColor] = useState(Colors.red500);
 	const [startTime, setStartTime] = useState('9');
@@ -85,7 +85,7 @@ export function ModalInput({
 			setMode('loading');
 			if (modalMode === 'join') {
 				dispatch(joinTeam({ id, token, user, uri: code }));
-				setTimeout(() => setMode('finish'), 500);
+				setTimeout(() => setMode('finish'), 1000);
 			} else if (modalMode === 'make') {
 				dispatch(inputTeamName(name));
 				dispatch(
@@ -99,7 +99,7 @@ export function ModalInput({
 						user,
 					})
 				);
-				setTimeout(() => setMode('finish'), 500);
+				setTimeout(() => setMode('finish'), 1000);
 			}
 		} else if (mode === 'close') {
 			dispatch(setTimeMode('make'));
@@ -234,6 +234,7 @@ export function ModalInput({
 											placeholderTextColor={Colors.grey600}
 										/>
 									</View>
+									<View style={styles.blankView} />
 									<Button
 										buttonNumber={1}
 										buttonText="확인"
@@ -255,6 +256,7 @@ export function ModalInput({
 											placeholderTextColor={Colors.grey600}
 										/>
 									</View>
+									<View style={styles.blankView} />
 									<Button
 										buttonNumber={1}
 										buttonText={'확인'}
@@ -284,7 +286,7 @@ export function ModalInput({
 									/>
 								</View>
 							</View>
-							<View style={{ height: 10 }} />
+							<View style={styles.blankView} />
 							<View style={styles.rowView}>
 								<Text style={styles.timeInputText}>종료 시간 : </Text>
 								<View style={styles.timeInputView}>
@@ -302,7 +304,7 @@ export function ModalInput({
 								style={{
 									borderWidth: 0.3,
 									width: '110%',
-									marginTop: 20,
+									marginTop: 15,
 								}}
 							/>
 							<Button
@@ -336,7 +338,7 @@ export function ModalInput({
 								style={{
 									borderWidth: 0.3,
 									width: '110%',
-									marginTop: 20,
+									marginTop: 15,
 								}}
 							/>
 							<Button
@@ -369,6 +371,7 @@ export function ModalInput({
 								buttonText={'확인'}
 								onPressFunction={onPressClose}
 							/>
+							<View style={styles.blankView} />
 						</>
 					)}
 					{mode === 'makeSuccess' && (
@@ -382,6 +385,7 @@ export function ModalInput({
 								buttonText={'확인'}
 								onPressFunction={onPressClose}
 							/>
+							<View style={styles.blankView} />
 						</>
 					)}
 
@@ -422,7 +426,6 @@ const styles = StyleSheet.create({
 		width: '50%',
 	},
 	modalView: {
-		// margin: 10,
 		marginBottom: 60,
 		backgroundColor: Colors.white,
 		borderRadius: 13,
@@ -468,14 +471,12 @@ const styles = StyleSheet.create({
 	},
 	textInput: {
 		fontSize: 18,
-		// flex: 1,
 		fontFamily: 'NanumSquareR',
 	},
 	textInputView: {
 		flexDirection: 'row',
 		paddingBottom: 2,
 		backgroundColor: Colors.white,
-		// borderWidth: 1,
 		borderBottomWidth: 0.3,
 		width: '70%',
 		marginLeft: '15%',
@@ -496,7 +497,6 @@ const styles = StyleSheet.create({
 	},
 	timeInput: {
 		fontSize: 18,
-		// flex: 1,
 		fontFamily: 'NanumSquareR',
 		textAlign: 'center',
 	},
@@ -512,12 +512,14 @@ const styles = StyleSheet.create({
 	},
 
 	modalText: {
-		// marginBottom: 15,
 		textAlign: 'center',
 	},
 	verticalLine: {
 		height: '50%',
 		borderLeftWidth: 0.16,
 		width: 1,
+	},
+	blankView: {
+		height: 15,
 	},
 });

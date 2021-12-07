@@ -18,6 +18,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import type { findTime } from '../interface/timetable';
 import { findTeam } from '../store/login';
+import { Button } from '../lib/util/Button';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -25,6 +26,8 @@ interface props {
 	setTimeModalVisible?: React.Dispatch<React.SetStateAction<boolean>>;
 	color?: string;
 	findTime: findTime[];
+	isConfirmMode: boolean;
+	onPressNext?: () => void;
 }
 
 export function ModalTime({
@@ -32,6 +35,8 @@ export function ModalTime({
 	setTimeModalVisible,
 	color,
 	findTime,
+	isConfirmMode,
+	onPressNext,
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
@@ -141,6 +146,26 @@ export function ModalTime({
 									</View>
 								</View>
 							))}
+						</>
+					)}
+					{isConfirmMode && (
+						<>
+							<View
+								style={{
+									borderWidth: 0.3,
+									width: '110%',
+									marginTop: 15,
+								}}
+							/>
+							<Button
+								buttonNumber={2}
+								buttonText="취소"
+								secondButtonText="다음"
+								onPressFunction={() =>
+									setTimeModalVisible && setTimeModalVisible(false)
+								}
+								secondOnPressFunction={() => onPressNext && onPressNext()}
+							/>
 						</>
 					)}
 				</View>

@@ -18,6 +18,7 @@ export interface Login {
 	startHour: number;
 	endHour: number;
 	dates: any;
+	individualColor: string;
 }
 
 export interface kakaoLoginAPI {

@@ -59,6 +59,9 @@ const initialState: team = {
 	teamColor: '',
 	modalMode: 'normal',
 	leaveTeamOK: false,
+	startHour: 0,
+	endHour: 0,
+	peopleCount: 0,
 };
 
 export const teamSlice = createSlice({
@@ -88,6 +91,9 @@ export const teamSlice = createSlice({
 			state.teamColor = action.payload.color;
 			state.joinTeam = true;
 			state.joinTeamError = false;
+			state.startHour = action.payload.starting_hours;
+			state.endHour = action.payload.end_hours;
+			state.peopleCount = action.payload.people_count;
 		},
 		JOIN_TEAM_FAILURE: (state, action: PayloadAction<any>) => {
 			// Alert.alert('초대 코드가 올바르지 않습니다');
