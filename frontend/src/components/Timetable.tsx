@@ -11,17 +11,15 @@ import {
 	getGroupDates,
 	getIndividualDates,
 	getOtherConfirmDates,
-	makeInitialTimePicked,
 	setDay,
-	setEndHour,
 	setStartHour,
+	toggleTimePick,
 } from '../store/timetable';
-import type { make_days, make60, timeType } from '../interface';
+import type { make60, timeType } from '../interface';
 import { View, Text, TouchableView } from '../theme';
 import { RootState } from '../store';
 import { kakaoLogin } from '../store/individual';
 import { ModalTime, ModalTimePicker } from '.';
-// import { ModalTimePicker } from './ModalTimePicker';
 const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 const boxHeight = 28;
@@ -121,18 +119,12 @@ export function Timetable({
 	const [timeModalVisible, setTimeModalVisible] = useState(false);
 	const [date, setDate] = useState<Date>(new Date());
 	const [endHour, setEndHour] = useState(0);
-	const [modalData, setModalData] = useState<modalData>({
-		people: [],
-		startTime: {
-			hour: 0,
-			minute: 0,
-		},
-		endTime: {
-			hour: 0,
-			minute: 0,
-		},
+	const [isConfirmMode, setIsConfirm] = useState(false);
+	const [select, setSelect] = useState({
+		idx: 0,
+		time: 0,
+		day: '',
 	});
-
 	useEffect(() => {
 		endIdx ? setEndHour(endIdx) : setEndHour(endHourTimetable);
 	}, [endIdx, endHourTimetable]);
@@ -185,33 +177,50 @@ export function Timetable({
 			dispatch(cloneEveryTime(kakaoDates));
 		}
 	}, [cloneDateSuccess, kakaoDates]);
-	const onPressGroupTime = useCallback((time: number, day: string) => {
-		dispatch(findTimeFromResponse({ time, day }));
 
-		setTimeout(() => {
-			setTimeModalVisible && setTimeModalVisible(true);
-		}, 100);
-	}, []);
+	const onPressGroupTime = useCallback(
+		(time: number, day: string, is: boolean, idx?: number) => {
+			dispatch(findTimeFromResponse({ time, day }));
+			idx && setSelect({ idx, time, day });
+			setIsConfirm(is);
+			setTimeout(() => {
+				setTimeModalVisible(true);
+			}, 100);
+		},
+		[]
+	);
+
+	const onPressNext = useCallback(() => {
+		console.log(select);
+		onSetStartHour(select.idx, select.time, select.day);
+		setTimeModalVisible(false);
+	}, [select]);
+
 	const onSetStartHour = useCallback(
 		(idx: number, time: number, day: string) => {
+			dispatch(toggleTimePick());
 			dispatch(setStartHour(time));
+
 			date.setHours(time);
 			setDate(new Date(date));
-			setMode && setMode('startMinute');
-			setModalVisible && setModalVisible(true);
 			dispatch(changeDayIdx(idx));
 			dispatch(setDay(day));
-			isConfirm ? dispatch(checkIsExist()) : dispatch(checkIsBlank());
+			setTimeout(() => {
+				isConfirm ? dispatch(checkIsExist()) : dispatch(checkIsBlank());
+			}, 100);
+			setTimeout(() => {
+				setMode && setMode('startMinute');
+			}, 500);
 		},
-		[isTimePicked, isGroup, date, isConfirm]
+		[isGroup, date, isConfirm]
 	);
 	useEffect(() => {
-		if (isTimePicked || isTimeNotExist) {
+		if (mode === 'startMinute' && !isTimePicked) {
+			setModalVisible && setModalVisible(true);
+		} else if (mode === 'startMinute' && isTimePicked) {
 			setMode && setMode('normal');
-			setModalVisible && setModalVisible(false);
-			dispatch(makeInitialTimePicked());
 		}
-	}, [isTimePicked, isTimeNotExist]);
+	}, [isTimePicked, mode]);
 
 	return (
 		<View style={styles.view}>
@@ -273,7 +282,7 @@ export function Timetable({
 												mode === 'confirmMode' &&
 													onSetStartHour(idx, Number(time), day.day);
 												mode === 'normal' &&
-													onPressGroupTime(Number(time), day.day);
+													onPressGroupTime(Number(time), day.day, false);
 											}}
 										>
 											{day.times[time].map((t, tIdx) => (
@@ -391,7 +400,8 @@ export function Timetable({
 											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
-												onSetStartHour(idx, Number(time), day.day);
+												onPressGroupTime(Number(time), day.day, true, idx);
+												// onSetStartHour(idx, Number(time), day.day);
 											}}
 										>
 											{day.times[time].map((t, tIdx) => (
@@ -472,6 +482,8 @@ export function Timetable({
 						setTimeModalVisible={setTimeModalVisible}
 						timeModalVisible={timeModalVisible}
 						findTime={findTime}
+						isConfirmMode={isConfirmMode}
+						onPressNext={onPressNext}
 					/>
 					<ModalTimePicker
 						modalVisible={modalVisible}
