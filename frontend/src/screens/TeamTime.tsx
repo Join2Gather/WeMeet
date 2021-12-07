@@ -21,7 +21,8 @@ import {
 } from '../store/timetable';
 import { RootState } from '../store';
 import { findTeam } from '../store/login';
-
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 type TeamStackParamList = {
 	TeamTime: {
 		name: string;
@@ -165,15 +166,15 @@ export default function TeamTime({ route }: Props) {
 							isGroup ? (
 								<MIcon
 									name="check-bold"
-									size={27}
+									size={22}
 									color={Colors.white}
 									style={{ paddingTop: 1 }}
 									onPress={goConfirmPage}
 								/>
 							) : (
-								<MIcon
+								<FontAwesome5Icon
 									name="plus"
-									size={27}
+									size={25}
 									color={Colors.white}
 									style={{ paddingTop: 1 }}
 									onPress={() => setMode('startMode')}
@@ -181,9 +182,9 @@ export default function TeamTime({ route }: Props) {
 							)
 						}
 						secondRight={() => (
-							<AntIcon
+							<MaterialIcon
 								name="settings"
-								size={25}
+								size={27}
 								color={Colors.white}
 								style={{ paddingTop: 1 }}
 								onPress={() => setSettingModalVisible(true)}
@@ -193,7 +194,7 @@ export default function TeamTime({ route }: Props) {
 
 					<View style={styles.viewHeight}>
 						<View style={styles.rowButtonView}>
-							<Spinner loading={loadingIndividual} />
+							{/* <Spinner loading={loadingIndividual} /> */}
 							{mode === 'normal' && (
 								<View style={{ flexDirection: 'column' }}>
 									<View
