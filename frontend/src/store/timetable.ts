@@ -357,6 +357,9 @@ export const timetableSlice = createSlice({
 			}
 			// state.selectTime[state.day].push(action.payload);
 		},
+		toggleTimePick: (state) => {
+			state.isTimePicked = false;
+		},
 		checkIsExist: (state) => {
 			let isNonColor = 0;
 			for (let i = 0; i <= 6; i++) {
@@ -586,6 +589,7 @@ export const {
 	setStartMin,
 	setEndMin,
 	checkIsBlank,
+	toggleTimePick,
 	changeAllColor,
 	setDay,
 	makePostIndividualDates,
