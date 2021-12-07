@@ -27,7 +27,9 @@ import {
 import * as FileSystem from 'expo-file-system';
 import { useMakeTimetable } from '../hooks';
 import { getUserMe } from '../store/login';
-
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import { HomeSetting } from '../components/HomeSetting';
 export default function Home() {
 	const {
 		token,
@@ -40,6 +42,7 @@ export default function Home() {
 		confirmClubs,
 		confirmDatesTimetable,
 		individualTimesText,
+		individualColor,
 	} = useSelector(({ login, individual, loading }: RootState) => ({
 		token: login.token,
 		id: login.id,
@@ -51,6 +54,7 @@ export default function Home() {
 		confirmClubs: login.confirmClubs,
 		confirmDatesTimetable: login.confirmDatesTimetable,
 		individualTimesText: individual.individualTimesText,
+		individualColor: login.individualColor,
 	}));
 	const dispatch = useDispatch();
 	const { defaultDates } = useMakeTimetable();
@@ -72,6 +76,7 @@ export default function Home() {
 	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [selectModalVisible, setSelectModalVisible] = useState(false);
+	const [settingModalVisible, setSettingModalVisible] = useState(false);
 	const flatListRef = useRef<FlatList | null>(null);
 
 	// image pic1er
@@ -83,17 +88,17 @@ export default function Home() {
 
 	// modal
 
-	useEffect(() => {
-		(async () => {
-			if (Platform.OS !== 'web') {
-				const { status } =
-					await ImagePicker.requestMediaLibraryPermissionsAsync();
-				if (status !== 'granted') {
-					alert('카메라 권한을 승인해주세요');
-				}
-			}
-		})();
-	}, []);
+	// useEffect(() => {
+	// 	(async () => {
+	// 		if (Platform.OS !== 'web') {
+	// 			const { status } =
+	// 				await ImagePicker.requestMediaLibraryPermissionsAsync();
+	// 			if (status !== 'granted') {
+	// 				alert('카메라 권한을 승인해주세요');
+	// 			}
+	// 		}
+	// 	})();
+	// }, []);
 
 	const pickImage = async () => {
 		const result = await ImagePicker.launchImageLibraryAsync({
@@ -111,26 +116,36 @@ export default function Home() {
 	};
 
 	return (
-		<SafeAreaView style={{ backgroundColor: '#33aafc' }}>
+		<SafeAreaView style={{ backgroundColor: individualColor }}>
 			<View style={[styles.view]}>
 				<NavigationHeader
 					title="내 일정 등록하기"
+					headerColor={individualColor}
 					Left={() => (
 						<Icon
 							name="timetable"
-							size={28}
+							size={30}
 							color={Colors.white}
 							style={{ paddingTop: 1 }}
 							onPress={() => setSelectModalVisible(true)}
 						/>
 					)}
 					Right={() => (
-						<Icon
+						<FontAwesome5Icon
 							name="plus"
-							size={28}
+							size={25}
 							color={Colors.white}
 							style={{ paddingTop: 1 }}
 							onPress={onPressPlus}
+						/>
+					)}
+					secondRight={() => (
+						<MaterialIcon
+							name="settings"
+							size={27}
+							color={Colors.white}
+							style={{ paddingTop: 1 }}
+							onPress={() => setSettingModalVisible(true)}
 						/>
 					)}
 				/>
@@ -142,7 +157,7 @@ export default function Home() {
 						{mode === '0' && (
 							<>
 								<View
-									style={[styles.boxView, { backgroundColor: Colors.blue400 }]}
+									style={[styles.boxView, { backgroundColor: individualColor }]}
 								/>
 								<Text style={styles.infoText}>모임 일정</Text>
 								<View
@@ -181,6 +196,14 @@ export default function Home() {
 					<ModalSelect
 						selectModalVisible={selectModalVisible}
 						setSelectModalVisible={setSelectModalVisible}
+					/>
+					<HomeSetting
+						setSettingModalVisible={setSettingModalVisible}
+						settingModalVisible={settingModalVisible}
+						user={user}
+						id={id}
+						token={token}
+						color={Colors.blue400}
 					/>
 				</ScrollView>
 			</View>
