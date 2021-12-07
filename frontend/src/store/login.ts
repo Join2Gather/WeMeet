@@ -23,6 +23,7 @@ const initialState: Login = {
 	startHour: 0,
 	endHour: 0,
 	dates: [],
+	individualColor: '#33aafc',
 };
 
 const USER_ME = 'login/USER_ME';
@@ -97,10 +98,14 @@ export const loginSlice = createSlice({
 		makeGroupColor: (state, action: PayloadAction<string>) => {
 			state.color = action.payload;
 		},
+		changeTeamColor: (state, action: PayloadAction<string>) => {
+			state.individualColor = action.payload;
+		},
 	},
 	extraReducers: {},
 });
 
-export const { getSocialLogin, findTeam, makeGroupColor } = loginSlice.actions;
+export const { getSocialLogin, findTeam, makeGroupColor, changeTeamColor } =
+	loginSlice.actions;
 
 export default loginSlice.reducer;
