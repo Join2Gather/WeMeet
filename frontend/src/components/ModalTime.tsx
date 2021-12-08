@@ -19,6 +19,7 @@ import { hexToRGB } from '../lib/util/hexToRGB';
 import type { findTime } from '../interface/timetable';
 import { findTeam } from '../store/login';
 import { Button } from '../lib/util/Button';
+import { deletePostTime } from '../store/timetable';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -28,6 +29,8 @@ interface props {
 	findTime: findTime[];
 	isConfirmMode: boolean;
 	onPressNext?: () => void;
+	tableMode: string;
+	isGroup?: boolean;
 }
 
 export function ModalTime({
@@ -37,6 +40,8 @@ export function ModalTime({
 	findTime,
 	isConfirmMode,
 	onPressNext,
+	tableMode,
+	isGroup,
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
@@ -46,11 +51,27 @@ export function ModalTime({
 		b: 0,
 	});
 	useEffect(() => {
+		if (mode == 'loading') {
+			setTimeout(() => {
+				setMode('success');
+			}, 1000);
+		}
+	}, [mode]);
+	useEffect(() => {
 		if (color) {
 			const result = hexToRGB(color);
 			result && setRGBColor(result);
 		}
 	}, [color]);
+	const onPressDelete = useCallback(() => {
+		dispatch(deletePostTime());
+		setMode('loading');
+	}, []);
+
+	const onPressCloseBtn = useCallback(() => {
+		setTimeModalVisible && setTimeModalVisible(false);
+		setMode('initial');
+	}, []);
 
 	return (
 		<Modal
@@ -80,7 +101,7 @@ export function ModalTime({
 								marginLeft: '90%',
 								width: '9%',
 							}}
-							onPress={() => setTimeModalVisible && setTimeModalVisible(false)}
+							onPress={onPressCloseBtn}
 						>
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
 						</TouchableHighlight>
@@ -134,29 +155,45 @@ export function ModalTime({
 									</View>
 								</View>
 							))}
-							<View style={styles.blankView} />
-							<Text style={styles.titleText}>참여 인원</Text>
-							<View style={styles.blankView} />
-							{findTime.map((t) => (
-								<View key={t.startTime.hour} style={[styles.backgroundView]}>
-									<View style={styles.columnView}>
-										<View style={styles.rowView}>
-											<Text style={styles.touchText}>{t.people}</Text>
+							{isGroup && (
+								<>
+									<View style={styles.blankView} />
+									<Text style={styles.titleText}>참여 인원</Text>
+									<View style={styles.blankView} />
+									{findTime.map((t) => (
+										<View
+											key={t.startTime.hour}
+											style={[styles.backgroundView]}
+										>
+											<View style={styles.columnView}>
+												<View style={styles.rowView}>
+													<Text style={styles.touchText}>{t.people}</Text>
+												</View>
+											</View>
 										</View>
-									</View>
-								</View>
-							))}
+									))}
+								</>
+							)}
+							{!isGroup && (
+								<>
+									<View style={styles.blankView} />
+									<View style={styles.rowLine} />
+									<Button
+										buttonNumber={2}
+										buttonText="취소"
+										secondButtonText="삭제"
+										onPressFunction={() =>
+											setTimeModalVisible && setTimeModalVisible(false)
+										}
+										secondOnPressFunction={onPressDelete}
+									/>
+								</>
+							)}
 						</>
 					)}
 					{isConfirmMode && (
 						<>
-							<View
-								style={{
-									borderWidth: 0.3,
-									width: '110%',
-									marginTop: 15,
-								}}
-							/>
+							<View style={styles.rowLine} />
 							<Button
 								buttonNumber={2}
 								buttonText="취소"
@@ -165,6 +202,36 @@ export function ModalTime({
 									setTimeModalVisible && setTimeModalVisible(false)
 								}
 								secondOnPressFunction={() => onPressNext && onPressNext()}
+							/>
+						</>
+					)}
+					{mode === 'loading' && (
+						<>
+							<View style={{ height: 30 }} />
+							<ActivityIndicator size="large" color={Colors.blue500} />
+							<View style={{ height: 30 }} />
+						</>
+					)}
+					{mode === 'success' && (
+						<>
+							<View style={styles.blankView} />
+							<View style={styles.rowView}>
+								<Font5Icon
+									name="check-circle"
+									size={19}
+									color={Colors.green500}
+								/>
+								<Text style={styles.touchText}>
+									{' '}
+									변경 사항이 저장 되었습니다
+								</Text>
+							</View>
+							<View style={styles.blankView} />
+							<View style={styles.buttonOverLine} />
+							<Button
+								buttonNumber={1}
+								buttonText="확인"
+								onPressFunction={onPressCloseBtn}
 							/>
 						</>
 					)}
@@ -265,5 +332,10 @@ const styles = StyleSheet.create({
 		width: screen.width * 0.9,
 		marginTop: 20,
 		borderColor: Colors.black,
+	},
+	rowLine: {
+		borderWidth: 0.4,
+		width: '110%',
+		marginTop: 15,
 	},
 });
