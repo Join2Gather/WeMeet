@@ -4,7 +4,7 @@ import { Colors } from 'react-native-paper';
 export function makeIndividualTimetable(state: timetable) {
 	state.weekIndex.map((day, idx) =>
 		state.responseIndividual[day].map((d, idxNumber) => {
-			state.postIndividualDates[day].push(d);
+			state.postIndividualDates[day] = [...state.postIndividualDates[day], d];
 
 			const startingMinute = Math.round(d.starting_minutes / 10);
 			const endMinute = Math.round(d.end_minutes / 10);
@@ -260,4 +260,43 @@ export function makeSnapShotDate(
 			}
 		})
 	);
+}
+
+export function deleteDate(
+	state: timetable,
+	date: any,
+	startHour: number,
+	startMinute: number,
+	endHour: number,
+	endMinute: number,
+	dayIdx: number
+) {
+	for (let i = startHour; i <= endHour; i++) {
+		if (i === startHour) {
+			for (let j = startMinute; j <= 6; j++) {
+				date[dayIdx].times[i][j].color = Colors.white;
+				if (j === 0 || j === 7) {
+					date[dayIdx].times[i][j].borderTop = true;
+					date[dayIdx].times[i][j].borderBottom = true;
+				}
+			}
+		} else if (i === endHour) {
+			for (let j = 0; j <= endMinute; j++) {
+				date[dayIdx].times[i][j].color = Colors.white;
+				date[dayIdx].times[i][j].mode = 'start';
+				if (j === 0 || j === 7) {
+					date[dayIdx].times[i][j].borderTop = true;
+					date[dayIdx].times[i][j].borderBottom = true;
+				}
+			}
+		} else {
+			for (let j = 0; j <= 6; j++) {
+				date[dayIdx].times[i][j].color = Colors.white;
+				if (j === 0 || j === 7) {
+					date[dayIdx].times[i][j].borderTop = true;
+					date[dayIdx].times[i][j].borderBottom = true;
+				}
+			}
+		}
+	}
 }
