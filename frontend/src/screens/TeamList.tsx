@@ -76,7 +76,7 @@ export default function TeamList() {
 	// useEffect
 	useEffect(() => {
 		dispatch(getUserMe({ id, token, user }));
-	}, [joinTeam, teamColor]);
+	}, [joinTeam]);
 	useEffect(() => {
 		dispatch(setModalMode('normal'));
 	}, [joinTeamError]);
@@ -160,7 +160,7 @@ export default function TeamList() {
 						<Text style={styles.teamTitle}>아직 아무런 모임이 없네요 😭</Text>
 					</TouchableView>
 				)}
-				{/* <Spinner loading={loadingUserMe} /> */}
+				<Spinner loading={loadingUserMe} />
 				<FlatList
 					style={{
 						height: dimensions.screen.height * 0.6,

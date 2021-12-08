@@ -3,7 +3,12 @@ import createRequestSaga from '../hooks/createRequestSaga';
 import * as api from '../lib/api/login';
 import { takeLatest } from 'redux-saga/effects';
 import { createAction } from 'redux-actions';
-import type { kakaoLoginAPI, Login, userMeAPI } from '../interface';
+import type {
+	kakaoLoginAPI,
+	Login,
+	nicknameAPI,
+	userMeAPI,
+} from '../interface';
 
 const initialState: Login = {
 	id: 0,
@@ -24,16 +29,24 @@ const initialState: Login = {
 	endHour: 0,
 	dates: [],
 	individualColor: '#33aafc',
+	nickname: '',
 };
 
 const USER_ME = 'login/USER_ME';
+const CHANGE_NICKNAME = 'login/CHANGE_NICKNAME';
 
 export const getUserMe = createAction(USER_ME, (data: userMeAPI) => data);
+export const changeNickname = createAction(
+	CHANGE_NICKNAME,
+	(data: nicknameAPI) => data
+);
 
 const getUserMeSaga = createRequestSaga(USER_ME, api.getUserMe);
+const changeNickSaga = createRequestSaga(CHANGE_NICKNAME, api.changeNickname);
 
 export function* loginSaga() {
 	yield takeLatest(USER_ME, getUserMeSaga);
+	yield takeLatest(CHANGE_NICKNAME, changeNickSaga);
 }
 
 export const loginSlice = createSlice({
@@ -93,6 +106,12 @@ export const loginSlice = createSlice({
 			state.userMeSuccess = true;
 		},
 		USER_ME_FAILURE: (state, action: PayloadAction<any>) => {
+			state.error = action.payload;
+		},
+		CHANGE_NICKNAME_SUCCESS: (state, action: PayloadAction<any>) => {
+			console.log(action.payload);
+		},
+		CHANGE_NICKNAME_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
 		makeGroupColor: (state, action: PayloadAction<string>) => {

@@ -124,7 +124,7 @@ export default function Home() {
 					Left={() => (
 						<Icon
 							name="timetable"
-							size={30}
+							size={28}
 							color={Colors.white}
 							style={{ paddingTop: 1 }}
 							onPress={() => setSelectModalVisible(true)}
@@ -135,7 +135,7 @@ export default function Home() {
 							name="plus"
 							size={25}
 							color={Colors.white}
-							style={{ paddingTop: 1 }}
+							style={{ paddingTop: 2 }}
 							onPress={onPressPlus}
 						/>
 					)}

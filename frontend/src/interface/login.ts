@@ -19,6 +19,7 @@ export interface Login {
 	endHour: number;
 	dates: any;
 	individualColor: string;
+	nickname: string;
 }
 
 export interface kakaoLoginAPI {
@@ -46,4 +47,11 @@ export interface userMeAPI {
 	user: number;
 	id: number;
 	token: string;
+}
+
+export interface nicknameAPI {
+	id: number;
+	user: number;
+	token: string;
+	nickname: string;
 }

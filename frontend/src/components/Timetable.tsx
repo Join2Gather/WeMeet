@@ -125,6 +125,7 @@ export function Timetable({
 		time: 0,
 		day: '',
 	});
+	const [tableMode, setTableMode] = useState('group');
 	useEffect(() => {
 		endIdx ? setEndHour(endIdx) : setEndHour(endHourTimetable);
 	}, [endIdx, endHourTimetable]);
@@ -180,12 +181,23 @@ export function Timetable({
 
 	const onPressGroupTime = useCallback(
 		(time: number, day: string, is: boolean, idx?: number) => {
-			dispatch(findTimeFromResponse({ time, day }));
+			dispatch(findTimeFromResponse({ time, day, isTeam: true }));
 			idx && setSelect({ idx, time, day });
 			setIsConfirm(is);
 			setTimeout(() => {
 				setTimeModalVisible(true);
 			}, 100);
+		},
+		[]
+	);
+
+	const onPressIndividualTime = useCallback(
+		(time: number, day: string, is: boolean, idx?: number) => {
+			dispatch(findTimeFromResponse({ time, day, isTeam: false }));
+			dispatch(changeDayIdx(idx));
+			idx && setSelect({ idx, time, day });
+			setTableMode('individual');
+			setTimeout(() => setTimeModalVisible(true), 100);
 		},
 		[]
 	);
@@ -442,7 +454,12 @@ export function Timetable({
 											key={time}
 											onPress={() => {
 												mode === 'normal' &&
-													onSetStartHour(idx, Number(time), day.day);
+													onPressIndividualTime(
+														Number(time),
+														day.day,
+														false,
+														idx
+													);
 												mode === 'startMode' &&
 													onSetStartHour(idx, Number(time), day.day);
 											}}
@@ -484,6 +501,8 @@ export function Timetable({
 						findTime={findTime}
 						isConfirmMode={isConfirmMode}
 						onPressNext={onPressNext}
+						tableMode={tableMode}
+						isGroup={isGroup}
 					/>
 					<ModalTimePicker
 						modalVisible={modalVisible}

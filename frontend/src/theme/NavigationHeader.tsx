@@ -34,7 +34,7 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 				{ backgroundColor: headerColor ? headerColor : '#33aafc' },
 			]}
 		>
-			<View style={{ flex: 0.05, backgroundColor: 'transparent' }}></View>
+			<View style={{ flex: 0.1, backgroundColor: 'transparent' }}></View>
 			<View style={styles.flex}>{Left && Left()}</View>
 			<View style={styles.flex}>
 				<Text style={[styles.title, titleStyle]}>{title}</Text>
@@ -46,11 +46,11 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 				]}
 			>
 				{thirdRight && thirdRight()}
-				<View style={{ flex: 0.3, backgroundColor: 'transparent' }}></View>
+				<View style={{ flex: 0.2, backgroundColor: 'transparent' }}></View>
 				{secondRight && secondRight()}
 				<View style={{ flex: 0.2, backgroundColor: 'transparent' }}></View>
 				{Right && Right()}
-				<View style={{ flex: 0.05, backgroundColor: 'transparent' }}></View>
+				<View style={{ flex: 0.1, backgroundColor: 'transparent' }}></View>
 			</View>
 		</View>
 	);

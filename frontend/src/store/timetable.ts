@@ -19,6 +19,7 @@ import { useMakeTimetable, useMakeTimeTableWith60 } from '../hooks';
 import { Alert } from 'react-native';
 import {
 	addEveryTime,
+	deleteDate,
 	makeConfirmWith,
 	makeGroupTimeTableWith60,
 	makeIndividualTimetable,
@@ -513,23 +514,73 @@ export const timetableSlice = createSlice({
 		},
 		makePostIndividualDates: (state) => {
 			if (!state.isTimePicked) {
-				state.postIndividualDates[state.weekIndex[state.dayIdx]].push({
+				const data = {
 					starting_hours: state.startTime,
 					starting_minutes: state.startMinute,
 					end_hours: state.endTime,
 					end_minutes: state.endMinute,
-				});
+				};
+				state.postIndividualDates[state.weekIndex[state.dayIdx]] = [
+					...state.postIndividualDates[state.weekIndex[state.dayIdx]],
+					data,
+				];
 				state.postDatesPrepare = true;
 			}
 		},
+		deletePostTime: (state) => {
+			const startMinute = Math.round(state.finTime[0].startTime.minute / 10);
+			const endMinute = Math.round(state.finTime[0].endTime.minute / 10);
+			const startHour = state.finTime[0].startTime.hour;
+			const endHour = state.finTime[0].endTime.hour;
+			state.postIndividualDates[state.weekIndex[state.dayIdx]] =
+				state.postIndividualDates[state.weekIndex[state.dayIdx]].filter(
+					(day: any) => {
+						day.starting_hours !== startHour;
+					}
+				);
+			const dayIdx = state.dayIdx;
+
+			deleteDate(
+				state,
+				state.dates,
+				startHour,
+				startMinute,
+				endHour,
+				endMinute,
+				dayIdx
+			);
+			deleteDate(
+				state,
+				state.teamDatesWith60,
+				startHour,
+				startMinute,
+				endHour,
+				endMinute,
+				dayIdx
+			);
+			deleteDate(
+				state,
+				state.teamConfirmDate,
+				startHour,
+				startMinute,
+				endHour,
+				endMinute,
+				dayIdx
+			);
+			state.postDatesPrepare = true;
+		},
 		makeConfirmDates: (state) => {
 			if (!state.isTimeNotExist) {
-				state.confirmDates[state.weekIndex[state.dayIdx]].push({
+				const data = {
 					starting_hours: state.startTime,
 					starting_minutes: state.startMinute,
 					end_hours: state.endTime,
 					end_minutes: state.endMinute,
-				});
+				};
+				state.confirmDates[state.weekIndex[state.dayIdx]] = [
+					...state.confirmDates[state.weekIndex[state.dayIdx]],
+					data,
+				];
 			}
 		},
 		makeConfirmPrepare: (state) => {
@@ -551,29 +602,47 @@ export const timetableSlice = createSlice({
 		},
 		findTimeFromResponse: (
 			state,
-			action: PayloadAction<{ day: string; time: number }>
+			action: PayloadAction<{ day: string; time: number; isTeam: boolean }>
 		) => {
 			const day = action.payload.day;
 			const time = action.payload.time;
 			state.finTime = [];
-
-			state.responseGroup[day].avail_time.forEach((t, idx) => {
-				if (t.starting_hours <= time && t.end_hours >= time) {
-					const data = {
-						people: state.responseGroup[day].avail_people[idx],
-						startTime: {
-							hour: t.starting_hours,
-							minute: t.starting_minutes,
-						},
-						endTime: {
-							hour: t.end_hours,
-							minute: t.end_minutes,
-						},
-						selectTime: time,
-					};
-					state.finTime.push(data);
-				}
-			});
+			if (action.payload.isTeam) {
+				state.responseGroup[day].avail_time.forEach((t, idx) => {
+					if (t.starting_hours <= time && t.end_hours >= time) {
+						const data = {
+							people: state.responseGroup[day].avail_people[idx],
+							startTime: {
+								hour: t.starting_hours,
+								minute: t.starting_minutes,
+							},
+							endTime: {
+								hour: t.end_hours,
+								minute: t.end_minutes,
+							},
+							selectTime: time,
+						};
+						state.finTime = [...state.finTime, data];
+					}
+				});
+			} else {
+				state.responseIndividual[day].forEach((t, idx) => {
+					if (t.starting_hours <= time && t.end_hours >= time) {
+						const data = {
+							startTime: {
+								hour: t.starting_hours,
+								minute: t.starting_minutes,
+							},
+							endTime: {
+								hour: t.end_hours,
+								minute: t.end_minutes,
+							},
+							selectTime: time,
+						};
+						state.finTime = [...state.finTime, data];
+					}
+				});
+			}
 		},
 		setTeamName: (state, action: PayloadAction<string>) => {
 			state.teamName = action.payload;
@@ -609,6 +678,7 @@ export const {
 	findTimeFromResponse,
 	setTeamName,
 	makeInitialConfirmTime,
+	deletePostTime,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;

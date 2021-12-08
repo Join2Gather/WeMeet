@@ -122,7 +122,7 @@ export interface timeProps {
 }
 
 export interface findTime {
-	people: string[];
+	people?: string[];
 	startTime: timeType;
 	endTime: timeType;
 	selectTime: number;
