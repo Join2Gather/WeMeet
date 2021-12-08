@@ -8,6 +8,7 @@ import {
 	View,
 	ActivityIndicator,
 	Dimensions,
+	TextInput,
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
@@ -16,7 +17,12 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import { Button } from '../lib/util/Button';
-import { changeTeamColor, getUserMe, makeGroupColor } from '../store/login';
+import {
+	changeNickname,
+	changeTeamColor,
+	getUserMe,
+	makeGroupColor,
+} from '../store/login';
 import { useNavigation } from '@react-navigation/core';
 
 const screen = Dimensions.get('screen');
@@ -41,6 +47,7 @@ export function HomeSetting({
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
 	const [pickColor, setPickColor] = useState(Colors.red500);
+	const [nickname, setNickname] = useState('');
 	// const [color, setColor] = useState(Colors.red500);
 	const [RGBColor, setRGBColor] = useState({
 		r: 0,
@@ -63,6 +70,7 @@ export function HomeSetting({
 	const onPressCloseButton = useCallback(() => {
 		setSettingModalVisible(false);
 		setMode('initial');
+		setNickname('');
 	}, []);
 
 	const onPressSetMode = useCallback((mode: string) => {
@@ -74,6 +82,13 @@ export function HomeSetting({
 		setMode('loading');
 	}, [pickColor]);
 
+	const onPressNickConfirm = useCallback(() => {
+		dispatch(changeNickname({ id, token, user, nickname }));
+		setMode('loading');
+		setTimeout(() => {
+			setNickname('');
+		}, 100);
+	}, [nickname]);
 	return (
 		<Modal
 			animationType="fade"
@@ -117,7 +132,7 @@ export function HomeSetting({
 									<TouchableHighlight
 										activeOpacity={1}
 										underlayColor={Colors.grey300}
-										onPress={() => onPressSetMode('color')}
+										onPress={() => setMode('nickname')}
 										style={styles.touchButtonStyle}
 									>
 										<View style={styles.rowView}>
@@ -192,10 +207,41 @@ export function HomeSetting({
 								secondButtonText={'확인'}
 								onPressWithParam={() => setMode('initial')}
 								pressParam="initial"
+								secondOnPressFunction={onChangeColor}
 							/>
 						</>
 					)}
+					{mode === 'nickname' && (
+						<>
+							<Text style={[styles.titleText, { alignSelf: 'center' }]}>
+								닉네임을 입력해 주세요
+							</Text>
+							<View style={styles.blankView} />
 
+							<View style={[styles.textInputView]}>
+								<TextInput
+									// onFocus={focus}
+									style={[styles.textInput, { color: Colors.black }]}
+									value={nickname}
+									onChangeText={(nickname) => setNickname((text) => nickname)}
+									placeholder="Enter your Nickname"
+									placeholderTextColor={Colors.grey600}
+									autoFocus={true}
+									autoCapitalize="none"
+								/>
+							</View>
+							<View style={styles.blankView} />
+							<View style={styles.buttonOverLine} />
+							<Button
+								buttonNumber={2}
+								buttonText={'이전'}
+								secondButtonText={'확인'}
+								onPressWithParam={() => setMode('initial')}
+								pressParam="initial"
+								secondOnPressFunction={onPressNickConfirm}
+							/>
+						</>
+					)}
 					{mode === 'loading' && (
 						<>
 							<View style={styles.blankView} />
@@ -288,6 +334,7 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
 		marginLeft: '8%',
+		marginTop: 15,
 	},
 	blankView: {
 		height: 10,
@@ -305,5 +352,18 @@ const styles = StyleSheet.create({
 		width: screen.width * 0.9,
 		marginTop: 20,
 		borderColor: Colors.black,
+	},
+	textInputView: {
+		flexDirection: 'row',
+		paddingBottom: 2,
+		backgroundColor: Colors.white,
+		borderBottomWidth: 0.3,
+		width: '70%',
+		marginLeft: '10%',
+		padding: 10,
+	},
+	textInput: {
+		fontSize: 18,
+		fontFamily: 'NanumSquareR',
 	},
 });
