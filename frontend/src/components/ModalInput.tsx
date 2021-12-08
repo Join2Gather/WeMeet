@@ -232,9 +232,10 @@ export function ModalInput({
 											onChangeText={(code) => setCode((text) => code)}
 											placeholder="Enter your Code"
 											placeholderTextColor={Colors.grey600}
+											autoFocus={true}
 										/>
 									</View>
-									<View style={styles.blankView} />
+
 									<Button
 										buttonNumber={1}
 										buttonText="확인"
@@ -254,9 +255,10 @@ export function ModalInput({
 											onChangeText={(name) => setName((text) => name)}
 											placeholder="Enter your ID"
 											placeholderTextColor={Colors.grey600}
+											autoFocus={true}
 										/>
 									</View>
-									<View style={styles.blankView} />
+
 									<Button
 										buttonNumber={1}
 										buttonText={'확인'}
@@ -283,6 +285,7 @@ export function ModalInput({
 										onChangeText={(hour) => setStartTime((text) => hour)}
 										placeholder="09"
 										placeholderTextColor={Colors.grey600}
+										autoFocus={true}
 									/>
 								</View>
 							</View>
@@ -300,13 +303,7 @@ export function ModalInput({
 									/>
 								</View>
 							</View>
-							<View
-								style={{
-									borderWidth: 0.3,
-									width: '110%',
-									marginTop: 15,
-								}}
-							/>
+							<View style={styles.rowLine} />
 							<Button
 								buttonNumber={2}
 								buttonText={'이전'}
@@ -334,13 +331,7 @@ export function ModalInput({
 									hideSliders={true}
 								/>
 							</View>
-							<View
-								style={{
-									borderWidth: 0.3,
-									width: '110%',
-									marginTop: 15,
-								}}
-							/>
+							<View style={styles.rowLine} />
 							<Button
 								buttonNumber={2}
 								buttonText={'이전'}
@@ -521,5 +512,10 @@ const styles = StyleSheet.create({
 	},
 	blankView: {
 		height: 15,
+	},
+	rowLine: {
+		borderWidth: 0.4,
+		width: '110%',
+		marginTop: 15,
 	},
 });
