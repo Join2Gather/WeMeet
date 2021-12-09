@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		marginBottom: -20,
 		width: '70%',
-		marginTop: 15,
+		// marginTop: 15,
 	},
 	buttonWithTwoView: {
 		flexDirection: 'row',
