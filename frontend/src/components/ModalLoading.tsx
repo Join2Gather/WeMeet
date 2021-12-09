@@ -29,8 +29,8 @@ const screen = Dimensions.get('screen');
 interface props {
 	loadingVisible: boolean;
 	setLoadingVisible: React.Dispatch<React.SetStateAction<boolean>>;
-	mode: string;
-	setMode: React.Dispatch<React.SetStateAction<string>>;
+	loadingMode: string;
+	setLoading: React.Dispatch<React.SetStateAction<string>>;
 	color: string;
 	onPressOk: () => void;
 	goLeft: () => void;
@@ -40,8 +40,8 @@ export function ModalLoading({
 	loadingVisible,
 	setLoadingVisible,
 	color,
-	mode,
-	setMode,
+	loadingMode,
+	setLoading,
 	onPressOk,
 	goLeft,
 }: props) {
@@ -84,7 +84,7 @@ export function ModalLoading({
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
 						</TouchableHighlight>
 					</View>
-					{mode === 'initial' && (
+					{loadingMode === 'initial' && (
 						<>
 							<View style={styles.blankView} />
 							<View style={styles.rowView}>
@@ -108,14 +108,14 @@ export function ModalLoading({
 						</>
 					)}
 
-					{mode === 'loading' && (
+					{loadingMode === 'loading' && (
 						<>
 							<View style={styles.blankView} />
 							<ActivityIndicator size={'large'} color={color} />
 							<View style={styles.blankView} />
 						</>
 					)}
-					{mode === 'success' && (
+					{loadingMode === 'success' && (
 						<>
 							<View style={styles.blankView} />
 							<View style={styles.rowView}>
