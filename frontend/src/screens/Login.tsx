@@ -43,7 +43,7 @@ export default function Login() {
 	const onPressSocial = useCallback(
 		async (social: any) => {
 			setSocialModalVisible(true);
-
+			console.log(clientBaseURL);
 			setSource(`${clientBaseURL}accounts/kakao/login`);
 			//setSource(`http://localhost:8000/accounts/kakao/login`);
 		},
