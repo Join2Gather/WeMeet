@@ -9,6 +9,8 @@ import HomeNavigator from './HomeNavigator';
 import Home from './Home';
 import TeamList from './TeamList';
 import type { RouteProp, ParamListBase } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 type TabBarIconProps = { focused: boolean; color: string; size: number };
 
@@ -22,17 +24,30 @@ const screenOptions = ({
 }: {
 	route: RouteProp<ParamListBase, string>;
 }) => {
+	const { individualColor, teamColor, isInTeamTime } = useSelector(
+		({ login, timetable }: RootState) => ({
+			individualColor: login.individualColor,
+			teamColor: login.color,
+			isInTeamTime: timetable.isInTeamTime,
+		})
+	);
 	return {
 		tabBarIcon: ({ focused, color, size }: TabBarIconProps) => {
 			const { name } = route;
 			const focusedSize = focused ? size + 6 : size;
-			const focusedColor = focused ? Colors.lightBlue500 : color;
+			const focusedColor = focused
+				? isInTeamTime
+					? teamColor
+					: individualColor
+				: color;
 			const [icon, iconOutline] = icons[name];
 			const iconName = focused ? icon : iconOutline;
 			return <Icon name={iconName} size={focusedSize} color={focusedColor} />;
 		},
 		tabBarActiveBackgroundColor: Colors.white,
 		tabBarInactiveBackgroundColor: Colors.white,
+		tabBarActiveTintColor: isInTeamTime ? teamColor : individualColor,
+
 		headerShown: false,
 	};
 };
