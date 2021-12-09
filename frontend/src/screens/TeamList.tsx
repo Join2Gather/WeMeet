@@ -18,9 +18,10 @@ import FontAweSome from 'react-native-vector-icons/FontAwesome5';
 import Material from 'react-native-vector-icons/MaterialCommunityIcons';
 import { findTeam, getUserMe } from '../store/login';
 import { Colors } from 'react-native-paper';
-import { makeTeamTime } from '../store/timetable';
+import { makeTeamTime, setIsInTeamTime } from '../store/timetable';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import { hexToRGB } from '../lib/util/hexToRGB';
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
 export default function TeamList() {
@@ -68,15 +69,24 @@ export default function TeamList() {
 		individualColor: login.individualColor,
 	}));
 	const [dimensions, setDimensions] = useState({ window, screen });
-
+	const [sequence, setSequence] = useState([0, 1, 2, 3]);
 	const [modalVisible, setModalVisible] = useState(false);
 	const navigation = useNavigation();
+	const [RGBColor, setRGBColor] = useState({
+		r: 0,
+		g: 0,
+		b: 0,
+	});
 	const dispatch = useDispatch();
 
 	// useEffect
 	useEffect(() => {
 		dispatch(getUserMe({ id, token, user }));
 	}, [joinTeam]);
+	useEffect(() => {
+		const result = hexToRGB(individualColor);
+		result && setRGBColor(result);
+	}, [individualColor]);
 	useEffect(() => {
 		dispatch(setModalMode('normal'));
 	}, [joinTeamError]);
@@ -92,6 +102,7 @@ export default function TeamList() {
 
 			setTimeout(() => {
 				dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
+				dispatch(setIsInTeamTime(true));
 				navigation.navigate('TeamTime', {
 					name,
 					user,
@@ -106,13 +117,15 @@ export default function TeamList() {
 	);
 	// 모달 모드 분리
 	const onMakeTeamTime = useCallback(() => {
+		if (sequence.length !== 4) setSequence((sequence) => [...sequence, 3]);
 		dispatch(setModalMode('make'));
 		setModalVisible(true);
-	}, []);
+	}, [sequence]);
 	const onJoinTeamTime = useCallback(() => {
+		setSequence((sequence) => sequence.filter((idx) => idx !== 3));
 		dispatch(setModalMode('join'));
 		setModalVisible(true);
-	}, []);
+	}, [sequence]);
 	const onReload = useCallback(() => {
 		dispatch(getUserMe({ id, user, token }));
 	}, []);
@@ -232,9 +245,16 @@ export default function TeamList() {
 					loadingChangeColor={loadingChangeColor}
 					joinName={joinName}
 					makeReady={makeReady}
+					individualColor={individualColor}
+					sequence={sequence}
 				/>
 				<TouchableView
-					style={[styles.touchableView, { backgroundColor: '#017bff' }]}
+					style={[
+						styles.touchableView,
+						{
+							backgroundColor: `rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 2)`,
+						},
+					]}
 					onPress={onJoinTeamTime}
 				>
 					<Text style={styles.loginText}>모임 참여</Text>
