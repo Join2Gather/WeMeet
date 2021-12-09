@@ -32,6 +32,8 @@ interface props {
 	modalVisible?: boolean;
 	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>> | null;
 	setMode?: React.Dispatch<React.SetStateAction<string>>;
+	setIsTimeMode?: React.Dispatch<React.SetStateAction<boolean>>;
+	setCurrent?: React.Dispatch<React.SetStateAction<number>>;
 	isGroup?: boolean;
 	isConfirm?: boolean;
 	individualDates?: make60[];
@@ -56,6 +58,8 @@ export function Timetable({
 	modalVisible,
 	setModalVisible,
 	setMode,
+	setIsTimeMode,
+	setCurrent,
 	isGroup,
 	isConfirm,
 	individualDates,
@@ -203,7 +207,7 @@ export function Timetable({
 	);
 
 	const onPressNext = useCallback(() => {
-		console.log(select);
+		setCurrent && setCurrent(1);
 		onSetStartHour(select.idx, select.time, select.day);
 		setTimeModalVisible(false);
 	}, [select]);
@@ -212,19 +216,21 @@ export function Timetable({
 		(idx: number, time: number, day: string) => {
 			dispatch(toggleTimePick());
 			dispatch(setStartHour(time));
-
+			setCurrent && setCurrent(1);
 			date.setHours(time);
 			setDate(new Date(date));
 			dispatch(changeDayIdx(idx));
 			dispatch(setDay(day));
+
 			setTimeout(() => {
 				isConfirm ? dispatch(checkIsExist()) : dispatch(checkIsBlank());
 			}, 100);
 			setTimeout(() => {
 				setMode && setMode('startMinute');
 			}, 500);
+			mode && console.log(mode);
 		},
-		[isGroup, date, isConfirm]
+		[isGroup, date, isConfirm, mode]
 	);
 	useEffect(() => {
 		if (mode === 'startMinute' && !isTimePicked) {
@@ -509,6 +515,8 @@ export function Timetable({
 						setModalVisible={setModalVisible}
 						mode={mode}
 						setMode={setMode}
+						setIsTimeMode={setIsTimeMode}
+						setCurrent={setCurrent}
 						id={id}
 						postIndividualDates={postIndividualDates}
 						token={token}
