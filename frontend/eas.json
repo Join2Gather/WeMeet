@@ -8,10 +8,7 @@
 			"distribution": "internal"
 		},
 		"preview": {
-			"distribution": "internal",
-			"ios": {
-				"enterpriseProvisioning": "universal"
-			}
+			"distribution": "internal"
 		},
 		"production": {}
 	},
