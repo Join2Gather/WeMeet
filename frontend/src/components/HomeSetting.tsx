@@ -89,6 +89,11 @@ export function HomeSetting({
 			setNickname('');
 		}, 100);
 	}, [nickname]);
+	const onPressConfirm = useCallback(() => {
+		setMode('initial');
+		setSettingModalVisible(false);
+		setPickColor(Colors.red500);
+	}, []);
 	return (
 		<Modal
 			animationType="fade"
@@ -263,9 +268,13 @@ export function HomeSetting({
 									변경 사항이 저장 되었습니다
 								</Text>
 							</View>
-							<View style={styles.blankView} />
+
 							<View style={styles.buttonOverLine} />
-							<Button buttonNumber={1} buttonText="확인" />
+							<Button
+								buttonNumber={1}
+								buttonText="확인"
+								onPressFunction={onPressConfirm}
+							/>
 						</>
 					)}
 				</View>
@@ -354,7 +363,6 @@ const styles = StyleSheet.create({
 		borderColor: Colors.black,
 	},
 	textInputView: {
-		flexDirection: 'row',
 		paddingBottom: 2,
 		backgroundColor: Colors.white,
 		borderBottomWidth: 0.3,
