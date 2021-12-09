@@ -174,7 +174,7 @@ export function ModalTime({
 									))}
 								</>
 							)}
-							{!isGroup && (
+							{!isGroup && !isConfirmMode && (
 								<>
 									<View style={styles.blankView} />
 									<View style={styles.rowLine} />
