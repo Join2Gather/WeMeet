@@ -192,6 +192,7 @@ export default function Home() {
 						isGroup={false}
 						individualTimesText={individualTimesText}
 						endIdx={25}
+						color={individualColor}
 					/>
 					<ModalSelect
 						selectModalVisible={selectModalVisible}
@@ -203,7 +204,7 @@ export default function Home() {
 						user={user}
 						id={id}
 						token={token}
-						color={Colors.blue400}
+						color={individualColor}
 					/>
 				</ScrollView>
 			</View>
@@ -218,10 +219,11 @@ const styles = StyleSheet.create({
 		alignContent: 'center',
 		justifyContent: 'center',
 
-		marginTop: 26,
+		marginTop: 20,
+		// marginBottom: 20,
 	},
 	viewHeight: {
-		height: 80,
+		height: 90,
 	},
 	infoText: {
 		fontFamily: 'NanumSquareR',
@@ -245,7 +247,7 @@ const styles = StyleSheet.create({
 		fontSize: 17,
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
-		marginTop: 14,
+		marginTop: 20,
 		letterSpacing: -1,
 	},
 });
