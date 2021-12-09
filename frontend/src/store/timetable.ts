@@ -196,6 +196,7 @@ const initialState: timetable = {
 	reload: false,
 	finTime: [],
 	teamName: '',
+	isInTeamTime: false,
 };
 
 export const timetableSlice = createSlice({
@@ -647,6 +648,9 @@ export const timetableSlice = createSlice({
 		setTeamName: (state, action: PayloadAction<string>) => {
 			state.teamName = action.payload;
 		},
+		setIsInTeamTime: (state, action: PayloadAction<boolean>) => {
+			state.isInTeamTime = action.payload;
+		},
 	},
 	extraReducers: {},
 });
@@ -679,6 +683,7 @@ export const {
 	setTeamName,
 	makeInitialConfirmTime,
 	deletePostTime,
+	setIsInTeamTime,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;

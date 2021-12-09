@@ -16,8 +16,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
 	makeInitialTimetable,
 	makeTeamTime,
+	setIsInTeamTime,
 	setTeamName,
-	setTimeMode,
 } from '../store/timetable';
 import { RootState } from '../store';
 import { findTeam } from '../store/login';
@@ -36,6 +36,7 @@ type TeamStackParamList = {
 type Props = NativeStackScreenProps<TeamStackParamList, 'TeamTime'>;
 import { setModalMode, shareUri } from '../store/team';
 import { ModalSetting } from '../components/ModalSetting';
+import { Sequence } from '../components/Sequence';
 
 export default function TeamTime({ route }: Props) {
 	const {
@@ -89,7 +90,9 @@ export default function TeamTime({ route }: Props) {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [settingModalVisible, setSettingModalVisible] = useState(false);
 	const [mode, setMode] = useState('normal');
-
+	const [isTimeMode, setIsTimeMode] = useState(false);
+	const [currentNumber, setCurrent] = useState(0);
+	const [sequence, setSequence] = useState([0, 1, 2, 3]);
 	// useEffect
 	useEffect(() => {
 		modalMode !== 'make' &&
@@ -118,7 +121,7 @@ export default function TeamTime({ route }: Props) {
 
 	// useCallback
 	const goConfirmPage = useCallback(() => {
-		Alert.alert('알림', '시간표를 확정 하시겠습니까?', [
+		Alert.alert('', '모임 시간을 정하셨나요?', [
 			{ text: '취소', onPress: () => {} },
 			{
 				text: '확인',
@@ -137,7 +140,7 @@ export default function TeamTime({ route }: Props) {
 	const goLeft = useCallback(() => {
 		navigation.goBack();
 		dispatch(setModalMode('normal'));
-		dispatch(setTimeMode('normal'));
+		dispatch(setIsInTeamTime(false));
 	}, []);
 	// 공유하기 버튼
 	const onShareURI = useCallback(() => {
@@ -145,6 +148,10 @@ export default function TeamTime({ route }: Props) {
 			dispatch(shareUri({ id, token, user, uri: joinUri }));
 		else dispatch(shareUri({ id, token, user, uri }));
 	}, [id, user, token, uri, joinUri]);
+	const onPressPlusBtn = useCallback(() => {
+		setIsTimeMode(true);
+		setMode('startMode');
+	}, []);
 	return (
 		<>
 			<SafeAreaView style={{ backgroundColor: color }}>
@@ -177,7 +184,7 @@ export default function TeamTime({ route }: Props) {
 									size={25}
 									color={Colors.white}
 									style={{ paddingTop: 1 }}
-									onPress={() => setMode('startMode')}
+									onPress={onPressPlusBtn}
 								/>
 							)
 						}
@@ -196,7 +203,7 @@ export default function TeamTime({ route }: Props) {
 						<View style={styles.rowButtonView}>
 							{/* <Spinner loading={loadingIndividual} /> */}
 							{mode === 'normal' && (
-								<View style={{ flexDirection: 'column' }}>
+								<View style={styles.boxOverView}>
 									<View
 										style={{
 											flexDirection: 'row',
@@ -256,31 +263,35 @@ export default function TeamTime({ route }: Props) {
 									</View>
 								</View>
 							)}
-							{mode === 'startMode' && (
-								<>
-									<Text style={styles.stepText}>
-										{'[1] 일정 시작 시간을 터치해주세요'}
-									</Text>
-								</>
-							)}
-							{mode === 'confirmMode' && (
-								<>
-									<Text style={styles.stepText}>
-										{'[1] 확정 시작 시간을 터치해주세요'}
-									</Text>
-								</>
-							)}
-							{mode === 'startMinute' && (
-								<>
-									<Text style={styles.stepText}>[2] 일정 시작 분 설정</Text>
-								</>
-							)}
-							{mode === 'endMode' && (
-								<>
-									<Text style={styles.stepText}>
-										[3] 종료 시간 입력해주세요
-									</Text>
-								</>
+							{isTimeMode && (
+								<View style={{ flexDirection: 'column' }}>
+									<View style={{ height: 30 }} />
+									<Sequence
+										color={color}
+										currentNumber={currentNumber}
+										mode={sequence}
+									/>
+									{mode === 'startMode' && (
+										<>
+											<Text style={styles.stepText}>
+												일정 시작 시간을 터치해주세요
+											</Text>
+										</>
+									)}
+
+									{mode === 'startMinute' && (
+										<>
+											<Text style={styles.stepText}>일정 시작 분 설정</Text>
+										</>
+									)}
+									{mode === 'endMode' && (
+										<>
+											<Text style={styles.stepText}>
+												종료 시간 입력해주세요
+											</Text>
+										</>
+									)}
+								</View>
 							)}
 						</View>
 					</View>
@@ -290,11 +301,13 @@ export default function TeamTime({ route }: Props) {
 							setMode={setMode}
 							modalVisible={modalVisible}
 							setModalVisible={setModalVisible}
+							setIsTimeMode={setIsTimeMode}
 							isGroup={isGroup}
 							uri={uri}
 							postDatesPrepare={postDatesPrepare}
 							confirmDatesPrepare={confirmDatesPrepare}
 							color={color}
+							setCurrent={setCurrent}
 						/>
 						<ModalSetting
 							settingModalVisible={settingModalVisible}
@@ -322,16 +335,15 @@ const styles = StyleSheet.create({
 	rowButtonView: {
 		flexDirection: 'row',
 		justifyContent: 'center',
-		marginTop: 20,
 		alignSelf: 'center',
 	},
 	viewHeight: {
-		height: 80,
+		height: 90,
 	},
 	touchableBoxView: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginBottom: 15,
+		marginBottom: 20,
 		justifyContent: 'center',
 		alignContent: 'center',
 		alignSelf: 'center',
@@ -394,10 +406,15 @@ const styles = StyleSheet.create({
 		letterSpacing: -1,
 		height: 40,
 		marginTop: 20,
+		textAlign: 'center',
 	},
 	loadingText: {
 		fontFamily: 'NanumSquareR',
 		fontSize: 20,
 		color: Colors.white,
+	},
+	boxOverView: {
+		flexDirection: 'column',
+		marginTop: 20,
 	},
 });

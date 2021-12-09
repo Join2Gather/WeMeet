@@ -38,6 +38,7 @@ import {
 import { initialIndividualTimetable } from '../store/individual';
 import team from '../store/team';
 import { ModalLoading } from '../components/ModalLoading';
+import { Sequence } from '../components/Sequence';
 
 export default function SnapShot({ route }: Props) {
 	const {
@@ -71,12 +72,16 @@ export default function SnapShot({ route }: Props) {
 	}));
 	// useState
 	const [mode, setMode] = useState('initial');
+	const [loadingMode, setLoading] = useState('initial');
 	const [modalVisible, setModalVisible] = useState(false);
 	const [loadingVisible, setLoadingVisible] = useState(false);
+	const [sequence] = useState([0, 1, 2, 3]);
+	const [currentNumber, setCurrent] = useState(0);
 	// navigation
 	const { name, color, timetableMode, isConfirm, uri } = route.params;
 	const navigation = useNavigation();
 	const dispatch = useDispatch();
+	console.log(loadingMode);
 	//modal
 	// useEffect
 	useEffect(() => {
@@ -104,7 +109,7 @@ export default function SnapShot({ route }: Props) {
 					})
 				);
 				dispatch(makeInitialConfirmTime());
-				setMode('success');
+				setLoading('success');
 			}, 500);
 		}
 	}, [mode, timeMode]);
@@ -127,75 +132,126 @@ export default function SnapShot({ route }: Props) {
 			dispatch(postConfirm({ date: confirmDates, id, token, uri, user }));
 			dispatch(postSnapShot({ uri, id, token, user }));
 		}
-		setMode('loading');
+		setLoading('loading');
 	}, [confirmDates, timeMode, joinUri]);
 	return (
-		<SafeAreaView style={{ backgroundColor: Colors.white }}>
-			<ScrollView>
-				<View style={[styles.view]}>
-					<NavigationHeader
-						headerColor={color}
-						title={name}
-						titleStyle={{ paddingLeft: 0 }}
-						Left={() => (
-							<Icon
-								name="angle-left"
-								size={24}
-								onPress={goLeft}
-								color={Colors.white}
-								// style={{ marginLeft: '3%' }}
-							/>
-						)}
-						Right={() => (
-							<MIcon
-								name="check-bold"
-								size={27}
-								color={Colors.white}
-								style={{ paddingTop: 1 }}
-								onPress={onPressConfirm}
-							/>
-						)}
-					/>
-
-					<View style={styles.viewHeight}>
-						<View style={styles.rowButtonView}>
-							<View />
-							<View style={{ flexDirection: 'row' }}>
-								<View style={[styles.boxView, { backgroundColor: color }]} />
-								<Text style={styles.infoText}>가능 일정</Text>
-								<View
-									style={[styles.boxView, { backgroundColor: Colors.grey300 }]}
-								/>
-								<Text style={styles.infoText}>개인 일정</Text>
-								<View
-									style={[styles.boxView, { backgroundColor: Colors.white }]}
-								/>
-								<Text style={styles.infoText}>비어있는 일정</Text>
-							</View>
-						</View>
-					</View>
-				</View>
-				{timetableMode === 'confirm' ? (
-					<Timetable
-						teamConfirmDate={teamConfirmDate}
-						color={color}
-						isConfirm={isConfirm}
-						modalVisible={modalVisible}
-						setModalVisible={setModalVisible}
-					/>
-				) : (
-					<Timetable snapShotDate={snapShotDate} color={color} />
-				)}
-				<ModalLoading
-					loadingVisible={loadingVisible}
-					setLoadingVisible={setLoadingVisible}
-					color={color}
-					mode={mode}
-					setMode={setMode}
-					onPressOk={onPressOk}
-					goLeft={goLeft}
+		<SafeAreaView style={{ backgroundColor: color }}>
+			<View style={[styles.view]}>
+				<NavigationHeader
+					headerColor={color}
+					title={name}
+					titleStyle={{ paddingLeft: 0 }}
+					Left={() => (
+						<Icon
+							name="angle-left"
+							size={24}
+							onPress={goLeft}
+							color={Colors.white}
+							// style={{ marginLeft: '3%' }}
+						/>
+					)}
+					Right={() => (
+						<MIcon
+							name="check-bold"
+							size={27}
+							color={Colors.white}
+							style={{ paddingTop: 1 }}
+							onPress={onPressConfirm}
+						/>
+					)}
 				/>
-			</ScrollView>
+
+				<View style={styles.viewHeight}>
+					{timetableMode === 'confirm' ? (
+						<View style={{ flexDirection: 'column' }}>
+							<View style={{ height: 20 }} />
+							<Sequence
+								color={color}
+								currentNumber={currentNumber}
+								mode={sequence}
+							/>
+							{currentNumber === 0 && (
+								<Text style={styles.stepText}>확정 시간을 터치해 주세요</Text>
+							)}
+							{currentNumber === 1 && (
+								<Text style={styles.stepText}>
+									모임 시작 시간을 설정해 주세요
+								</Text>
+							)}
+							{currentNumber === 2 && (
+								<Text style={styles.stepText}>모임 종료 터치해 주세요</Text>
+							)}
+							{currentNumber === 3 && (
+								<View
+									style={{
+										flexDirection: 'row',
+										justifyContent: 'center',
+										alignContent: 'center',
+										alignItems: 'center',
+									}}
+								>
+									<Text style={styles.stepText}>상단의 </Text>
+									<MIcon
+										name="check-bold"
+										style={{ marginBottom: 8 }}
+										size={27}
+										color={color}
+									/>
+									<Text style={styles.stepText}>
+										버튼을 눌러서 저장해 주세요
+									</Text>
+								</View>
+							)}
+						</View>
+					) : (
+						<>
+							<View style={styles.rowButtonView}>
+								<View />
+								<View style={{ flexDirection: 'row' }}>
+									<View style={[styles.boxView, { backgroundColor: color }]} />
+									<Text style={styles.infoText}>가능 일정</Text>
+									<View
+										style={[
+											styles.boxView,
+											{ backgroundColor: Colors.grey300 },
+										]}
+									/>
+									<Text style={styles.infoText}>개인 일정</Text>
+									<View
+										style={[styles.boxView, { backgroundColor: Colors.white }]}
+									/>
+									<Text style={styles.infoText}>비어있는 일정</Text>
+								</View>
+							</View>
+						</>
+					)}
+				</View>
+				<ScrollView style={{ backgroundColor: Colors.white }}>
+					{timetableMode === 'confirm' ? (
+						<Timetable
+							teamConfirmDate={teamConfirmDate}
+							color={color}
+							isConfirm={isConfirm}
+							modalVisible={modalVisible}
+							mode={mode}
+							setMode={setMode}
+							setModalVisible={setModalVisible}
+							setCurrent={setCurrent}
+						/>
+					) : (
+						<Timetable snapShotDate={snapShotDate} color={color} />
+					)}
+					<ModalLoading
+						loadingVisible={loadingVisible}
+						setLoadingVisible={setLoadingVisible}
+						color={color}
+						loadingMode={loadingMode}
+						setLoading={setLoading}
+						onPressOk={onPressOk}
+						goLeft={goLeft}
+					/>
+				</ScrollView>
+			</View>
 		</SafeAreaView>
 	);
 }
@@ -209,7 +265,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 	},
 	viewHeight: {
-		height: 80,
+		height: 90,
 	},
 	touchableBoxView: {
 		flexDirection: 'row',
@@ -277,6 +333,8 @@ const styles = StyleSheet.create({
 		fontSize: 15,
 		letterSpacing: -1,
 		height: 40,
+		marginTop: 20,
+		textAlign: 'center',
 	},
 	loadingText: {
 		fontFamily: 'NanumSquareR',

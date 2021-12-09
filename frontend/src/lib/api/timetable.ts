@@ -9,6 +9,8 @@ import type {
 } from '../../interface';
 import { makeHeader } from '../util/header';
 import { API_URL } from 'react-native-dotenv';
+
+console.log(API_URL);
 // 개인 시간 받아오기
 export const getIndividualDates = ({
 	user,

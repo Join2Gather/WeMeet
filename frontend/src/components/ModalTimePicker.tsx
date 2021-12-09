@@ -24,6 +24,8 @@ interface props {
 	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>> | null;
 	mode?: string;
 	setMode?: React.Dispatch<React.SetStateAction<string>>;
+	setIsTimeMode?: React.Dispatch<React.SetStateAction<boolean>>;
+	setCurrent?: React.Dispatch<React.SetStateAction<number>>;
 	postDatesPrepare?: boolean;
 	confirmDatesPrepare?: boolean;
 	token: string;
@@ -45,6 +47,8 @@ export function ModalTimePicker({
 	setModalVisible,
 	mode,
 	setMode,
+	setIsTimeMode,
+	setCurrent,
 	postDatesPrepare,
 	confirmDatesPrepare,
 	token,
@@ -80,6 +84,7 @@ export function ModalTimePicker({
 			setSecond(false);
 			setMode && setMode('normal');
 			setModalVisible && setModalVisible(false);
+			setCurrent && setCurrent(3);
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
 			console.log(timeHour, timeMinute);
@@ -106,6 +111,7 @@ export function ModalTimePicker({
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
 			console.log('start', timeHour, timeMinute);
+			setCurrent && setCurrent(2);
 			// setHour(date.getHours());
 			// setMinute(date.getMinutes());
 			setModalVisible && setModalVisible(false);
@@ -124,7 +130,8 @@ export function ModalTimePicker({
 		setFirst(false);
 		setSecond(false);
 		setModalVisible && setModalVisible(false);
-
+		setIsTimeMode && setIsTimeMode(false);
+		setCurrent && setCurrent(0);
 		setMode && setMode('normal');
 	}, [setModalVisible, modalVisible]);
 	// 이전 모드

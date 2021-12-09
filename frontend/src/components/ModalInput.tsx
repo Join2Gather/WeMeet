@@ -25,6 +25,9 @@ import Material from 'react-native-vector-icons/MaterialIcons';
 import { getUserMe } from '../store/login';
 import { makeTeamTime, setTimeMode } from '../store/timetable';
 import { Button } from '../lib/util/Button';
+import { Sequence } from './Sequence';
+import { current } from '@reduxjs/toolkit';
+
 interface props {
 	modalVisible: boolean;
 	setModalVisible: any;
@@ -40,6 +43,8 @@ interface props {
 	joinUri: string;
 	joinName: string;
 	makeReady: boolean;
+	individualColor: string;
+	sequence: number[];
 }
 
 export function ModalInput({
@@ -57,6 +62,8 @@ export function ModalInput({
 	postTeamError,
 	joinName,
 	makeReady,
+	individualColor,
+	sequence,
 }: props) {
 	const dispatch = useDispatch();
 	// const [name, setName] = useState('2ff148e7-05b9-461e-a2c2-1d3ccce16ba9');
@@ -66,6 +73,7 @@ export function ModalInput({
 	const [color, setColor] = useState(Colors.red500);
 	const [startTime, setStartTime] = useState('9');
 	const [endTime, setEndTime] = useState('22');
+	const [currentNumber, setCurrent] = useState(0);
 
 	// useEffect
 	useEffect(() => {
@@ -108,11 +116,16 @@ export function ModalInput({
 		}
 	}, [name, modalMode, mode, color, id, token, joinUri, user, code]);
 
-	const onPressPrev = useCallback((mode) => {
-		setMode(mode);
-	}, []);
+	const onPressPrev = useCallback(
+		(mode) => {
+			setMode(mode);
+			setCurrent((current) => current - 1);
+		},
+		[current]
+	);
 	const onPressNext = useCallback((mode) => {
 		setMode(mode);
+		setCurrent((current) => current + 1);
 	}, []);
 	const onCloseError = useCallback(() => {
 		setMode('initial');
@@ -173,21 +186,31 @@ export function ModalInput({
 								},
 							]}
 						>
-							<TouchableHighlight
-								activeOpacity={1}
-								underlayColor={Colors.white}
-								style={{
-									marginLeft: '90%',
-									width: '9%',
-								}}
-								onPress={onPressCloseButton}
-							>
-								<Icon
-									style={{ alignSelf: 'flex-end' }}
-									name="close"
-									size={25}
+							<>
+								<TouchableHighlight
+									activeOpacity={1}
+									underlayColor={Colors.white}
+									style={{
+										marginLeft: '90%',
+										width: '9%',
+									}}
+									onPress={onPressCloseButton}
+								>
+									<Icon
+										style={{ alignSelf: 'flex-end' }}
+										name="close"
+										size={25}
+									/>
+								</TouchableHighlight>
+								<View style={styles.blankView} />
+								<Sequence
+									color={individualColor}
+									currentNumber={currentNumber}
+									mode={sequence}
 								/>
-							</TouchableHighlight>
+								<View style={styles.blankView} />
+							</>
+
 							{!loadingJoin && mode === 'makeError' && (
 								<View style={styles.errorView}>
 									<Material
@@ -303,6 +326,7 @@ export function ModalInput({
 									/>
 								</View>
 							</View>
+							<View style={styles.blankView} />
 							<View style={styles.rowLine} />
 							<Button
 								buttonNumber={2}
@@ -435,15 +459,15 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		fontFamily: 'NanumSquareBold',
 		fontSize: 20,
-		marginTop: 10,
-		marginBottom: 15,
+
+		marginBottom: 20,
 	},
 	titleUnderText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		fontSize: 13,
 		marginTop: 0,
-		marginBottom: 15,
+		marginBottom: 20,
 	},
 	errorView: {
 		flexDirection: 'row',
@@ -465,13 +489,13 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareR',
 	},
 	textInputView: {
-		flexDirection: 'row',
 		paddingBottom: 2,
 		backgroundColor: Colors.white,
 		borderBottomWidth: 0.3,
 		width: '70%',
 		marginLeft: '15%',
 		padding: 10,
+		marginBottom: 15,
 	},
 	timeInputView: {
 		paddingBottom: 2,
@@ -511,7 +535,7 @@ const styles = StyleSheet.create({
 		width: 1,
 	},
 	blankView: {
-		height: 15,
+		height: 20,
 	},
 	rowLine: {
 		borderWidth: 0.4,

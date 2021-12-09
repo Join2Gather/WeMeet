@@ -41,6 +41,7 @@ export interface timetable {
 	reload: boolean;
 	finTime: findTime[];
 	teamName: string;
+	isInTeamTime: boolean;
 }
 
 export type weekIndex = Array<string>;
