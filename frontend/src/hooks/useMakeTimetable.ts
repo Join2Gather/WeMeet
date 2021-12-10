@@ -8,7 +8,7 @@ import { cloneIndividualDates } from '../store/individual';
 export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 	const times: timeWith60 = {};
 	const timesText: Array<string> = [];
-	console.log(startHour, endHour);
+
 	for (let i = startHour; i < endHour; i++) {
 		times[i] = [];
 		for (let j = 0; j <= 60; j += 10) {
@@ -63,6 +63,7 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 			}
 		}
 	}
+
 	const defaultDatesWith60 = [
 		{ day: 'sun', times: times },
 		{ day: 'mon', times: times },
