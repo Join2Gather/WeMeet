@@ -124,6 +124,8 @@ export interface timeProps {
 
 export interface findTime {
 	people?: string[];
+	color?: string;
+	name?: string;
 	startTime: timeType;
 	endTime: timeType;
 	selectTime: number;

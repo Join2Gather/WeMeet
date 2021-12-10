@@ -177,7 +177,7 @@ export function makeConfirmWith(state: timetable, dates: any) {
 			date[day].map((d: any) => {
 				const startingMinute = Math.round(d.starting_minutes / 10);
 				const endMinute = Math.round(d.end_minutes / 10);
-				if (state.teamName !== date.club.name) {
+				if (state.teamName !== date.club?.name) {
 					for (let i = d.starting_hours; i <= d.end_hours; i++) {
 						if (i === d.starting_hours) {
 							for (let j = startingMinute; j <= 6; j++) {
