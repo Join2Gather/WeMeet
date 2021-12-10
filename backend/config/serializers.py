@@ -384,7 +384,7 @@ class ProfilesSerializer(serializers.ModelSerializer):
 
     @ swagger_serializer_method(serializer_or_field=serializers.CharField())
     def get_nickname(self, obj):
-        return obj.user.username
+        return obj.name
 
 
 class ClubsWithDateSerializer(serializers.ModelSerializer):
