@@ -69,9 +69,12 @@ export const teamSlice = createSlice({
 	initialState,
 	reducers: {
 		POST_TEAM_SUCCESS: (state, action: PayloadAction<responseTeamAPI>) => {
-			state.date = action.payload.date;
-			state.joinUri = action.payload.uri;
-			state.teamColor = action.payload.color;
+			const { color, name, uri, starting_hours, end_hours } = action.payload;
+			state.joinUri = uri;
+			state.teamColor = color;
+			state.name = decodeURIComponent(name);
+			state.startHour = starting_hours;
+			state.endHour = end_hours;
 		},
 		POST_TEAM_FAILURE: (state, action: PayloadAction<any>) => {
 			state.postTeamError = true;

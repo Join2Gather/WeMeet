@@ -193,6 +193,7 @@ export default function Home() {
 						individualTimesText={individualTimesText}
 						endIdx={25}
 						color={individualColor}
+						isHomeTime={true}
 					/>
 					<ModalSelect
 						selectModalVisible={selectModalVisible}

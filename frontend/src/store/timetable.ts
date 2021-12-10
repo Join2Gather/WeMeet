@@ -82,6 +82,7 @@ export function* timetableSaga() {
 }
 
 const initialState: timetable = {
+	teamURI: '',
 	dates: [],
 	teamDatesWith60: [],
 	snapShotDate: [],
@@ -196,6 +197,8 @@ const initialState: timetable = {
 	finTime: [],
 	teamName: '',
 	isInTeamTime: false,
+	selectTimeMode: '',
+	modalMode: false,
 };
 
 export const timetableSlice = createSlice({
@@ -206,10 +209,11 @@ export const timetableSlice = createSlice({
 			state.makeReady = false;
 		},
 		makeTeamTime: (state, action: PayloadAction<makeTeam>) => {
-			state.startHour = action.payload.startHour;
-			state.endHour = action.payload.endHour;
-			state.peopleCount = action.payload.peopleCount;
-			state.color = action.payload.color;
+			const { color, endHour, startHour, peopleCount } = action.payload;
+			state.startHour = startHour;
+			state.endHour = endHour;
+			state.peopleCount = peopleCount;
+			state.color = color;
 			const { defaultDatesWith60, timesText } = useMakeTimeTableWith60(
 				action.payload.startHour,
 				action.payload.endHour
@@ -380,18 +384,46 @@ export const timetableSlice = createSlice({
 				state.isTimeNotExist = true;
 			}
 		},
+		checkMode: (state, action: PayloadAction<number>) => {
+			const time = action.payload;
+			state.selectTimeMode = '';
+			let modeSelect = [
+				{
+					count: 0,
+					content: 'individual',
+				},
+				{
+					count: 0,
+					content: 'other',
+				},
+				{
+					count: 0,
+					content: 'everyTime',
+				},
+			];
+			state.dates[state.dayIdx].times[time].forEach((t) => {
+				modeSelect.forEach((mode) => mode.content === t.mode && mode.count++);
+			});
+			console.log(modeSelect);
+			modeSelect.sort((a, b) => b.count - a.count);
+			modeSelect.forEach((mode) => {
+				if (mode.count) {
+					state.selectTimeMode += mode.content;
+				}
+			});
+		},
 		changeDayIdx: (state, action: PayloadAction<any>) => {
 			state.dayIdx = action.payload;
 		},
 		changeConfirmTime: (state) => {
 			const startingMinute = Math.round(state.startMinute / 10);
 			const endMinute = Math.round(state.endMinute / 10);
+			const dayIdx = state.dayIdx;
 			for (let i = state.startTime; i <= state.endTime; i++) {
 				for (let j = 0; j <= 6; j++) {
 					let isNonColor = 0;
 					if (
-						state.teamDatesWith60[state.dayIdx].times[i][j].color ===
-						Colors.white
+						state.teamDatesWith60[dayIdx].times[i][j].color === Colors.white
 					) {
 						isNonColor++;
 					}
@@ -416,38 +448,32 @@ export const timetableSlice = createSlice({
 				for (let i = state.startTime; i <= state.endTime; i++) {
 					if (i === state.startTime) {
 						for (let j = startingMinute; j <= 6; j++) {
-							state.teamConfirmDate[state.dayIdx].times[i][j].color =
+							state.teamConfirmDate[dayIdx].times[i][j].color = state.color;
+							state.teamConfirmDate[dayIdx].times[i][j].isEveryTime = false;
+							state.teamConfirmDate[dayIdx].times[i][j].isPicked = true;
+							state.teamConfirmDate[dayIdx].times[i][j].mode = 'start';
+							state.teamConfirmDate[dayIdx].times[i][j].borderColor =
 								state.color;
-							state.teamConfirmDate[state.dayIdx].times[i][j].isEveryTime =
-								false;
-							state.teamConfirmDate[state.dayIdx].times[i][j].isPicked = true;
-							state.teamConfirmDate[state.dayIdx].times[i][j].mode = 'start';
-							state.teamConfirmDate[state.dayIdx].times[i][j].borderColor =
-								state.color;
-							state.teamConfirmDate[state.dayIdx].times[i][j].borderWidth = 5;
+							state.teamConfirmDate[dayIdx].times[i][j].borderWidth = 5;
 						}
 					} else if (i === state.endTime) {
 						for (let j = 0; j <= endMinute; j++) {
-							state.teamConfirmDate[state.dayIdx].times[i][j].color =
+							state.teamConfirmDate[dayIdx].times[i][j].color = state.color;
+							state.teamConfirmDate[dayIdx].times[i][j].isEveryTime = false;
+							state.teamConfirmDate[dayIdx].times[i][j].isPicked = true;
+							state.teamConfirmDate[dayIdx].times[i][j].mode = 'start';
+							state.teamConfirmDate[dayIdx].times[i][j].borderColor =
 								state.color;
-							state.teamConfirmDate[state.dayIdx].times[i][j].isEveryTime =
-								false;
-							state.teamConfirmDate[state.dayIdx].times[i][j].isPicked = true;
-							state.teamConfirmDate[state.dayIdx].times[i][j].mode = 'start';
-							state.teamConfirmDate[state.dayIdx].times[i][j].borderColor =
-								state.color;
-							state.teamConfirmDate[state.dayIdx].times[i][j].borderWidth = 5;
+							state.teamConfirmDate[dayIdx].times[i][j].borderWidth = 5;
 						}
 					} else {
 						for (let j = 0; j <= 6; j++) {
-							state.teamConfirmDate[state.dayIdx].times[i][j].color =
+							state.teamConfirmDate[dayIdx].times[i][j].color = state.color;
+							state.teamConfirmDate[dayIdx].times[i][j].isEveryTime = false;
+							state.teamConfirmDate[dayIdx].times[i][j].isPicked = true;
+							state.teamConfirmDate[dayIdx].times[i][j].borderColor =
 								state.color;
-							state.teamConfirmDate[state.dayIdx].times[i][j].isEveryTime =
-								false;
-							state.teamConfirmDate[state.dayIdx].times[i][j].isPicked = true;
-							state.teamConfirmDate[state.dayIdx].times[i][j].borderColor =
-								state.color;
-							state.teamConfirmDate[state.dayIdx].times[i][j].borderWidth = 5;
+							state.teamConfirmDate[dayIdx].times[i][j].borderWidth = 5;
 						}
 					}
 				}
@@ -644,11 +670,19 @@ export const timetableSlice = createSlice({
 				});
 			}
 		},
-		setTeamName: (state, action: PayloadAction<string>) => {
-			state.teamName = action.payload;
+		setTeamName: (
+			state,
+			action: PayloadAction<{ name: string; uri: string }>
+		) => {
+			const { name, uri } = action.payload;
+			state.teamName = name;
+			state.teamURI = uri;
 		},
 		setIsInTeamTime: (state, action: PayloadAction<boolean>) => {
 			state.isInTeamTime = action.payload;
+		},
+		setTimeModalMode: (state, action: PayloadAction<boolean>) => {
+			state.modalMode = action.payload;
 		},
 	},
 	extraReducers: {},
@@ -683,6 +717,8 @@ export const {
 	makeInitialConfirmTime,
 	deletePostTime,
 	setIsInTeamTime,
+	checkMode,
+	setTimeModalMode,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;

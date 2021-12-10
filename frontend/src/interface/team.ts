@@ -16,6 +16,8 @@ export interface responseTeamAPI {
 	uri: string;
 	date: Object;
 	color: string;
+	starting_hours: number;
+	end_hours: number;
 }
 
 export interface team {

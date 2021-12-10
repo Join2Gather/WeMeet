@@ -20,7 +20,7 @@ import type { findTime } from '../interface/timetable';
 import type { individualTime } from '../interface';
 import { findTeam } from '../store/login';
 import { Button } from '../lib/util/Button';
-import { deletePostTime } from '../store/timetable';
+import { deletePostTime, setTimeModalMode } from '../store/timetable';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -72,6 +72,7 @@ export function ModalTime({
 	const onPressCloseBtn = useCallback(() => {
 		setTimeModalVisible && setTimeModalVisible(false);
 		setMode('initial');
+		dispatch(setTimeModalMode(false));
 	}, []);
 
 	return (
@@ -142,7 +143,9 @@ export function ModalTime({
 														? `오후  ${t.startTime.hour - 12}`
 														: `오전  ${t.startTime.hour}`}
 													{'  : '}
-													{t.startTime.minute}
+													{t.startTime.minute < 10
+														? '0' + t.startTime.minute
+														: t.startTime.minute}
 													{' ~   '}
 												</Text>
 
@@ -151,7 +154,9 @@ export function ModalTime({
 														? `오후  ${t.endTime.hour - 12}`
 														: `오전  ${t.endTime.hour}`}
 													{' : '}
-													{t.startTime.minute}
+													{t.endTime.minute < 10
+														? '0' + t.endTime.minute
+														: t.endTime.minute}
 												</Text>
 											</View>
 										</View>

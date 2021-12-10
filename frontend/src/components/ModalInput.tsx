@@ -93,6 +93,7 @@ export function ModalInput({
 			setMode('loading');
 			if (modalMode === 'join') {
 				dispatch(joinTeam({ id, token, user, uri: code }));
+				setCurrent(2);
 				setTimeout(() => setMode('finish'), 1000);
 			} else if (modalMode === 'make') {
 				dispatch(inputTeamName(name));
@@ -107,6 +108,7 @@ export function ModalInput({
 						user,
 					})
 				);
+				setCurrent(3);
 				setTimeout(() => setMode('finish'), 1000);
 			}
 		} else if (mode === 'close') {
@@ -140,19 +142,12 @@ export function ModalInput({
 		dispatch(getUserMe({ id, token, user }));
 		setModalVisible(false);
 		setMode('initial');
+		setCurrent(0);
 		if (modalMode === 'join') {
 			const uri = joinUri;
 			goTeamTime(uri);
 			setCode('');
 		} else if (modalMode === 'make') {
-			dispatch(
-				makeTeamTime({
-					startHour: Number(startTime),
-					endHour: Number(endTime),
-					color,
-					peopleCount: 1,
-				})
-			);
 			setColor(Colors.red500);
 			setStartTime('9');
 			setEndTime('22');
