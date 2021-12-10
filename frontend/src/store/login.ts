@@ -86,6 +86,7 @@ export const loginSlice = createSlice({
 				data = state.clubs.find((club) => club.uri === action.payload.uri);
 			}
 			if (data) {
+				state.name = data.name;
 				state.uri = data.uri;
 				state.color = data.color;
 				state.peopleCount = data.people_count;
