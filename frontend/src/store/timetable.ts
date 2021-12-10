@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type {
-	changeColorType,
 	postConfirmAPI,
 	postIndividualDatesAPI,
 	requestGroupDatesAPI,
@@ -15,7 +14,7 @@ import { createAction } from 'redux-actions';
 import createRequestSaga from '../hooks/createRequestSaga';
 import * as api from '../lib/api/timetable';
 import { takeLatest } from '@redux-saga/core/effects';
-import { useMakeTimetable, useMakeTimeTableWith60 } from '../hooks';
+import { useMakeTimeTableWith60 } from '../hooks';
 import { Alert } from 'react-native';
 import {
 	addEveryTime,
@@ -627,7 +626,7 @@ export const timetableSlice = createSlice({
 					}
 				});
 			} else {
-				state.responseIndividual[day].forEach((t, idx) => {
+				state.responseIndividual[day].forEach((t) => {
 					if (t.starting_hours <= time && t.end_hours >= time) {
 						const data = {
 							startTime: {
