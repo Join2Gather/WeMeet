@@ -6,6 +6,7 @@ import {
 	changeDayIdx,
 	checkIsBlank,
 	checkIsExist,
+	checkMode,
 	cloneEveryTime,
 	findTimeFromResponse,
 	getGroupDates,
@@ -13,6 +14,7 @@ import {
 	getOtherConfirmDates,
 	setDay,
 	setStartHour,
+	setTimeModalMode,
 	toggleTimePick,
 } from '../store/timetable';
 import type { make60, timeType } from '../interface';
@@ -47,6 +49,7 @@ interface props {
 	endIdx?: number;
 	color?: string;
 	teamConfirmDate?: make60[];
+	isHomeTime: boolean;
 }
 
 interface modalData {
@@ -73,6 +76,7 @@ export function Timetable({
 	endIdx,
 	color,
 	teamConfirmDate,
+	isHomeTime,
 }: props) {
 	const {
 		dates,
@@ -97,6 +101,8 @@ export function Timetable({
 		reload,
 		findTime,
 		findIndividual,
+		selectTimeMode,
+		modalMode,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
@@ -121,6 +127,8 @@ export function Timetable({
 			reload: timetable.reload,
 			findTime: timetable.finTime,
 			findIndividual: login.findIndividual,
+			selectTimeMode: timetable.selectTimeMode,
+			modalMode: timetable.modalMode,
 		})
 	);
 	const dispatch = useDispatch();
@@ -129,6 +137,7 @@ export function Timetable({
 	const [date, setDate] = useState<Date>(new Date());
 	const [endHour, setEndHour] = useState(0);
 	const [isConfirmMode, setIsConfirm] = useState(false);
+
 	const [select, setSelect] = useState({
 		idx: 0,
 		time: 0,
@@ -202,15 +211,25 @@ export function Timetable({
 
 	const onPressIndividualTime = useCallback(
 		(time: number, day: string, is: boolean, idx?: number) => {
-			dispatch(findTimeFromResponse({ time, day, isTeam: false }));
 			dispatch(changeDayIdx(idx));
+			dispatch(checkMode(time));
+			dispatch(findTimeFromResponse({ time, day, isTeam: false }));
+			dispatch(findHomeTime({ day, time }));
 			idx && setSelect({ idx, time, day });
 			setTableMode('individual');
-			setTimeout(() => setTimeModalVisible(true), 100);
+			dispatch(setTimeModalMode(true));
 		},
 		[]
 	);
-
+	useEffect(() => {
+		if (modalMode === true && !isHomeTime) {
+			if (selectTimeMode === 'individual') {
+				setTimeModalVisible(true);
+			} else {
+				setInModalVisible(true);
+			}
+		}
+	}, [modalMode, selectTimeMode]);
 	const onPressNext = useCallback(() => {
 		setCurrent && setCurrent(1);
 		onSetStartHour(select.idx, select.time, select.day);
