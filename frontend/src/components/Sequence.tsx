@@ -9,7 +9,6 @@ interface props {
 }
 
 export function Sequence({ currentNumber, mode, color }: props) {
-	console.log(currentNumber, mode, color);
 	return (
 		<View style={styles.rowView}>
 			{mode.map((c, idx) => (
