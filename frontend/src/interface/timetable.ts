@@ -8,6 +8,7 @@ export interface timetable {
 	teamDatesWith60: make60[];
 	snapShotDate: make60[];
 	teamConfirmDate: make60[];
+	teamURI: string;
 	startTime: number;
 	endTime: number;
 	startMinute: number;
@@ -42,6 +43,8 @@ export interface timetable {
 	finTime: findTime[];
 	teamName: string;
 	isInTeamTime: boolean;
+	selectTimeMode: string;
+	modalMode: boolean;
 }
 
 export type weekIndex = Array<string>;
