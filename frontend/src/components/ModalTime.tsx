@@ -17,6 +17,7 @@ import FontIcon from 'react-native-vector-icons/FontAwesome';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import type { findTime } from '../interface/timetable';
+import type { individualTime } from '../interface';
 import { findTeam } from '../store/login';
 import { Button } from '../lib/util/Button';
 import { deletePostTime } from '../store/timetable';
@@ -108,7 +109,7 @@ export function ModalTime({
 					</View>
 					{mode === 'initial' && (
 						<>
-							{findTime[0] && (
+							{findTime && findTime[0] && (
 								<>
 									<View style={styles.blankView} />
 									<Text style={styles.titleText}>선택 시간</Text>
@@ -132,27 +133,30 @@ export function ModalTime({
 							<Text style={styles.titleText}>가능 시간</Text>
 							<View style={styles.blankView} />
 							{findTime.map((t) => (
-								<View key={t.startTime.hour} style={[styles.backgroundView]}>
-									<View style={styles.columnView}>
-										<View style={styles.rowView}>
-											<Text style={styles.touchText}>
-												{t.startTime.hour > 12
-													? `오후  ${t.startTime.hour - 12}`
-													: `오전  ${t.startTime.hour}`}
-												{'  : '}
-												{t.startTime.minute}
-												{' ~   '}
-											</Text>
+								<View key={t.startTime.hour}>
+									<View style={[styles.backgroundView]}>
+										<View style={styles.columnView}>
+											<View style={styles.rowView}>
+												<Text style={styles.touchText}>
+													{t.startTime.hour > 12
+														? `오후  ${t.startTime.hour - 12}`
+														: `오전  ${t.startTime.hour}`}
+													{'  : '}
+													{t.startTime.minute}
+													{' ~   '}
+												</Text>
 
-											<Text style={styles.touchText}>
-												{t.endTime.hour >= 12
-													? `오후  ${t.endTime.hour - 12}`
-													: `오전  ${t.endTime.hour}`}
-												{' : '}
-												{t.startTime.minute}
-											</Text>
+												<Text style={styles.touchText}>
+													{t.endTime.hour >= 12
+														? `오후  ${t.endTime.hour - 12}`
+														: `오전  ${t.endTime.hour}`}
+													{' : '}
+													{t.startTime.minute}
+												</Text>
+											</View>
 										</View>
 									</View>
+									<View style={styles.blankView} />
 								</View>
 							))}
 							{isGroup && (
@@ -161,15 +165,15 @@ export function ModalTime({
 									<Text style={styles.titleText}>참여 인원</Text>
 									<View style={styles.blankView} />
 									{findTime.map((t) => (
-										<View
-											key={t.startTime.hour}
-											style={[styles.backgroundView]}
-										>
-											<View style={styles.columnView}>
-												<View style={styles.rowView}>
-													<Text style={styles.touchText}>{t.people}</Text>
+										<View key={t.startTime.hour}>
+											<View style={[styles.backgroundView]}>
+												<View style={styles.columnView}>
+													<View style={styles.rowView}>
+														<Text style={styles.touchText}>{t.people}</Text>
+													</View>
 												</View>
 											</View>
+											<View style={styles.blankView} />
 										</View>
 									))}
 								</>
@@ -251,11 +255,7 @@ const styles = StyleSheet.create({
 	},
 	rowView: {
 		flexDirection: 'row',
-		// alignItems: 'center',
-		// justifyContent: 'flex-start',
 		width: screen.width * 0.53,
-		// backgroundColor: Colors.blue200,
-		// height: 30,
 		alignItems: 'center',
 		alignSelf: 'center',
 		justifyContent: 'flex-start',
@@ -298,11 +298,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
-		// marginLeft: 10,
 		justifyContent: 'center',
-		// alignSelf: 'center',
-		// alignContent: 'center',
-		// alignItems: 'center',
 	},
 	titleText: {
 		fontSize: 20,
