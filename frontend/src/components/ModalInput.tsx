@@ -25,6 +25,9 @@ import Material from 'react-native-vector-icons/MaterialIcons';
 import { getUserMe } from '../store/login';
 import { makeTeamTime, setTimeMode } from '../store/timetable';
 import { Button } from '../lib/util/Button';
+import { Sequence } from './Sequence';
+import { current } from '@reduxjs/toolkit';
+
 interface props {
 	modalVisible: boolean;
 	setModalVisible: any;
@@ -40,6 +43,8 @@ interface props {
 	joinUri: string;
 	joinName: string;
 	makeReady: boolean;
+	individualColor: string;
+	sequence: number[];
 }
 
 export function ModalInput({
@@ -57,15 +62,18 @@ export function ModalInput({
 	postTeamError,
 	joinName,
 	makeReady,
+	individualColor,
+	sequence,
 }: props) {
 	const dispatch = useDispatch();
 	// const [name, setName] = useState('2ff148e7-05b9-461e-a2c2-1d3ccce16ba9');
 	const [name, setName] = useState('');
-	const [code, setCode] = useState('');
+	const [code, setCode] = useState('ddb6984a-e7b4-4ff0-91f7-2d9fc0044532');
 	const [mode, setMode] = useState('initial');
 	const [color, setColor] = useState(Colors.red500);
 	const [startTime, setStartTime] = useState('9');
 	const [endTime, setEndTime] = useState('22');
+	const [currentNumber, setCurrent] = useState(0);
 
 	// useEffect
 	useEffect(() => {
@@ -85,7 +93,7 @@ export function ModalInput({
 			setMode('loading');
 			if (modalMode === 'join') {
 				dispatch(joinTeam({ id, token, user, uri: code }));
-				setTimeout(() => setMode('finish'), 500);
+				setTimeout(() => setMode('finish'), 1000);
 			} else if (modalMode === 'make') {
 				dispatch(inputTeamName(name));
 				dispatch(
@@ -99,7 +107,7 @@ export function ModalInput({
 						user,
 					})
 				);
-				setTimeout(() => setMode('finish'), 500);
+				setTimeout(() => setMode('finish'), 1000);
 			}
 		} else if (mode === 'close') {
 			dispatch(setTimeMode('make'));
@@ -108,11 +116,16 @@ export function ModalInput({
 		}
 	}, [name, modalMode, mode, color, id, token, joinUri, user, code]);
 
-	const onPressPrev = useCallback((mode) => {
-		setMode(mode);
-	}, []);
+	const onPressPrev = useCallback(
+		(mode) => {
+			setMode(mode);
+			setCurrent((current) => current - 1);
+		},
+		[current]
+	);
 	const onPressNext = useCallback((mode) => {
 		setMode(mode);
+		setCurrent((current) => current + 1);
 	}, []);
 	const onCloseError = useCallback(() => {
 		setMode('initial');
@@ -173,21 +186,31 @@ export function ModalInput({
 								},
 							]}
 						>
-							<TouchableHighlight
-								activeOpacity={1}
-								underlayColor={Colors.white}
-								style={{
-									marginLeft: '90%',
-									width: '9%',
-								}}
-								onPress={onPressCloseButton}
-							>
-								<Icon
-									style={{ alignSelf: 'flex-end' }}
-									name="close"
-									size={25}
+							<>
+								<TouchableHighlight
+									activeOpacity={1}
+									underlayColor={Colors.white}
+									style={{
+										marginLeft: '90%',
+										width: '9%',
+									}}
+									onPress={onPressCloseButton}
+								>
+									<Icon
+										style={{ alignSelf: 'flex-end' }}
+										name="close"
+										size={25}
+									/>
+								</TouchableHighlight>
+								<View style={styles.blankView} />
+								<Sequence
+									color={individualColor}
+									currentNumber={currentNumber}
+									mode={sequence}
 								/>
-							</TouchableHighlight>
+								<View style={styles.blankView} />
+							</>
+
 							{!loadingJoin && mode === 'makeError' && (
 								<View style={styles.errorView}>
 									<Material
@@ -232,8 +255,10 @@ export function ModalInput({
 											onChangeText={(code) => setCode((text) => code)}
 											placeholder="Enter your Code"
 											placeholderTextColor={Colors.grey600}
+											autoFocus={true}
 										/>
 									</View>
+
 									<Button
 										buttonNumber={1}
 										buttonText="확인"
@@ -253,8 +278,10 @@ export function ModalInput({
 											onChangeText={(name) => setName((text) => name)}
 											placeholder="Enter your ID"
 											placeholderTextColor={Colors.grey600}
+											autoFocus={true}
 										/>
 									</View>
+
 									<Button
 										buttonNumber={1}
 										buttonText={'확인'}
@@ -281,10 +308,11 @@ export function ModalInput({
 										onChangeText={(hour) => setStartTime((text) => hour)}
 										placeholder="09"
 										placeholderTextColor={Colors.grey600}
+										autoFocus={true}
 									/>
 								</View>
 							</View>
-							<View style={{ height: 10 }} />
+							<View style={styles.blankView} />
 							<View style={styles.rowView}>
 								<Text style={styles.timeInputText}>종료 시간 : </Text>
 								<View style={styles.timeInputView}>
@@ -298,13 +326,8 @@ export function ModalInput({
 									/>
 								</View>
 							</View>
-							<View
-								style={{
-									borderWidth: 0.3,
-									width: '110%',
-									marginTop: 20,
-								}}
-							/>
+							<View style={styles.blankView} />
+							<View style={styles.rowLine} />
 							<Button
 								buttonNumber={2}
 								buttonText={'이전'}
@@ -332,13 +355,7 @@ export function ModalInput({
 									hideSliders={true}
 								/>
 							</View>
-							<View
-								style={{
-									borderWidth: 0.3,
-									width: '110%',
-									marginTop: 20,
-								}}
-							/>
+							<View style={styles.rowLine} />
 							<Button
 								buttonNumber={2}
 								buttonText={'이전'}
@@ -369,6 +386,7 @@ export function ModalInput({
 								buttonText={'확인'}
 								onPressFunction={onPressClose}
 							/>
+							<View style={styles.blankView} />
 						</>
 					)}
 					{mode === 'makeSuccess' && (
@@ -382,6 +400,7 @@ export function ModalInput({
 								buttonText={'확인'}
 								onPressFunction={onPressClose}
 							/>
+							<View style={styles.blankView} />
 						</>
 					)}
 
@@ -422,7 +441,6 @@ const styles = StyleSheet.create({
 		width: '50%',
 	},
 	modalView: {
-		// margin: 10,
 		marginBottom: 60,
 		backgroundColor: Colors.white,
 		borderRadius: 13,
@@ -441,15 +459,15 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		fontFamily: 'NanumSquareBold',
 		fontSize: 20,
-		marginTop: 10,
-		marginBottom: 15,
+
+		marginBottom: 20,
 	},
 	titleUnderText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		fontSize: 13,
 		marginTop: 0,
-		marginBottom: 15,
+		marginBottom: 20,
 	},
 	errorView: {
 		flexDirection: 'row',
@@ -468,18 +486,16 @@ const styles = StyleSheet.create({
 	},
 	textInput: {
 		fontSize: 18,
-		// flex: 1,
 		fontFamily: 'NanumSquareR',
 	},
 	textInputView: {
-		flexDirection: 'row',
 		paddingBottom: 2,
 		backgroundColor: Colors.white,
-		// borderWidth: 1,
 		borderBottomWidth: 0.3,
 		width: '70%',
 		marginLeft: '15%',
 		padding: 10,
+		marginBottom: 15,
 	},
 	timeInputView: {
 		paddingBottom: 2,
@@ -496,7 +512,6 @@ const styles = StyleSheet.create({
 	},
 	timeInput: {
 		fontSize: 18,
-		// flex: 1,
 		fontFamily: 'NanumSquareR',
 		textAlign: 'center',
 	},
@@ -512,12 +527,19 @@ const styles = StyleSheet.create({
 	},
 
 	modalText: {
-		// marginBottom: 15,
 		textAlign: 'center',
 	},
 	verticalLine: {
 		height: '50%',
 		borderLeftWidth: 0.16,
 		width: 1,
+	},
+	blankView: {
+		height: 20,
+	},
+	rowLine: {
+		borderWidth: 0.4,
+		width: '110%',
+		marginTop: 15,
 	},
 });

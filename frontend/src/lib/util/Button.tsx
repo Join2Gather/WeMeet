@@ -43,37 +43,42 @@ export function Button({
 				</View>
 			)}
 			{buttonNumber === 2 && (
-				<View style={styles.buttonWithTwoView}>
-					<TouchableHighlight
-						activeOpacity={0.1}
-						underlayColor={Colors.grey200}
-						style={[styles.twoButtonStyle, { borderBottomLeftRadius: 13 }]}
-						onPress={() => {
-							onPressFunction && onPressFunction();
-							onPressWithParam && pressParam && onPressWithParam(pressParam);
-						}}
-					>
-						<Text style={[styles.buttonText]}>{buttonText}</Text>
-					</TouchableHighlight>
-					<View
-						style={{
-							height: '100%',
-							borderWidth: 0.3,
-						}}
-					/>
-					<TouchableHighlight
-						activeOpacity={0.1}
-						underlayColor={Colors.grey200}
-						style={[styles.twoButtonStyle, { borderBottomRightRadius: 13 }]}
-						onPress={() => {
-							secondOnPressFunction && secondOnPressFunction();
-							secondOnPressWithParam &&
-								secondParam &&
-								secondOnPressWithParam(secondParam);
-						}}
-					>
-						<Text style={styles.buttonText}>{secondButtonText}</Text>
-					</TouchableHighlight>
+				<View style={styles.columnView}>
+					<View style={styles.buttonWithTwoView}>
+						<TouchableHighlight
+							activeOpacity={0.1}
+							underlayColor={Colors.grey200}
+							style={[
+								styles.twoButtonStyle,
+								{ borderBottomLeftRadius: 13, paddingLeft: '-10%' },
+							]}
+							onPress={() => {
+								onPressFunction && onPressFunction();
+								onPressWithParam && pressParam && onPressWithParam(pressParam);
+							}}
+						>
+							<Text style={[styles.buttonText]}>{buttonText}</Text>
+						</TouchableHighlight>
+						<View
+							style={{
+								height: '100%',
+								borderWidth: 0.4,
+							}}
+						/>
+						<TouchableHighlight
+							activeOpacity={0.1}
+							underlayColor={Colors.grey200}
+							style={[styles.twoButtonStyle, { borderBottomRightRadius: 13 }]}
+							onPress={() => {
+								secondOnPressFunction && secondOnPressFunction();
+								secondOnPressWithParam &&
+									secondParam &&
+									secondOnPressWithParam(secondParam);
+							}}
+						>
+							<Text style={styles.buttonText}>{secondButtonText}</Text>
+						</TouchableHighlight>
+					</View>
 				</View>
 			)}
 		</>
@@ -87,12 +92,14 @@ const styles = StyleSheet.create({
 		alignContent: 'center',
 		alignSelf: 'center',
 		marginBottom: -20,
-		width: '50%',
+		width: '70%',
+		// marginTop: 15,
 	},
 	buttonWithTwoView: {
 		flexDirection: 'row',
 		marginBottom: -20,
 		marginLeft: 1,
+		width: '112%',
 	},
 	closeButtonStyle: {
 		padding: 15,
@@ -102,15 +109,20 @@ const styles = StyleSheet.create({
 	},
 	twoButtonStyle: {
 		padding: 15,
-		width: '57%',
+		width: '50%',
 		height: '100%',
-		paddingLeft: 10,
-		paddingRight: 10,
 	},
 
 	buttonText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		fontSize: 14,
+	},
+	// rowLine: {
+	// 	borderWidth: 0.4,
+	// 	width: '110%',
+	// },
+	columnView: {
+		flexDirection: 'column',
 	},
 });

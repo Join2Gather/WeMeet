@@ -12,7 +12,8 @@ import { useNavigation, DrawerActions } from '@react-navigation/native';
 import {SafeAreaView, View, UnderlineText,TopBar,
 NavigationHeader, MaterialCommunityIcon as Icon, Text} from '../theme';
 import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
-import { LeftRightNavigation, Spinner, Timetable } from '../components';
+import { LeftRightNavigation, Spinner, ModalSelect } from '../components';
+import { Timetable } from '../components/Timetable';
 import type { LeftRightNavigationMethods } from '../components';
 import { Colors } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
@@ -23,11 +24,12 @@ import {
 	cloneIndividualDates,
 	postImage,
 } from '../store/individual';
-import { ModalSelect } from '../components';
 import * as FileSystem from 'expo-file-system';
 import { useMakeTimetable } from '../hooks';
 import { getUserMe } from '../store/login';
-
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import { HomeSetting } from '../components/HomeSetting';
 export default function Home() {
 	const {
 		token,
@@ -40,6 +42,7 @@ export default function Home() {
 		confirmClubs,
 		confirmDatesTimetable,
 		individualTimesText,
+		individualColor,
 	} = useSelector(({ login, individual, loading }: RootState) => ({
 		token: login.token,
 		id: login.id,
@@ -51,6 +54,7 @@ export default function Home() {
 		confirmClubs: login.confirmClubs,
 		confirmDatesTimetable: login.confirmDatesTimetable,
 		individualTimesText: individual.individualTimesText,
+		individualColor: login.individualColor,
 	}));
 	const dispatch = useDispatch();
 	const { defaultDates } = useMakeTimetable();
@@ -72,6 +76,7 @@ export default function Home() {
 	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [selectModalVisible, setSelectModalVisible] = useState(false);
+	const [settingModalVisible, setSettingModalVisible] = useState(false);
 	const flatListRef = useRef<FlatList | null>(null);
 
 	// image pic1er
@@ -83,17 +88,17 @@ export default function Home() {
 
 	// modal
 
-	useEffect(() => {
-		(async () => {
-			if (Platform.OS !== 'web') {
-				const { status } =
-					await ImagePicker.requestMediaLibraryPermissionsAsync();
-				if (status !== 'granted') {
-					alert('카메라 권한을 승인해주세요');
-				}
-			}
-		})();
-	}, []);
+	// useEffect(() => {
+	// 	(async () => {
+	// 		if (Platform.OS !== 'web') {
+	// 			const { status } =
+	// 				await ImagePicker.requestMediaLibraryPermissionsAsync();
+	// 			if (status !== 'granted') {
+	// 				alert('카메라 권한을 승인해주세요');
+	// 			}
+	// 		}
+	// 	})();
+	// }, []);
 
 	const pickImage = async () => {
 		const result = await ImagePicker.launchImageLibraryAsync({
@@ -111,69 +116,73 @@ export default function Home() {
 	};
 
 	return (
-		<SafeAreaView style={{ backgroundColor: Colors.white }}>
-			<ScrollView>
-				<View style={[styles.view]}>
-					<NavigationHeader
-						title="내 일정 등록하기"
-						Left={() => (
-							<Icon
-								name="timetable"
-								size={28}
-								color={Colors.white}
-								style={{ paddingTop: 1 }}
-								onPress={() => setSelectModalVisible(true)}
-							/>
-						)}
-						Right={() => (
-							<Icon
-								name="plus"
-								size={28}
-								color={Colors.white}
-								style={{ paddingTop: 1 }}
-								onPress={onPressPlus}
-							/>
-						)}
-					/>
+		<SafeAreaView style={{ backgroundColor: individualColor }}>
+			<View style={[styles.view]}>
+				<NavigationHeader
+					title="내 일정 등록하기"
+					headerColor={individualColor}
+					Left={() => (
+						<Icon
+							name="timetable"
+							size={28}
+							color={Colors.white}
+							style={{ paddingTop: 1 }}
+							onPress={() => setSelectModalVisible(true)}
+						/>
+					)}
+					Right={() => (
+						<FontAwesome5Icon
+							name="plus"
+							size={25}
+							color={Colors.white}
+							style={{ paddingTop: 2 }}
+							onPress={onPressPlus}
+						/>
+					)}
+					secondRight={() => (
+						<MaterialIcon
+							name="settings"
+							size={27}
+							color={Colors.white}
+							style={{ paddingTop: 1 }}
+							onPress={() => setSettingModalVisible(true)}
+						/>
+					)}
+				/>
 
-					<View style={styles.viewHeight}>
-						<Text style={styles.titleText}>make your plan</Text>
-						<Spinner loading={postEveryTime} />
-						<View style={styles.rowView}>
-							{mode === '0' && (
-								<>
-									<View
-										style={[
-											styles.boxView,
-											{ backgroundColor: Colors.blue400 },
-										]}
-									/>
-									<Text style={styles.infoText}>모임 일정</Text>
-									<View
-										style={[
-											styles.boxView,
-											{ backgroundColor: Colors.grey300 },
-										]}
-									/>
-									<Text style={styles.infoText}>개인 일정</Text>
-									<View
-										style={[styles.boxView, { backgroundColor: Colors.white }]}
-									/>
-									<Text style={styles.infoText}>비어있는 일정</Text>
-								</>
-							)}
-							{mode === '1' && (
-								<>
-									<Text style={styles.stepText}>1. 시작 시간 터치</Text>
-								</>
-							)}
-							{mode === '3' && (
-								<>
-									<Text style={styles.stepText}>3. 종료 시간 터치</Text>
-								</>
-							)}
-						</View>
+				<View style={styles.viewHeight}>
+					<Text style={styles.titleText}>make your plan</Text>
+					<Spinner loading={postEveryTime} />
+					<View style={styles.rowView}>
+						{mode === '0' && (
+							<>
+								<View
+									style={[styles.boxView, { backgroundColor: individualColor }]}
+								/>
+								<Text style={styles.infoText}>모임 일정</Text>
+								<View
+									style={[styles.boxView, { backgroundColor: Colors.grey300 }]}
+								/>
+								<Text style={styles.infoText}>개인 일정</Text>
+								<View
+									style={[styles.boxView, { backgroundColor: Colors.white }]}
+								/>
+								<Text style={styles.infoText}>비어있는 일정</Text>
+							</>
+						)}
+						{mode === '1' && (
+							<>
+								<Text style={styles.stepText}>1. 시작 시간 터치</Text>
+							</>
+						)}
+						{mode === '3' && (
+							<>
+								<Text style={styles.stepText}>3. 종료 시간 터치</Text>
+							</>
+						)}
 					</View>
+				</View>
+				<ScrollView style={{ backgroundColor: Colors.white }}>
 					<Timetable
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
@@ -183,13 +192,22 @@ export default function Home() {
 						isGroup={false}
 						individualTimesText={individualTimesText}
 						endIdx={25}
+						color={individualColor}
 					/>
 					<ModalSelect
 						selectModalVisible={selectModalVisible}
 						setSelectModalVisible={setSelectModalVisible}
 					/>
-				</View>
-			</ScrollView>
+					<HomeSetting
+						setSettingModalVisible={setSettingModalVisible}
+						settingModalVisible={settingModalVisible}
+						user={user}
+						id={id}
+						token={token}
+						color={individualColor}
+					/>
+				</ScrollView>
+			</View>
 		</SafeAreaView>
 	);
 }
@@ -200,11 +218,12 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignContent: 'center',
 		justifyContent: 'center',
-		// marginLeft: 20,
-		marginTop: 26,
+
+		marginTop: 20,
+		// marginBottom: 20,
 	},
 	viewHeight: {
-		height: 80,
+		height: 90,
 	},
 	infoText: {
 		fontFamily: 'NanumSquareR',
@@ -228,7 +247,7 @@ const styles = StyleSheet.create({
 		fontSize: 17,
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
-		marginTop: 14,
+		marginTop: 20,
 		letterSpacing: -1,
 	},
 });

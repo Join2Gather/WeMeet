@@ -1,9 +1,8 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 // import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-	changeAllColor,
 	changeConfirmTime,
 	postSnapShot,
 	makeConfirmDates,
@@ -16,17 +15,17 @@ import {
 	setStartHour,
 } from '../store/timetable';
 import { Colors } from 'react-native-paper';
-import { useIsDarkMode } from '../hooks';
 import { RootState } from '../store';
 import { getUserMe } from '../store/login';
 import { cloneINDates, initialIndividualTimetable } from '../store/individual';
-import { cos } from 'react-native-reanimated';
 import DatePicker from 'react-native-date-picker';
 interface props {
 	modalVisible?: boolean;
 	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>> | null;
 	mode?: string;
 	setMode?: React.Dispatch<React.SetStateAction<string>>;
+	setIsTimeMode?: React.Dispatch<React.SetStateAction<boolean>>;
+	setCurrent?: React.Dispatch<React.SetStateAction<number>>;
 	postDatesPrepare?: boolean;
 	confirmDatesPrepare?: boolean;
 	token: string;
@@ -36,7 +35,7 @@ interface props {
 	postIndividualDates: any;
 	confirmDates: any;
 	isTimePicked?: boolean;
-	isGroup?: boolean;
+	isConfirm?: boolean;
 	date: Date;
 	setDate: React.Dispatch<React.SetStateAction<Date>>;
 	timeMode: string;
@@ -48,6 +47,8 @@ export function ModalTimePicker({
 	setModalVisible,
 	mode,
 	setMode,
+	setIsTimeMode,
+	setCurrent,
 	postDatesPrepare,
 	confirmDatesPrepare,
 	token,
@@ -57,7 +58,7 @@ export function ModalTimePicker({
 	postIndividualDates,
 	confirmDates,
 	isTimePicked,
-	isGroup,
+	isConfirm,
 	date,
 	setDate,
 	timeMode,
@@ -83,13 +84,11 @@ export function ModalTimePicker({
 			setSecond(false);
 			setMode && setMode('normal');
 			setModalVisible && setModalVisible(false);
+			setCurrent && setCurrent(3);
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
-
-			// setHour(timeHour);
-			// setMinute(timeMinute);
 			console.log(timeHour, timeMinute);
-			if (isGroup) {
+			if (isConfirm) {
 				{
 					dispatch(setEndHour(timeHour));
 					dispatch(setEndMin(timeMinute));
@@ -104,7 +103,7 @@ export function ModalTimePicker({
 				}
 			}
 		},
-		[isGroup]
+		[isConfirm]
 	);
 
 	const onPressConfirm = useCallback(
@@ -112,6 +111,7 @@ export function ModalTimePicker({
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
 			console.log('start', timeHour, timeMinute);
+			setCurrent && setCurrent(2);
 			// setHour(date.getHours());
 			// setMinute(date.getMinutes());
 			setModalVisible && setModalVisible(false);
@@ -122,7 +122,7 @@ export function ModalTimePicker({
 				setSecond(true);
 			}, 100);
 		},
-		[mode, isGroup, date, modalVisible]
+		[mode, isConfirm, date, modalVisible]
 	);
 
 	// 닫기 버튼
@@ -130,7 +130,8 @@ export function ModalTimePicker({
 		setFirst(false);
 		setSecond(false);
 		setModalVisible && setModalVisible(false);
-
+		setIsTimeMode && setIsTimeMode(false);
+		setCurrent && setCurrent(0);
 		setMode && setMode('normal');
 	}, [setModalVisible, modalVisible]);
 	// 이전 모드
@@ -161,16 +162,6 @@ export function ModalTimePicker({
 						user,
 					})
 				);
-		} else if (confirmDatesPrepare && uri) {
-			if (timeMode === 'make') {
-				dispatch(
-					postConfirm({ date: confirmDates, id, token, uri: joinUri, user })
-				);
-				dispatch(postSnapShot({ uri: joinUri, id, token, user }));
-			} else {
-				dispatch(postConfirm({ date: confirmDates, id, token, uri, user }));
-				dispatch(postSnapShot({ uri, id, token, user }));
-			}
 		}
 	}, [
 		postDatesPrepare,
@@ -218,7 +209,6 @@ export function ModalTimePicker({
 				mode="time"
 				onConfirm={(date) => {
 					setSecond(false);
-
 					onPressEndConfirm(date);
 				}}
 				onDateChange={(date) => setDate(date)}
@@ -248,7 +238,7 @@ const styles = StyleSheet.create({
 		borderRadius: 13,
 		padding: 15,
 		alignItems: 'center',
-		// shadowColor: '#000',
+
 		shadowColor: 'black',
 		shadowOffset: {
 			width: 1,
@@ -256,7 +246,7 @@ const styles = StyleSheet.create({
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
-		// elevation: 5,
+
 		width: '94%',
 	},
 	titleText: {
@@ -279,20 +269,15 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 		fontFamily: 'NanumSquareR',
 		marginTop: 4,
-		// flex: 1,
-		// backgroundColor: Colors.red100,
 	},
 	textInput: {
 		fontSize: 22,
 		flex: 0.6,
 		fontFamily: 'NanumSquareR',
-		// marginTop: -2,
+
 		alignSelf: 'center',
 		borderWidth: 0.3,
 		padding: 2,
-		// marginTop: -4,
-		// marginLeft: -3,
-		// marginRight: -3,
 		textAlign: 'center',
 
 		borderColor: Colors.blue300,
@@ -315,10 +300,6 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		marginTop: 10,
 		marginBottom: 0,
-		// flex: 1,
-		// flexGrow: 0.5,
-		// flexShrink: 0.5,
-		// backgroundColor: Colors.red200,
 	},
 	textStyle: {
 		color: 'white',
@@ -326,26 +307,20 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 	closeButtonStyle: {
-		// width: '40%',
-		// height: '100%',
 		borderRadius: 8,
-		// backgroundColor: Colors.blue300,
+
 		padding: 12,
 		flex: 1,
 	},
 	acceptButtonStyle: {
 		padding: 15,
-		// width: '50%',
-		// height: '100%',
+
 		borderRadius: 10,
-		// backgroundColor: Colors.blue400,
 	},
 	modalText: {
-		// marginBottom: 15,
 		textAlign: 'center',
 	},
 	verticalLine: {
-		// height: '50%',
 		borderLeftWidth: 0.16,
 		width: 1,
 	},

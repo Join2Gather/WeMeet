@@ -7,20 +7,19 @@ import {
 	checkIsBlank,
 	checkIsExist,
 	cloneEveryTime,
+	findTimeFromResponse,
 	getGroupDates,
 	getIndividualDates,
 	getOtherConfirmDates,
-	makeInitialTimePicked,
 	setDay,
-	setEndHour,
 	setStartHour,
+	toggleTimePick,
 } from '../store/timetable';
-import type { make_days, make60 } from '../interface';
+import type { make60, timeType } from '../interface';
 import { View, Text, TouchableView } from '../theme';
 import { RootState } from '../store';
 import { kakaoLogin } from '../store/individual';
-import { ModalTimePicker } from '.';
-// import { ModalTimePicker } from './ModalTimePicker';
+import { ModalTime, ModalTimePicker } from '.';
 const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 const boxHeight = 28;
@@ -33,7 +32,10 @@ interface props {
 	modalVisible?: boolean;
 	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>> | null;
 	setMode?: React.Dispatch<React.SetStateAction<string>>;
+	setIsTimeMode?: React.Dispatch<React.SetStateAction<boolean>>;
+	setCurrent?: React.Dispatch<React.SetStateAction<number>>;
 	isGroup?: boolean;
+	isConfirm?: boolean;
 	individualDates?: make60[];
 	snapShotDate?: make60[];
 	uri?: string;
@@ -42,6 +44,13 @@ interface props {
 	individualTimesText?: Array<string>;
 	endIdx?: number;
 	color?: string;
+	teamConfirmDate?: make60[];
+}
+
+interface modalData {
+	people: Array<string>;
+	startTime: timeType;
+	endTime: timeType;
 }
 
 export function Timetable({
@@ -49,7 +58,10 @@ export function Timetable({
 	modalVisible,
 	setModalVisible,
 	setMode,
+	setIsTimeMode,
+	setCurrent,
 	isGroup,
+	isConfirm,
 	individualDates,
 	snapShotDate,
 	uri,
@@ -58,6 +70,7 @@ export function Timetable({
 	individualTimesText,
 	endIdx,
 	color,
+	teamConfirmDate,
 }: props) {
 	const {
 		dates,
@@ -80,6 +93,7 @@ export function Timetable({
 		timesText,
 		endHourTimetable,
 		reload,
+		findTime,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
@@ -102,13 +116,20 @@ export function Timetable({
 			timesText: timetable.timesText,
 			endHourTimetable: timetable.endHour,
 			reload: timetable.reload,
+			findTime: timetable.finTime,
 		})
 	);
 	const dispatch = useDispatch();
-
+	const [timeModalVisible, setTimeModalVisible] = useState(false);
 	const [date, setDate] = useState<Date>(new Date());
 	const [endHour, setEndHour] = useState(0);
-
+	const [isConfirmMode, setIsConfirm] = useState(false);
+	const [select, setSelect] = useState({
+		idx: 0,
+		time: 0,
+		day: '',
+	});
+	const [tableMode, setTableMode] = useState('group');
 	useEffect(() => {
 		endIdx ? setEndHour(endIdx) : setEndHour(endHourTimetable);
 	}, [endIdx, endHourTimetable]);
@@ -119,28 +140,26 @@ export function Timetable({
 				if (timeMode === 'make')
 					dispatch(getGroupDates({ id, user, token, uri: joinUri }));
 				else dispatch(getGroupDates({ id, user, token, uri }));
-				isGroup &&
-					dispatch(
-						getOtherConfirmDates({
-							confirmClubs,
-							confirmDatesTimetable,
-							isGroup,
-						})
-					);
+				dispatch(
+					getOtherConfirmDates({
+						confirmClubs,
+						confirmDatesTimetable,
+						isGroup,
+					})
+				);
 			} else if (uri && !isGroup) {
 				if (timeMode == 'make')
 					dispatch(getIndividualDates({ id, user, token, uri: joinUri }));
 				else {
 					dispatch(getIndividualDates({ id, user, token, uri }));
 				}
-				isGroup &&
-					dispatch(
-						getOtherConfirmDates({
-							confirmClubs,
-							confirmDatesTimetable,
-							isGroup,
-						})
-					);
+				dispatch(
+					getOtherConfirmDates({
+						confirmClubs,
+						confirmDatesTimetable,
+						isGroup: false,
+					})
+				);
 			}
 		}
 	}, [
@@ -154,6 +173,7 @@ export function Timetable({
 		joinUri,
 		timeMode,
 		reload,
+		confirmDatesPrepare,
 	]);
 
 	useEffect(() => {
@@ -163,26 +183,63 @@ export function Timetable({
 		}
 	}, [cloneDateSuccess, kakaoDates]);
 
+	const onPressGroupTime = useCallback(
+		(time: number, day: string, is: boolean, idx?: number) => {
+			dispatch(findTimeFromResponse({ time, day, isTeam: true }));
+			idx && setSelect({ idx, time, day });
+			setIsConfirm(is);
+			setTimeout(() => {
+				setTimeModalVisible(true);
+			}, 100);
+		},
+		[]
+	);
+
+	const onPressIndividualTime = useCallback(
+		(time: number, day: string, is: boolean, idx?: number) => {
+			dispatch(findTimeFromResponse({ time, day, isTeam: false }));
+			dispatch(changeDayIdx(idx));
+			idx && setSelect({ idx, time, day });
+			setTableMode('individual');
+			setTimeout(() => setTimeModalVisible(true), 100);
+		},
+		[]
+	);
+
+	const onPressNext = useCallback(() => {
+		setCurrent && setCurrent(1);
+		onSetStartHour(select.idx, select.time, select.day);
+		setTimeModalVisible(false);
+	}, [select]);
+
 	const onSetStartHour = useCallback(
 		(idx: number, time: number, day: string) => {
+			dispatch(toggleTimePick());
 			dispatch(setStartHour(time));
+			setCurrent && setCurrent(1);
 			date.setHours(time);
 			setDate(new Date(date));
-			setMode && setMode('startMinute');
-			setModalVisible && setModalVisible(true);
 			dispatch(changeDayIdx(idx));
 			dispatch(setDay(day));
-			isGroup ? dispatch(checkIsExist()) : dispatch(checkIsBlank());
+
+			setTimeout(() => {
+				isConfirm ? dispatch(checkIsExist()) : dispatch(checkIsBlank());
+			}, 100);
+			setTimeout(() => {
+				setMode && setMode('startMinute');
+			}, 500);
+			mode && console.log(mode);
 		},
-		[isTimePicked, isGroup, date]
+		[isGroup, date, isConfirm, mode]
 	);
 	useEffect(() => {
-		if (isTimePicked || isTimeNotExist) {
+		if (mode === 'startMinute' && !isTimePicked) {
+			setModalVisible && setModalVisible(true);
+		} else if (mode === 'startMinute' && isTimePicked) {
 			setMode && setMode('normal');
-			setModalVisible && setModalVisible(false);
-			dispatch(makeInitialTimePicked());
 		}
-	}, [isTimePicked, isTimeNotExist]);
+	}, [isTimePicked, mode]);
+
 	return (
 		<View style={styles.view}>
 			<View style={styles.rowDayOfWeekView}>
@@ -242,6 +299,8 @@ export function Timetable({
 											onPress={() => {
 												mode === 'confirmMode' &&
 													onSetStartHour(idx, Number(time), day.day);
+												mode === 'normal' &&
+													onPressGroupTime(Number(time), day.day, false);
 											}}
 										>
 											{day.times[time].map((t, tIdx) => (
@@ -350,6 +409,47 @@ export function Timetable({
 								</View>
 							))}
 						</>
+					) : teamConfirmDate ? (
+						<>
+							{teamConfirmDate.map((day, idx) => (
+								<View style={styles.columnView} key={day.day}>
+									{Object.keys(day.times).map((time) => (
+										<TouchableView
+											style={[styles.boxView]}
+											key={time}
+											onPress={() => {
+												onPressGroupTime(Number(time), day.day, true, idx);
+												// onSetStartHour(idx, Number(time), day.day);
+											}}
+										>
+											{day.times[time].map((t, tIdx) => (
+												<View
+													key={t.minute}
+													style={{
+														backgroundColor: t.color,
+														height: boxHeight / inBoxHeight,
+														borderTopWidth:
+															Number(time) === endHour
+																? borderWidth
+																: t.borderBottom
+																? borderWidth
+																: 0,
+														borderBottomWidth:
+															Number(time) === endHour - 1 && tIdx === 6
+																? borderWidth
+																: 0,
+														borderLeftWidth:
+															Number(time) === endHour ? 0 : borderWidth,
+														borderRightWidth:
+															Number(time) === endHour ? 0 : borderWidth,
+													}}
+												/>
+											))}
+										</TouchableView>
+									))}
+								</View>
+							))}
+						</>
 					) : (
 						<>
 							{dates.map((day, idx) => (
@@ -360,7 +460,12 @@ export function Timetable({
 											key={time}
 											onPress={() => {
 												mode === 'normal' &&
-													onSetStartHour(idx, Number(time), day.day);
+													onPressIndividualTime(
+														Number(time),
+														day.day,
+														false,
+														idx
+													);
 												mode === 'startMode' &&
 													onSetStartHour(idx, Number(time), day.day);
 											}}
@@ -395,29 +500,23 @@ export function Timetable({
 						</>
 					)}
 
-					{/* <ModalMinute
-						modalVisible={modalVisible}
-						setModalVisible={setModalVisible}
-						start={start}
-						end={end}
-						mode={mode}
-						setMode={setMode}
-						id={id}
-						postIndividualDates={postIndividualDates}
-						token={token}
-						uri={uri}
-						user={user}
-						postDatesPrepare={postDatesPrepare}
-						confirmDatesPrepare={confirmDatesPrepare}
-						isTimePicked={isTimePicked}
+					<ModalTime
+						color={color}
+						setTimeModalVisible={setTimeModalVisible}
+						timeModalVisible={timeModalVisible}
+						findTime={findTime}
+						isConfirmMode={isConfirmMode}
+						onPressNext={onPressNext}
+						tableMode={tableMode}
 						isGroup={isGroup}
-						confirmDates={confirmDates}
-					/> */}
+					/>
 					<ModalTimePicker
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}
 						mode={mode}
 						setMode={setMode}
+						setIsTimeMode={setIsTimeMode}
+						setCurrent={setCurrent}
 						id={id}
 						postIndividualDates={postIndividualDates}
 						token={token}
@@ -426,7 +525,7 @@ export function Timetable({
 						postDatesPrepare={postDatesPrepare}
 						confirmDatesPrepare={confirmDatesPrepare}
 						isTimePicked={isTimePicked}
-						isGroup={isGroup}
+						isConfirm={isConfirm}
 						confirmDates={confirmDates}
 						date={date}
 						setDate={setDate}

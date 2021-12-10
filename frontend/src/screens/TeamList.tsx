@@ -18,7 +18,10 @@ import FontAweSome from 'react-native-vector-icons/FontAwesome5';
 import Material from 'react-native-vector-icons/MaterialCommunityIcons';
 import { findTeam, getUserMe } from '../store/login';
 import { Colors } from 'react-native-paper';
-import { makeTeamTime } from '../store/timetable';
+import { makeTeamTime, setIsInTeamTime } from '../store/timetable';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import { hexToRGB } from '../lib/util/hexToRGB';
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
 export default function TeamList() {
@@ -42,6 +45,7 @@ export default function TeamList() {
 		peopleCount,
 		startHour,
 		endHour,
+		individualColor,
 	} = useSelector(({ login, team, loading, timetable }: RootState) => ({
 		user: login.user,
 		id: login.id,
@@ -62,17 +66,27 @@ export default function TeamList() {
 		peopleCount: login.peopleCount,
 		startHour: login.startHour,
 		endHour: login.endHour,
+		individualColor: login.individualColor,
 	}));
 	const [dimensions, setDimensions] = useState({ window, screen });
-
+	const [sequence, setSequence] = useState([0, 1, 2, 3]);
 	const [modalVisible, setModalVisible] = useState(false);
 	const navigation = useNavigation();
+	const [RGBColor, setRGBColor] = useState({
+		r: 0,
+		g: 0,
+		b: 0,
+	});
 	const dispatch = useDispatch();
 
 	// useEffect
 	useEffect(() => {
 		dispatch(getUserMe({ id, token, user }));
-	}, [joinTeam, teamColor]);
+	}, [joinTeam]);
+	useEffect(() => {
+		const result = hexToRGB(individualColor);
+		result && setRGBColor(result);
+	}, [individualColor]);
 	useEffect(() => {
 		dispatch(setModalMode('normal'));
 	}, [joinTeamError]);
@@ -85,8 +99,10 @@ export default function TeamList() {
 			} else {
 				dispatch(findTeam({ name }));
 			}
-			dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
+
 			setTimeout(() => {
+				dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
+				dispatch(setIsInTeamTime(true));
 				navigation.navigate('TeamTime', {
 					name,
 					user,
@@ -94,31 +110,41 @@ export default function TeamList() {
 					token,
 					modalMode,
 				});
-			}, 100);
+			}, 500);
 			dispatch(initialError());
 		},
 		[modalMode, makeReady]
 	);
 	// 모달 모드 분리
 	const onMakeTeamTime = useCallback(() => {
+		if (sequence.length !== 4) setSequence((sequence) => [...sequence, 3]);
 		dispatch(setModalMode('make'));
 		setModalVisible(true);
-	}, []);
+	}, [sequence]);
 	const onJoinTeamTime = useCallback(() => {
+		setSequence((sequence) => sequence.filter((idx) => idx !== 3));
 		dispatch(setModalMode('join'));
 		setModalVisible(true);
-	}, []);
+	}, [sequence]);
 	const onReload = useCallback(() => {
 		dispatch(getUserMe({ id, user, token }));
 	}, []);
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }}>
-			<View style={[styles.view, { opacity: modalVisible ? 0.2 : 1 }]}>
+		<SafeAreaView
+			style={{ backgroundColor: modalVisible ? Colors.white : individualColor }}
+		>
+			<View
+				style={[
+					styles.view,
+					{ opacity: modalVisible ? 0.2 : 1, backgroundColor: Colors.white },
+				]}
+			>
 				<NavigationHeader
 					title="모임 목록"
+					headerColor={individualColor}
 					Left={() => (
-						<Material
-							name="reload"
+						<FontAwesome5Icon
+							name="redo-alt"
 							size={25}
 							color={Colors.white}
 							style={{ paddingTop: 1 }}
@@ -126,9 +152,9 @@ export default function TeamList() {
 						/>
 					)}
 					Right={() => (
-						<FontAweSome
+						<FontAwesome5Icon
 							name="plus"
-							size={22}
+							size={25}
 							color={Colors.white}
 							style={{ paddingTop: 1 }}
 							onPress={onMakeTeamTime}
@@ -150,7 +176,7 @@ export default function TeamList() {
 				<Spinner loading={loadingUserMe} />
 				<FlatList
 					style={{
-						height: dimensions.screen.height * 0.55,
+						height: dimensions.screen.height * 0.6,
 						flexGrow: 0,
 					}}
 					data={clubs}
@@ -219,15 +245,21 @@ export default function TeamList() {
 					loadingChangeColor={loadingChangeColor}
 					joinName={joinName}
 					makeReady={makeReady}
+					individualColor={individualColor}
+					sequence={sequence}
 				/>
+				<TouchableView
+					style={[
+						styles.touchableView,
+						{
+							backgroundColor: `rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 2)`,
+						},
+					]}
+					onPress={onJoinTeamTime}
+				>
+					<Text style={styles.loginText}>모임 참여</Text>
+				</TouchableView>
 			</View>
-
-			<TouchableView
-				style={[styles.touchableView, { backgroundColor: '#017bff' }]}
-				onPress={onJoinTeamTime}
-			>
-				<Text style={styles.loginText}>모임 참여</Text>
-			</TouchableView>
 		</SafeAreaView>
 	);
 }
@@ -238,7 +270,7 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareR',
 		fontSize: 16,
 		marginTop: 13,
-		marginBottom: 39,
+		marginBottom: 20,
 		letterSpacing: -0.3,
 		textAlign: 'center',
 		backgroundColor: 'white',
@@ -301,13 +333,14 @@ const styles = StyleSheet.create({
 	textInputView: { marginTop: 5, borderRadius: 10 },
 	touchableView: {
 		flexDirection: 'row',
-		height: 45,
+		height: 50,
+		marginBottom: 50,
 		borderRadius: 10,
 		width: '65%',
 		justifyContent: 'center',
 		alignItems: 'center',
 		shadowColor: 'black',
-
+		backgroundColor: Colors.white,
 		shadowOffset: {
 			width: 1,
 			height: 1,
