@@ -237,9 +237,14 @@ export default function SnapShot({ route }: Props) {
 							setMode={setMode}
 							setModalVisible={setModalVisible}
 							setCurrent={setCurrent}
+							isHomeTime={false}
 						/>
 					) : (
-						<Timetable snapShotDate={snapShotDate} color={color} />
+						<Timetable
+							snapShotDate={snapShotDate}
+							color={color}
+							isHomeTime={false}
+						/>
 					)}
 					<ModalLoading
 						loadingVisible={loadingVisible}
