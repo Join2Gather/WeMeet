@@ -84,10 +84,11 @@ export function ModalTimePicker({
 			setSecond(false);
 			setMode && setMode('normal');
 			setModalVisible && setModalVisible(false);
-			setCurrent && setCurrent(3);
+			setIsTimeMode && setIsTimeMode(false);
+			setCurrent && setCurrent(0);
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
-			console.log(timeHour, timeMinute);
+
 			if (isConfirm) {
 				{
 					dispatch(setEndHour(timeHour));
@@ -110,7 +111,7 @@ export function ModalTimePicker({
 		(date) => {
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
-			console.log('start', timeHour, timeMinute);
+
 			setCurrent && setCurrent(2);
 			// setHour(date.getHours());
 			// setMinute(date.getMinutes());
