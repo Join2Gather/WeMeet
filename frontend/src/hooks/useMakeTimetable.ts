@@ -1,9 +1,5 @@
 import { Colors } from 'react-native-paper';
-import { useDispatch } from 'react-redux';
-import type { time, state_time, timeWith60 } from '../interface';
-import { useEffect } from 'react';
-import { cloneDates } from '../store/timetable';
-import { cloneIndividualDates } from '../store/individual';
+import type { state_time, timeWith60 } from '../interface';
 
 export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 	const times: timeWith60 = {};
