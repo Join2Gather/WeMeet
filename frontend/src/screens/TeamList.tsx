@@ -18,7 +18,7 @@ import FontAweSome from 'react-native-vector-icons/FontAwesome5';
 import Material from 'react-native-vector-icons/MaterialCommunityIcons';
 import { findTeam, getUserMe } from '../store/login';
 import { Colors } from 'react-native-paper';
-import { makeTeamTime, setIsInTeamTime } from '../store/timetable';
+import { makeTeamTime, setIsInTeamTime, setTeamName } from '../store/timetable';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import { hexToRGB } from '../lib/util/hexToRGB';
@@ -30,6 +30,8 @@ export default function TeamList() {
 		id,
 		clubs,
 		token,
+		loginURI,
+		loginName,
 		joinTeam,
 		joinName,
 		postTeamError,
@@ -37,6 +39,9 @@ export default function TeamList() {
 		loadingJoin,
 		loadingChangeColor,
 		teamColor,
+		teamName,
+		teamUri,
+		teamMakeColor,
 		joinUri,
 		loadingUserMe,
 		makeReady,
@@ -45,12 +50,16 @@ export default function TeamList() {
 		peopleCount,
 		startHour,
 		endHour,
+		makeStartHour,
+		makeEndHour,
 		individualColor,
 	} = useSelector(({ login, team, loading, timetable }: RootState) => ({
 		user: login.user,
 		id: login.id,
 		clubs: login.clubs,
 		token: login.token,
+		loginURI: login.uri,
+		loginName: login.name,
 		joinTeam: team.joinTeam,
 		joinName: team.joinName,
 		joinTeamError: team.joinTeamError,
@@ -58,6 +67,9 @@ export default function TeamList() {
 		loadingJoin: loading['team/JOIN_TEAM'],
 		loadingChangeColor: loading['team/CHANGE_COLOR'],
 		teamColor: timetable.color,
+		teamMakeColor: team.teamColor,
+		teamName: team.name,
+		teamUri: team.joinUri,
 		joinUri: team.joinUri,
 		loadingUserMe: loading['login/USER_ME'],
 		makeReady: timetable.makeReady,
@@ -66,11 +78,15 @@ export default function TeamList() {
 		peopleCount: login.peopleCount,
 		startHour: login.startHour,
 		endHour: login.endHour,
+		makeStartHour: team.startHour,
+		makeEndHour: team.endHour,
 		individualColor: login.individualColor,
 	}));
 	const [dimensions, setDimensions] = useState({ window, screen });
 	const [sequence, setSequence] = useState([0, 1, 2, 3]);
 	const [modalVisible, setModalVisible] = useState(false);
+	const [mode, setMode] = useState('initial');
+	const [makeName, setMake] = useState('');
 	const navigation = useNavigation();
 	const [RGBColor, setRGBColor] = useState({
 		r: 0,
@@ -92,28 +108,58 @@ export default function TeamList() {
 	}, [joinTeamError]);
 	// useCallback
 	// Navigation 이동
+	useEffect(() => {
+		if (mode === 'next') {
+			if (modalMode === 'make') {
+				dispatch(
+					makeTeamTime({
+						color: teamMakeColor,
+						peopleCount: 1,
+						startHour: makeStartHour,
+						endHour: makeEndHour,
+					})
+				);
+				dispatch(setTeamName({ name: teamName, uri: teamUri }));
+				setTimeout(() => {
+					navigation.navigate('TeamTime', {
+						user,
+						id,
+						token,
+						modalMode,
+					});
+				}, 50);
+				setMode('normal');
+			} else {
+				dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
+				dispatch(setTeamName({ name: loginName, uri: loginURI }));
+				setTimeout(() => {
+					navigation.navigate('TeamTime', {
+						user,
+						id,
+						token,
+						modalMode,
+					});
+				}, 50);
+				setMode('normal');
+			}
+		}
+	}, [modalMode, mode, teamMakeColor, makeStartHour, makeEndHour]);
 	const goTeamTime = useCallback(
 		(name?: string, uri?: string) => {
 			if (modalMode === 'join') {
 				dispatch(findTeam({ uri }));
-			} else {
+				setMode('next');
+			} else if (modalMode === 'normal') {
 				dispatch(findTeam({ name }));
+				setMode('next');
+			} else if (modalMode === 'make') {
+				name && setMake(name);
+				setMode('next');
 			}
 
-			setTimeout(() => {
-				dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
-				dispatch(setIsInTeamTime(true));
-				navigation.navigate('TeamTime', {
-					name,
-					user,
-					id,
-					token,
-					modalMode,
-				});
-			}, 500);
 			dispatch(initialError());
 		},
-		[modalMode, makeReady]
+		[modalMode]
 	);
 	// 모달 모드 분리
 	const onMakeTeamTime = useCallback(() => {
@@ -173,7 +219,7 @@ export default function TeamList() {
 						<Text style={styles.teamTitle}>아직 아무런 모임이 없네요 😭</Text>
 					</TouchableView>
 				)}
-				<Spinner loading={loadingUserMe} />
+				{/* <Spinner loading={loadingUserMe} /> */}
 				<FlatList
 					style={{
 						height: dimensions.screen.height * 0.6,
