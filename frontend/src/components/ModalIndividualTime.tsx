@@ -13,7 +13,7 @@ import { useDispatch } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import type { findTime } from '../interface/timetable';
-import { deletePostTime } from '../store/timetable';
+import { deletePostTime, setTimeModalMode } from '../store/timetable';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -49,13 +49,9 @@ export function ModalIndividualTime({
 			result && setRGBColor(result);
 		}
 	}, [color]);
-	const onPressDelete = useCallback(() => {
-		dispatch(deletePostTime());
-		setMode('loading');
-	}, []);
-
 	const onPressCloseBtn = useCallback(() => {
 		setInModalVisible && setInModalVisible(false);
+		dispatch(setTimeModalMode(false));
 		setMode('initial');
 	}, []);
 
@@ -157,8 +153,10 @@ export function ModalIndividualTime({
 													? `오후  ${t.startTime.hour - 12}`
 													: `오전  ${t.startTime.hour}`}
 												{'  : '}
-												{t.startTime.minute}
-												{' ~   '}
+												{t.startTime.minute < 10
+													? '0' + t.startTime.minute
+													: t.startTime.minute}
+												{'  ~   '}
 											</Text>
 
 											<Text style={styles.touchText}>
@@ -166,7 +164,9 @@ export function ModalIndividualTime({
 													? `오후  ${t.endTime.hour - 12}`
 													: `오전  ${t.endTime.hour}`}
 												{' : '}
-												{t.startTime.minute}
+												{t.endTime.minute < 10
+													? '0' + t.endTime.minute
+													: t.endTime.minute}
 											</Text>
 										</View>
 									</View>
