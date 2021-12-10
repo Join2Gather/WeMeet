@@ -20,6 +20,8 @@ import { View, Text, TouchableView } from '../theme';
 import { RootState } from '../store';
 import { kakaoLogin } from '../store/individual';
 import { ModalTime, ModalTimePicker } from '.';
+import { findHomeTime } from '../store/login';
+import { ModalIndividualTime } from './ModalIndividualTime';
 const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 const boxHeight = 28;
@@ -94,6 +96,7 @@ export function Timetable({
 		endHourTimetable,
 		reload,
 		findTime,
+		findIndividual,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
@@ -117,10 +120,12 @@ export function Timetable({
 			endHourTimetable: timetable.endHour,
 			reload: timetable.reload,
 			findTime: timetable.finTime,
+			findIndividual: login.findIndividual,
 		})
 	);
 	const dispatch = useDispatch();
 	const [timeModalVisible, setTimeModalVisible] = useState(false);
+	const [inModalVisible, setInModalVisible] = useState(false);
 	const [date, setDate] = useState<Date>(new Date());
 	const [endHour, setEndHour] = useState(0);
 	const [isConfirmMode, setIsConfirm] = useState(false);
@@ -232,6 +237,13 @@ export function Timetable({
 		},
 		[isGroup, date, isConfirm, mode]
 	);
+
+	const onFindHomeTime = useCallback((day: string, time: number) => {
+		dispatch(findHomeTime({ day, time }));
+		setTimeout(() => {
+			setInModalVisible(true);
+		}, 300);
+	}, []);
 	useEffect(() => {
 		if (mode === 'startMinute' && !isTimePicked) {
 			setModalVisible && setModalVisible(true);
@@ -339,7 +351,7 @@ export function Timetable({
 										<TouchableView
 											style={[styles.boxView]}
 											key={time}
-											onPress={() => console.log(time)}
+											onPress={() => onFindHomeTime(day.day, Number(time))}
 										>
 											{day.times[time].map((t, tIdx) => (
 												<View
@@ -509,6 +521,11 @@ export function Timetable({
 						onPressNext={onPressNext}
 						tableMode={tableMode}
 						isGroup={isGroup}
+					/>
+					<ModalIndividualTime
+						findIndividual={findIndividual}
+						setInModalVisible={setInModalVisible}
+						inModalVisible={inModalVisible}
 					/>
 					<ModalTimePicker
 						modalVisible={modalVisible}
