@@ -117,9 +117,10 @@ export interface timeProps {
 	isEveryTime: boolean;
 	minute: number;
 	borderWidth: number;
-	borderColor: string;
-	borderTop: boolean;
-	borderBottom: boolean;
+	borderColor?: string;
+	borderTop?: boolean;
+	borderBottom?: boolean;
+
 	people?: Array<string>;
 	startTime?: timeType;
 	endTime?: timeType;
