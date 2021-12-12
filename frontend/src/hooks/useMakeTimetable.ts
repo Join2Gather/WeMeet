@@ -15,9 +15,9 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 					mode: 'normal',
 					isEveryTime: false,
 					minute: j,
-					borderWidth: 0.2,
-					borderColor: Colors.black,
-					borderBottom: true,
+					borderWidth: 0.3,
+
+					borderBottom: false,
 					borderTop: true,
 				});
 			} else {
@@ -27,8 +27,8 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 					mode: 'normal',
 					isEveryTime: false,
 					minute: j,
-					borderWidth: 0.2,
-					borderColor: Colors.black,
+					borderWidth: 0.3,
+
 					borderBottom: false,
 					borderTop: false,
 				});
