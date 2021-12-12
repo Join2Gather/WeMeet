@@ -93,7 +93,10 @@ export function ModalLoading({
 									size={21}
 									color={Colors.green500}
 								/>
-								<Text style={styles.touchText}> 확정 하시겠습니까?</Text>
+								<Text style={styles.touchText}>
+									{' '}
+									모임 시간을 저장 하시겠습니까?
+								</Text>
 							</View>
 							<View style={styles.blankView} />
 							<View style={styles.buttonOverLine} />
