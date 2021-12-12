@@ -29,6 +29,7 @@ import {
 	getGroupDates,
 	getIndividualDates,
 	getOtherConfirmDates,
+	makeConfirmDates,
 	makeConfirmPrepare,
 	makeInitialConfirmTime,
 	makeTeamTime,
@@ -81,11 +82,11 @@ export default function SnapShot({ route }: Props) {
 	const { name, color, timetableMode, isConfirm, uri } = route.params;
 	const navigation = useNavigation();
 	const dispatch = useDispatch();
-	console.log(loadingMode);
+
 	//modal
 	// useEffect
 	useEffect(() => {
-		if (mode === 'loading') {
+		if (loadingMode === 'loading') {
 			setTimeout(() => {
 				if (timeMode === 'make') {
 					dispatch(getGroupDates({ id, user, token, uri: joinUri }));
@@ -112,16 +113,16 @@ export default function SnapShot({ route }: Props) {
 				setLoading('success');
 			}, 500);
 		}
-	}, [mode, timeMode]);
+	}, [mode, timeMode, loadingMode]);
 	// useCallback
 	const goLeft = useCallback(() => {
 		navigation.goBack();
 	}, []);
 	const onPressConfirm = useCallback(() => {
+		setLoading('initial');
 		setLoadingVisible(true);
 	}, []);
 	const onPressOk = useCallback(() => {
-		dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
 		dispatch(makeConfirmPrepare());
 		if (timeMode === 'make') {
 			dispatch(
@@ -132,6 +133,7 @@ export default function SnapShot({ route }: Props) {
 			dispatch(postConfirm({ date: confirmDates, id, token, uri, user }));
 			dispatch(postSnapShot({ uri, id, token, user }));
 		}
+		dispatch(makeTeamTime({ color, endHour, startHour, peopleCount }));
 		setLoading('loading');
 	}, [confirmDates, timeMode, joinUri]);
 	return (
@@ -171,7 +173,9 @@ export default function SnapShot({ route }: Props) {
 								mode={sequence}
 							/>
 							{currentNumber === 0 && (
-								<Text style={styles.stepText}>확정 시간을 터치해 주세요</Text>
+								<Text style={styles.stepText}>
+									모임 시작 시간을 터치해 주세요
+								</Text>
 							)}
 							{currentNumber === 1 && (
 								<Text style={styles.stepText}>
@@ -179,7 +183,9 @@ export default function SnapShot({ route }: Props) {
 								</Text>
 							)}
 							{currentNumber === 2 && (
-								<Text style={styles.stepText}>모임 종료 터치해 주세요</Text>
+								<Text style={styles.stepText}>
+									모임 종료 시간을 설정해 주세요
+								</Text>
 							)}
 							{currentNumber === 3 && (
 								<View
