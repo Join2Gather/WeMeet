@@ -6,43 +6,28 @@ import {
 	Text,
 	TouchableHighlight,
 	View,
-	TextInput,
-	ActivityIndicator,
 	Dimensions,
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
-import Font5Icon from 'react-native-vector-icons/FontAwesome5';
-import FontIcon from 'react-native-vector-icons/FontAwesome';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import type { findTime } from '../interface/timetable';
-import type { individualTime } from '../interface';
-import { findTeam } from '../store/login';
-import { Button } from '../lib/util/Button';
 import { deletePostTime, setTimeModalMode } from '../store/timetable';
 const screen = Dimensions.get('screen');
 
 interface props {
-	timeModalVisible?: boolean;
-	setTimeModalVisible?: React.Dispatch<React.SetStateAction<boolean>>;
+	inModalVisible?: boolean;
+	setInModalVisible?: React.Dispatch<React.SetStateAction<boolean>>;
 	color?: string;
-	findTime: findTime[];
-	isConfirmMode: boolean;
-	onPressNext?: () => void;
-	tableMode: string;
-	isGroup?: boolean;
+	findIndividual: findTime[];
 }
 
-export function ModalTime({
-	timeModalVisible,
-	setTimeModalVisible,
+export function ModalIndividualTime({
+	inModalVisible,
+	setInModalVisible,
 	color,
-	findTime,
-	isConfirmMode,
-	onPressNext,
-	tableMode,
-	isGroup,
+	findIndividual,
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
@@ -64,22 +49,17 @@ export function ModalTime({
 			result && setRGBColor(result);
 		}
 	}, [color]);
-	const onPressDelete = useCallback(() => {
-		dispatch(deletePostTime());
-		setMode('loading');
-	}, []);
-
 	const onPressCloseBtn = useCallback(() => {
-		setTimeModalVisible && setTimeModalVisible(false);
-		setMode('initial');
+		setInModalVisible && setInModalVisible(false);
 		dispatch(setTimeModalMode(false));
+		setMode('initial');
 	}, []);
 
 	return (
 		<Modal
 			animationType="fade"
 			transparent={true}
-			visible={timeModalVisible}
+			visible={inModalVisible}
 			onRequestClose={() => {
 				Alert.alert('Modal has been closed.');
 			}}
@@ -110,7 +90,38 @@ export function ModalTime({
 					</View>
 					{mode === 'initial' && (
 						<>
-							{findTime && findTime[0] && (
+							{findIndividual && findIndividual[0] && (
+								<>
+									<View style={styles.blankView} />
+									<Text style={styles.titleText}>모임명</Text>
+									<View style={styles.blankView} />
+
+									<View
+										style={[
+											styles.backgroundView,
+											{
+												backgroundColor: findIndividual[0].color
+													? findIndividual[0].color
+													: Colors.grey600,
+											},
+										]}
+									>
+										<View style={styles.columnView}>
+											<View style={styles.rowView}>
+												<Text
+													style={
+														(styles.touchText,
+														{ color: Colors.white, fontSize: 16 })
+													}
+												>
+													{findIndividual[0].name}
+												</Text>
+											</View>
+										</View>
+									</View>
+								</>
+							)}
+							{findIndividual && findIndividual[0] && (
 								<>
 									<View style={styles.blankView} />
 									<Text style={styles.titleText}>선택 시간</Text>
@@ -120,9 +131,9 @@ export function ModalTime({
 										<View style={styles.columnView}>
 											<View style={styles.rowView}>
 												<Text style={styles.touchText}>
-													{findTime[0].selectTime > 12
-														? `오후  ${findTime[0].selectTime - 12}시`
-														: `오전  ${findTime[0].selectTime}시`}
+													{findIndividual[0].selectTime > 12
+														? `오후  ${findIndividual[0].selectTime - 12}시`
+														: `오전  ${findIndividual[0].selectTime}시`}
 												</Text>
 											</View>
 										</View>
@@ -131,11 +142,11 @@ export function ModalTime({
 							)}
 
 							<View style={styles.blankView} />
-							<Text style={styles.titleText}>가능 시간</Text>
+							<Text style={styles.titleText}>모임 시간</Text>
 							<View style={styles.blankView} />
-							{findTime.map((t) => (
-								<View key={t.startTime.hour}>
-									<View style={[styles.backgroundView]}>
+							{findIndividual &&
+								findIndividual.map((t) => (
+									<View key={t.startTime.hour} style={[styles.backgroundView]}>
 										<View style={styles.columnView}>
 											<View style={styles.rowView}>
 												<Text style={styles.touchText}>
@@ -146,7 +157,7 @@ export function ModalTime({
 													{t.startTime.minute < 10
 														? '0' + t.startTime.minute
 														: t.startTime.minute}
-													{' ~   '}
+													{'  ~   '}
 												</Text>
 
 												<Text style={styles.touchText}>
@@ -161,87 +172,7 @@ export function ModalTime({
 											</View>
 										</View>
 									</View>
-									<View style={styles.blankView} />
-								</View>
-							))}
-							{isGroup && (
-								<>
-									<View style={styles.blankView} />
-									<Text style={styles.titleText}>참여 인원</Text>
-									<View style={styles.blankView} />
-									{findTime.map((t) => (
-										<View key={t.startTime.hour}>
-											<View style={[styles.backgroundView]}>
-												<View style={styles.columnView}>
-													<View style={styles.rowView}>
-														<Text style={styles.touchText}>{t.people}</Text>
-													</View>
-												</View>
-											</View>
-											<View style={styles.blankView} />
-										</View>
-									))}
-								</>
-							)}
-							{!isGroup && !isConfirmMode && (
-								<>
-									<View style={styles.blankView} />
-									<View style={styles.rowLine} />
-									<Button
-										buttonNumber={2}
-										buttonText="취소"
-										secondButtonText="삭제"
-										onPressFunction={() =>
-											setTimeModalVisible && setTimeModalVisible(false)
-										}
-										secondOnPressFunction={onPressDelete}
-									/>
-								</>
-							)}
-						</>
-					)}
-					{isConfirmMode && (
-						<>
-							<View style={styles.rowLine} />
-							<Button
-								buttonNumber={2}
-								buttonText="취소"
-								secondButtonText="다음"
-								onPressFunction={() =>
-									setTimeModalVisible && setTimeModalVisible(false)
-								}
-								secondOnPressFunction={() => onPressNext && onPressNext()}
-							/>
-						</>
-					)}
-					{mode === 'loading' && (
-						<>
-							<View style={{ height: 30 }} />
-							<ActivityIndicator size="large" color={Colors.blue500} />
-							<View style={{ height: 30 }} />
-						</>
-					)}
-					{mode === 'success' && (
-						<>
-							<View style={styles.blankView} />
-							<View style={styles.rowView}>
-								<Font5Icon
-									name="check-circle"
-									size={19}
-									color={Colors.green500}
-								/>
-								<Text style={styles.touchText}>
-									{' '}
-									변경 사항이 저장 되었습니다
-								</Text>
-							</View>
-							<View style={styles.blankView} />
-							<View style={styles.buttonOverLine} />
-							<Button
-								buttonNumber={1}
-								buttonText="확인"
-								onPressFunction={onPressCloseBtn}
-							/>
+								))}
 						</>
 					)}
 				</View>
@@ -323,9 +254,6 @@ const styles = StyleSheet.create({
 	touchButtonStyle: {
 		padding: 5,
 		borderRadius: 10,
-		// alignItems: 'center',
-		// alignContent: 'center',
-		// alignSelf: 'center',
 		justifyContent: 'center',
 	},
 	buttonOverLine: {

@@ -1,11 +1,12 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, View } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import {
 	changeDayIdx,
 	checkIsBlank,
 	checkIsExist,
+	checkMode,
 	cloneEveryTime,
 	findTimeFromResponse,
 	getGroupDates,
@@ -13,17 +14,22 @@ import {
 	getOtherConfirmDates,
 	setDay,
 	setStartHour,
+	setTimeModalMode,
 	toggleTimePick,
 } from '../store/timetable';
 import type { make60, timeType } from '../interface';
-import { View, Text, TouchableView } from '../theme';
+import { Text, TouchableView } from '../theme';
 import { RootState } from '../store';
 import { kakaoLogin } from '../store/individual';
-import { ModalTime, ModalTimePicker } from '.';
+import { ModalTime } from './';
+import { ModalTimePicker } from './ModalTimePicker';
+import { findHomeTime } from '../store/login';
+import { ModalIndividualTime } from './ModalIndividualTime';
+import { delay } from 'redux-saga/effects';
 const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
-const boxHeight = 28;
-const inBoxHeight = 7;
+const boxHeight = 28.0;
+const inBoxHeight = 7.0;
 const lastBox = 25;
 const screen = Dimensions.get('screen');
 const borderWidth = 0.3;
@@ -45,6 +51,7 @@ interface props {
 	endIdx?: number;
 	color?: string;
 	teamConfirmDate?: make60[];
+	isHomeTime: boolean;
 }
 
 interface modalData {
@@ -71,6 +78,7 @@ export function Timetable({
 	endIdx,
 	color,
 	teamConfirmDate,
+	isHomeTime,
 }: props) {
 	const {
 		dates,
@@ -94,6 +102,9 @@ export function Timetable({
 		endHourTimetable,
 		reload,
 		findTime,
+		findIndividual,
+		selectTimeMode,
+		modalMode,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
@@ -117,13 +128,18 @@ export function Timetable({
 			endHourTimetable: timetable.endHour,
 			reload: timetable.reload,
 			findTime: timetable.finTime,
+			findIndividual: login.findIndividual,
+			selectTimeMode: timetable.selectTimeMode,
+			modalMode: timetable.modalMode,
 		})
 	);
 	const dispatch = useDispatch();
 	const [timeModalVisible, setTimeModalVisible] = useState(false);
+	const [inModalVisible, setInModalVisible] = useState(false);
 	const [date, setDate] = useState<Date>(new Date());
 	const [endHour, setEndHour] = useState(0);
 	const [isConfirmMode, setIsConfirm] = useState(false);
+
 	const [select, setSelect] = useState({
 		idx: 0,
 		time: 0,
@@ -184,9 +200,11 @@ export function Timetable({
 	}, [cloneDateSuccess, kakaoDates]);
 
 	const onPressGroupTime = useCallback(
-		(time: number, day: string, is: boolean, idx?: number) => {
+		(time: number, day: string, is: boolean, idx: number) => {
 			dispatch(findTimeFromResponse({ time, day, isTeam: true }));
-			idx && setSelect({ idx, time, day });
+			dispatch(setStartHour(time));
+			dispatch(changeDayIdx(idx));
+			setSelect({ idx, time, day });
 			setIsConfirm(is);
 			setTimeout(() => {
 				setTimeModalVisible(true);
@@ -197,15 +215,26 @@ export function Timetable({
 
 	const onPressIndividualTime = useCallback(
 		(time: number, day: string, is: boolean, idx?: number) => {
-			dispatch(findTimeFromResponse({ time, day, isTeam: false }));
 			dispatch(changeDayIdx(idx));
+			dispatch(checkMode(time));
+			dispatch(setStartHour(time));
+			dispatch(findTimeFromResponse({ time, day, isTeam: false }));
+			dispatch(findHomeTime({ day, time }));
 			idx && setSelect({ idx, time, day });
 			setTableMode('individual');
-			setTimeout(() => setTimeModalVisible(true), 100);
+			dispatch(setTimeModalMode(true));
 		},
 		[]
 	);
-
+	useEffect(() => {
+		if (modalMode === true && !isHomeTime) {
+			if (selectTimeMode === 'individual') {
+				setTimeModalVisible(true);
+			} else {
+				setInModalVisible(true);
+			}
+		}
+	}, [modalMode, selectTimeMode]);
 	const onPressNext = useCallback(() => {
 		setCurrent && setCurrent(1);
 		onSetStartHour(select.idx, select.time, select.day);
@@ -223,15 +252,23 @@ export function Timetable({
 			dispatch(setDay(day));
 
 			setTimeout(() => {
-				isConfirm ? dispatch(checkIsExist()) : dispatch(checkIsBlank());
+				isConfirm
+					? dispatch(checkIsExist('start'))
+					: dispatch(checkIsBlank('start'));
 			}, 100);
 			setTimeout(() => {
 				setMode && setMode('startMinute');
 			}, 500);
-			mode && console.log(mode);
 		},
 		[isGroup, date, isConfirm, mode]
 	);
+
+	const onFindHomeTime = useCallback((day: string, time: number) => {
+		dispatch(findHomeTime({ day, time }));
+		setTimeout(() => {
+			setInModalVisible(true);
+		}, 300);
+	}, []);
 	useEffect(() => {
 		if (mode === 'startMinute' && !isTimePicked) {
 			setModalVisible && setModalVisible(true);
@@ -300,30 +337,32 @@ export function Timetable({
 												mode === 'confirmMode' &&
 													onSetStartHour(idx, Number(time), day.day);
 												mode === 'normal' &&
-													onPressGroupTime(Number(time), day.day, false);
+													onPressGroupTime(Number(time), day.day, false, idx);
 											}}
 										>
 											{day.times[time].map((t, tIdx) => (
 												<View
 													key={t.minute}
-													style={{
-														backgroundColor: t.color,
-														height: boxHeight / inBoxHeight,
-														borderTopWidth:
-															Number(time) === endHour
-																? borderWidth
-																: t.borderBottom
-																? borderWidth
-																: 0,
-														borderBottomWidth:
-															Number(time) === endHour - 1 && tIdx === 6
-																? borderWidth
-																: 0,
-														borderLeftWidth:
-															Number(time) === endHour ? 0 : borderWidth,
-														borderRightWidth:
-															Number(time) === endHour ? 0 : borderWidth,
-													}}
+													style={[
+														styles.timeSmallView,
+														{
+															backgroundColor: t.color,
+															borderTopWidth:
+																Number(time) === endHour
+																	? borderWidth
+																	: t.borderTop
+																	? borderWidth
+																	: 0,
+															borderBottomWidth:
+																Number(time) === endHour - 1 && tIdx === 6
+																	? borderWidth
+																	: 0,
+															borderLeftWidth:
+																Number(time) === endHour ? 0 : borderWidth,
+															borderRightWidth:
+																Number(time) === endHour ? 0 : borderWidth,
+														},
+													]}
 												/>
 											))}
 										</TouchableView>
@@ -339,29 +378,31 @@ export function Timetable({
 										<TouchableView
 											style={[styles.boxView]}
 											key={time}
-											onPress={() => console.log(time)}
+											onPress={() => onFindHomeTime(day.day, Number(time))}
 										>
 											{day.times[time].map((t, tIdx) => (
 												<View
 													key={t.minute}
-													style={{
-														backgroundColor: t.color,
-														height: boxHeight / inBoxHeight,
-														borderTopWidth:
-															Number(time) === endHour
-																? borderWidth
-																: t.borderBottom
-																? borderWidth
-																: 0,
-														borderBottomWidth:
-															Number(time) === endHour - 1 && tIdx === 6
-																? borderWidth
-																: 0,
-														borderLeftWidth:
-															Number(time) === endHour ? 0 : borderWidth,
-														borderRightWidth:
-															Number(time) === endHour ? 0 : borderWidth,
-													}}
+													style={[
+														styles.timeSmallView,
+														{
+															backgroundColor: t.color,
+															borderTopWidth:
+																Number(time) === endHour
+																	? borderWidth
+																	: t.borderTop
+																	? borderWidth
+																	: 0,
+															borderBottomWidth:
+																Number(time) === endHour - 1 && tIdx === 6
+																	? borderWidth
+																	: 0,
+															borderLeftWidth:
+																Number(time) === endHour ? 0 : borderWidth,
+															borderRightWidth:
+																Number(time) === endHour ? 0 : borderWidth,
+														},
+													]}
 												/>
 											))}
 										</TouchableView>
@@ -384,24 +425,26 @@ export function Timetable({
 											{day.times[time].map((t, tIdx) => (
 												<View
 													key={t.minute}
-													style={{
-														backgroundColor: t.color,
-														height: boxHeight / inBoxHeight,
-														borderTopWidth:
-															Number(time) === endHour
-																? borderWidth
-																: t.borderBottom
-																? borderWidth
-																: 0,
-														borderBottomWidth:
-															Number(time) === endHour - 1 && tIdx === 6
-																? borderWidth
-																: 0,
-														borderLeftWidth:
-															Number(time) === endHour ? 0 : borderWidth,
-														borderRightWidth:
-															Number(time) === endHour ? 0 : borderWidth,
-													}}
+													style={[
+														styles.timeSmallView,
+														{
+															backgroundColor: t.color,
+															borderTopWidth:
+																Number(time) === endHour
+																	? borderWidth
+																	: t.borderTop
+																	? borderWidth
+																	: 0,
+															borderBottomWidth:
+																Number(time) === endHour - 1 && tIdx === 6
+																	? borderWidth
+																	: 0,
+															borderLeftWidth:
+																Number(time) === endHour ? 0 : borderWidth,
+															borderRightWidth:
+																Number(time) === endHour ? 0 : borderWidth,
+														},
+													]}
 												/>
 											))}
 										</TouchableView>
@@ -419,30 +462,35 @@ export function Timetable({
 											key={time}
 											onPress={() => {
 												onPressGroupTime(Number(time), day.day, true, idx);
-												// onSetStartHour(idx, Number(time), day.day);
 											}}
 										>
 											{day.times[time].map((t, tIdx) => (
 												<View
 													key={t.minute}
-													style={{
-														backgroundColor: t.color,
-														height: boxHeight / inBoxHeight,
-														borderTopWidth:
-															Number(time) === endHour
-																? borderWidth
-																: t.borderBottom
-																? borderWidth
-																: 0,
-														borderBottomWidth:
-															Number(time) === endHour - 1 && tIdx === 6
-																? borderWidth
-																: 0,
-														borderLeftWidth:
-															Number(time) === endHour ? 0 : borderWidth,
-														borderRightWidth:
-															Number(time) === endHour ? 0 : borderWidth,
-													}}
+													style={[
+														styles.timeSmallView,
+														{
+															backgroundColor: t.color,
+
+															borderTopWidth:
+																Number(time) === endHour
+																	? t.borderWidth
+																	: t.borderTop
+																	? t.borderWidth
+																	: 0,
+															borderBottomWidth:
+																Number(time) === endHour - 1 && tIdx === 6
+																	? t.borderWidth
+																	: t.borderBottom
+																	? t.borderWidth
+																	: 0,
+
+															borderLeftWidth:
+																Number(time) === endHour ? 0 : t.borderWidth,
+															borderRightWidth:
+																Number(time) === endHour ? 0 : t.borderWidth,
+														},
+													]}
 												/>
 											))}
 										</TouchableView>
@@ -473,24 +521,26 @@ export function Timetable({
 											{day.times[time].map((t, tIdx) => (
 												<View
 													key={t.minute}
-													style={{
-														backgroundColor: t.color,
-														height: boxHeight / inBoxHeight,
-														borderTopWidth:
-															Number(time) === endHour
-																? borderWidth
-																: t.borderBottom
-																? borderWidth
-																: 0,
-														borderBottomWidth:
-															Number(time) === endHour - 1 && tIdx === 6
-																? borderWidth
-																: 0,
-														borderLeftWidth:
-															Number(time) === endHour ? 0 : borderWidth,
-														borderRightWidth:
-															Number(time) === endHour ? 0 : borderWidth,
-													}}
+													style={[
+														styles.timeSmallView,
+														{
+															backgroundColor: t.color,
+															borderTopWidth:
+																Number(time) === endHour
+																	? borderWidth
+																	: t.borderTop
+																	? borderWidth
+																	: 0,
+															borderBottomWidth:
+																Number(time) === endHour - 1 && tIdx === 6
+																	? borderWidth
+																	: 0,
+															borderLeftWidth:
+																Number(time) === endHour ? 0 : borderWidth,
+															borderRightWidth:
+																Number(time) === endHour ? 0 : borderWidth,
+														},
+													]}
 												/>
 											))}
 										</TouchableView>
@@ -509,6 +559,11 @@ export function Timetable({
 						onPressNext={onPressNext}
 						tableMode={tableMode}
 						isGroup={isGroup}
+					/>
+					<ModalIndividualTime
+						findIndividual={findIndividual}
+						setInModalVisible={setInModalVisible}
+						inModalVisible={inModalVisible}
 					/>
 					<ModalTimePicker
 						modalVisible={modalVisible}
@@ -573,14 +628,18 @@ const styles = StyleSheet.create({
 		paddingBottom: 10,
 	},
 	boxView: {
-		height: boxHeight,
+		height: 28,
 		width: screen.width / 9,
 	},
 	timeEachView: {
-		height: boxHeight * 2,
+		height: 56,
 		borderTopWidth: 2,
 		borderColor: Colors.blue500,
-		width: '100%',
+		width: screen.width / 3,
 		alignSelf: 'flex-end',
+	},
+	timeSmallView: {
+		flex: 1,
+		marginBottom: -0.3,
 	},
 });

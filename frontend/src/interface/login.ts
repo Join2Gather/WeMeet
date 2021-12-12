@@ -1,3 +1,4 @@
+import { findTime, timeProps, timeType } from '.';
 import type { responseEveryTime } from './individual';
 
 export interface Login {
@@ -20,6 +21,9 @@ export interface Login {
 	dates: any;
 	individualColor: string;
 	nickname: string;
+	findIndividual: findTime[];
+	inDates: inDates;
+	weekIndex: string[];
 }
 
 export interface kakaoLoginAPI {
@@ -43,6 +47,24 @@ export interface confirmDates {
 	[prop: string]: any;
 }
 
+export interface inDates {
+	sun: date[];
+	mon: date[];
+	tue: date[];
+	wed: date[];
+	thu: date[];
+	fri: date[];
+	sat: date[];
+	[prop: string]: date[];
+}
+
+export interface date {
+	start: timeType;
+	end: timeType;
+	color: string;
+	name: string;
+}
+
 export interface userMeAPI {
 	user: number;
 	id: number;
@@ -54,4 +76,11 @@ export interface nicknameAPI {
 	user: number;
 	token: string;
 	nickname: string;
+}
+
+export interface findHome {
+	startTime: timeType;
+	endTime: timeType;
+	color: string;
+	name: string;
 }

@@ -25,7 +25,6 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 type TeamStackParamList = {
 	TeamTime: {
-		name: string;
 		user: number;
 		id: number;
 		token: string;
@@ -58,9 +57,10 @@ export default function TeamTime({ route }: Props) {
 		makeReady,
 		createdDate,
 		snapShotError,
+		name,
 	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
-		uri: login.uri,
-		color: login.color,
+		uri: timetable.teamURI,
+		color: timetable.color,
 		peopleCount: login.peopleCount,
 		postDatesPrepare: timetable.postDatesPrepare,
 		confirmDatesPrepare: timetable.confirmDatesPrepare,
@@ -77,9 +77,10 @@ export default function TeamTime({ route }: Props) {
 		makeReady: timetable.makeReady,
 		createdDate: timetable.createdDate,
 		snapShotError: timetable.snapShotError,
+		name: timetable.teamName,
 	}));
 	// navigation
-	const { name, id, user, token, modalMode } = route.params;
+	const { id, user, token, modalMode } = route.params;
 	const navigation = useNavigation();
 	const dispatch = useDispatch();
 
@@ -92,20 +93,20 @@ export default function TeamTime({ route }: Props) {
 	const [mode, setMode] = useState('normal');
 	const [isTimeMode, setIsTimeMode] = useState(false);
 	const [currentNumber, setCurrent] = useState(0);
-	const [sequence, setSequence] = useState([0, 1, 2, 3]);
+	const [sequence, setSequence] = useState([0, 1, 2]);
 	// useEffect
-	useEffect(() => {
-		modalMode !== 'make' &&
-			dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
-	}, [color, peopleCount, startHour, endHour, modalMode]);
+	// useEffect(() => {
+	// 	modalMode !== 'make' &&
+	// 		dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
+	// }, [color, peopleCount, startHour, endHour, modalMode]);
 	// initial
 	useEffect(() => {
 		makeReady && dispatch(makeInitialTimetable());
 	}, [name, makeReady]);
-	useEffect(() => {
-		if (modalMode === 'join') dispatch(setTeamName(joinName));
-		else dispatch(setTeamName(name));
-	}, [name, joinName]);
+	// useEffect(() => {
+	// 	if (modalMode === 'join') dispatch(setTeamName(joinName));
+	// 	else dispatch(setTeamName(name));
+	// }, [name, joinName]);
 	// URI 찾아오기 로직
 	// useEffect(() => {
 	// 	if (modalMode === 'normal') dispatch(findURI(name));
@@ -308,6 +309,7 @@ export default function TeamTime({ route }: Props) {
 							confirmDatesPrepare={confirmDatesPrepare}
 							color={color}
 							setCurrent={setCurrent}
+							isHomeTime={false}
 						/>
 						<ModalSetting
 							settingModalVisible={settingModalVisible}

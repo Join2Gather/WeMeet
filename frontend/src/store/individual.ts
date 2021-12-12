@@ -83,7 +83,9 @@ export const individualSlice = createSlice({
 							for (let i = d.starting_hours; i <= d.end_hours; i++) {
 								if (i === d.starting_hours) {
 									for (let j = startingMinute; j <= 6; j++) {
-										state.individualDates[idx].times[i][j].color = date.color;
+										state.individualDates[idx].times[i][j].color = date.color
+											? date.color
+											: Colors.grey400;
 										state.individualDates[idx].times[i][j].isEveryTime = false;
 										state.individualDates[idx].times[i][j].isPicked = true;
 										state.individualDates[idx].times[i][j].mode = 'start';
@@ -92,7 +94,9 @@ export const individualSlice = createSlice({
 									}
 								} else if (i === d.end_hours) {
 									for (let j = 0; j < endMinute; j++) {
-										state.individualDates[idx].times[i][j].color = date.color;
+										state.individualDates[idx].times[i][j].color = date.color
+											? date.color
+											: Colors.grey400;
 										state.individualDates[idx].times[i][j].isEveryTime = false;
 										state.individualDates[idx].times[i][j].isPicked = true;
 										state.individualDates[idx].times[i][j].mode = 'start';
@@ -101,7 +105,9 @@ export const individualSlice = createSlice({
 									}
 								} else {
 									for (let j = 0; j <= 6; j++) {
-										state.individualDates[idx].times[i][j].color = date.color;
+										state.individualDates[idx].times[i][j].color = date.color
+											? date.color
+											: Colors.grey400;
 										state.individualDates[idx].times[i][j].isEveryTime = false;
 										state.individualDates[idx].times[i][j].isPicked = true;
 										state.individualDates[idx].times[i][j].borderBottom = false;
@@ -139,7 +145,7 @@ export const individualSlice = createSlice({
 							if (i === d.starting_hours) {
 								for (let j = startingMinute; j <= 6; j++) {
 									state.individualDates[idx].times[i][j].color = Colors.grey400;
-									state.individualDates[idx].times[i][j].isEveryTime = false;
+									state.individualDates[idx].times[i][j].isEveryTime = true;
 									state.individualDates[idx].times[i][j].isPicked = true;
 									state.individualDates[idx].times[i][j].mode = 'start';
 									state.individualDates[idx].times[i][j].borderTop = false;
@@ -148,7 +154,7 @@ export const individualSlice = createSlice({
 							} else if (i === d.end_hours) {
 								for (let j = 0; j < endMinute; j++) {
 									state.individualDates[idx].times[i][j].color = Colors.grey400;
-									state.individualDates[idx].times[i][j].isEveryTime = false;
+									state.individualDates[idx].times[i][j].isEveryTime = true;
 									state.individualDates[idx].times[i][j].isPicked = true;
 									state.individualDates[idx].times[i][j].mode = 'start';
 									state.individualDates[idx].times[i][j].borderTop = false;
@@ -157,7 +163,7 @@ export const individualSlice = createSlice({
 							} else {
 								for (let j = 0; j <= 6; j++) {
 									state.individualDates[idx].times[i][j].color = Colors.grey400;
-									state.individualDates[idx].times[i][j].isEveryTime = false;
+									state.individualDates[idx].times[i][j].isEveryTime = true;
 									state.individualDates[idx].times[i][j].isPicked = true;
 									state.individualDates[idx].times[i][j].borderTop = false;
 									state.individualDates[idx].times[i][j].borderBottom = false;

@@ -8,6 +8,7 @@ export interface timetable {
 	teamDatesWith60: make60[];
 	snapShotDate: make60[];
 	teamConfirmDate: make60[];
+	teamURI: string;
 	startTime: number;
 	endTime: number;
 	startMinute: number;
@@ -42,6 +43,8 @@ export interface timetable {
 	finTime: findTime[];
 	teamName: string;
 	isInTeamTime: boolean;
+	selectTimeMode: string;
+	modalMode: boolean;
 }
 
 export type weekIndex = Array<string>;
@@ -114,9 +117,10 @@ export interface timeProps {
 	isEveryTime: boolean;
 	minute: number;
 	borderWidth: number;
-	borderColor: string;
-	borderTop: boolean;
-	borderBottom: boolean;
+	borderColor?: string;
+	borderTop?: boolean;
+	borderBottom?: boolean;
+
 	people?: Array<string>;
 	startTime?: timeType;
 	endTime?: timeType;
@@ -124,6 +128,8 @@ export interface timeProps {
 
 export interface findTime {
 	people?: string[];
+	color?: string;
+	name?: string;
 	startTime: timeType;
 	endTime: timeType;
 	selectTime: number;

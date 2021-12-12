@@ -14,7 +14,7 @@ export function makeIndividualTimetable(state: timetable) {
 						state.dates[idx].times[i][j].color = state.color;
 						state.dates[idx].times[i][j].isEveryTime = false;
 						state.dates[idx].times[i][j].isPicked = true;
-						state.dates[idx].times[i][j].mode = 'start';
+						state.dates[idx].times[i][j].mode = 'individual';
 						state.dates[idx].times[i][j].borderTop = false;
 						state.dates[idx].times[i][j].borderBottom = false;
 					}
@@ -23,7 +23,7 @@ export function makeIndividualTimetable(state: timetable) {
 						state.dates[idx].times[i][j].color = state.color;
 						state.dates[idx].times[i][j].isEveryTime = false;
 						state.dates[idx].times[i][j].isPicked = true;
-						state.dates[idx].times[i][j].mode = 'start';
+						state.dates[idx].times[i][j].mode = 'individual';
 						state.dates[idx].times[i][j].borderTop = false;
 						state.dates[idx].times[i][j].borderBottom = false;
 					}
@@ -32,6 +32,7 @@ export function makeIndividualTimetable(state: timetable) {
 						state.dates[idx].times[i][j].color = state.color;
 						state.dates[idx].times[i][j].isEveryTime = false;
 						state.dates[idx].times[i][j].isPicked = true;
+						state.dates[idx].times[i][j].mode = 'individual';
 						state.dates[idx].times[i][j].borderTop = false;
 						state.dates[idx].times[i][j].borderBottom = false;
 					}
@@ -60,7 +61,7 @@ export function makeGroupTimeTableWith60(state: timetable, dates: any) {
 							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
 							dates[idx].times[i][j].isEveryTime = false;
 							dates[idx].times[i][j].isPicked = true;
-							dates[idx].times[i][j].mode = 'start';
+							dates[idx].times[i][j].mode = 'team';
 							dates[idx].times[i][j].borderTop = false;
 							dates[idx].times[i][j].borderBottom = false;
 						}
@@ -71,7 +72,7 @@ export function makeGroupTimeTableWith60(state: timetable, dates: any) {
 							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
 							dates[idx].times[i][j].isEveryTime = false;
 							dates[idx].times[i][j].isPicked = true;
-							dates[idx].times[i][j].mode = 'start';
+							dates[idx].times[i][j].mode = 'team';
 							dates[idx].times[i][j].borderTop = false;
 							dates[idx].times[i][j].borderBottom = false;
 						}
@@ -82,6 +83,7 @@ export function makeGroupTimeTableWith60(state: timetable, dates: any) {
 							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
 							dates[idx].times[i][j].isEveryTime = false;
 							dates[idx].times[i][j].borderTop = false;
+							dates[idx].times[i][j].mode = 'team';
 							dates[idx].times[i][j].borderBottom = false;
 						}
 					}
@@ -104,7 +106,7 @@ export function makeHomeTimetable(state: individual) {
 							state.individualDates[idx].times[i][j].color = Colors.grey400;
 							state.individualDates[idx].times[i][j].isEveryTime = false;
 							state.individualDates[idx].times[i][j].isPicked = true;
-							state.individualDates[idx].times[i][j].mode = 'start';
+							state.individualDates[idx].times[i][j].mode = 'home';
 							state.individualDates[idx].times[i][j].borderBottom = false;
 							state.individualDates[idx].times[i][j].borderTop = false;
 						}
@@ -113,7 +115,7 @@ export function makeHomeTimetable(state: individual) {
 							state.individualDates[idx].times[i][j].color = Colors.grey400;
 							state.individualDates[idx].times[i][j].isEveryTime = false;
 							state.individualDates[idx].times[i][j].isPicked = true;
-							state.individualDates[idx].times[i][j].mode = 'start';
+							state.individualDates[idx].times[i][j].mode = 'home';
 							state.individualDates[idx].times[i][j].borderBottom = false;
 							state.individualDates[idx].times[i][j].borderTop = false;
 						}
@@ -122,6 +124,7 @@ export function makeHomeTimetable(state: individual) {
 							state.individualDates[idx].times[i][j].color = Colors.grey400;
 							state.individualDates[idx].times[i][j].isEveryTime = false;
 							state.individualDates[idx].times[i][j].isPicked = true;
+							state.individualDates[idx].times[i][j].mode = 'home';
 							state.individualDates[idx].times[i][j].borderBottom = false;
 							state.individualDates[idx].times[i][j].borderTop = false;
 						}
@@ -143,7 +146,7 @@ export function addEveryTime(state: timetable, date: any) {
 							date[idx].times[i][j].color = Colors.grey400;
 							date[idx].times[i][j].isEveryTime = true;
 							date[idx].times[i][j].isPicked = true;
-							date[idx].times[i][j].mode = 'start';
+							date[idx].times[i][j].mode = 'everyTime';
 							date[idx].times[i][j].borderTop = false;
 							date[idx].times[i][j].borderBottom = false;
 						}
@@ -152,7 +155,7 @@ export function addEveryTime(state: timetable, date: any) {
 							date[idx].times[i][j].color = Colors.grey400;
 							date[idx].times[i][j].isEveryTime = true;
 							date[idx].times[i][j].isPicked = true;
-							date[idx].times[i][j].mode = 'start';
+							date[idx].times[i][j].mode = 'everyTime';
 							date[idx].times[i][j].borderTop = false;
 							date[idx].times[i][j].borderBottom = false;
 						}
@@ -161,6 +164,7 @@ export function addEveryTime(state: timetable, date: any) {
 							date[idx].times[i][j].color = Colors.grey400;
 							date[idx].times[i][j].isEveryTime = true;
 							date[idx].times[i][j].isPicked = true;
+							date[idx].times[i][j].mode = 'everyTime';
 							date[idx].times[i][j].borderTop = false;
 							date[idx].times[i][j].borderBottom = false;
 						}
@@ -177,7 +181,7 @@ export function makeConfirmWith(state: timetable, dates: any) {
 			date[day].map((d: any) => {
 				const startingMinute = Math.round(d.starting_minutes / 10);
 				const endMinute = Math.round(d.end_minutes / 10);
-				if (state.teamName !== date.club.name) {
+				if (state.teamName !== date.club?.name) {
 					for (let i = d.starting_hours; i <= d.end_hours; i++) {
 						if (i === d.starting_hours) {
 							for (let j = startingMinute; j <= 6; j++) {
@@ -185,7 +189,7 @@ export function makeConfirmWith(state: timetable, dates: any) {
 									dates[idx].times[i][j].color = Colors.grey400;
 									dates[idx].times[i][j].isEveryTime = false;
 									dates[idx].times[i][j].isPicked = true;
-									dates[idx].times[i][j].mode = 'start';
+									dates[idx].times[i][j].mode = 'other';
 									dates[idx].times[i][j].borderBottom = false;
 									dates[idx].times[i][j].borderTop = false;
 								}
@@ -196,7 +200,7 @@ export function makeConfirmWith(state: timetable, dates: any) {
 									dates[idx].times[i][j].color = Colors.grey400;
 									dates[idx].times[i][j].isEveryTime = false;
 									dates[idx].times[i][j].isPicked = true;
-									dates[idx].times[i][j].mode = 'start';
+									dates[idx].times[i][j].mode = 'other';
 									dates[idx].times[i][j].borderBottom = false;
 									dates[idx].times[i][j].borderTop = false;
 								}
@@ -207,6 +211,7 @@ export function makeConfirmWith(state: timetable, dates: any) {
 									dates[idx].times[i][j].color = Colors.grey400;
 									dates[idx].times[i][j].isEveryTime = false;
 									dates[idx].times[i][j].isPicked = true;
+									dates[idx].times[i][j].mode = 'other';
 									dates[idx].times[i][j].borderBottom = false;
 									dates[idx].times[i][j].borderTop = false;
 								}

@@ -1,14 +1,10 @@
 import { Colors } from 'react-native-paper';
-import { useDispatch } from 'react-redux';
-import type { time, state_time, timeWith60 } from '../interface';
-import { useEffect } from 'react';
-import { cloneDates } from '../store/timetable';
-import { cloneIndividualDates } from '../store/individual';
+import type { state_time, timeWith60 } from '../interface';
 
 export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 	const times: timeWith60 = {};
 	const timesText: Array<string> = [];
-	console.log(startHour, endHour);
+
 	for (let i = startHour; i < endHour; i++) {
 		times[i] = [];
 		for (let j = 0; j <= 60; j += 10) {
@@ -19,9 +15,9 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 					mode: 'normal',
 					isEveryTime: false,
 					minute: j,
-					borderWidth: 0.2,
-					borderColor: Colors.black,
-					borderBottom: true,
+					borderWidth: 0.3,
+
+					borderBottom: false,
 					borderTop: true,
 				});
 			} else {
@@ -31,8 +27,8 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 					mode: 'normal',
 					isEveryTime: false,
 					minute: j,
-					borderWidth: 0.2,
-					borderColor: Colors.black,
+					borderWidth: 0.3,
+
 					borderBottom: false,
 					borderTop: false,
 				});
@@ -63,6 +59,7 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 			}
 		}
 	}
+
 	const defaultDatesWith60 = [
 		{ day: 'sun', times: times },
 		{ day: 'mon', times: times },

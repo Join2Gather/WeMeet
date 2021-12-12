@@ -13,12 +13,17 @@ import {
 	setEndMin,
 	setStartMin,
 	setStartHour,
+	checkIsExist,
+	checkIsBlank,
+	toggleTimePick,
+	makeInitialTimePicked,
 } from '../store/timetable';
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
 import { getUserMe } from '../store/login';
 import { cloneINDates, initialIndividualTimetable } from '../store/individual';
 import DatePicker from 'react-native-date-picker';
+import { Spinner } from '.';
 interface props {
 	modalVisible?: boolean;
 	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>> | null;
@@ -34,7 +39,7 @@ interface props {
 	user: number;
 	postIndividualDates: any;
 	confirmDates: any;
-	isTimePicked?: boolean;
+
 	isConfirm?: boolean;
 	date: Date;
 	setDate: React.Dispatch<React.SetStateAction<Date>>;
@@ -57,19 +62,25 @@ export function ModalTimePicker({
 	id,
 	postIndividualDates,
 	confirmDates,
-	isTimePicked,
 	isConfirm,
 	date,
 	setDate,
 	timeMode,
 	joinUri,
 }: props) {
-	const { postConfirmSuccess, confirmClubs, confirmDatesTimetable } =
-		useSelector(({ timetable, login, team }: RootState) => ({
-			postConfirmSuccess: timetable.postConfirmSuccess,
-			confirmClubs: login.confirmClubs,
-			confirmDatesTimetable: login.confirmDatesTimetable,
-		}));
+	const {
+		postConfirmSuccess,
+		confirmClubs,
+		confirmDatesTimetable,
+		isTimePicked,
+		isTimeNoExist,
+	} = useSelector(({ timetable, login, team }: RootState) => ({
+		postConfirmSuccess: timetable.postConfirmSuccess,
+		confirmClubs: login.confirmClubs,
+		confirmDatesTimetable: login.confirmDatesTimetable,
+		isTimeNoExist: timetable.isTimeNotExist,
+		isTimePicked: timetable.isTimePicked,
+	}));
 	const dispatch = useDispatch();
 	// const [minute, setMinute] = useState(0);
 	// const [hour, setHour] = useState(0);
@@ -79,28 +90,39 @@ export function ModalTimePicker({
 	useEffect(() => {
 		if (modalVisible) setFirst(true);
 	}, [modalVisible]);
+	useEffect(() => {
+		if (mode === 'loading') {
+			if (!isConfirm && !isTimePicked) {
+				dispatch(makePostIndividualDates());
+			} else if (isConfirm && !isTimeNoExist) {
+				dispatch(makeConfirmDates());
+			}
+			if (isTimeNoExist || isTimePicked) {
+				setCurrent && setCurrent(0);
+			}
+			setTimeout(() => {
+				setMode && setMode('normal');
+			}, 500);
+		}
+	}, [mode, isConfirm, isTimeNoExist, isTimePicked]);
 	const onPressEndConfirm = useCallback(
 		(date) => {
 			setSecond(false);
-			setMode && setMode('normal');
 			setModalVisible && setModalVisible(false);
-			setCurrent && setCurrent(3);
+			setIsTimeMode && setIsTimeMode(false);
+			setCurrent && setCurrent(0);
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
-			console.log(timeHour, timeMinute);
+			dispatch(setEndHour(timeHour));
+			dispatch(setEndMin(timeMinute));
 			if (isConfirm) {
-				{
-					dispatch(setEndHour(timeHour));
-					dispatch(setEndMin(timeMinute));
-					dispatch(changeConfirmTime());
-					dispatch(makeConfirmDates());
-				}
+				dispatch(checkIsExist('end'));
+				dispatch(changeConfirmTime());
+				setCurrent && setCurrent(3);
+				setMode && setMode('loading');
 			} else {
-				{
-					dispatch(setEndHour(timeHour));
-					dispatch(setEndMin(timeMinute));
-					dispatch(makePostIndividualDates());
-				}
+				dispatch(checkIsBlank('end'));
+				setMode && setMode('loading');
 			}
 		},
 		[isConfirm]
@@ -108,9 +130,9 @@ export function ModalTimePicker({
 
 	const onPressConfirm = useCallback(
 		(date) => {
+			dispatch(makeInitialTimePicked());
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
-			console.log('start', timeHour, timeMinute);
 			setCurrent && setCurrent(2);
 			// setHour(date.getHours());
 			// setMinute(date.getMinutes());
@@ -185,6 +207,7 @@ export function ModalTimePicker({
 	}, [confirmClubs, confirmDatesTimetable]);
 	return (
 		<>
+			<Spinner loading={mode} />
 			<DatePicker
 				modal
 				open={firstVisible}

@@ -30,6 +30,17 @@ const initialState: Login = {
 	dates: [],
 	individualColor: '#33aafc',
 	nickname: '',
+	findIndividual: [],
+	inDates: {
+		sun: [],
+		mon: [],
+		tue: [],
+		wed: [],
+		thu: [],
+		fri: [],
+		sat: [],
+	},
+	weekIndex: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
 };
 
 const USER_ME = 'login/USER_ME';
@@ -75,6 +86,7 @@ export const loginSlice = createSlice({
 				data = state.clubs.find((club) => club.uri === action.payload.uri);
 			}
 			if (data) {
+				state.name = data.name;
 				state.uri = data.uri;
 				state.color = data.color;
 				state.peopleCount = data.people_count;
@@ -82,22 +94,67 @@ export const loginSlice = createSlice({
 				state.endHour = data.end_hours;
 			}
 		},
+		findHomeTime: (
+			state,
+			action: PayloadAction<{ day: string; time: number }>
+		) => {
+			state.findIndividual = [];
+			const { day, time } = action.payload;
+			state.inDates[day].forEach((d) => {
+				if (d.start.hour <= time && d.end.hour >= time) {
+					const data = {
+						startTime: d.start,
+						endTime: d.end,
+						color: d.color,
+						name: d.name,
+						selectTime: time,
+					};
+					state.findIndividual = [...state.findIndividual, data];
+				}
+			});
+		},
 		USER_ME_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.confirmClubs = [];
+			state.inDates = {
+				sun: [],
+				mon: [],
+				tue: [],
+				wed: [],
+				thu: [],
+				fri: [],
+				sat: [],
+			};
 			const { clubs, dates } = action.payload;
-			const confirmDatesTimetable = dates.filter(
+			state.confirmDatesTimetable = dates.filter(
 				(da: any) => !da.is_temporary_reserved
-			);
-			state.confirmDatesTimetable = confirmDatesTimetable.filter(
-				(day: any) => day.club !== null
 			);
 			state.confirmDatesTimetable.forEach((day: any) => {
 				const find = clubs.find((date: any) => date.id === day.club?.id);
 				if (find) {
 					day['color'] = find.color;
 					day.club.name = decodeURIComponent(day.club.name);
-					state.confirmClubs.push(find.color);
 				}
+			});
+			state.confirmDatesTimetable.forEach((day: any) => {
+				state.weekIndex.forEach((dayString) => {
+					if (day[dayString].length) {
+						day[dayString].map((d: any) => {
+							const data = {
+								start: {
+									hour: d.starting_hours,
+									minute: d.starting_minutes,
+								},
+								end: {
+									hour: d.end_hours,
+									minute: d.end_minutes,
+								},
+								color: day.color,
+								name: day.club === null ? '개인 시간표' : day.club.name,
+							};
+							state.inDates[dayString] = [...state.inDates[dayString], data];
+						});
+					}
+				});
 			});
 			state.clubs = action.payload.clubs;
 			state.clubs.map((club) => {
@@ -124,7 +181,12 @@ export const loginSlice = createSlice({
 	extraReducers: {},
 });
 
-export const { getSocialLogin, findTeam, makeGroupColor, changeTeamColor } =
-	loginSlice.actions;
+export const {
+	getSocialLogin,
+	findTeam,
+	makeGroupColor,
+	changeTeamColor,
+	findHomeTime,
+} = loginSlice.actions;
 
 export default loginSlice.reducer;
