@@ -47,8 +47,7 @@ class ProfileView(APIView):
         elif len(nickname) > 100:
             return JsonResponse({'error': 'nickname too long. max length is 100'}, status=status.HTTP_400_BAD_REQUEST)
 
-        profile.user.username = nickname
-        profile.user.save()
+        profile.name = nickname
         profile.save()
 
         return JsonResponse(ProfilesSerializer(profile).data)
