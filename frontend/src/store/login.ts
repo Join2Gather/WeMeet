@@ -100,7 +100,7 @@ export const loginSlice = createSlice({
 		) => {
 			state.findIndividual = [];
 			const { day, time } = action.payload;
-			const find = state.inDates[day].forEach((d) => {
+			state.inDates[day].forEach((d) => {
 				if (d.start.hour <= time && d.end.hour >= time) {
 					const data = {
 						startTime: d.start,
