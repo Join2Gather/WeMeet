@@ -144,34 +144,35 @@ export function ModalIndividualTime({
 							<View style={styles.blankView} />
 							<Text style={styles.titleText}>모임 시간</Text>
 							<View style={styles.blankView} />
-							{findIndividual.map((t) => (
-								<View key={t.startTime.hour} style={[styles.backgroundView]}>
-									<View style={styles.columnView}>
-										<View style={styles.rowView}>
-											<Text style={styles.touchText}>
-												{t.startTime.hour > 12
-													? `오후  ${t.startTime.hour - 12}`
-													: `오전  ${t.startTime.hour}`}
-												{'  : '}
-												{t.startTime.minute < 10
-													? '0' + t.startTime.minute
-													: t.startTime.minute}
-												{'  ~   '}
-											</Text>
+							{findIndividual &&
+								findIndividual.map((t) => (
+									<View key={t.startTime.hour} style={[styles.backgroundView]}>
+										<View style={styles.columnView}>
+											<View style={styles.rowView}>
+												<Text style={styles.touchText}>
+													{t.startTime.hour > 12
+														? `오후  ${t.startTime.hour - 12}`
+														: `오전  ${t.startTime.hour}`}
+													{'  : '}
+													{t.startTime.minute < 10
+														? '0' + t.startTime.minute
+														: t.startTime.minute}
+													{'  ~   '}
+												</Text>
 
-											<Text style={styles.touchText}>
-												{t.endTime.hour >= 12
-													? `오후  ${t.endTime.hour - 12}`
-													: `오전  ${t.endTime.hour}`}
-												{' : '}
-												{t.endTime.minute < 10
-													? '0' + t.endTime.minute
-													: t.endTime.minute}
-											</Text>
+												<Text style={styles.touchText}>
+													{t.endTime.hour >= 12
+														? `오후  ${t.endTime.hour - 12}`
+														: `오전  ${t.endTime.hour}`}
+													{' : '}
+													{t.endTime.minute < 10
+														? '0' + t.endTime.minute
+														: t.endTime.minute}
+												</Text>
+											</View>
 										</View>
 									</View>
-								</View>
-							))}
+								))}
 						</>
 					)}
 				</View>
