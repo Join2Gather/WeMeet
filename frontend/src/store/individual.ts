@@ -55,6 +55,15 @@ const initialState: individual = {
 	confirmDatesTimetable: [],
 	confirmClubs: [],
 	individualTimesText: timesText,
+	startTime: {
+		hour: 0,
+		minute: 0,
+	},
+	endTime: {
+		hour: 0,
+		minute: 0,
+	},
+	inTimeMode: '',
 };
 
 export const individualSlice = createSlice({
@@ -88,7 +97,7 @@ export const individualSlice = createSlice({
 											: Colors.grey400;
 										state.individualDates[idx].times[i][j].isEveryTime = false;
 										state.individualDates[idx].times[i][j].isPicked = true;
-										state.individualDates[idx].times[i][j].mode = 'start';
+										state.individualDates[idx].times[i][j].mode = 'team';
 										state.individualDates[idx].times[i][j].borderBottom = false;
 										state.individualDates[idx].times[i][j].borderTop = false;
 									}
@@ -99,7 +108,7 @@ export const individualSlice = createSlice({
 											: Colors.grey400;
 										state.individualDates[idx].times[i][j].isEveryTime = false;
 										state.individualDates[idx].times[i][j].isPicked = true;
-										state.individualDates[idx].times[i][j].mode = 'start';
+										state.individualDates[idx].times[i][j].mode = 'team';
 										state.individualDates[idx].times[i][j].borderBottom = false;
 										state.individualDates[idx].times[i][j].borderTop = false;
 									}
@@ -110,6 +119,7 @@ export const individualSlice = createSlice({
 											: Colors.grey400;
 										state.individualDates[idx].times[i][j].isEveryTime = false;
 										state.individualDates[idx].times[i][j].isPicked = true;
+										state.individualDates[idx].times[i][j].mode = 'team';
 										state.individualDates[idx].times[i][j].borderBottom = false;
 										state.individualDates[idx].times[i][j].borderTop = false;
 									}
@@ -185,6 +195,62 @@ export const individualSlice = createSlice({
 		POST_EVERYTIME_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
+		setInStartTime: (
+			state,
+			action: PayloadAction<{ hour: number; min: number }>
+		) => {
+			const { hour, min } = action.payload;
+			state.startTime.hour = hour;
+			state.startTime.minute = min;
+		},
+		setInEndTime: (
+			state,
+			action: PayloadAction<{ hour: number; min: number }>
+		) => {
+			const { hour, min } = action.payload;
+			state.endTime.hour = hour;
+			state.endTime.minute = min;
+		},
+		checkInMode: (
+			state,
+			action: PayloadAction<{ time: number; idx: number }>
+		) => {
+			const { time, idx } = action.payload;
+			state.inTimeMode = '';
+			let modeSelect = [
+				{
+					count: 0,
+					content: 'individual',
+				},
+				{
+					count: 0,
+					content: 'other',
+				},
+				{
+					count: 0,
+					content: 'everyTime',
+				},
+				{
+					count: 0,
+					content: 'normal',
+				},
+				{
+					count: 0,
+					content: 'team',
+				},
+			];
+			state.individualDates[idx].times[time].forEach((t) => {
+				modeSelect.forEach((mode) => mode.content === t.mode && mode.count++);
+			});
+			modeSelect.sort((a, b) => b.count - a.count);
+			console.log(modeSelect);
+			modeSelect.forEach((mode) => {
+				if (mode.count) {
+					state.inTimeMode += mode.content;
+				}
+			});
+			console.log(state.inTimeMode);
+		},
 	},
 	extraReducers: {},
 });
@@ -195,6 +261,9 @@ export const {
 	kakaoLogin,
 	cloneINDates,
 	initialIndividualTimetable,
+	setInEndTime,
+	setInStartTime,
+	checkInMode,
 } = individualSlice.actions;
 
 export default individualSlice.reducer;
