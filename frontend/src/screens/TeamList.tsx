@@ -22,8 +22,10 @@ import { makeTeamTime, setIsInTeamTime, setTeamName } from '../store/timetable';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import { hexToRGB } from '../lib/util/hexToRGB';
+import { TouchableHighlight } from 'react-native-gesture-handler';
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
+const circleWidth = 15;
 export default function TeamList() {
 	const {
 		user,
@@ -207,7 +209,9 @@ export default function TeamList() {
 						/>
 					)}
 				/>
-				<Text style={styles.headerUnderText}>Plan list</Text>
+
+				<Text style={[styles.headerUnderText]}>Plan list</Text>
+
 				{!clubs.length && (
 					<TouchableView
 						style={[
@@ -227,29 +231,40 @@ export default function TeamList() {
 					}}
 					data={clubs}
 					renderItem={({ item }) => (
-						<TouchableView
-							onPress={() => goTeamTime(item.name)}
-							style={[
-								styles.teamListTouchableView,
-								{
-									width: '100%',
-									justifyContent: 'space-between',
-									opacity: 1,
-								},
-							]}
-						>
-							<View
-								style={[styles.rowCircle, { backgroundColor: item.color }]}
-							/>
-							<Text
-								numberOfLines={1}
-								ellipsizeMode="tail"
-								style={styles.teamTitle}
+						<View>
+							<TouchableHighlight
+								onPress={() => goTeamTime(item.name)}
+								activeOpacity={0.1}
+								underlayColor={Colors.grey300}
+								style={[
+									styles.teamListTouchableView,
+									{
+										opacity: 1,
+									},
+								]}
 							>
-								{item.name}
-							</Text>
-							<Icons size={15} name="right" style={styles.iconStyle} />
-						</TouchableView>
+								<View
+									style={{
+										justifyContent: 'flex-start',
+										flexDirection: 'row',
+										alignItems: 'center',
+										width: '100%',
+									}}
+								>
+									<View
+										style={[styles.rowCircle, { backgroundColor: item.color }]}
+									/>
+									<Text
+										numberOfLines={1}
+										ellipsizeMode="tail"
+										style={styles.teamTitle}
+									>
+										{item.name}
+									</Text>
+									<Icons size={15} name="right" style={styles.iconStyle} />
+								</View>
+							</TouchableHighlight>
+						</View>
 					)}
 					keyExtractor={(item, index) => String(item.id)}
 				/>
@@ -318,8 +333,8 @@ const styles = StyleSheet.create({
 		marginTop: 13,
 		marginBottom: 20,
 		letterSpacing: -0.3,
+
 		textAlign: 'center',
-		backgroundColor: 'white',
 	},
 
 	text: {
@@ -350,15 +365,16 @@ const styles = StyleSheet.create({
 	},
 	rowCircle: {
 		// flexDirection: 'row',
-		padding: 7,
-		alignItems: 'flex-start',
-		justifyContent: 'flex-end',
+		width: circleWidth,
+		height: circleWidth,
 
-		backgroundColor: '#017bff',
-		borderRadius: 20,
+		// alignItems: 'flex-start',
+		// justifyContent: 'flex-end',
+
+		borderRadius: circleWidth / 2,
 		position: 'absolute',
-		top: 12,
-		left: 40,
+
+		left: '10%',
 	},
 	teamTitle: {
 		fontSize: 15,
@@ -366,13 +382,18 @@ const styles = StyleSheet.create({
 		color: '#000',
 		position: 'absolute',
 		letterSpacing: -0.5,
-		left: 70,
+		left: '18%',
 		overflow: 'hidden',
-		maxWidth: 230,
+		alignSelf: 'center',
+		alignItems: 'center',
+		// maxWidth: 230,
 	},
 	iconStyle: {
 		position: 'absolute',
-		right: 40,
+		right: '10%',
+		alignItems: 'center',
+		alignContent: 'center',
+		alignSelf: 'center',
 	},
 	textView: { width: '100%', padding: 5, marginBottom: 30 },
 	textInput: { fontSize: 24, padding: 10 },
@@ -401,7 +422,7 @@ const styles = StyleSheet.create({
 	teamListTouchableView: {
 		flexDirection: 'row',
 		height: 40,
-		borderRadius: 10,
+		// borderRadius: 10,
 		width: '100%',
 		justifyContent: 'center',
 		alignItems: 'center',
