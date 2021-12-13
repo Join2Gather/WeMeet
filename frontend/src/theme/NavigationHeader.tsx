@@ -50,8 +50,8 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 				{secondRight && secondRight()}
 				<View style={{ flex: 0.2, backgroundColor: 'transparent' }}></View>
 				{Right && Right()}
-				<View style={{ flex: 0.1, backgroundColor: 'transparent' }}></View>
 			</View>
+			<View style={{ flex: 0.1, backgroundColor: 'transparent' }}></View>
 		</View>
 	);
 };
@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
 		fontSize: 19,
 		fontWeight: '300',
 		textAlign: 'center',
+
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -2,
 		color: '#fff',
