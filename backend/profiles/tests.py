@@ -43,7 +43,7 @@ class ChangeNickNameTestCase(TestCase):
 
         self.assertEquals(nickname_changed.status_code, 200, '닉네임이 주어지면 200')
 
-        changed_nickname = UserModel.objects.get(id=self.user.id).username
+        changed_nickname = Profiles.objects.get(id=self.profile.id).name
 
         self.assertEquals(changed_nickname, nickname, '사용자 이름이 닉네임으로 바뀌어야 한다')
 
