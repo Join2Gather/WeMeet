@@ -21,7 +21,12 @@ import {
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
 import { getUserMe } from '../store/login';
-import { cloneINDates, initialIndividualTimetable } from '../store/individual';
+import {
+	cloneINDates,
+	initialIndividualTimetable,
+	setInEndTime,
+	setInStartTime,
+} from '../store/individual';
 import DatePicker from 'react-native-date-picker';
 import { Spinner } from '.';
 interface props {
@@ -45,6 +50,7 @@ interface props {
 	setDate: React.Dispatch<React.SetStateAction<Date>>;
 	timeMode: string;
 	joinUri: string;
+	isHomeTime: boolean;
 }
 
 export function ModalTimePicker({
@@ -67,6 +73,7 @@ export function ModalTimePicker({
 	setDate,
 	timeMode,
 	joinUri,
+	isHomeTime,
 }: props) {
 	const {
 		postConfirmSuccess,
@@ -113,8 +120,12 @@ export function ModalTimePicker({
 			setCurrent && setCurrent(0);
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
-			dispatch(setEndHour(timeHour));
-			dispatch(setEndMin(timeMinute));
+			if (isHomeTime) {
+				dispatch(setInEndTime({ hour: timeHour, min: timeMinute }));
+			} else {
+				dispatch(setEndHour(timeHour));
+				dispatch(setEndMin(timeMinute));
+			}
 			if (isConfirm) {
 				dispatch(checkIsExist('end'));
 				dispatch(changeConfirmTime());
@@ -125,7 +136,7 @@ export function ModalTimePicker({
 				setMode && setMode('loading');
 			}
 		},
-		[isConfirm]
+		[isConfirm, isHomeTime]
 	);
 
 	const onPressConfirm = useCallback(
@@ -137,14 +148,18 @@ export function ModalTimePicker({
 			// setHour(date.getHours());
 			// setMinute(date.getMinutes());
 			setModalVisible && setModalVisible(false);
-			dispatch(setStartHour(timeHour));
-			dispatch(setStartMin(timeMinute));
+			if (isHomeTime) {
+				dispatch(setInStartTime({ hour: timeHour, min: timeMinute }));
+			} else {
+				dispatch(setStartHour(timeHour));
+				dispatch(setStartMin(timeMinute));
+			}
 			setMode && setMode('endMode');
 			setTimeout(() => {
 				setSecond(true);
 			}, 100);
 		},
-		[mode, isConfirm, date, modalVisible]
+		[mode, isConfirm, date, modalVisible, isHomeTime]
 	);
 
 	// 닫기 버튼
@@ -220,7 +235,7 @@ export function ModalTimePicker({
 				onDateChange={(date) => setDate(date)}
 				onCancel={onPressClose}
 				androidVariant={'iosClone'}
-				minuteInterval={5}
+				minuteInterval={10}
 				title="시작 시간 설정"
 				confirmText="확인"
 				cancelText="취소"
@@ -237,7 +252,7 @@ export function ModalTimePicker({
 				onDateChange={(date) => setDate(date)}
 				onCancel={onPressClose}
 				androidVariant={'iosClone'}
-				minuteInterval={5}
+				minuteInterval={10}
 				title="종료 시간 설정"
 				confirmText="확인"
 				cancelText="취소"
