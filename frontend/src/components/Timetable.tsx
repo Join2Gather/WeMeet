@@ -20,7 +20,7 @@ import {
 import type { make60, timeType } from '../interface';
 import { Text, TouchableView } from '../theme';
 import { RootState } from '../store';
-import { kakaoLogin } from '../store/individual';
+import { checkInMode, kakaoLogin } from '../store/individual';
 import { ModalTime } from './';
 import { ModalTimePicker } from './ModalTimePicker';
 import { findHomeTime } from '../store/login';
@@ -105,6 +105,7 @@ export function Timetable({
 		findIndividual,
 		selectTimeMode,
 		modalMode,
+		inTimeMode,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
@@ -131,6 +132,7 @@ export function Timetable({
 			findIndividual: login.findIndividual,
 			selectTimeMode: timetable.selectTimeMode,
 			modalMode: timetable.modalMode,
+			inTimeMode: individual.inTimeMode,
 		})
 	);
 	const dispatch = useDispatch();
@@ -201,34 +203,81 @@ export function Timetable({
 
 	const onPressGroupTime = useCallback(
 		(time: number, day: string, is: boolean, idx: number) => {
-			dispatch(findTimeFromResponse({ time, day, isTeam: true }));
 			dispatch(setStartHour(time));
 			dispatch(changeDayIdx(idx));
+			dispatch(checkMode({ time, mode: 'group' }));
+			setTableMode('gr');
 			setSelect({ idx, time, day });
 			setIsConfirm(is);
-			setTimeout(() => {
-				setTimeModalVisible(true);
-			}, 100);
 		},
 		[]
 	);
 
 	const onPressIndividualTime = useCallback(
-		(time: number, day: string, is: boolean, idx?: number) => {
+		(time: number, day: string, idx: number) => {
 			dispatch(changeDayIdx(idx));
-			dispatch(checkMode(time));
+			dispatch(checkMode({ time, mode: 'in' }));
 			dispatch(setStartHour(time));
-			dispatch(findTimeFromResponse({ time, day, isTeam: false }));
-			dispatch(findHomeTime({ day, time }));
-			idx && setSelect({ idx, time, day });
+
+			setSelect({ idx, time, day });
 			setTableMode('individual');
-			dispatch(setTimeModalMode(true));
+			setCurrent && setCurrent(0);
+		},
+		[]
+	);
+
+	const onPressHomeTime = useCallback(
+		(time: number, day: string, idx: number) => {
+			dispatch(checkInMode({ time, idx }));
+			setSelect({ idx, time, day });
 		},
 		[]
 	);
 	useEffect(() => {
+		if (inTimeMode.includes('team')) {
+			dispatch(findHomeTime({ day: select.day, time: select.time }));
+			setInModalVisible(true);
+		} else if (inTimeMode === 'normal') {
+			setModalVisible && setModalVisible(true);
+			setIsTimeMode && setIsTimeMode(true);
+			setMode && setMode('startMode');
+			setCurrent && setCurrent(1);
+		}
+	}, [inTimeMode]);
+
+	useEffect(() => {
+		// 시간 누르기 로직
+
+		if (selectTimeMode === 'normal' && tableMode === 'individual') {
+			setMode && setMode('startMinute');
+			setIsTimeMode && setIsTimeMode(true);
+			onSetStartHour(select.idx, select.time, select.day);
+		} else if (tableMode === 'individual') {
+			dispatch(
+				findTimeFromResponse({
+					time: select.time,
+					day: select.day,
+					isTeam: false,
+				})
+			);
+			dispatch(findHomeTime({ day: select.day, time: select.time }));
+			dispatch(setTimeModalMode(true));
+		} else if (selectTimeMode !== 'normal' && tableMode === 'gr') {
+			dispatch(
+				findTimeFromResponse({
+					time: select.time,
+					day: select.day,
+					isTeam: true,
+				})
+			);
+			setTimeout(() => {
+				setTimeModalVisible(true);
+			}, 100);
+		}
+	}, [select, selectTimeMode, tableMode]);
+	useEffect(() => {
 		if (modalMode === true && !isHomeTime) {
-			if (selectTimeMode === 'individual') {
+			if (selectTimeMode.includes('individual')) {
 				setTimeModalVisible(true);
 			} else {
 				setInModalVisible(true);
@@ -378,7 +427,12 @@ export function Timetable({
 										<TouchableView
 											style={[styles.boxView]}
 											key={time}
-											onPress={() => onFindHomeTime(day.day, Number(time))}
+											onPress={() => {
+												mode === 'normal' &&
+													onPressHomeTime(Number(time), day.day, idx);
+												mode === 'startMode' &&
+													onSetStartHour(idx, Number(time), day.day);
+											}}
 										>
 											{day.times[time].map((t, tIdx) => (
 												<View
@@ -511,7 +565,7 @@ export function Timetable({
 													onPressIndividualTime(
 														Number(time),
 														day.day,
-														false,
+
 														idx
 													);
 												mode === 'startMode' &&
@@ -586,6 +640,7 @@ export function Timetable({
 						setDate={setDate}
 						timeMode={timeMode}
 						joinUri={joinUri}
+						isHomeTime={isHomeTime}
 					/>
 				</View>
 			</View>

@@ -7,6 +7,7 @@ import {
 	TouchableHighlight,
 	View,
 	TextInput,
+	Dimensions,
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,6 +16,9 @@ import IonicIcon from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { loginEveryTime, postEveryTime } from '../store/individual';
 import type { RootState } from '../store';
+import { setModalMode } from '../store/team';
+
+const screen = Dimensions.get('screen');
 
 interface props {
 	selectModalVisible: boolean;
@@ -45,7 +49,11 @@ export function ModalSelect({
 		setSelectModalVisible(false);
 		setMode('normal');
 	}, [loginID, password]);
-
+	const onPressCloseBtn = useCallback(() => {
+		setModalMode('normal');
+		setMode('normal');
+		setSelectModalVisible(false);
+	}, []);
 	useEffect(() => {
 		loginSuccess &&
 			dispatch(
@@ -80,17 +88,17 @@ export function ModalSelect({
 								width: '9%',
 								marginBottom: 10,
 							}}
-							onPress={() => {
-								setSelectModalVisible(false);
-							}}
+							onPress={onPressCloseBtn}
 						>
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={28} />
 						</TouchableHighlight>
+						<View style={{ height: 20 }} />
 						{mode === 'normal' && (
 							<View>
 								<Text style={styles.titleText}>
 									시간표 등록 방법을 선택하세요
 								</Text>
+								<View style={{ height: 20 }} />
 								<View style={{ flexDirection: 'row' }}>
 									<TouchableHighlight
 										activeOpacity={1}
@@ -127,6 +135,7 @@ export function ModalSelect({
 										</View>
 									</TouchableHighlight>
 								</View>
+								<View style={{ height: 20 }} />
 							</View>
 						)}
 						{mode === 'everytime' && (
@@ -226,7 +235,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
 		// elevation: 5,
-		width: '85%',
+		width: screen.width * 0.9,
 	},
 	titleText: {
 		textAlign: 'center',
@@ -235,7 +244,8 @@ const styles = StyleSheet.create({
 		marginBottom: 15,
 	},
 	textView: {
-		width: '93%',
+		width: '90%',
+		marginLeft: '5%',
 		//
 	},
 	textInput: {
@@ -246,10 +256,11 @@ const styles = StyleSheet.create({
 	},
 	textInputView: {
 		flexDirection: 'row',
-		borderRadius: 10,
+		borderRadius: 15,
 		padding: 10,
 		borderWidth: 1,
 		borderColor: Colors.blue200,
+		// marginLeft: '5%',
 	},
 	buttonText: {
 		textAlign: 'center',
@@ -291,10 +302,9 @@ const styles = StyleSheet.create({
 	iconTouchableView: {
 		flex: 1,
 		height: 80,
-		borderWidth: 1,
-		borderColor: Colors.blue300,
+
 		justifyContent: 'center',
-		borderRadius: 10,
+		borderRadius: 15,
 	},
 	iconUnderText: {
 		textAlign: 'center',
