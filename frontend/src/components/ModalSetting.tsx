@@ -22,7 +22,6 @@ import { Button } from '../lib/util/Button';
 import { changeTimetableColor, getSnapShot } from '../store/timetable';
 import { getUserMe, makeGroupColor } from '../store/login';
 import { useNavigation } from '@react-navigation/core';
-import { make60 } from '../interface';
 
 const screen = Dimensions.get('screen');
 
@@ -171,13 +170,17 @@ export function ModalSetting({
 										activeOpacity={1}
 										underlayColor={Colors.grey300}
 										onPress={() => onPressSetMode('color')}
-										style={styles.touchButtonStyle}
+										style={[
+											styles.touchButtonStyle,
+											{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
+										]}
 									>
 										<View style={styles.rowView}>
 											<Font5Icon
 												name="palette"
 												size={21}
 												color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+												style={styles.iconStyle}
 											/>
 											<Text style={styles.touchText}> 팀 색상 변경</Text>
 											<View style={styles.iconView}>
@@ -185,22 +188,27 @@ export function ModalSetting({
 													name="angle-right"
 													size={19}
 													color={Colors.black}
+													style={styles.rightIconStyle}
 												/>
 											</View>
 										</View>
 									</TouchableHighlight>
-									<View style={styles.blankView} />
+
 									<TouchableHighlight
 										activeOpacity={1}
 										underlayColor={Colors.grey300}
 										onPress={onShareURI}
-										style={styles.touchButtonStyle}
+										style={[
+											styles.touchButtonStyle,
+											{ borderTopLeftRadius: 0, borderTopRightRadius: 0 },
+										]}
 									>
 										<View style={styles.rowView}>
 											<Font5Icon
 												name="user-plus"
 												size={20}
 												color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+												style={styles.iconStyle}
 											/>
 											<Text style={styles.touchText}>팀원 초대</Text>
 											<View style={styles.iconView}>
@@ -208,6 +216,7 @@ export function ModalSetting({
 													name="angle-right"
 													size={19}
 													color={Colors.black}
+													style={styles.rightIconStyle}
 												/>
 											</View>
 										</View>
@@ -223,13 +232,17 @@ export function ModalSetting({
 										activeOpacity={1}
 										underlayColor={Colors.grey300}
 										onPress={onPressGetSnapShot}
-										style={styles.touchButtonStyle}
+										style={[
+											styles.touchButtonStyle,
+											{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
+										]}
 									>
 										<View style={styles.rowView}>
 											<Font5Icon
 												name="cloud-download-alt"
 												size={17}
 												color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+												style={styles.iconStyle}
 											/>
 											<Text style={styles.touchText}>저장 시간 불러오기</Text>
 											<View style={styles.iconView}>
@@ -237,22 +250,27 @@ export function ModalSetting({
 													name="angle-right"
 													size={19}
 													color={Colors.black}
+													style={styles.rightIconStyle}
 												/>
 											</View>
 										</View>
 									</TouchableHighlight>
-									<View style={styles.blankView} />
+
 									<TouchableHighlight
 										activeOpacity={1}
 										underlayColor={Colors.grey300}
 										onPress={onPressLeaveTeam}
-										style={styles.touchButtonStyle}
+										style={[
+											styles.touchButtonStyle,
+											{ borderTopLeftRadius: 0, borderTopRightRadius: 0 },
+										]}
 									>
 										<View style={styles.rowView}>
 											<FontIcon
 												name="close"
 												size={25}
 												color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+												style={styles.iconStyle}
 											/>
 											<Text style={styles.touchText}>모임에서 나가기</Text>
 											<View style={styles.iconView}>
@@ -260,6 +278,7 @@ export function ModalSetting({
 													name="angle-right"
 													size={19}
 													color={Colors.black}
+													style={styles.rightIconStyle}
 												/>
 											</View>
 										</View>
@@ -274,8 +293,8 @@ export function ModalSetting({
 							<View style={styles.blankView} />
 							<Text
 								style={[
-									styles.touchText,
-									{ color: Colors.red500, marginLeft: '3%' },
+									styles.titleText,
+									{ color: Colors.red500, fontSize: 13, marginTop: 0 },
 								]}
 							>
 								주의 사항 : 팀원 전체의 모임 색이 변경되게 됩니다
@@ -309,7 +328,7 @@ export function ModalSetting({
 					{mode === 'snapShot' && (
 						<>
 							<View style={styles.blankView} />
-							<Text style={styles.titleText}>저장 시간 불러오기</Text>
+							<Text style={[styles.titleText]}>저장 시간 불러오기</Text>
 
 							<View style={styles.blankView} />
 							<View style={[styles.backgroundView]}>
@@ -322,7 +341,12 @@ export function ModalSetting({
 											style={styles.touchButtonStyle}
 										>
 											<View style={styles.rowView}>
-												<Font5Icon name="ban" size={23} color={Colors.red500} />
+												<Font5Icon
+													name="ban"
+													size={23}
+													color={Colors.red500}
+													style={styles.iconStyle}
+												/>
 												<Text style={styles.touchText}>
 													저장된 시간이 없습니다
 												</Text>
@@ -357,23 +381,37 @@ export function ModalSetting({
 									)}
 								</View>
 							</View>
+							<View style={styles.blankView} />
 							<Button
 								buttonNumber={1}
 								buttonText={'이전'}
 								onPressWithParam={() => setMode('initial')}
 								pressParam="initial"
 							/>
+							<View style={styles.blankView} />
 						</>
 					)}
-					{mode === 'loading' ||
-						mode === 'loadingSave' ||
-						(mode === 'loadingLeave' && (
-							<>
-								<View style={styles.blankView} />
-								<ActivityIndicator size={'large'} color={color} />
-								<View style={styles.blankView} />
-							</>
-						))}
+					{mode === 'loading' && (
+						<>
+							<View style={styles.blankView} />
+							<ActivityIndicator size={'large'} color={color} />
+							<View style={styles.blankView} />
+						</>
+					)}
+					{mode === 'loadingSave' && (
+						<>
+							<View style={styles.blankView} />
+							<ActivityIndicator size={'large'} color={color} />
+							<View style={styles.blankView} />
+						</>
+					)}
+					{mode === 'loadingLeave' && (
+						<>
+							<View style={styles.blankView} />
+							<ActivityIndicator size={'large'} color={color} />
+							<View style={styles.blankView} />
+						</>
+					)}
 					{mode === 'success' && (
 						<>
 							<View style={styles.blankView} />
@@ -390,11 +428,13 @@ export function ModalSetting({
 							</View>
 							<View style={styles.blankView} />
 							<View style={styles.buttonOverLine} />
+							<View style={styles.blankView} />
 							<Button
 								buttonNumber={1}
 								buttonText="확인"
 								onPressFunction={onFinishChangeColor}
 							/>
+							<View style={styles.blankView} />
 						</>
 					)}
 					{mode === 'successLeave' && (
@@ -437,18 +477,15 @@ const styles = StyleSheet.create({
 	rowView: {
 		flexDirection: 'row',
 		alignItems: 'center',
-
 		justifyContent: 'flex-start',
-		width: screen.width * 0.53,
+		width: screen.width * 0.65,
+		height: screen.height * 0.05,
+		borderRadius: 13,
 	},
 	columnView: {
 		flexDirection: 'column',
-
-		borderRadius: 13,
+		// borderRadius: 13,
 		alignContent: 'center',
-		margin: 30,
-		marginBottom: 20,
-		marginTop: 20,
 	},
 	backgroundView: {
 		borderRadius: 13,
@@ -488,31 +525,35 @@ const styles = StyleSheet.create({
 	},
 	titleText: {
 		fontSize: 20,
-		textAlign: 'left',
-		justifyContent: 'flex-start',
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
 		marginLeft: '8%',
+		marginTop: 15,
 	},
 	blankView: {
-		height: 10,
+		height: 15,
 	},
 	textView: {
 		width: '100%',
 	},
 	touchButtonStyle: {
 		padding: 5,
-		borderRadius: 10,
-		// alignItems: 'center',
-		// alignContent: 'center',
-		// alignSelf: 'center',
+		borderRadius: 13,
 		justifyContent: 'center',
+		paddingLeft: 5,
+		paddingRight: 5,
 	},
 	buttonOverLine: {
 		borderWidth: 0.4,
 		width: screen.width * 0.9,
 		marginTop: 20,
 		borderColor: Colors.black,
+	},
+	iconStyle: {
+		marginLeft: 10,
+	},
+	rightIconStyle: {
+		marginRight: 10,
 	},
 });
