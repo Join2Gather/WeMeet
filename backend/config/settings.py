@@ -27,9 +27,6 @@ DEBUG = get_secret("DEBUG") if get_secret("DEBUG") else False
 
 ALLOWED_HOSTS = ['*']
 
-SWAGGER_SETTINGS = {
-    'USE_SESSION_AUTH': False
-}
 # Application definition
 
 NOSE_ARGS = ['--nocapture',
