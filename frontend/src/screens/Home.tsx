@@ -97,6 +97,10 @@ export default function Home() {
 		setMode('startMode');
 	}, []);
 
+	useEffect(() => {
+		!userMeSuccess && setSettingModalVisible(true);
+	}, [userMeSuccess]);
+
 	// modal
 
 	// useEffect(() => {
@@ -239,6 +243,7 @@ export default function Home() {
 						setSelectModalVisible={setSelectModalVisible}
 					/>
 					<HomeSetting
+						userMeSuccess={userMeSuccess}
 						setSettingModalVisible={setSettingModalVisible}
 						settingModalVisible={settingModalVisible}
 						user={user}
