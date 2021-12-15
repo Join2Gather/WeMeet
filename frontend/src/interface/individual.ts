@@ -19,6 +19,11 @@ export interface individual {
 		minute: number;
 	};
 	inTimeMode: string;
+	dayString: string;
+	dayIdx: number;
+	isHomeTimePicked: boolean;
+	postHomePrepare: boolean;
+	postHomeSuccess: boolean;
 }
 
 export interface postImageAPI {

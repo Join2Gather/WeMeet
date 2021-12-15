@@ -207,36 +207,45 @@ export function ModalInput({
 							</>
 
 							{!loadingJoin && mode === 'makeError' && (
-								<View style={styles.errorView}>
-									<Material
-										name={'error-outline'}
-										size={23}
-										style={{ alignSelf: 'center' }}
-										color={Colors.red300}
-									/>
-									<Text style={styles.errorText}> 서버 오류</Text>
+								<>
+									<View style={styles.errorView}>
+										<Material
+											name={'error-outline'}
+											size={23}
+											style={{ alignSelf: 'center' }}
+											color={Colors.red300}
+										/>
+										<Text style={styles.errorText}> 서버 오류</Text>
+									</View>
 									<Button
 										buttonNumber={1}
 										buttonText="확인"
 										onPressFunction={onCloseError}
 									/>
-								</View>
+								</>
 							)}
 							{!loadingJoin && mode === 'joinError' && (
-								<View style={styles.errorView}>
-									<Material
-										name={'error-outline'}
-										size={23}
-										style={{ alignSelf: 'center' }}
-										color={Colors.red300}
-									/>
-									<Text style={styles.errorText}> 잘못된 공유 코드 입니다</Text>
+								<>
+									<View style={styles.errorView}>
+										<Material
+											name={'error-outline'}
+											size={23}
+											style={{ alignSelf: 'center' }}
+											color={Colors.red300}
+										/>
+										<Text style={styles.errorText}>
+											{' '}
+											잘못된 공유 코드 입니다
+										</Text>
+									</View>
+									<View style={styles.blankView} />
 									<Button
 										buttonNumber={1}
 										buttonText="확인"
 										onPressFunction={onCloseError}
 									/>
-								</View>
+									<View style={styles.blankView} />
+								</>
 							)}
 							{mode === 'initial' && modalMode === 'join' && (
 								<>
@@ -276,13 +285,14 @@ export function ModalInput({
 											autoFocus={true}
 										/>
 									</View>
-
+									<View style={styles.blankView} />
 									<Button
 										buttonNumber={1}
 										buttonText={'확인'}
 										onPressWithParam={() => onPressNext('time')}
 										pressParam="time"
 									/>
+									<View style={styles.blankView} />
 								</>
 							)}
 						</View>

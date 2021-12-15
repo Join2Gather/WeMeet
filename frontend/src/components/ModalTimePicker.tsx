@@ -4,10 +4,8 @@ import { StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import {
 	changeConfirmTime,
-	postSnapShot,
 	makeConfirmDates,
 	makePostIndividualDates,
-	postConfirm,
 	postIndividualTime,
 	setEndHour,
 	setEndMin,
@@ -15,15 +13,18 @@ import {
 	setStartHour,
 	checkIsExist,
 	checkIsBlank,
-	toggleTimePick,
 	makeInitialTimePicked,
 } from '../store/timetable';
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
 import { getUserMe } from '../store/login';
-import {
+import individual, {
+	checkHomeIstBlank,
 	cloneINDates,
 	initialIndividualTimetable,
+	initialTimeMode,
+	makePostHomeDates,
+	postEveryTime,
 	setInEndTime,
 	setInStartTime,
 } from '../store/individual';
@@ -61,13 +62,11 @@ export function ModalTimePicker({
 	setIsTimeMode,
 	setCurrent,
 	postDatesPrepare,
-	confirmDatesPrepare,
 	token,
 	uri,
 	user,
 	id,
 	postIndividualDates,
-	confirmDates,
 	isConfirm,
 	date,
 	setDate,
@@ -81,12 +80,20 @@ export function ModalTimePicker({
 		confirmDatesTimetable,
 		isTimePicked,
 		isTimeNoExist,
-	} = useSelector(({ timetable, login, team }: RootState) => ({
+		isHomeTimePicked,
+		postHomePrepare,
+		everyTime,
+		postHomeSuccess,
+	} = useSelector(({ timetable, login, individual }: RootState) => ({
 		postConfirmSuccess: timetable.postConfirmSuccess,
 		confirmClubs: login.confirmClubs,
 		confirmDatesTimetable: login.confirmDatesTimetable,
 		isTimeNoExist: timetable.isTimeNotExist,
 		isTimePicked: timetable.isTimePicked,
+		isHomeTimePicked: individual.isHomeTimePicked,
+		postHomePrepare: individual.postHomePrepare,
+		everyTime: individual.everyTime,
+		postHomeSuccess: individual.postHomeSuccess,
 	}));
 	const dispatch = useDispatch();
 	// const [minute, setMinute] = useState(0);
@@ -99,54 +106,37 @@ export function ModalTimePicker({
 	}, [modalVisible]);
 	useEffect(() => {
 		if (mode === 'loading') {
-			if (!isConfirm && !isTimePicked) {
-				dispatch(makePostIndividualDates());
-			} else if (isConfirm && !isTimeNoExist) {
-				dispatch(makeConfirmDates());
+			//
+			if (isHomeTime && !isHomeTimePicked) {
+				dispatch(makePostHomeDates());
+			} else {
+				if (!isConfirm && !isTimePicked) {
+					dispatch(makePostIndividualDates());
+				} else if (isConfirm && !isTimeNoExist) {
+					dispatch(makeConfirmDates());
+				}
 			}
-			if (isTimeNoExist || isTimePicked) {
+			if (isTimeNoExist || isTimePicked || isHomeTimePicked) {
 				setCurrent && setCurrent(0);
 			}
 			setTimeout(() => {
 				setMode && setMode('normal');
 			}, 500);
 		}
-	}, [mode, isConfirm, isTimeNoExist, isTimePicked]);
-	const onPressEndConfirm = useCallback(
-		(date) => {
-			setSecond(false);
-			setModalVisible && setModalVisible(false);
-			setIsTimeMode && setIsTimeMode(false);
-			setCurrent && setCurrent(0);
-			const timeHour = date.getHours();
-			const timeMinute = date.getMinutes();
-			if (isHomeTime) {
-				dispatch(setInEndTime({ hour: timeHour, min: timeMinute }));
-			} else {
-				dispatch(setEndHour(timeHour));
-				dispatch(setEndMin(timeMinute));
-			}
-			if (isConfirm) {
-				dispatch(checkIsExist('end'));
-				dispatch(changeConfirmTime());
-				setCurrent && setCurrent(3);
-				setMode && setMode('loading');
-			} else {
-				dispatch(checkIsBlank('end'));
-				setMode && setMode('loading');
-			}
-		},
-		[isConfirm, isHomeTime]
-	);
-
+	}, [
+		mode,
+		isConfirm,
+		isTimeNoExist,
+		isTimePicked,
+		isHomeTime,
+		isHomeTimePicked,
+	]);
 	const onPressConfirm = useCallback(
 		(date) => {
 			dispatch(makeInitialTimePicked());
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
 			setCurrent && setCurrent(2);
-			// setHour(date.getHours());
-			// setMinute(date.getMinutes());
 			setModalVisible && setModalVisible(false);
 			if (isHomeTime) {
 				dispatch(setInStartTime({ hour: timeHour, min: timeMinute }));
@@ -161,6 +151,35 @@ export function ModalTimePicker({
 		},
 		[mode, isConfirm, date, modalVisible, isHomeTime]
 	);
+	const onPressEndConfirm = useCallback(
+		(date) => {
+			setSecond(false);
+			setModalVisible && setModalVisible(false);
+			setIsTimeMode && setIsTimeMode(false);
+			setCurrent && setCurrent(0);
+			const timeHour = date.getHours();
+			const timeMinute = date.getMinutes();
+			if (isHomeTime) {
+				dispatch(setInEndTime({ hour: timeHour, min: timeMinute }));
+			} else {
+				dispatch(setEndHour(timeHour));
+				dispatch(setEndMin(timeMinute));
+			}
+			if (isHomeTime) {
+				dispatch(checkHomeIstBlank());
+			} else {
+				if (isConfirm) {
+					dispatch(checkIsExist('end'));
+					dispatch(changeConfirmTime());
+					setCurrent && setCurrent(3);
+				} else {
+					dispatch(checkIsBlank('end'));
+				}
+			}
+			setMode && setMode('loading');
+		},
+		[isConfirm, isHomeTime]
+	);
 
 	// 닫기 버튼
 	const onPressClose = useCallback(() => {
@@ -170,12 +189,15 @@ export function ModalTimePicker({
 		setIsTimeMode && setIsTimeMode(false);
 		setCurrent && setCurrent(0);
 		setMode && setMode('normal');
+		isHomeTime && dispatch(initialTimeMode());
 	}, [setModalVisible, modalVisible]);
-	// 이전 모드
-	const onPressPrevMode = useCallback(() => {
-		setMode && setMode('startMinute');
-		// setModalVisible(false);
-	}, []);
+
+	// 에브리 타임 시간 전송
+	useEffect(() => {
+		if (postHomePrepare) {
+			dispatch(postEveryTime({ data: everyTime, id, token, user }));
+		}
+	}, [postHomePrepare, everyTime]);
 	// 개인 시간 전송
 	useEffect(() => {
 		if (postDatesPrepare && uri) {
@@ -200,23 +222,13 @@ export function ModalTimePicker({
 					})
 				);
 		}
-	}, [
-		postDatesPrepare,
-		uri,
-		postIndividualDates,
-		id,
-		token,
-		user,
-		confirmDates,
-		joinUri,
-		timeMode,
-	]);
+	}, [postDatesPrepare, uri, joinUri]);
 	useEffect(() => {
-		if (postConfirmSuccess) {
+		if (postConfirmSuccess || postHomeSuccess) {
 			dispatch(getUserMe({ id, user, token }));
 			dispatch(initialIndividualTimetable());
 		}
-	}, [postConfirmSuccess]);
+	}, [postConfirmSuccess, postHomeSuccess]);
 	useEffect(() => {
 		dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
 	}, [confirmClubs, confirmDatesTimetable]);
