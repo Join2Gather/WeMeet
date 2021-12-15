@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import { Button } from '../lib/util/Button';
+import Material from 'react-native-vector-icons/MaterialIcons';
 import {
 	changeNickname,
 	changeTeamColor,
@@ -37,6 +38,7 @@ interface props {
 	myNickName: string;
 	joinClubNum: number;
 	confirmClubNum: number;
+	userMeSuccess: boolean;
 }
 
 export function HomeSetting({
@@ -49,6 +51,7 @@ export function HomeSetting({
 	myNickName,
 	joinClubNum,
 	confirmClubNum,
+	userMeSuccess,
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
@@ -60,7 +63,9 @@ export function HomeSetting({
 		g: 0,
 		b: 0,
 	});
-
+	useEffect(() => {
+		!userMeSuccess && setMode('error');
+	}, [userMeSuccess]);
 	useEffect(() => {
 		if (mode === 'loading') {
 			setTimeout(() => {
@@ -359,6 +364,28 @@ export function HomeSetting({
 							/>
 						</>
 					)}
+					{mode === 'error' && (
+						<>
+							<View style={styles.errorView}>
+								<Material
+									name={'error-outline'}
+									size={23}
+									style={{ alignSelf: 'center' }}
+									color={Colors.red300}
+								/>
+								<Text style={styles.errorText}> 서버 오류</Text>
+							</View>
+							<View style={styles.blankView} />
+							<Button
+								buttonNumber={1}
+								buttonText="확인"
+								onPressFunction={() => {
+									setSettingModalVisible(false);
+								}}
+							/>
+							<View style={styles.blankView} />
+						</>
+					)}
 				</View>
 			</View>
 		</Modal>
@@ -461,5 +488,17 @@ const styles = StyleSheet.create({
 	},
 	rightIconStyle: {
 		marginRight: 10,
+	},
+	errorView: {
+		flexDirection: 'row',
+		marginTop: 15,
+		justifyContent: 'center',
+		alignContent: 'center',
+	},
+	errorText: {
+		textAlign: 'center',
+		fontFamily: 'NanumSquareR',
+		fontSize: 15,
+		alignSelf: 'center',
 	},
 });
