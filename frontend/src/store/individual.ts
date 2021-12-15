@@ -13,6 +13,7 @@ import type {
 import { Colors } from 'react-native-paper';
 import { useMakeTimeTableWith60 } from '../hooks';
 import { makeHomeTimetable } from '../lib/util';
+import { Alert } from 'react-native';
 
 const POST_IMAGE = 'individual/POST_IMAGE';
 const LOGIN_EVERYTIME = 'individual/LOGIN_EVERYTIME';
@@ -55,6 +56,20 @@ const initialState: individual = {
 	confirmDatesTimetable: [],
 	confirmClubs: [],
 	individualTimesText: timesText,
+	startTime: {
+		hour: 0,
+		minute: 0,
+	},
+	endTime: {
+		hour: 0,
+		minute: 0,
+	},
+	inTimeMode: '',
+	dayIdx: 0,
+	dayString: '',
+	isHomeTimePicked: false,
+	postHomePrepare: false,
+	postHomeSuccess: false,
 };
 
 export const individualSlice = createSlice({
@@ -72,6 +87,7 @@ export const individualSlice = createSlice({
 				confirmClubs: Array<string>;
 			}>
 		) => {
+			// state.individualDates = defaultDatesWith60;
 			state.confirmClubs = action.payload.confirmClubs;
 			state.confirmDatesTimetable = action.payload.confirmDatesTimetable;
 			state.confirmDatesTimetable?.length &&
@@ -88,7 +104,7 @@ export const individualSlice = createSlice({
 											: Colors.grey400;
 										state.individualDates[idx].times[i][j].isEveryTime = false;
 										state.individualDates[idx].times[i][j].isPicked = true;
-										state.individualDates[idx].times[i][j].mode = 'start';
+										state.individualDates[idx].times[i][j].mode = 'team';
 										state.individualDates[idx].times[i][j].borderBottom = false;
 										state.individualDates[idx].times[i][j].borderTop = false;
 									}
@@ -99,7 +115,7 @@ export const individualSlice = createSlice({
 											: Colors.grey400;
 										state.individualDates[idx].times[i][j].isEveryTime = false;
 										state.individualDates[idx].times[i][j].isPicked = true;
-										state.individualDates[idx].times[i][j].mode = 'start';
+										state.individualDates[idx].times[i][j].mode = 'team';
 										state.individualDates[idx].times[i][j].borderBottom = false;
 										state.individualDates[idx].times[i][j].borderTop = false;
 									}
@@ -110,6 +126,7 @@ export const individualSlice = createSlice({
 											: Colors.grey400;
 										state.individualDates[idx].times[i][j].isEveryTime = false;
 										state.individualDates[idx].times[i][j].isPicked = true;
+										state.individualDates[idx].times[i][j].mode = 'team';
 										state.individualDates[idx].times[i][j].borderBottom = false;
 										state.individualDates[idx].times[i][j].borderTop = false;
 									}
@@ -122,6 +139,7 @@ export const individualSlice = createSlice({
 		initialIndividualTimetable: (state) => {
 			state.individualDates = defaultDatesWith60;
 			makeHomeTimetable(state);
+			state.postHomeSuccess = false;
 		},
 		kakaoLogin: (state, action: PayloadAction<any>) => {
 			if (state.cloneDateSuccess) {
@@ -181,9 +199,101 @@ export const individualSlice = createSlice({
 		},
 		POST_EVERYTIME_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.loginSuccess = false;
+			state.postHomePrepare = false;
+			state.postHomeSuccess = true;
 		},
 		POST_EVERYTIME_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
+			state.postHomeSuccess = false;
+		},
+		setInStartTime: (
+			state,
+			action: PayloadAction<{ hour: number; min: number }>
+		) => {
+			const { hour, min } = action.payload;
+
+			state.startTime.hour = hour;
+			state.startTime.minute = min;
+		},
+		setInEndTime: (
+			state,
+			action: PayloadAction<{ hour: number; min: number }>
+		) => {
+			const { hour, min } = action.payload;
+			state.endTime.hour = hour;
+			state.endTime.minute = min;
+		},
+		initialTimeMode: (state) => {
+			state.inTimeMode = '';
+		},
+		checkInMode: (
+			state,
+			action: PayloadAction<{ time: number; idx: number; day: string }>
+		) => {
+			const { time, idx, day } = action.payload;
+			state.dayString = day;
+			state.inTimeMode = '';
+			state.dayIdx = idx;
+			let modeSelect = [
+				{
+					count: 0,
+					content: 'normal',
+				},
+				{
+					count: 0,
+					content: 'team',
+				},
+				{
+					count: 0,
+					content: 'home',
+				},
+			];
+			state.individualDates[idx].times[time].forEach((t) => {
+				modeSelect.forEach((mode) => {
+					mode.content === t.mode && mode.count++;
+				});
+			});
+			modeSelect.sort((a, b) => b.count - a.count);
+
+			// modeSelect.forEach((mode) => {
+			// 	if (mode.count) {
+			// 		state.inTimeMode += mode.content;
+			// 	}
+			// });
+			state.inTimeMode = modeSelect[0].content;
+			console.log(state.inTimeMode);
+		},
+		makePostHomeDates: (state) => {
+			const data = {
+				starting_hours: state.startTime.hour,
+				starting_minutes: state.startTime.minute,
+				end_hours: state.endTime.hour,
+				end_minutes: state.endTime.minute,
+			};
+			state.everyTime[state.dayString] = [
+				...state.everyTime[state.dayString],
+				data,
+			];
+			state.postHomePrepare = true;
+		},
+		checkHomeIstBlank: (state) => {
+			let isNonColor = 0;
+			const dayIdx = state.dayIdx;
+			const endHour = state.endTime.hour;
+			state.isHomeTimePicked = false;
+			state.individualDates[dayIdx].times[endHour].forEach((t) => {
+				t.mode !== 'normal' && isNonColor++;
+			});
+
+			if (isNonColor !== 0) {
+				Alert.alert('알림', '이미 지정된 시간 입니다', [
+					{
+						text: '확인',
+						onPress: () => {},
+					},
+				]);
+				state.isHomeTimePicked = true;
+			}
 		},
 	},
 	extraReducers: {},
@@ -195,6 +305,12 @@ export const {
 	kakaoLogin,
 	cloneINDates,
 	initialIndividualTimetable,
+	setInEndTime,
+	setInStartTime,
+	checkInMode,
+	makePostHomeDates,
+	initialTimeMode,
+	checkHomeIstBlank,
 } = individualSlice.actions;
 
 export default individualSlice.reducer;

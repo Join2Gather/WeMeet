@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import { Button } from '../lib/util/Button';
+import Material from 'react-native-vector-icons/MaterialIcons';
 import {
 	changeNickname,
 	changeTeamColor,
@@ -34,6 +35,10 @@ interface props {
 	id: number;
 	token: string;
 	color: string;
+	myNickName: string;
+	joinClubNum: number;
+	confirmClubNum: number;
+	userMeSuccess: boolean;
 }
 
 export function HomeSetting({
@@ -43,6 +48,10 @@ export function HomeSetting({
 	id,
 	token,
 	color,
+	myNickName,
+	joinClubNum,
+	confirmClubNum,
+	userMeSuccess,
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
@@ -54,8 +63,9 @@ export function HomeSetting({
 		g: 0,
 		b: 0,
 	});
-	const navigation = useNavigation();
-
+	useEffect(() => {
+		!userMeSuccess && setMode('error');
+	}, [userMeSuccess]);
 	useEffect(() => {
 		if (mode === 'loading') {
 			setTimeout(() => {
@@ -129,58 +139,135 @@ export function HomeSetting({
 					</View>
 					{mode === 'initial' && (
 						<>
-							<View style={styles.blankView} />
-							<Text style={styles.titleText}>계정 설정</Text>
-							<View style={styles.blankView} />
-							<View style={[styles.backgroundView]}>
-								<View style={styles.columnView}>
-									<TouchableHighlight
-										activeOpacity={1}
-										underlayColor={Colors.grey300}
-										onPress={() => setMode('nickname')}
-										style={styles.touchButtonStyle}
-									>
-										<View style={styles.rowView}>
-											<Font5Icon
-												name="user-edit"
-												size={21}
-												color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
-											/>
-											<Text style={styles.touchText}> 닉네임 변경</Text>
-											<View style={styles.iconView}>
+							<>
+								<Text style={styles.titleText}>계정 정보</Text>
+								<View style={styles.blankView} />
+								<View style={[styles.backgroundView]}>
+									<View style={styles.columnView}>
+										<TouchableHighlight
+											activeOpacity={1}
+											underlayColor={Colors.grey300}
+											style={styles.touchButtonStyle}
+										>
+											<View style={styles.rowView}>
 												<Font5Icon
-													name="angle-right"
-													size={19}
-													color={Colors.black}
+													name="user-alt"
+													size={21}
+													color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+													style={styles.iconStyle}
 												/>
+												<Text style={styles.touchText}>
+													{' '}
+													닉네임 : {myNickName}
+												</Text>
 											</View>
-										</View>
-									</TouchableHighlight>
-									<View style={styles.blankView} />
-									<TouchableHighlight
-										activeOpacity={1}
-										underlayColor={Colors.grey300}
-										style={styles.touchButtonStyle}
-										onPress={() => setMode('color')}
-									>
-										<View style={styles.rowView}>
-											<Font5Icon
-												name="palette"
-												size={21}
-												color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
-											/>
-											<Text style={styles.touchText}> 테마 색상 변경</Text>
-											<View style={styles.iconView}>
+										</TouchableHighlight>
+
+										<TouchableHighlight
+											activeOpacity={1}
+											style={styles.touchButtonStyle}
+										>
+											<View style={styles.rowView}>
 												<Font5Icon
-													name="angle-right"
-													size={19}
-													color={Colors.black}
+													name="th-list"
+													size={21}
+													color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+													style={styles.iconStyle}
 												/>
+												<Text style={styles.touchText}>
+													{' '}
+													참여중인 모임 수 : {joinClubNum}
+												</Text>
 											</View>
-										</View>
-									</TouchableHighlight>
+										</TouchableHighlight>
+
+										<TouchableHighlight
+											activeOpacity={1}
+											style={styles.touchButtonStyle}
+										>
+											<View style={styles.rowView}>
+												<Font5Icon
+													name="check-square"
+													size={21}
+													color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+													style={styles.iconStyle}
+												/>
+												<Text style={styles.touchText}>
+													{' '}
+													확정 모임 수 : {confirmClubNum}
+												</Text>
+											</View>
+										</TouchableHighlight>
+									</View>
 								</View>
-							</View>
+							</>
+							<>
+								<Text style={styles.titleText}>계정 설정</Text>
+								<View style={styles.blankView} />
+								<View style={[styles.backgroundView]}>
+									<View style={styles.columnView}>
+										<TouchableHighlight
+											activeOpacity={1}
+											underlayColor={Colors.grey300}
+											onPress={() => setMode('nickname')}
+											style={[
+												styles.touchButtonStyle,
+												{
+													borderBottomLeftRadius: 0,
+													borderBottomRightRadius: 0,
+												},
+											]}
+										>
+											<View style={styles.rowView}>
+												<Font5Icon
+													name="user-edit"
+													size={21}
+													color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+													style={styles.iconStyle}
+												/>
+												<Text style={styles.touchText}> 닉네임 변경</Text>
+												<View style={styles.iconView}>
+													<Font5Icon
+														name="angle-right"
+														size={19}
+														color={Colors.black}
+														style={styles.rightIconStyle}
+													/>
+												</View>
+											</View>
+										</TouchableHighlight>
+
+										<TouchableHighlight
+											activeOpacity={1}
+											underlayColor={Colors.grey300}
+											style={[
+												styles.touchButtonStyle,
+												{ borderTopLeftRadius: 0, borderTopRightRadius: 0 },
+											]}
+											onPress={() => setMode('color')}
+										>
+											<View style={styles.rowView}>
+												<Font5Icon
+													name="palette"
+													size={21}
+													color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+													style={styles.iconStyle}
+												/>
+												<Text style={styles.touchText}> 테마 색상 변경</Text>
+												<View style={styles.iconView}>
+													<Font5Icon
+														name="angle-right"
+														size={19}
+														color={Colors.black}
+														style={styles.rightIconStyle}
+													/>
+												</View>
+											</View>
+										</TouchableHighlight>
+									</View>
+								</View>
+								<View style={styles.blankView} />
+							</>
 						</>
 					)}
 					{mode === 'color' && (
@@ -277,6 +364,28 @@ export function HomeSetting({
 							/>
 						</>
 					)}
+					{mode === 'error' && (
+						<>
+							<View style={styles.errorView}>
+								<Material
+									name={'error-outline'}
+									size={23}
+									style={{ alignSelf: 'center' }}
+									color={Colors.red300}
+								/>
+								<Text style={styles.errorText}> 서버 오류</Text>
+							</View>
+							<View style={styles.blankView} />
+							<Button
+								buttonNumber={1}
+								buttonText="확인"
+								onPressFunction={() => {
+									setSettingModalVisible(false);
+								}}
+							/>
+							<View style={styles.blankView} />
+						</>
+					)}
 				</View>
 			</View>
 		</Modal>
@@ -294,16 +403,13 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'flex-start',
-		width: screen.width * 0.53,
+		width: screen.width * 0.65,
+		height: screen.height * 0.05,
+		borderRadius: 13,
 	},
 	columnView: {
 		flexDirection: 'column',
-
-		borderRadius: 13,
 		alignContent: 'center',
-		margin: 30,
-		marginBottom: 20,
-		marginTop: 20,
 	},
 	backgroundView: {
 		borderRadius: 13,
@@ -333,7 +439,8 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
-		marginLeft: 10,
+		position: 'absolute',
+		left: '16%',
 		justifyContent: 'center',
 		textAlignVertical: 'center',
 	},
@@ -346,15 +453,17 @@ const styles = StyleSheet.create({
 		marginTop: 15,
 	},
 	blankView: {
-		height: 10,
+		height: 15,
 	},
 	textView: {
 		width: '100%',
 	},
 	touchButtonStyle: {
 		padding: 5,
-		borderRadius: 10,
+		borderRadius: 13,
 		justifyContent: 'center',
+		paddingLeft: 5,
+		paddingRight: 5,
 	},
 	buttonOverLine: {
 		borderWidth: 0.4,
@@ -373,5 +482,23 @@ const styles = StyleSheet.create({
 	textInput: {
 		fontSize: 18,
 		fontFamily: 'NanumSquareR',
+	},
+	iconStyle: {
+		marginLeft: 10,
+	},
+	rightIconStyle: {
+		marginRight: 10,
+	},
+	errorView: {
+		flexDirection: 'row',
+		marginTop: 15,
+		justifyContent: 'center',
+		alignContent: 'center',
+	},
+	errorText: {
+		textAlign: 'center',
+		fontFamily: 'NanumSquareR',
+		fontSize: 15,
+		alignSelf: 'center',
 	},
 });

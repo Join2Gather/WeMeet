@@ -24,6 +24,8 @@ export interface Login {
 	findIndividual: findTime[];
 	inDates: inDates;
 	weekIndex: string[];
+	joinClubNum: number;
+	confirmClubNum: number;
 }
 
 export interface kakaoLoginAPI {

@@ -385,8 +385,11 @@ export const timetableSlice = createSlice({
 				state.isTimeNotExist = true;
 			}
 		},
-		checkMode: (state, action: PayloadAction<number>) => {
-			const time = action.payload;
+		checkMode: (
+			state,
+			action: PayloadAction<{ time: number; mode: string }>
+		) => {
+			const { time, mode } = action.payload;
 			state.selectTimeMode = '';
 			let modeSelect = [
 				{
@@ -401,17 +404,33 @@ export const timetableSlice = createSlice({
 					count: 0,
 					content: 'everyTime',
 				},
+				{
+					count: 0,
+					content: 'normal',
+				},
+				{
+					count: 0,
+					content: 'team',
+				},
 			];
-			state.dates[state.dayIdx].times[time].forEach((t) => {
-				modeSelect.forEach((mode) => mode.content === t.mode && mode.count++);
-			});
-			console.log(modeSelect);
+			if (mode === 'group') {
+				state.teamDatesWith60[state.dayIdx].times[time].forEach((t) => {
+					modeSelect.forEach((mode) => mode.content === t.mode && mode.count++);
+				});
+			} else {
+				state.dates[state.dayIdx].times[time].forEach((t) => {
+					modeSelect.forEach((mode) => mode.content === t.mode && mode.count++);
+				});
+			}
+
 			modeSelect.sort((a, b) => b.count - a.count);
+			console.log(modeSelect);
 			modeSelect.forEach((mode) => {
 				if (mode.count) {
 					state.selectTimeMode += mode.content;
 				}
 			});
+			console.log(state.selectTimeMode);
 		},
 		changeDayIdx: (state, action: PayloadAction<any>) => {
 			state.dayIdx = action.payload;
@@ -585,9 +604,8 @@ export const timetableSlice = createSlice({
 					end_hours: state.endTime,
 					end_minutes: state.endMinute,
 				};
-				console.log('인덱스', state.weekIndex, state.dayIdx);
+
 				state.confirmDates[state.weekIndex[state.dayIdx]].push(data);
-				console.log('데이터', state.confirmDates);
 			}
 		},
 		makeConfirmPrepare: (state) => {
@@ -665,6 +683,7 @@ export const timetableSlice = createSlice({
 		setTimeModalMode: (state, action: PayloadAction<boolean>) => {
 			state.modalMode = action.payload;
 		},
+		// checkTimeMode(state, action:PayloadAction<)
 	},
 	extraReducers: {},
 });

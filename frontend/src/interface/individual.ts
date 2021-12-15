@@ -10,6 +10,20 @@ export interface individual {
 	confirmDatesTimetable: confirmDatesType[];
 	confirmClubs: Array<string>;
 	individualTimesText: Array<string>;
+	startTime: {
+		hour: number;
+		minute: number;
+	};
+	endTime: {
+		hour: number;
+		minute: number;
+	};
+	inTimeMode: string;
+	dayString: string;
+	dayIdx: number;
+	isHomeTimePicked: boolean;
+	postHomePrepare: boolean;
+	postHomeSuccess: boolean;
 }
 
 export interface postImageAPI {

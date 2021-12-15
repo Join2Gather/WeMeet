@@ -30,6 +30,7 @@ import { getUserMe } from '../store/login';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import { HomeSetting } from '../components/HomeSetting';
+import { Sequence } from '../components/Sequence';
 export default function Home() {
 	const {
 		token,
@@ -43,6 +44,9 @@ export default function Home() {
 		confirmDatesTimetable,
 		individualTimesText,
 		individualColor,
+		myNickName,
+		joinClubNum,
+		confirmClubNum,
 	} = useSelector(({ login, individual, loading }: RootState) => ({
 		token: login.token,
 		id: login.id,
@@ -55,6 +59,9 @@ export default function Home() {
 		confirmDatesTimetable: login.confirmDatesTimetable,
 		individualTimesText: individual.individualTimesText,
 		individualColor: login.individualColor,
+		myNickName: login.nickname,
+		joinClubNum: login.joinClubNum,
+		confirmClubNum: login.confirmClubNum,
 	}));
 	const dispatch = useDispatch();
 	const { defaultDates } = useMakeTimetable();
@@ -81,10 +88,18 @@ export default function Home() {
 
 	// image pic1er
 	const [image, setImage] = useState(null);
-	const [mode, setMode] = useState('0');
+	const [mode, setMode] = useState('normal');
+	const [isTimeMode, setIsTimeMode] = useState(false);
+	const [currentNumber, setCurrent] = useState(0);
+	const [sequence, setSequence] = useState([0, 1, 2]);
 	const onPressPlus = useCallback(() => {
-		setMode('1');
+		setIsTimeMode(true);
+		setMode('startMode');
 	}, []);
+
+	useEffect(() => {
+		!userMeSuccess && setSettingModalVisible(true);
+	}, [userMeSuccess]);
 
 	// modal
 
@@ -151,36 +166,62 @@ export default function Home() {
 				/>
 
 				<View style={styles.viewHeight}>
-					<Text style={styles.titleText}>make your plan</Text>
 					<Spinner loading={postEveryTime} />
-					<View style={styles.rowView}>
-						{mode === '0' && (
-							<>
-								<View
-									style={[styles.boxView, { backgroundColor: individualColor }]}
-								/>
-								<Text style={styles.infoText}>모임 일정</Text>
-								<View
-									style={[styles.boxView, { backgroundColor: Colors.grey300 }]}
-								/>
-								<Text style={styles.infoText}>개인 일정</Text>
-								<View
-									style={[styles.boxView, { backgroundColor: Colors.white }]}
-								/>
-								<Text style={styles.infoText}>비어있는 일정</Text>
-							</>
-						)}
-						{mode === '1' && (
-							<>
-								<Text style={styles.stepText}>1. 시작 시간 터치</Text>
-							</>
-						)}
-						{mode === '3' && (
-							<>
-								<Text style={styles.stepText}>3. 종료 시간 터치</Text>
-							</>
-						)}
-					</View>
+					{mode === 'normal' && (
+						<View style={{ flexDirection: 'column' }}>
+							<Text style={styles.titleText}>make your plan</Text>
+							<View style={styles.rowView}>
+								<>
+									<View
+										style={[
+											styles.boxView,
+											{ backgroundColor: individualColor },
+										]}
+									/>
+									<Text style={styles.infoText}>모임 일정</Text>
+									<View
+										style={[
+											styles.boxView,
+											{ backgroundColor: Colors.grey300 },
+										]}
+									/>
+									<Text style={styles.infoText}>개인 일정</Text>
+									<View
+										style={[styles.boxView, { backgroundColor: Colors.white }]}
+									/>
+									<Text style={styles.infoText}>비어있는 일정</Text>
+								</>
+							</View>
+						</View>
+					)}
+					{isTimeMode && (
+						<View style={{ flexDirection: 'column' }}>
+							<View style={{ height: 30 }} />
+							<Sequence
+								color={individualColor}
+								currentNumber={currentNumber}
+								mode={sequence}
+							/>
+							{mode === 'startMode' && (
+								<>
+									<Text style={styles.stepText}>
+										일정 시작 시간을 터치해주세요
+									</Text>
+								</>
+							)}
+
+							{mode === 'startMinute' && (
+								<>
+									<Text style={styles.stepText}>일정 시작 분 설정</Text>
+								</>
+							)}
+							{mode === 'endMode' && (
+								<>
+									<Text style={styles.stepText}>종료 시간 입력해주세요</Text>
+								</>
+							)}
+						</View>
+					)}
 				</View>
 				<ScrollView style={{ backgroundColor: Colors.white }}>
 					<Timetable
@@ -188,24 +229,30 @@ export default function Home() {
 						setModalVisible={setModalVisible}
 						mode={mode}
 						setMode={setMode}
+						setIsTimeMode={setIsTimeMode}
 						individualDates={individualDates}
 						isGroup={false}
 						individualTimesText={individualTimesText}
 						endIdx={25}
 						color={individualColor}
 						isHomeTime={true}
+						setCurrent={setCurrent}
 					/>
 					<ModalSelect
 						selectModalVisible={selectModalVisible}
 						setSelectModalVisible={setSelectModalVisible}
 					/>
 					<HomeSetting
+						userMeSuccess={userMeSuccess}
 						setSettingModalVisible={setSettingModalVisible}
 						settingModalVisible={settingModalVisible}
 						user={user}
 						id={id}
 						token={token}
 						color={individualColor}
+						myNickName={myNickName}
+						joinClubNum={joinClubNum}
+						confirmClubNum={confirmClubNum}
 					/>
 				</ScrollView>
 			</View>
@@ -235,6 +282,9 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareBold',
 		fontSize: 15,
 		letterSpacing: -1,
+		height: 40,
+		marginTop: 20,
+		textAlign: 'center',
 	},
 	boxView: {
 		width: 20,

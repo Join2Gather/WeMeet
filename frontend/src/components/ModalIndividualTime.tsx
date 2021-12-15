@@ -14,6 +14,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import type { findTime } from '../interface/timetable';
 import { deletePostTime, setTimeModalMode } from '../store/timetable';
+import { Button } from '../lib/util/Button';
+import { initialTimeMode } from '../store/individual';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -21,6 +23,7 @@ interface props {
 	setInModalVisible?: React.Dispatch<React.SetStateAction<boolean>>;
 	color?: string;
 	findIndividual: findTime[];
+	inTimeMode: string;
 }
 
 export function ModalIndividualTime({
@@ -28,9 +31,11 @@ export function ModalIndividualTime({
 	setInModalVisible,
 	color,
 	findIndividual,
+	inTimeMode,
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
+	console.log(inTimeMode);
 	const [RGBColor, setRGBColor] = useState({
 		r: 0,
 		g: 0,
@@ -52,6 +57,7 @@ export function ModalIndividualTime({
 	const onPressCloseBtn = useCallback(() => {
 		setInModalVisible && setInModalVisible(false);
 		dispatch(setTimeModalMode(false));
+		dispatch(initialTimeMode());
 		setMode('initial');
 	}, []);
 
@@ -173,6 +179,18 @@ export function ModalIndividualTime({
 										</View>
 									</View>
 								))}
+							{inTimeMode == 'home' && (
+								<>
+									<View style={styles.blankView} />
+									<View style={styles.rowLine} />
+									<Button
+										buttonNumber={2}
+										buttonText="취소"
+										secondButtonText="삭제"
+										onPressFunction={onPressCloseBtn}
+									/>
+								</>
+							)}
 						</>
 					)}
 				</View>

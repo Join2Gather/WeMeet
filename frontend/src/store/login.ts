@@ -24,7 +24,7 @@ const initialState: Login = {
 	response: '',
 	confirmDatesTimetable: [],
 	confirmClubs: [],
-	userMeSuccess: false,
+	userMeSuccess: true,
 	startHour: 0,
 	endHour: 0,
 	dates: [],
@@ -41,6 +41,8 @@ const initialState: Login = {
 		sat: [],
 	},
 	weekIndex: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
+	joinClubNum: 0,
+	confirmClubNum: 0,
 };
 
 const USER_ME = 'login/USER_ME';
@@ -124,7 +126,9 @@ export const loginSlice = createSlice({
 				fri: [],
 				sat: [],
 			};
-			const { clubs, dates } = action.payload;
+			const { clubs, dates, nickname } = action.payload;
+			state.joinClubNum = clubs.length;
+			state.nickname = nickname;
 			state.confirmDatesTimetable = dates.filter(
 				(da: any) => !da.is_temporary_reserved
 			);
@@ -135,6 +139,10 @@ export const loginSlice = createSlice({
 					day.club.name = decodeURIComponent(day.club.name);
 				}
 			});
+			state.confirmClubNum =
+				state.confirmDatesTimetable.length > 0
+					? state.confirmDatesTimetable.length - 1
+					: 0;
 			state.confirmDatesTimetable.forEach((day: any) => {
 				state.weekIndex.forEach((dayString) => {
 					if (day[dayString].length) {
@@ -164,9 +172,10 @@ export const loginSlice = createSlice({
 		},
 		USER_ME_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
+			state.userMeSuccess = false;
 		},
 		CHANGE_NICKNAME_SUCCESS: (state, action: PayloadAction<any>) => {
-			console.log(action.payload);
+			state.nickname = action.payload.nickname;
 		},
 		CHANGE_NICKNAME_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
