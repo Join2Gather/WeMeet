@@ -24,7 +24,7 @@ const initialState: Login = {
 	response: '',
 	confirmDatesTimetable: [],
 	confirmClubs: [],
-	userMeSuccess: false,
+	userMeSuccess: true,
 	startHour: 0,
 	endHour: 0,
 	dates: [],
@@ -172,6 +172,7 @@ export const loginSlice = createSlice({
 		},
 		USER_ME_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
+			state.userMeSuccess = false;
 		},
 		CHANGE_NICKNAME_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.nickname = action.payload.nickname;
