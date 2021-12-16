@@ -561,9 +561,7 @@ export const timetableSlice = createSlice({
 			const endHour = state.finTime[0].endTime.hour;
 			state.postIndividualDates[state.weekIndex[state.dayIdx]] =
 				state.postIndividualDates[state.weekIndex[state.dayIdx]].filter(
-					(day: any) => {
-						day.starting_hours !== startHour;
-					}
+					(day: any) => day.starting_hours !== startHour
 				);
 			const dayIdx = state.dayIdx;
 
