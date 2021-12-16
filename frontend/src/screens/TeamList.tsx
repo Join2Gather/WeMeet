@@ -225,10 +225,7 @@ export default function TeamList() {
 				)}
 				{/* <Spinner loading={loadingUserMe} /> */}
 				<FlatList
-					style={{
-						height: dimensions.screen.height * 0.6,
-						flexGrow: 0,
-					}}
+					style={styles.FlatView}
 					data={clubs}
 					renderItem={({ item }) => (
 						<View>
@@ -441,5 +438,9 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		bottom: 10,
 		height: 30,
+	},
+	FlatView: {
+		height: screen.height * 0.6,
+		flexGrow: 0,
 	},
 });
