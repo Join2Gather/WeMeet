@@ -24,6 +24,7 @@ export interface individual {
 	isHomeTimePicked: boolean;
 	postHomePrepare: boolean;
 	postHomeSuccess: boolean;
+	setTime: number;
 }
 
 export interface postImageAPI {
