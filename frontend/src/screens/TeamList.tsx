@@ -84,7 +84,7 @@ export default function TeamList() {
 		makeEndHour: team.endHour,
 		individualColor: login.individualColor,
 	}));
-	const [dimensions, setDimensions] = useState({ window, screen });
+
 	const [sequence, setSequence] = useState([0, 1, 2, 3]);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [mode, setMode] = useState('initial');
@@ -225,10 +225,7 @@ export default function TeamList() {
 				)}
 				{/* <Spinner loading={loadingUserMe} /> */}
 				<FlatList
-					style={{
-						height: dimensions.screen.height * 0.6,
-						flexGrow: 0,
-					}}
+					style={styles.FlatView}
 					data={clubs}
 					renderItem={({ item }) => (
 						<View>
@@ -364,13 +361,8 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	rowCircle: {
-		// flexDirection: 'row',
 		width: circleWidth,
 		height: circleWidth,
-
-		// alignItems: 'flex-start',
-		// justifyContent: 'flex-end',
-
 		borderRadius: circleWidth / 2,
 		position: 'absolute',
 
@@ -415,9 +407,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
 		marginTop: 50,
-		// position: 'absolute',
-		// bottom: Platform.select({ ios: 10, android: 10 }), // -3-
-		// marginBottom: 53,
 	},
 	teamListTouchableView: {
 		flexDirection: 'row',
@@ -441,5 +430,9 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		bottom: 10,
 		height: 30,
+	},
+	FlatView: {
+		height: screen.height * 0.6,
+		flexGrow: 0,
 	},
 });

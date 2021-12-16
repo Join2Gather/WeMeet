@@ -245,6 +245,8 @@ export function Timetable({
 				}, 100);
 			} else if (inTimeMode.includes('normal')) {
 				// 시간 설정 로직
+				date.setHours(select.time);
+				setDate(new Date(date));
 				setModalVisible && setModalVisible(true);
 				setIsTimeMode && setIsTimeMode(true);
 				setMode && setMode('startMode');
