@@ -4,8 +4,6 @@ import { Colors } from 'react-native-paper';
 export function makeIndividualTimetable(state: timetable) {
 	state.weekIndex.map((day, idx) =>
 		state.responseIndividual[day].map((d, idxNumber) => {
-			state.postIndividualDates[day] = [...state.postIndividualDates[day], d];
-
 			const startingMinute = Math.round(d.starting_minutes / 10);
 			const endMinute = Math.round(d.end_minutes / 10);
 			for (let i = d.starting_hours; i <= d.end_hours; i++) {
@@ -19,7 +17,7 @@ export function makeIndividualTimetable(state: timetable) {
 						state.dates[idx].times[i][j].borderBottom = false;
 					}
 				} else if (i === d.end_hours) {
-					for (let j = 0; j <= endMinute; j++) {
+					for (let j = 0; j < endMinute; j++) {
 						state.dates[idx].times[i][j].color = state.color;
 						state.dates[idx].times[i][j].isEveryTime = false;
 						state.dates[idx].times[i][j].isPicked = true;
@@ -66,7 +64,7 @@ export function makeGroupTimeTableWith60(state: timetable, dates: any) {
 							dates[idx].times[i][j].borderBottom = false;
 						}
 					} else if (i === d.end_hours) {
-						for (let j = 0; j <= endMinute; j++) {
+						for (let j = 0; j < endMinute; j++) {
 							dates[idx].times[i][
 								j
 							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
@@ -141,32 +139,34 @@ export function addEveryTime(state: timetable, date: any) {
 				const startingMinute = Math.round(d.starting_minutes / 10);
 				const endMinute = Math.round(d.end_minutes / 10);
 				for (let i = d.starting_hours; i <= d.end_hours; i++) {
-					if (i === d.starting_hours) {
-						for (let j = startingMinute; j <= 6; j++) {
-							date[idx].times[i][j].color = Colors.grey400;
-							date[idx].times[i][j].isEveryTime = true;
-							date[idx].times[i][j].isPicked = true;
-							date[idx].times[i][j].mode = 'everyTime';
-							date[idx].times[i][j].borderTop = false;
-							date[idx].times[i][j].borderBottom = false;
-						}
-					} else if (i === d.end_hours) {
-						for (let j = 0; j < endMinute; j++) {
-							date[idx].times[i][j].color = Colors.grey400;
-							date[idx].times[i][j].isEveryTime = true;
-							date[idx].times[i][j].isPicked = true;
-							date[idx].times[i][j].mode = 'everyTime';
-							date[idx].times[i][j].borderTop = false;
-							date[idx].times[i][j].borderBottom = false;
-						}
-					} else {
-						for (let j = 0; j <= 6; j++) {
-							date[idx].times[i][j].color = Colors.grey400;
-							date[idx].times[i][j].isEveryTime = true;
-							date[idx].times[i][j].isPicked = true;
-							date[idx].times[i][j].mode = 'everyTime';
-							date[idx].times[i][j].borderTop = false;
-							date[idx].times[i][j].borderBottom = false;
+					if (i <= state.startHour && i >= state.endHour) {
+						if (i === d.starting_hours) {
+							for (let j = startingMinute; j <= 6; j++) {
+								date[idx].times[i][j].color = Colors.grey400;
+								date[idx].times[i][j].isEveryTime = true;
+								date[idx].times[i][j].isPicked = true;
+								date[idx].times[i][j].mode = 'everyTime';
+								date[idx].times[i][j].borderTop = false;
+								date[idx].times[i][j].borderBottom = false;
+							}
+						} else if (i === d.end_hours) {
+							for (let j = 0; j < endMinute; j++) {
+								date[idx].times[i][j].color = Colors.grey400;
+								date[idx].times[i][j].isEveryTime = true;
+								date[idx].times[i][j].isPicked = true;
+								date[idx].times[i][j].mode = 'everyTime';
+								date[idx].times[i][j].borderTop = false;
+								date[idx].times[i][j].borderBottom = false;
+							}
+						} else {
+							for (let j = 0; j <= 6; j++) {
+								date[idx].times[i][j].color = Colors.grey400;
+								date[idx].times[i][j].isEveryTime = true;
+								date[idx].times[i][j].isPicked = true;
+								date[idx].times[i][j].mode = 'everyTime';
+								date[idx].times[i][j].borderTop = false;
+								date[idx].times[i][j].borderBottom = false;
+							}
 						}
 					}
 				}
@@ -286,7 +286,7 @@ export function deleteDate(
 				}
 			}
 		} else if (i === endHour) {
-			for (let j = 0; j <= endMinute; j++) {
+			for (let j = 0; j < endMinute; j++) {
 				date[dayIdx].times[i][j].color = Colors.white;
 				date[dayIdx].times[i][j].mode = 'start';
 				if (j === 0 || j === 7) {
