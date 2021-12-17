@@ -66,6 +66,7 @@ export function ModalTime({
 	}, [color]);
 	const onPressDelete = useCallback(() => {
 		dispatch(deletePostTime());
+		setTimeModalVisible && setTimeModalVisible(false);
 		setMode('loading');
 	}, []);
 

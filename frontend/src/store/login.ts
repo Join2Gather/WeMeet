@@ -67,15 +67,18 @@ export const loginSlice = createSlice({
 	initialState,
 	reducers: {
 		getSocialLogin: (state, action: PayloadAction<kakaoLoginAPI>) => {
-			state.id = action.payload.id;
-			state.name = action.payload.name;
-			state.user = action.payload.user;
-			state.token = action.payload.token;
-			state.clubs = action.payload.clubs;
+			const { id, clubs, dates, kakaoDates, name, token, user } =
+				action.payload;
+			state.kakaoDates = [];
+			state.id = id;
+			state.name = name;
+			state.user = user;
+			state.token = token;
+			state.clubs = clubs;
 			state.clubs.map((club) => {
 				club.name = decodeURIComponent(club.name);
 			});
-			state.kakaoDates = action.payload.kakaoDates;
+			state.kakaoDates = kakaoDates;
 		},
 		findTeam: (
 			state,

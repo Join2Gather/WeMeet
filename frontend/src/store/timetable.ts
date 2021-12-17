@@ -272,6 +272,7 @@ export const timetableSlice = createSlice({
 				sat: [],
 			};
 			state.responseIndividual = action.payload;
+			state.postIndividualDates = action.payload;
 			makeIndividualTimetable(state);
 			addEveryTime(state, state.dates);
 			state.reload = false;
@@ -307,6 +308,7 @@ export const timetableSlice = createSlice({
 			action: PayloadAction<responseSnapShotTimetable>
 		) => {
 			const { created_date, dates } = action.payload;
+			console.log(action.payload);
 			state.snapShotError = false;
 			makeSnapShotDate(state, created_date, dates);
 		},
@@ -370,19 +372,20 @@ export const timetableSlice = createSlice({
 		checkIsExist: (state, action: PayloadAction<string>) => {
 			let isNonColor = 0;
 			const mode = action.payload === 'start' ? state.startTime : state.endTime;
+			if (state.endMinute !== 0) {
+				state.teamConfirmDate[state.dayIdx].times[mode].forEach((t) => {
+					t.mode === 'normal' && isNonColor++;
+				});
 
-			state.teamConfirmDate[state.dayIdx].times[mode].forEach((t) => {
-				t.mode === 'normal' && isNonColor++;
-			});
-
-			if (isNonColor === 7) {
-				Alert.alert('알림', '가능 시간 중에서 선택해 주세요', [
-					{
-						text: '확인',
-						onPress: () => {},
-					},
-				]);
-				state.isTimeNotExist = true;
+				if (isNonColor === 7) {
+					Alert.alert('알림', '가능 시간 중에서 선택해 주세요', [
+						{
+							text: '확인',
+							onPress: () => {},
+						},
+					]);
+					state.isTimeNotExist = true;
+				}
 			}
 		},
 		checkMode: (
@@ -424,7 +427,7 @@ export const timetableSlice = createSlice({
 			}
 
 			modeSelect.sort((a, b) => b.count - a.count);
-			console.log(modeSelect);
+
 			modeSelect.forEach((mode) => {
 				if (mode.count) {
 					state.selectTimeMode += mode.content;
@@ -455,7 +458,7 @@ export const timetableSlice = createSlice({
 							state.teamConfirmDate[dayIdx].times[i][j].borderWidth = 2;
 						}
 					} else if (i === state.endTime) {
-						for (let j = 0; j <= endMinute; j++) {
+						for (let j = 0; j < endMinute; j++) {
 							if (j === endMinute) {
 								state.teamConfirmDate[dayIdx].times[i][j].borderBottom = true;
 							}
@@ -513,7 +516,7 @@ export const timetableSlice = createSlice({
 							state.teamConfirmDate[state.dayIdx].times[i][j].borderTop = false;
 						}
 					} else if (i === state.endTime) {
-						for (let j = 0; j <= endMinute; j++) {
+						for (let j = 0; j < endMinute; j++) {
 							state.teamConfirmDate[state.dayIdx].times[i][j].color =
 								state.color;
 							state.teamConfirmDate[state.dayIdx].times[i][j].isEveryTime =
@@ -561,9 +564,7 @@ export const timetableSlice = createSlice({
 			const endHour = state.finTime[0].endTime.hour;
 			state.postIndividualDates[state.weekIndex[state.dayIdx]] =
 				state.postIndividualDates[state.weekIndex[state.dayIdx]].filter(
-					(day: any) => {
-						day.starting_hours !== startHour;
-					}
+					(day: any) => day.starting_hours !== startHour
 				);
 			const dayIdx = state.dayIdx;
 

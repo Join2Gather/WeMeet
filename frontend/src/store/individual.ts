@@ -9,6 +9,7 @@ import type {
 	responseImageAPI,
 	make_days,
 	postEveryTimeAPI,
+	findTime,
 } from '../interface';
 import { Colors } from 'react-native-paper';
 import { useMakeTimeTableWith60 } from '../hooks';
@@ -70,6 +71,7 @@ const initialState: individual = {
 	isHomeTimePicked: false,
 	postHomePrepare: false,
 	postHomeSuccess: false,
+	setTime: 0,
 };
 
 export const individualSlice = createSlice({
@@ -144,7 +146,18 @@ export const individualSlice = createSlice({
 		kakaoLogin: (state, action: PayloadAction<any>) => {
 			if (state.cloneDateSuccess) {
 				if (action.payload) {
-					state.everyTime = action.payload;
+					(state.everyTime = {
+						sun: [],
+						mon: [],
+						tue: [],
+						wed: [],
+						thu: [],
+						fri: [],
+						sat: [],
+					}),
+						(state.everyTime = action.payload);
+					delete state.everyTime['club'];
+					delete state.everyTime['is_temporary_reserved'];
 					makeHomeTimetable(state);
 				}
 			}
@@ -234,6 +247,7 @@ export const individualSlice = createSlice({
 			state.dayString = day;
 			state.inTimeMode = '';
 			state.dayIdx = idx;
+			state.setTime = time;
 			let modeSelect = [
 				{
 					count: 0,
@@ -255,12 +269,12 @@ export const individualSlice = createSlice({
 			});
 			modeSelect.sort((a, b) => b.count - a.count);
 
-			// modeSelect.forEach((mode) => {
-			// 	if (mode.count) {
-			// 		state.inTimeMode += mode.content;
-			// 	}
-			// });
-			state.inTimeMode = modeSelect[0].content;
+			modeSelect.forEach((mode) => {
+				if (mode.count) {
+					state.inTimeMode += mode.content;
+				}
+			});
+			// state.inTimeMode = modeSelect[0].content;
 			console.log(state.inTimeMode);
 		},
 		makePostHomeDates: (state) => {
@@ -270,6 +284,7 @@ export const individualSlice = createSlice({
 				end_hours: state.endTime.hour,
 				end_minutes: state.endTime.minute,
 			};
+
 			state.everyTime[state.dayString] = [
 				...state.everyTime[state.dayString],
 				data,
@@ -280,6 +295,7 @@ export const individualSlice = createSlice({
 			let isNonColor = 0;
 			const dayIdx = state.dayIdx;
 			const endHour = state.endTime.hour;
+
 			state.isHomeTimePicked = false;
 			state.individualDates[dayIdx].times[endHour].forEach((t) => {
 				t.mode !== 'normal' && isNonColor++;
@@ -294,6 +310,17 @@ export const individualSlice = createSlice({
 				]);
 				state.isHomeTimePicked = true;
 			}
+		},
+		deleteHomeTime: (state, action: PayloadAction<findTime[]>) => {
+			const findTime = action.payload;
+			const startHour = findTime[0].startTime.hour;
+			console.log(startHour);
+			console.log(state.everyTime);
+			state.everyTime[state.dayString] = state.everyTime[
+				state.dayString
+			].filter((time) => time.starting_hours !== startHour);
+
+			state.postHomePrepare = true;
 		},
 	},
 	extraReducers: {},
@@ -311,6 +338,7 @@ export const {
 	makePostHomeDates,
 	initialTimeMode,
 	checkHomeIstBlank,
+	deleteHomeTime,
 } = individualSlice.actions;
 
 export default individualSlice.reducer;

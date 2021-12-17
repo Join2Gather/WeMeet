@@ -9,19 +9,21 @@ import {
 	Dimensions,
 } from 'react-native';
 import { Colors } from 'react-native-paper';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import type { findTime } from '../interface/timetable';
 import { deletePostTime, setTimeModalMode } from '../store/timetable';
 import { Button } from '../lib/util/Button';
-import { initialTimeMode } from '../store/individual';
+import { deleteHomeTime, initialTimeMode } from '../store/individual';
+import { RootState } from '../store';
+import { Spinner } from '.';
 const screen = Dimensions.get('screen');
 
 interface props {
 	inModalVisible?: boolean;
 	setInModalVisible?: React.Dispatch<React.SetStateAction<boolean>>;
-	color?: string;
+
 	findIndividual: findTime[];
 	inTimeMode: string;
 }
@@ -29,38 +31,28 @@ interface props {
 export function ModalIndividualTime({
 	inModalVisible,
 	setInModalVisible,
-	color,
+
 	findIndividual,
 	inTimeMode,
 }: props) {
 	const dispatch = useDispatch();
-	const [mode, setMode] = useState('initial');
+	const [mode, setMode] = useState('normal');
 	console.log(inTimeMode);
-	const [RGBColor, setRGBColor] = useState({
-		r: 0,
-		g: 0,
-		b: 0,
-	});
-	useEffect(() => {
-		if (mode == 'loading') {
-			setTimeout(() => {
-				setMode('success');
-			}, 1000);
-		}
-	}, [mode]);
-	useEffect(() => {
-		if (color) {
-			const result = hexToRGB(color);
-			result && setRGBColor(result);
-		}
-	}, [color]);
+
 	const onPressCloseBtn = useCallback(() => {
 		setInModalVisible && setInModalVisible(false);
 		dispatch(setTimeModalMode(false));
 		dispatch(initialTimeMode());
-		setMode('initial');
 	}, []);
-
+	const onPressDeleteBtn = useCallback(() => {
+		dispatch(deleteHomeTime(findIndividual));
+		dispatch(initialTimeMode());
+		setMode('loading');
+		setTimeout(() => {
+			setMode('normal');
+			setInModalVisible && setInModalVisible(false);
+		}, 1000);
+	}, [findIndividual]);
 	return (
 		<Modal
 			animationType="fade"
@@ -70,6 +62,7 @@ export function ModalIndividualTime({
 				Alert.alert('Modal has been closed.');
 			}}
 		>
+			<Spinner loading={mode} />
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
 					<View
@@ -94,105 +87,105 @@ export function ModalIndividualTime({
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
 						</TouchableHighlight>
 					</View>
-					{mode === 'initial' && (
-						<>
-							{findIndividual && findIndividual[0] && (
-								<>
-									<View style={styles.blankView} />
-									<Text style={styles.titleText}>모임명</Text>
-									<View style={styles.blankView} />
 
-									<View
-										style={[
-											styles.backgroundView,
-											{
-												backgroundColor: findIndividual[0].color
-													? findIndividual[0].color
-													: Colors.grey600,
-											},
-										]}
-									>
-										<View style={styles.columnView}>
-											<View style={styles.rowView}>
-												<Text
-													style={
-														(styles.touchText,
-														{ color: Colors.white, fontSize: 16 })
-													}
-												>
-													{findIndividual[0].name}
-												</Text>
-											</View>
+					<>
+						{findIndividual && findIndividual[0] && (
+							<>
+								<View style={styles.blankView} />
+								<Text style={styles.titleText}>모임명</Text>
+								<View style={styles.blankView} />
+
+								<View
+									style={[
+										styles.backgroundView,
+										{
+											backgroundColor: findIndividual[0].color
+												? findIndividual[0].color
+												: Colors.grey600,
+										},
+									]}
+								>
+									<View style={styles.columnView}>
+										<View style={styles.rowView}>
+											<Text
+												style={
+													(styles.touchText,
+													{ color: Colors.white, fontSize: 16 })
+												}
+											>
+												{findIndividual[0].name}
+											</Text>
 										</View>
 									</View>
-								</>
-							)}
-							{findIndividual && findIndividual[0] && (
-								<>
-									<View style={styles.blankView} />
-									<Text style={styles.titleText}>선택 시간</Text>
-									<View style={styles.blankView} />
+								</View>
+							</>
+						)}
+						{findIndividual && findIndividual[0] && (
+							<>
+								<View style={styles.blankView} />
+								<Text style={styles.titleText}>선택 시간</Text>
+								<View style={styles.blankView} />
 
-									<View style={[styles.backgroundView]}>
-										<View style={styles.columnView}>
-											<View style={styles.rowView}>
-												<Text style={styles.touchText}>
-													{findIndividual[0].selectTime > 12
-														? `오후  ${findIndividual[0].selectTime - 12}시`
-														: `오전  ${findIndividual[0].selectTime}시`}
-												</Text>
-											</View>
+								<View style={[styles.backgroundView]}>
+									<View style={styles.columnView}>
+										<View style={styles.rowView}>
+											<Text style={styles.touchText}>
+												{findIndividual[0].selectTime > 12
+													? `오후  ${findIndividual[0].selectTime - 12}시`
+													: `오전  ${findIndividual[0].selectTime}시`}
+											</Text>
 										</View>
 									</View>
-								</>
-							)}
+								</View>
+							</>
+						)}
 
-							<View style={styles.blankView} />
-							<Text style={styles.titleText}>모임 시간</Text>
-							<View style={styles.blankView} />
-							{findIndividual &&
-								findIndividual.map((t) => (
-									<View key={t.startTime.hour} style={[styles.backgroundView]}>
-										<View style={styles.columnView}>
-											<View style={styles.rowView}>
-												<Text style={styles.touchText}>
-													{t.startTime.hour > 12
-														? `오후  ${t.startTime.hour - 12}`
-														: `오전  ${t.startTime.hour}`}
-													{'  : '}
-													{t.startTime.minute < 10
-														? '0' + t.startTime.minute
-														: t.startTime.minute}
-													{'  ~   '}
-												</Text>
+						<View style={styles.blankView} />
+						<Text style={styles.titleText}>모임 시간</Text>
+						<View style={styles.blankView} />
+						{findIndividual &&
+							findIndividual.map((t) => (
+								<View key={t.startTime.hour} style={[styles.backgroundView]}>
+									<View style={styles.columnView}>
+										<View style={styles.rowView}>
+											<Text style={styles.touchText}>
+												{t.startTime.hour > 12
+													? `오후  ${t.startTime.hour - 12}`
+													: `오전  ${t.startTime.hour}`}
+												{'  : '}
+												{t.startTime.minute < 10
+													? '0' + t.startTime.minute
+													: t.startTime.minute}
+												{'  ~   '}
+											</Text>
 
-												<Text style={styles.touchText}>
-													{t.endTime.hour >= 12
-														? `오후  ${t.endTime.hour - 12}`
-														: `오전  ${t.endTime.hour}`}
-													{' : '}
-													{t.endTime.minute < 10
-														? '0' + t.endTime.minute
-														: t.endTime.minute}
-												</Text>
-											</View>
+											<Text style={styles.touchText}>
+												{t.endTime.hour >= 12
+													? `오후  ${t.endTime.hour - 12}`
+													: `오전  ${t.endTime.hour}`}
+												{' : '}
+												{t.endTime.minute < 10
+													? '0' + t.endTime.minute
+													: t.endTime.minute}
+											</Text>
 										</View>
 									</View>
-								))}
-							{inTimeMode == 'home' && (
-								<>
-									<View style={styles.blankView} />
-									<View style={styles.rowLine} />
-									<Button
-										buttonNumber={2}
-										buttonText="취소"
-										secondButtonText="삭제"
-										onPressFunction={onPressCloseBtn}
-									/>
-								</>
-							)}
-						</>
-					)}
+								</View>
+							))}
+						{inTimeMode.includes('team') && (
+							<>
+								<View style={styles.blankView} />
+								<View style={styles.rowLine} />
+								<Button
+									buttonNumber={2}
+									buttonText="취소"
+									secondButtonText="삭제"
+									onPressFunction={onPressCloseBtn}
+									secondOnPressFunction={onPressDeleteBtn}
+								/>
+							</>
+						)}
+					</>
 				</View>
 			</View>
 		</Modal>
