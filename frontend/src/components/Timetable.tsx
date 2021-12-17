@@ -261,8 +261,6 @@ export function Timetable({
 	useEffect(() => {
 		// 시간 누르기 로직
 		if (!isHomeTime) {
-			console.log(tableMode);
-
 			if (selectTimeMode === 'normal' && tableMode === 'individual') {
 				setMode && setMode('startMinute');
 				setIsTimeMode && setIsTimeMode(true);
@@ -278,7 +276,6 @@ export function Timetable({
 				dispatch(findHomeTime({ day: select.day, time: select.time }));
 				dispatch(setTimeModalMode(true));
 			} else if (selectTimeMode.includes('team') && tableMode === 'gr') {
-				console.log('isTeam jkasldfjasfdkjl');
 				dispatch(
 					findTimeFromResponse({
 						time: select.time,
