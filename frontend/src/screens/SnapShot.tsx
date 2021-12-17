@@ -125,13 +125,13 @@ export default function SnapShot({ route }: Props) {
 	const onPressOk = useCallback(() => {
 		dispatch(makeConfirmPrepare());
 		if (timeMode === 'make') {
+			dispatch(postSnapShot({ uri: joinUri, id, token, user }));
 			dispatch(
 				postConfirm({ date: confirmDates, id, token, uri: joinUri, user })
 			);
-			dispatch(postSnapShot({ uri: joinUri, id, token, user }));
 		} else {
-			dispatch(postConfirm({ date: confirmDates, id, token, uri, user }));
 			dispatch(postSnapShot({ uri, id, token, user }));
+			dispatch(postConfirm({ date: confirmDates, id, token, uri, user }));
 		}
 		dispatch(makeTeamTime({ color, endHour, startHour, peopleCount }));
 		setLoading('loading');
