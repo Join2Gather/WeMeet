@@ -20,7 +20,6 @@
     "axios": "^0.21.1",
     "dayjs": "^1.10.7",
     "expo": "^43.0.3",
-    "expo-cli": "^5.0.1",
     "expo-clipboard": "^2.0.3",
     "expo-dev-client": "~0.6.3",
     "expo-file-system": "^13.0.3",

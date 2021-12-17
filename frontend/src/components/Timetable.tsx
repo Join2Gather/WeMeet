@@ -207,9 +207,9 @@ export function Timetable({
 			dispatch(setStartHour(time));
 			dispatch(changeDayIdx(idx));
 			dispatch(checkMode({ time, mode: 'group' }));
-			setTableMode('gr');
 			setSelect({ idx, time, day });
 			setIsConfirm(is);
+			setTableMode('gr');
 		},
 		[]
 	);
@@ -275,7 +275,7 @@ export function Timetable({
 				);
 				dispatch(findHomeTime({ day: select.day, time: select.time }));
 				dispatch(setTimeModalMode(true));
-			} else if (selectTimeMode !== 'normal' && tableMode === 'gr') {
+			} else if (selectTimeMode.includes('team') && tableMode === 'gr') {
 				dispatch(
 					findTimeFromResponse({
 						time: select.time,
@@ -290,14 +290,19 @@ export function Timetable({
 		}
 	}, [select, selectTimeMode, tableMode, isHomeTime]);
 	useEffect(() => {
+		console.log('mode :', mode);
+		console.log('selectTimeMode', selectTimeMode);
 		if (modalMode === true && !isHomeTime) {
-			if (selectTimeMode.includes('individual')) {
+			if (
+				selectTimeMode.includes('individual') ||
+				selectTimeMode.includes('team')
+			) {
 				setTimeModalVisible(true);
 			} else {
 				setInModalVisible(true);
 			}
 		}
-	}, [modalMode, selectTimeMode]);
+	}, [modalMode, selectTimeMode, mode]);
 	const onPressNext = useCallback(() => {
 		setCurrent && setCurrent(1);
 		onSetStartHour(select.idx, select.time, select.day);
@@ -530,6 +535,7 @@ export function Timetable({
 											key={time}
 											onPress={() => {
 												onPressGroupTime(Number(time), day.day, true, idx);
+												console.log('hihi');
 											}}
 										>
 											{day.times[time].map((t, tIdx) => (
