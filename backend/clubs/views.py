@@ -369,10 +369,12 @@ class ClubConfirmView(APIView):
     @profile_guard
     @club_guard
     def post(self, request: Request, user: int, profile: Any, uri: str, club: Any):
+        if old_snapshot := ClubSnapshots.objects.filter(profile=profile, club=club):
+            old_snapshot: ClubSnapshots = old_snapshot.get()
 
-        if snapshot := ClubSnapshots.objects.filter(profile=profile, club=club):
-            snapshot = snapshot.get()
-            return JsonResponse(SnapshotSerializer(snapshot).data)
+            ProfileDatesToSnapshot.objects.filter(
+                snapshot=old_snapshot).delete()
+            old_snapshot.delete()
 
         snapshot = ClubSnapshots.objects.create(profile=profile, club=club)
 
