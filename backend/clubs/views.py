@@ -369,19 +369,19 @@ class ClubConfirmView(APIView):
     @profile_guard
     @club_guard
     def post(self, request: Request, user: int, profile: Any, uri: str, club: Any):
-        if old_snapshot := ClubSnapshots.objects.filter(profile=profile, club=club):
-            old_snapshot: ClubSnapshots = old_snapshot.get()
-
-            ProfileDatesToSnapshot.objects.filter(
-                snapshot=old_snapshot).delete()
-            old_snapshot.delete()
+        ProfileDatesToSnapshot.objects.filter(
+            profile_date__profile=profile, profile_date__club=club, snapshot__isnull=False).delete()
+        ClubSnapshots.objects.filter(profile=profile, club=club).delete()
 
         snapshot = ClubSnapshots.objects.create(profile=profile, club=club)
 
-        profile_dates = ProfileDates.objects.filter(club=club.id)
-        for profile_date in profile_dates:
-            ProfileDatesToSnapshot.objects.create(
-                profile_date=profile_date, snapshot=snapshot)
+        profile_dates_to_snapshots = ProfileDatesToSnapshot.objects \
+                .prefetch_related('profile_date') \
+                .filter(profile_date__profile=profile, profile_date__club=club, snapshot=None)
+        
+        for profile_dates_to_snapshot in profile_dates_to_snapshots:
+            ProfileDatesToSnapshot.objects.get_or_create(
+                profile_date=profile_dates_to_snapshot.profile_date, snapshot=snapshot)
 
         return JsonResponse(SnapshotSerializer(snapshot).data)
 
@@ -489,8 +489,8 @@ class ClubConfirmOKView(APIView):
     @club_guard
     def post(self, request: Request, user: int, profile: Any, uri: str, club: Any):
         # 기존에 생성된 튜플은 지워줌
-        ProfileDates.objects.filter(
-            profile=profile, club=club).delete()
+        ProfileDatesToSnapshot.objects.filter(
+            profile_date__profile=profile, profile_date__club=club, snapshot=None).delete()
 
         for idx, day in enumerate(constants.week):
             times = request.data.get(day) or []
@@ -503,8 +503,10 @@ class ClubConfirmOKView(APIView):
                 date = Dates.objects.get_or_create(
                     day=idx, starting_hours=starting_hours,
                     starting_minutes=starting_minutes, end_hours=end_hours, end_minutes=end_minutes)[0]
-                ProfileDates.objects.get_or_create(
-                    profile=profile, date=date, club=club, is_temporary_reserved=False)
+                profile_date = ProfileDates.objects.get_or_create(
+                    profile=profile, date=date, club=club, is_temporary_reserved=False)[0]
+                ProfileDatesToSnapshot.objects.get_or_create(
+                    profile_date=profile_date, snapshot=None)
 
         profile = Profiles.objects.get(id=profile.id)
         result = ProfilesSerializer(profile).data
