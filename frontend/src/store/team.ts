@@ -87,16 +87,27 @@ export const teamSlice = createSlice({
 		SHARE_URI_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
-		JOIN_TEAM_SUCCESS: (state, action: PayloadAction<any>) => {
-			state.id = action.payload.id;
-			state.joinName = decodeURI(action.payload.name);
-			state.joinUri = action.payload.uri;
-			state.teamColor = action.payload.color;
+		JOIN_TEAM_SUCCESS: (state, action: PayloadAction<joinTeamAPI>) => {
+			const {
+				color,
+				end_hours,
+				id,
+				name,
+				people_count,
+				starting_hours,
+				token,
+				uri,
+				user,
+			} = action.payload;
+			state.id = id;
+			state.joinName = decodeURI(name);
+			state.joinUri = uri;
+			state.teamColor = color;
 			state.joinTeam = true;
 			state.joinTeamError = false;
-			state.startHour = action.payload.starting_hours;
-			state.endHour = action.payload.end_hours;
-			state.peopleCount = action.payload.people_count;
+			state.startHour = starting_hours;
+			state.endHour = end_hours;
+			state.peopleCount = people_count;
 		},
 		JOIN_TEAM_FAILURE: (state, action: PayloadAction<any>) => {
 			// Alert.alert('초대 코드가 올바르지 않습니다');
