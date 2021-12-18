@@ -11,24 +11,18 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 			if (j === 0) {
 				times[i].push({
 					color: Colors.white,
-					isPicked: false,
 					mode: 'normal',
-					isEveryTime: false,
 					minute: j,
 					borderWidth: 0.3,
-
 					borderBottom: false,
 					borderTop: true,
 				});
 			} else {
 				times[i].push({
 					color: Colors.white,
-					isPicked: false,
 					mode: 'normal',
-					isEveryTime: false,
 					minute: j,
 					borderWidth: 0.3,
-
 					borderBottom: false,
 					borderTop: false,
 				});

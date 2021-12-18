@@ -51,6 +51,11 @@ export interface joinTeamAPI {
 	id: number;
 	token: string;
 	uri: string;
+	name: string;
+	color: string;
+	starting_hours: number;
+	end_hours: number;
+	people_count: number;
 }
 
 export interface changeColorAPI {

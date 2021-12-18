@@ -45,6 +45,7 @@ export interface timetable {
 	isInTeamTime: boolean;
 	selectTimeMode: string;
 	modalMode: boolean;
+	isPostRevertSuccess: boolean;
 }
 
 export type weekIndex = Array<string>;
@@ -112,15 +113,12 @@ export interface timeWith60 {
 
 export interface timeProps {
 	color: string;
-	isPicked: boolean;
 	mode: string;
-	isEveryTime: boolean;
 	minute: number;
 	borderWidth: number;
 	borderColor?: string;
 	borderTop?: boolean;
 	borderBottom?: boolean;
-
 	people?: Array<string>;
 	startTime?: timeType;
 	endTime?: timeType;

@@ -1,38 +1,28 @@
 import type { individual, time, timetable } from '../../interface';
 import { hexToRGB } from './hexToRGB';
 import { Colors } from 'react-native-paper';
+
+const greyColor = Colors.grey400;
+
 export function makeIndividualTimetable(state: timetable) {
+	const color = state.color;
 	state.weekIndex.map((day, idx) =>
 		state.responseIndividual[day].map((d, idxNumber) => {
 			const startingMinute = Math.round(d.starting_minutes / 10);
 			const endMinute = Math.round(d.end_minutes / 10);
+
 			for (let i = d.starting_hours; i <= d.end_hours; i++) {
 				if (i === d.starting_hours) {
 					for (let j = startingMinute; j <= 6; j++) {
-						state.dates[idx].times[i][j].color = state.color;
-						state.dates[idx].times[i][j].isEveryTime = false;
-						state.dates[idx].times[i][j].isPicked = true;
-						state.dates[idx].times[i][j].mode = 'individual';
-						state.dates[idx].times[i][j].borderTop = false;
-						state.dates[idx].times[i][j].borderBottom = false;
+						makeTime(state.dates[idx].times[i][j], 'individual', color);
 					}
 				} else if (i === d.end_hours) {
 					for (let j = 0; j < endMinute; j++) {
-						state.dates[idx].times[i][j].color = state.color;
-						state.dates[idx].times[i][j].isEveryTime = false;
-						state.dates[idx].times[i][j].isPicked = true;
-						state.dates[idx].times[i][j].mode = 'individual';
-						state.dates[idx].times[i][j].borderTop = false;
-						state.dates[idx].times[i][j].borderBottom = false;
+						makeTime(state.dates[idx].times[i][j], 'individual', color);
 					}
 				} else {
 					for (let j = 0; j <= 6; j++) {
-						state.dates[idx].times[i][j].color = state.color;
-						state.dates[idx].times[i][j].isEveryTime = false;
-						state.dates[idx].times[i][j].isPicked = true;
-						state.dates[idx].times[i][j].mode = 'individual';
-						state.dates[idx].times[i][j].borderTop = false;
-						state.dates[idx].times[i][j].borderBottom = false;
+						makeTime(state.dates[idx].times[i][j], 'individual', color);
 					}
 				}
 			}
@@ -46,43 +36,24 @@ export function makeGroupTimeTableWith60(state: timetable, dates: any) {
 	result &&
 		state.weekIndex.map((day, idx) => {
 			state.responseGroup[day].avail_time.map((d, idxNumber) => {
-				const color =
+				const colorCount =
 					state.responseGroup[day].count[idxNumber] / state.peopleCount;
+				const color = `rgba(${result.r}, ${result.g}, ${result.b}, ${colorCount})`;
 				const startingMinute = Math.round(d.starting_minutes / 10);
 				const endMinute = Math.round(d.end_minutes / 10);
 
 				for (let i = d.starting_hours; i <= d.end_hours; i++) {
 					if (i === d.starting_hours) {
 						for (let j = startingMinute; j <= 6; j++) {
-							dates[idx].times[i][
-								j
-							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
-							dates[idx].times[i][j].isEveryTime = false;
-							dates[idx].times[i][j].isPicked = true;
-							dates[idx].times[i][j].mode = 'team';
-							dates[idx].times[i][j].borderTop = false;
-							dates[idx].times[i][j].borderBottom = false;
+							makeTime(dates[idx].times[i][j], 'team', color);
 						}
 					} else if (i === d.end_hours) {
 						for (let j = 0; j < endMinute; j++) {
-							dates[idx].times[i][
-								j
-							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
-							dates[idx].times[i][j].isEveryTime = false;
-							dates[idx].times[i][j].isPicked = true;
-							dates[idx].times[i][j].mode = 'team';
-							dates[idx].times[i][j].borderTop = false;
-							dates[idx].times[i][j].borderBottom = false;
+							makeTime(dates[idx].times[i][j], 'team', color);
 						}
 					} else {
 						for (let j = 0; j <= 6; j++) {
-							dates[idx].times[i][
-								j
-							].color = `rgba(${result.r}, ${result.g}, ${result.b}, ${color})`;
-							dates[idx].times[i][j].isEveryTime = false;
-							dates[idx].times[i][j].borderTop = false;
-							dates[idx].times[i][j].mode = 'team';
-							dates[idx].times[i][j].borderBottom = false;
+							makeTime(dates[idx].times[i][j], 'team', color);
 						}
 					}
 				}
@@ -101,30 +72,27 @@ export function makeHomeTimetable(state: individual) {
 				for (let i = d.starting_hours; i <= d.end_hours; i++) {
 					if (i === d.starting_hours) {
 						for (let j = startingMinute; j <= 6; j++) {
-							state.individualDates[idx].times[i][j].color = Colors.grey400;
-							state.individualDates[idx].times[i][j].isEveryTime = false;
-							state.individualDates[idx].times[i][j].isPicked = true;
-							state.individualDates[idx].times[i][j].mode = 'home';
-							state.individualDates[idx].times[i][j].borderBottom = false;
-							state.individualDates[idx].times[i][j].borderTop = false;
+							makeTime(
+								state.individualDates[idx].times[i][j],
+								'home',
+								greyColor
+							);
 						}
 					} else if (i === d.end_hours) {
 						for (let j = 0; j < endMinute; j++) {
-							state.individualDates[idx].times[i][j].color = Colors.grey400;
-							state.individualDates[idx].times[i][j].isEveryTime = false;
-							state.individualDates[idx].times[i][j].isPicked = true;
-							state.individualDates[idx].times[i][j].mode = 'home';
-							state.individualDates[idx].times[i][j].borderBottom = false;
-							state.individualDates[idx].times[i][j].borderTop = false;
+							makeTime(
+								state.individualDates[idx].times[i][j],
+								'home',
+								greyColor
+							);
 						}
 					} else {
 						for (let j = 0; j <= 6; j++) {
-							state.individualDates[idx].times[i][j].color = Colors.grey400;
-							state.individualDates[idx].times[i][j].isEveryTime = false;
-							state.individualDates[idx].times[i][j].isPicked = true;
-							state.individualDates[idx].times[i][j].mode = 'home';
-							state.individualDates[idx].times[i][j].borderBottom = false;
-							state.individualDates[idx].times[i][j].borderTop = false;
+							makeTime(
+								state.individualDates[idx].times[i][j],
+								'home',
+								greyColor
+							);
 						}
 					}
 				}
@@ -142,30 +110,27 @@ export function addEveryTime(state: timetable, date: any) {
 					if (i <= state.startHour && i >= state.endHour) {
 						if (i === d.starting_hours) {
 							for (let j = startingMinute; j <= 6; j++) {
-								date[idx].times[i][j].color = Colors.grey400;
-								date[idx].times[i][j].isEveryTime = true;
-								date[idx].times[i][j].isPicked = true;
-								date[idx].times[i][j].mode = 'everyTime';
-								date[idx].times[i][j].borderTop = false;
-								date[idx].times[i][j].borderBottom = false;
+								makeTime(
+									date[idx].times[i][j].times[i][j],
+									'everyTime',
+									greyColor
+								);
 							}
 						} else if (i === d.end_hours) {
 							for (let j = 0; j < endMinute; j++) {
-								date[idx].times[i][j].color = Colors.grey400;
-								date[idx].times[i][j].isEveryTime = true;
-								date[idx].times[i][j].isPicked = true;
-								date[idx].times[i][j].mode = 'everyTime';
-								date[idx].times[i][j].borderTop = false;
-								date[idx].times[i][j].borderBottom = false;
+								makeTime(
+									date[idx].times[i][j].times[i][j],
+									'everyTime',
+									greyColor
+								);
 							}
 						} else {
 							for (let j = 0; j <= 6; j++) {
-								date[idx].times[i][j].color = Colors.grey400;
-								date[idx].times[i][j].isEveryTime = true;
-								date[idx].times[i][j].isPicked = true;
-								date[idx].times[i][j].mode = 'everyTime';
-								date[idx].times[i][j].borderTop = false;
-								date[idx].times[i][j].borderBottom = false;
+								makeTime(
+									date[idx].times[i][j].times[i][j],
+									'everyTime',
+									greyColor
+								);
 							}
 						}
 					}
@@ -176,7 +141,7 @@ export function addEveryTime(state: timetable, date: any) {
 }
 
 export function makeConfirmWith(state: timetable, dates: any) {
-	state.confirmDatesTimetable.map((date, idxNumber) => {
+	state.confirmDatesTimetable.map((date) => {
 		state.weekIndex.map((day, idx) => {
 			date[day].map((d: any) => {
 				const startingMinute = Math.round(d.starting_minutes / 10);
@@ -186,34 +151,19 @@ export function makeConfirmWith(state: timetable, dates: any) {
 						if (i === d.starting_hours) {
 							for (let j = startingMinute; j <= 6; j++) {
 								if (dates[idx].times[i]) {
-									dates[idx].times[i][j].color = Colors.grey400;
-									dates[idx].times[i][j].isEveryTime = false;
-									dates[idx].times[i][j].isPicked = true;
-									dates[idx].times[i][j].mode = 'other';
-									dates[idx].times[i][j].borderBottom = false;
-									dates[idx].times[i][j].borderTop = false;
+									makeTime(dates[idx]?.times[i][j], 'other', greyColor);
 								}
 							}
 						} else if (i === d.end_hours) {
 							for (let j = 0; j < endMinute; j++) {
 								if (dates[idx].times[i]) {
-									dates[idx].times[i][j].color = Colors.grey400;
-									dates[idx].times[i][j].isEveryTime = false;
-									dates[idx].times[i][j].isPicked = true;
-									dates[idx].times[i][j].mode = 'other';
-									dates[idx].times[i][j].borderBottom = false;
-									dates[idx].times[i][j].borderTop = false;
+									makeTime(dates[idx]?.times[i][j], 'other', greyColor);
 								}
 							}
 						} else {
 							for (let j = 0; j <= 6; j++) {
 								if (dates[idx].times[i]) {
-									dates[idx].times[i][j].color = Colors.grey400;
-									dates[idx].times[i][j].isEveryTime = false;
-									dates[idx].times[i][j].isPicked = true;
-									dates[idx].times[i][j].mode = 'other';
-									dates[idx].times[i][j].borderBottom = false;
-									dates[idx].times[i][j].borderTop = false;
+									makeTime(dates[idx]?.times[i][j], 'other', greyColor);
 								}
 							}
 						}
@@ -229,6 +179,7 @@ export function makeSnapShotDate(
 	created_date: any,
 	dates: any
 ) {
+	const color = state.color;
 	state.createdDate = created_date.slice(0, 10);
 	state.weekIndex.map((day, idx) =>
 		dates[day].map((d: any) => {
@@ -237,29 +188,15 @@ export function makeSnapShotDate(
 			for (let i = d.starting_hours; i <= d.end_hours; i++) {
 				if (i === d.starting_hours) {
 					for (let j = startingMinute; j <= 6; j++) {
-						state.snapShotDate[idx].times[i][j].color = state.color;
-						state.snapShotDate[idx].times[i][j].isEveryTime = false;
-						state.snapShotDate[idx].times[i][j].isPicked = true;
-						state.snapShotDate[idx].times[i][j].mode = 'start';
-						state.snapShotDate[idx].times[i][j].borderTop = false;
-						state.snapShotDate[idx].times[i][j].borderBottom = false;
+						makeTime(state.snapShotDate[idx].times[i][j], 'start', color);
 					}
 				} else if (i === d.end_hours) {
 					for (let j = 0; j < endMinute; j++) {
-						state.snapShotDate[idx].times[i][j].color = state.color;
-						state.snapShotDate[idx].times[i][j].isEveryTime = false;
-						state.snapShotDate[idx].times[i][j].isPicked = true;
-						state.snapShotDate[idx].times[i][j].mode = 'start';
-						state.snapShotDate[idx].times[i][j].borderTop = false;
-						state.snapShotDate[idx].times[i][j].borderBottom = false;
+						makeTime(state.snapShotDate[idx].times[i][j], 'start', color);
 					}
 				} else {
 					for (let j = 0; j <= 6; j++) {
-						state.snapShotDate[idx].times[i][j].color = state.color;
-						state.snapShotDate[idx].times[i][j].isEveryTime = false;
-						state.snapShotDate[idx].times[i][j].isPicked = true;
-						state.snapShotDate[idx].times[i][j].borderTop = false;
-						state.snapShotDate[idx].times[i][j].borderBottom = false;
+						makeTime(state.snapShotDate[idx].times[i][j], 'start', color);
 					}
 				}
 			}
@@ -303,5 +240,14 @@ export function deleteDate(
 				}
 			}
 		}
+	}
+}
+
+export function makeTime(changeTime: any, mode: string, funcColor: string) {
+	if (changeTime) {
+		changeTime.color = funcColor;
+		changeTime.mode = mode;
+		changeTime.borderBottom = false;
+		changeTime.borderTop = false;
 	}
 }

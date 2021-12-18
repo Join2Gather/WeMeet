@@ -125,17 +125,18 @@ export default function SnapShot({ route }: Props) {
 	const onPressOk = useCallback(() => {
 		dispatch(makeConfirmPrepare());
 		if (timeMode === 'make') {
-			dispatch(postSnapShot({ uri: joinUri, id, token, user }));
 			dispatch(
 				postConfirm({ date: confirmDates, id, token, uri: joinUri, user })
 			);
+			dispatch(postSnapShot({ uri: joinUri, id, token, user }));
 		} else {
-			dispatch(postSnapShot({ uri, id, token, user }));
 			dispatch(postConfirm({ date: confirmDates, id, token, uri, user }));
+			dispatch(postSnapShot({ uri, id, token, user }));
 		}
 		dispatch(makeTeamTime({ color, endHour, startHour, peopleCount }));
 		setLoading('loading');
 	}, [confirmDates, timeMode, joinUri]);
+	const onPressRevert = useCallback(() => {}, []);
 	return (
 		<SafeAreaView style={{ backgroundColor: color }}>
 			<View style={[styles.view]}>
@@ -158,7 +159,9 @@ export default function SnapShot({ route }: Props) {
 							size={27}
 							color={Colors.white}
 							style={{ paddingTop: 1 }}
-							onPress={onPressConfirm}
+							onPress={() =>
+								timetableMode === 'confirm' ? onPressConfirm() : onPressRevert()
+							}
 						/>
 					)}
 				/>

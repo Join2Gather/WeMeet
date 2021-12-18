@@ -65,7 +65,7 @@ export function HomeSetting({
 	});
 	useEffect(() => {
 		!userMeSuccess && setMode('error');
-	}, [userMeSuccess]);
+	}, [userMeSuccess, mode]);
 	useEffect(() => {
 		if (mode === 'loading') {
 			setTimeout(() => {
@@ -81,10 +81,6 @@ export function HomeSetting({
 		setSettingModalVisible(false);
 		setMode('initial');
 		setNickname('');
-	}, []);
-
-	const onPressSetMode = useCallback((mode: string) => {
-		setMode(mode);
 	}, []);
 
 	const onChangeColor = useCallback(() => {
@@ -381,6 +377,7 @@ export function HomeSetting({
 								buttonText="확인"
 								onPressFunction={() => {
 									setSettingModalVisible(false);
+									setMode('error');
 								}}
 							/>
 							<View style={styles.blankView} />

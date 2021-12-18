@@ -97,3 +97,14 @@ export const confirmSnapShot = ({ id, uri, user, token }: getSnapShotAPI) => {
 		{ headers }
 	);
 };
+
+// 확정 시간 되돌리기
+export const revertConfirm = ({ id, uri, user, token }: getSnapShotAPI) => {
+	const headers = makeHeader(token);
+	const data = null;
+	return axios.post(
+		`${API_URL}users/${user}/profiles/${id}/clubs/${uri}/confirm/revert`,
+		data,
+		{ headers }
+	);
+};
