@@ -149,6 +149,9 @@ export function Timetable({
 	});
 	const [tableMode, setTableMode] = useState('group');
 	useEffect(() => {
+		mode === undefined && setMode && setMode('normal');
+	}, [mode]);
+	useEffect(() => {
 		endIdx ? setEndHour(endIdx) : setEndHour(endHourTimetable);
 	}, [endIdx, endHourTimetable]);
 	// 최초 렌더링 개인 페이지 정보 받아오기
