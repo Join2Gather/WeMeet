@@ -366,6 +366,7 @@ export function ModalSetting({
 														name="save"
 														size={23}
 														color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+														style={styles.iconStyle}
 													/>
 													<Text style={styles.touchText}>{createdDate}</Text>
 													<View style={styles.iconView}>
@@ -373,6 +374,7 @@ export function ModalSetting({
 															name="angle-right"
 															size={19}
 															color={Colors.black}
+															style={styles.rightIconStyle}
 														/>
 													</View>
 												</View>

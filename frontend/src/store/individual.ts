@@ -13,7 +13,7 @@ import type {
 } from '../interface';
 import { Colors } from 'react-native-paper';
 import { useMakeTimeTableWith60 } from '../hooks';
-import { makeHomeTimetable } from '../lib/util';
+import { makeHomeTimetable, makeTime } from '../lib/util';
 import { Alert } from 'react-native';
 
 const POST_IMAGE = 'individual/POST_IMAGE';
@@ -90,47 +90,39 @@ export const individualSlice = createSlice({
 			}>
 		) => {
 			// state.individualDates = defaultDatesWith60;
-			state.confirmClubs = action.payload.confirmClubs;
-			state.confirmDatesTimetable = action.payload.confirmDatesTimetable;
+			const { confirmClubs, confirmDatesTimetable } = action.payload;
+			state.confirmClubs = confirmClubs;
+			state.confirmDatesTimetable = confirmDatesTimetable;
 			state.confirmDatesTimetable?.length &&
 				state.confirmDatesTimetable.map((date, dIdx) => {
 					state.weekIndex.map((day, idx) => {
-						date[day].map((d) => {
+						date[day].map((d: any) => {
 							const startingMinute = Math.round(d.starting_minutes / 10);
 							const endMinute = Math.round(d.end_minutes / 10);
 							for (let i = d.starting_hours; i <= d.end_hours; i++) {
 								if (i === d.starting_hours) {
 									for (let j = startingMinute; j <= 6; j++) {
-										state.individualDates[idx].times[i][j].color = date.color
-											? date.color
-											: Colors.grey400;
-										state.individualDates[idx].times[i][j].isEveryTime = false;
-										state.individualDates[idx].times[i][j].isPicked = true;
-										state.individualDates[idx].times[i][j].mode = 'team';
-										state.individualDates[idx].times[i][j].borderBottom = false;
-										state.individualDates[idx].times[i][j].borderTop = false;
+										makeTime(
+											state.individualDates[idx].times[i][j],
+											'team',
+											date.color ? date.color : Colors.grey400
+										);
 									}
 								} else if (i === d.end_hours) {
 									for (let j = 0; j < endMinute; j++) {
-										state.individualDates[idx].times[i][j].color = date.color
-											? date.color
-											: Colors.grey400;
-										state.individualDates[idx].times[i][j].isEveryTime = false;
-										state.individualDates[idx].times[i][j].isPicked = true;
-										state.individualDates[idx].times[i][j].mode = 'team';
-										state.individualDates[idx].times[i][j].borderBottom = false;
-										state.individualDates[idx].times[i][j].borderTop = false;
+										makeTime(
+											state.individualDates[idx].times[i][j],
+											'team',
+											date.color ? date.color : Colors.grey400
+										);
 									}
 								} else {
 									for (let j = 0; j <= 6; j++) {
-										state.individualDates[idx].times[i][j].color = date.color
-											? date.color
-											: Colors.grey400;
-										state.individualDates[idx].times[i][j].isEveryTime = false;
-										state.individualDates[idx].times[i][j].isPicked = true;
-										state.individualDates[idx].times[i][j].mode = 'team';
-										state.individualDates[idx].times[i][j].borderBottom = false;
-										state.individualDates[idx].times[i][j].borderTop = false;
+										makeTime(
+											state.individualDates[idx].times[i][j],
+											'team',
+											date.color ? date.color : Colors.grey400
+										);
 									}
 								}
 							}
@@ -175,29 +167,27 @@ export const individualSlice = createSlice({
 						for (let i = d.starting_hours; i <= d.end_hours; i++) {
 							if (i === d.starting_hours) {
 								for (let j = startingMinute; j <= 6; j++) {
-									state.individualDates[idx].times[i][j].color = Colors.grey400;
-									state.individualDates[idx].times[i][j].isEveryTime = true;
-									state.individualDates[idx].times[i][j].isPicked = true;
-									state.individualDates[idx].times[i][j].mode = 'start';
-									state.individualDates[idx].times[i][j].borderTop = false;
-									state.individualDates[idx].times[i][j].borderBottom = false;
+									makeTime(
+										state.individualDates[idx].times[i][j],
+										'team',
+										Colors.grey400
+									);
 								}
 							} else if (i === d.end_hours) {
 								for (let j = 0; j < endMinute; j++) {
-									state.individualDates[idx].times[i][j].color = Colors.grey400;
-									state.individualDates[idx].times[i][j].isEveryTime = true;
-									state.individualDates[idx].times[i][j].isPicked = true;
-									state.individualDates[idx].times[i][j].mode = 'start';
-									state.individualDates[idx].times[i][j].borderTop = false;
-									state.individualDates[idx].times[i][j].borderBottom = false;
+									makeTime(
+										state.individualDates[idx].times[i][j],
+										'team',
+										Colors.grey400
+									);
 								}
 							} else {
 								for (let j = 0; j <= 6; j++) {
-									state.individualDates[idx].times[i][j].color = Colors.grey400;
-									state.individualDates[idx].times[i][j].isEveryTime = true;
-									state.individualDates[idx].times[i][j].isPicked = true;
-									state.individualDates[idx].times[i][j].borderTop = false;
-									state.individualDates[idx].times[i][j].borderBottom = false;
+									makeTime(
+										state.individualDates[idx].times[i][j],
+										'team',
+										Colors.grey400
+									);
 								}
 							}
 						}
@@ -267,6 +257,7 @@ export const individualSlice = createSlice({
 					mode.content === t.mode && mode.count++;
 				});
 			});
+
 			modeSelect.sort((a, b) => b.count - a.count);
 
 			modeSelect.forEach((mode) => {

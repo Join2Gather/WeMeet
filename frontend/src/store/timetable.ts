@@ -9,7 +9,7 @@ import type {
 	timetable,
 	makeTeam,
 } from '../interface';
-import { Colors } from 'react-native-paper';
+
 import { createAction } from 'redux-actions';
 import createRequestSaga from '../hooks/createRequestSaga';
 import * as api from '../lib/api/timetable';
@@ -24,7 +24,6 @@ import {
 	makeIndividualTimetable,
 	makeSnapShotDate,
 } from '../lib/util';
-import { confirmDates } from '../interface/timetable';
 
 const GET_INDIVIDUAL = 'timetable/GET_INDIVIDUAL';
 const GET_GROUP = 'timetable/GET_GROUP';
@@ -32,6 +31,7 @@ const POST_INDIVIDUAL = 'timetable/POST_INDIVIDUAL';
 const POST_CONFIRM = 'timetable/POST_CONFIRM';
 const GET_SNAPSHOT = 'timetable/GET_SNAPSHOT';
 const POST_SNAPSHOT = 'timetable/POST_SNAPSHOT';
+const POST_REVERT = 'timetable/POST_REVERT';
 
 export const getIndividualDates = createAction(
 	GET_INDIVIDUAL,
@@ -59,6 +59,11 @@ export const postSnapShot = createAction(
 	(data: getSnapShotAPI) => data
 );
 
+export const postRevert = createAction(
+	POST_REVERT,
+	(data: getSnapShotAPI) => data
+);
+
 const getIndividualSaga = createRequestSaga(
 	GET_INDIVIDUAL,
 	api.getIndividualDates
@@ -71,6 +76,7 @@ const postIndividualSaga = createRequestSaga(
 const postConfirmSaga = createRequestSaga(POST_CONFIRM, api.postConfirm);
 const getSnapShotSaga = createRequestSaga(GET_SNAPSHOT, api.getSnapShot);
 const postSnapShotSaga = createRequestSaga(POST_SNAPSHOT, api.confirmSnapShot);
+const postRevertSaga = createRequestSaga(POST_REVERT, api.revertConfirm);
 
 export function* timetableSaga() {
 	yield takeLatest(GET_INDIVIDUAL, getIndividualSaga);
@@ -79,6 +85,7 @@ export function* timetableSaga() {
 	yield takeLatest(POST_CONFIRM, postConfirmSaga);
 	yield takeLatest(GET_SNAPSHOT, getSnapShotSaga);
 	yield takeLatest(POST_CONFIRM, postSnapShotSaga);
+	yield takeLatest(POST_REVERT, postRevertSaga);
 }
 
 const initialState: timetable = {
@@ -199,6 +206,7 @@ const initialState: timetable = {
 	isInTeamTime: false,
 	selectTimeMode: '',
 	modalMode: false,
+	isPostRevertSuccess: false,
 };
 
 export const timetableSlice = createSlice({
@@ -327,6 +335,13 @@ export const timetableSlice = createSlice({
 		POST_CONFIRM_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
+		POST_REVERT_SUCCESS: (state, action: PayloadAction<any>) => {
+			state.isPostRevertSuccess = true;
+		},
+		POST_REVERT_FAILURE: (state, action: PayloadAction<any>) => {
+			state.error = action.payload;
+			state.isPostRevertSuccess = false;
+		},
 		cloneDates: (state, action: PayloadAction<any>) => {
 			state.dates = action.payload;
 		},
@@ -451,97 +466,29 @@ export const timetableSlice = createSlice({
 								state.teamConfirmDate[dayIdx].times[i][j].borderTop = true;
 							}
 							state.teamConfirmDate[dayIdx].times[i][j].color = state.color;
-							state.teamConfirmDate[dayIdx].times[i][j].isEveryTime = false;
-							state.teamConfirmDate[dayIdx].times[i][j].isPicked = true;
 							state.teamConfirmDate[dayIdx].times[i][j].mode = 'confirm';
-
 							state.teamConfirmDate[dayIdx].times[i][j].borderWidth = 2;
 						}
 					} else if (i === state.endTime) {
-						for (let j = 0; j < endMinute; j++) {
+						for (let j = 0; j <= endMinute; j++) {
 							if (j === endMinute) {
 								state.teamConfirmDate[dayIdx].times[i][j].borderBottom = true;
 							}
-
 							state.teamConfirmDate[dayIdx].times[i][j].color = state.color;
-							state.teamConfirmDate[dayIdx].times[i][j].isEveryTime = false;
-							state.teamConfirmDate[dayIdx].times[i][j].isPicked = true;
 							state.teamConfirmDate[dayIdx].times[i][j].mode = 'confirm';
-
 							state.teamConfirmDate[dayIdx].times[i][j].borderWidth = 2;
 						}
 					} else {
 						for (let j = 0; j <= 6; j++) {
 							state.teamConfirmDate[dayIdx].times[i][j].color = state.color;
-							state.teamConfirmDate[dayIdx].times[i][j].isEveryTime = false;
-							state.teamConfirmDate[dayIdx].times[i][j].isPicked = true;
 							state.teamConfirmDate[dayIdx].times[i][j].mode = 'confirm';
-
 							state.teamConfirmDate[dayIdx].times[i][j].borderWidth = 2;
 						}
 					}
 				}
 			}
 		},
-		changeAllColor: (state) => {
-			const startingMinute = Math.round(state.startMinute / 10);
-			const endMinute = Math.round(state.endMinute / 10);
 
-			for (let i = state.startTime; i <= state.endTime; i++) {
-				for (let j = 0; j <= 6; j++) {
-					if (state.dates[state.dayIdx].times[i][j].color !== Colors.white) {
-						state.isTimePicked = true;
-						Alert.alert('알림', '이미 지정된 시간 입니다', [
-							{
-								text: '확인',
-								onPress: () => {},
-							},
-						]);
-						break;
-					}
-				}
-			}
-			if (!state.isTimePicked) {
-				for (let i = state.startTime; i <= state.endTime; i++) {
-					if (i === state.startTime) {
-						for (let j = startingMinute; j <= 6; j++) {
-							state.teamConfirmDate[state.dayIdx].times[i][j].color =
-								state.color;
-							state.teamConfirmDate[state.dayIdx].times[i][j].isEveryTime =
-								false;
-							state.teamConfirmDate[state.dayIdx].times[i][j].isPicked = true;
-							state.teamConfirmDate[state.dayIdx].times[i][j].mode = 'start';
-							state.teamConfirmDate[state.dayIdx].times[i][j].borderBottom =
-								false;
-							state.teamConfirmDate[state.dayIdx].times[i][j].borderTop = false;
-						}
-					} else if (i === state.endTime) {
-						for (let j = 0; j < endMinute; j++) {
-							state.teamConfirmDate[state.dayIdx].times[i][j].color =
-								state.color;
-							state.teamConfirmDate[state.dayIdx].times[i][j].isEveryTime =
-								false;
-							state.teamConfirmDate[state.dayIdx].times[i][j].isPicked = true;
-							state.teamConfirmDate[state.dayIdx].times[i][j].mode = 'end';
-							state.teamConfirmDate[state.dayIdx].times[i][j].borderBottom =
-								false;
-							state.teamConfirmDate[state.dayIdx].times[i][j].borderTop = false;
-						}
-					} else {
-						for (let j = 0; j <= 6; j++) {
-							state.teamConfirmDate[state.dayIdx].times[i][j].color =
-								state.color;
-							state.teamConfirmDate[state.dayIdx].times[i][j].isEveryTime =
-								false;
-							state.teamConfirmDate[state.dayIdx].times[i][j].isPicked = true;
-							state.teamConfirmDate[state.dayIdx].times[i][j].borderBottom =
-								false;
-							state.teamConfirmDate[state.dayIdx].times[i][j].borderTop = false;
-						}
-					}
-				}
-			}
-		},
 		makePostIndividualDates: (state) => {
 			if (!state.isTimePicked) {
 				const data = {
@@ -684,6 +631,7 @@ export const timetableSlice = createSlice({
 		setTimeModalMode: (state, action: PayloadAction<boolean>) => {
 			state.modalMode = action.payload;
 		},
+
 		// checkTimeMode(state, action:PayloadAction<)
 	},
 	extraReducers: {},
@@ -697,7 +645,7 @@ export const {
 	setEndMin,
 	checkIsBlank,
 	toggleTimePick,
-	changeAllColor,
+
 	setDay,
 	makePostIndividualDates,
 	makeConfirmDates,
