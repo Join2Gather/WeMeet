@@ -88,17 +88,8 @@ export const teamSlice = createSlice({
 			state.error = action.payload;
 		},
 		JOIN_TEAM_SUCCESS: (state, action: PayloadAction<joinTeamAPI>) => {
-			const {
-				color,
-				end_hours,
-				id,
-				name,
-				people_count,
-				starting_hours,
-				token,
-				uri,
-				user,
-			} = action.payload;
+			const { color, end_hours, id, name, people_count, starting_hours, uri } =
+				action.payload;
 			state.id = id;
 			state.joinName = decodeURI(name);
 			state.joinUri = uri;
