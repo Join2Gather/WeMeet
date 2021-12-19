@@ -201,7 +201,7 @@ const initialState: timetable = {
 	snapShotError: false,
 	createdDate: '',
 	reload: false,
-	finTime: [],
+	findTime: [],
 	teamName: '',
 	isInTeamTime: false,
 	selectTimeMode: '',
@@ -365,9 +365,9 @@ export const timetableSlice = createSlice({
 			let isNonColor = 0;
 			const mode = action.payload === 'start' ? state.startTime : state.endTime;
 
-			state.teamDatesWith60[state.dayIdx].times[mode].forEach((t) => {
-				t.mode === 'normal' && isNonColor++;
-			});
+			state.dates[state.dayIdx].times[mode].forEach(
+				(t) => t.mode === 'normal' && isNonColor++
+			);
 
 			if (isNonColor === 0) {
 				Alert.alert('알림', '이미 지정된 시간 입니다', [
@@ -505,10 +505,10 @@ export const timetableSlice = createSlice({
 			}
 		},
 		deletePostTime: (state) => {
-			const startMinute = Math.round(state.finTime[0].startTime.minute / 10);
-			const endMinute = Math.round(state.finTime[0].endTime.minute / 10);
-			const startHour = state.finTime[0].startTime.hour;
-			const endHour = state.finTime[0].endTime.hour;
+			const startMinute = Math.round(state.findTime[0].startTime.minute / 10);
+			const endMinute = Math.round(state.findTime[0].endTime.minute / 10);
+			const startHour = state.findTime[0].startTime.hour;
+			const endHour = state.findTime[0].endTime.hour;
 			state.postIndividualDates[state.weekIndex[state.dayIdx]] =
 				state.postIndividualDates[state.weekIndex[state.dayIdx]].filter(
 					(day: any) => day.starting_hours !== startHour
@@ -579,7 +579,7 @@ export const timetableSlice = createSlice({
 		) => {
 			const day = action.payload.day;
 			const time = action.payload.time;
-			state.finTime = [];
+			state.findTime = [];
 			if (action.payload.isTeam) {
 				state.responseGroup[day].avail_time.forEach((t, idx) => {
 					if (t.starting_hours <= time && t.end_hours >= time) {
@@ -594,8 +594,21 @@ export const timetableSlice = createSlice({
 								minute: t.end_minutes,
 							},
 							selectTime: time,
+							timeText: `${
+								t.starting_hours > 12
+									? `오후  ${t.starting_hours - 12}`
+									: `오전  ${t.starting_hours}`
+							} : ${
+								t.starting_minutes < 10
+									? '0' + t.starting_minutes
+									: t.starting_minutes
+							}  ~  ${
+								t.end_hours > 12
+									? `오후  ${t.end_hours - 12}`
+									: `오전  ${t.end_hours}`
+							} : ${t.end_minutes < 10 ? '0' + t.end_minutes : t.end_minutes}`,
 						};
-						state.finTime = [...state.finTime, data];
+						state.findTime = [...state.findTime, data];
 					}
 				});
 			} else {
@@ -611,8 +624,21 @@ export const timetableSlice = createSlice({
 								minute: t.end_minutes,
 							},
 							selectTime: time,
+							timeText: `${
+								t.starting_hours > 12
+									? `오후  ${t.starting_hours - 12}`
+									: `오전  ${t.starting_hours}`
+							} : ${
+								t.starting_minutes < 10
+									? '0' + t.starting_minutes
+									: t.starting_minutes
+							}  ~  ${
+								t.end_hours > 12
+									? `오후  ${t.end_hours - 12}`
+									: `오전  ${t.end_hours}`
+							} : ${t.end_minutes < 10 ? '0' + t.end_minutes : t.end_minutes}`,
 						};
-						state.finTime = [...state.finTime, data];
+						state.findTime = [...state.findTime, data];
 					}
 				});
 			}

@@ -30,6 +30,7 @@ import individual, {
 } from '../store/individual';
 import DatePicker from 'react-native-date-picker';
 import { Spinner } from '.';
+import { findTime } from '../interface';
 interface props {
 	modalVisible?: boolean;
 	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>> | null;
@@ -52,6 +53,7 @@ interface props {
 	timeMode: string;
 	joinUri: string;
 	isHomeTime: boolean;
+	findTime?: findTime[];
 }
 
 export function ModalTimePicker({
@@ -73,6 +75,7 @@ export function ModalTimePicker({
 	timeMode,
 	joinUri,
 	isHomeTime,
+	findTime,
 }: props) {
 	const {
 		postConfirmSuccess,
@@ -248,7 +251,11 @@ export function ModalTimePicker({
 				onCancel={onPressClose}
 				androidVariant={'iosClone'}
 				minuteInterval={10}
-				title="시작 시간 설정"
+				title={
+					isConfirm
+						? findTime && `시작시간 설정\n${findTime[0].timeText}`
+						: '시작시간 설정'
+				}
 				confirmText="확인"
 				cancelText="취소"
 			/>
@@ -265,7 +272,11 @@ export function ModalTimePicker({
 				onCancel={onPressClose}
 				androidVariant={'iosClone'}
 				minuteInterval={10}
-				title="종료 시간 설정"
+				title={
+					isConfirm
+						? findTime && `종료시간 설정\n${findTime[0].timeText}`
+						: '종료시간 설정'
+				}
 				confirmText="확인"
 				cancelText="취소"
 			/>

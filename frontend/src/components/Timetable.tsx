@@ -128,7 +128,7 @@ export function Timetable({
 			timesText: timetable.timesText,
 			endHourTimetable: timetable.endHour,
 			reload: timetable.reload,
-			findTime: timetable.finTime,
+			findTime: timetable.findTime,
 			findIndividual: login.findIndividual,
 			selectTimeMode: timetable.selectTimeMode,
 			modalMode: timetable.modalMode,
@@ -195,6 +195,7 @@ export function Timetable({
 		joinUri,
 		timeMode,
 		reload,
+		color,
 		confirmDatesPrepare,
 	]);
 
@@ -239,7 +240,7 @@ export function Timetable({
 	);
 	useEffect(() => {
 		if (isHomeTime) {
-			if (inTimeMode.includes('team') || inTimeMode.includes('home')) {
+			if (inTimeMode.includes('team') || inTimeMode.includes('everyTime')) {
 				// 빈 칸 아닐 경우
 				dispatch(findHomeTime({ day: select.day, time: select.time }));
 
@@ -360,7 +361,14 @@ export function Timetable({
 							<Text
 								style={[
 									styles.dayOfText,
-									{ color: idx === 0 ? Colors.red500 : Colors.black },
+									{
+										color:
+											idx === 0
+												? Colors.red500
+												: idx === 6
+												? Colors.blue500
+												: Colors.black,
+									},
 								]}
 							>
 								{dayText}
@@ -538,7 +546,6 @@ export function Timetable({
 											key={time}
 											onPress={() => {
 												onPressGroupTime(Number(time), day.day, true, idx);
-												console.log('hihi');
 											}}
 										>
 											{day.times[time].map((t, tIdx) => (
@@ -664,6 +671,7 @@ export function Timetable({
 						timeMode={timeMode}
 						joinUri={joinUri}
 						isHomeTime={isHomeTime}
+						findTime={findTime}
 					/>
 				</View>
 			</View>

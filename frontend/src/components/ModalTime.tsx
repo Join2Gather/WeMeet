@@ -46,11 +46,7 @@ export function ModalTime({
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
-	const [RGBColor, setRGBColor] = useState({
-		r: 0,
-		g: 0,
-		b: 0,
-	});
+
 	useEffect(() => {
 		if (mode == 'loading') {
 			setTimeout(() => {
@@ -58,12 +54,7 @@ export function ModalTime({
 			}, 1000);
 		}
 	}, [mode]);
-	useEffect(() => {
-		if (color) {
-			const result = hexToRGB(color);
-			result && setRGBColor(result);
-		}
-	}, [color]);
+
 	const onPressDelete = useCallback(() => {
 		dispatch(deletePostTime());
 		setTimeModalVisible && setTimeModalVisible(false);
@@ -139,26 +130,7 @@ export function ModalTime({
 									<View style={[styles.backgroundView]}>
 										<View style={styles.columnView}>
 											<View style={styles.rowView}>
-												<Text style={styles.touchText}>
-													{t.startTime.hour > 12
-														? `오후  ${t.startTime.hour - 12}`
-														: `오전  ${t.startTime.hour}`}
-													{'  : '}
-													{t.startTime.minute < 10
-														? '0' + t.startTime.minute
-														: t.startTime.minute}
-													{' ~   '}
-												</Text>
-
-												<Text style={styles.touchText}>
-													{t.endTime.hour >= 12
-														? `오후  ${t.endTime.hour - 12}`
-														: `오전  ${t.endTime.hour}`}
-													{' : '}
-													{t.endTime.minute < 10
-														? '0' + t.endTime.minute
-														: t.endTime.minute}
-												</Text>
+												<Text style={styles.touchText}>{t.timeText}</Text>
 											</View>
 										</View>
 									</View>

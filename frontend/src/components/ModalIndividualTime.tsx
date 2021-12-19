@@ -172,7 +172,7 @@ export function ModalIndividualTime({
 									</View>
 								</View>
 							))}
-						{inTimeMode.includes('team') && (
+						{inTimeMode.includes('everyTime') && (
 							<>
 								<View style={styles.blankView} />
 								<View style={styles.rowLine} />
