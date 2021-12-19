@@ -131,8 +131,3 @@ class KakaoLoginToDjango(SocialLoginView):
     adapter_class = kakao_view.KakaoOAuth2Adapter
     client_class = OAuth2Client
     callback_url = Constants.KAKAO_CALLBACK_URI
-
-class AppleCallbackView(APIView):
-    @swagger_auto_schema(operation_id="애플 로그인 콜백")
-    def post(self, request):
-        print(request.data)
