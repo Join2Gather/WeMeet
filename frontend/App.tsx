@@ -42,7 +42,7 @@ sagaMiddleware.run(rootSaga);
 export default function App() {
 	const scheme = useColorScheme();
 	const [theme, setTheme] = useState(
-		scheme === 'dark' ? DarkTheme : DefaultTheme
+		scheme === 'dark' ? DefaultTheme : DefaultTheme
 	);
 	React.useEffect(() => {
 		lockOrientation();
