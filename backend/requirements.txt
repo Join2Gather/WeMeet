@@ -16,3 +16,4 @@ ruamel.yaml
 gevent
 hypothesis
 hypothesis[all]
+pyjwt

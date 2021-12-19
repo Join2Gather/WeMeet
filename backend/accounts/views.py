@@ -1,3 +1,4 @@
+from rest_framework.request import Request
 from config.settings import DEBUG
 from typing import Optional
 from django.contrib.auth.models import User
@@ -15,7 +16,7 @@ from config.environment import get_secret
 from config.models import Profiles
 from config.serializers import ProfilesSerializer
 from drf_yasg.utils import swagger_auto_schema
-
+import jwt
 # Data class for shorthand notation
 class Constants:
     KAKAO_CALLBACK_URI: str = get_secret('KAKAO_CALLBACK_URI')
@@ -131,3 +132,18 @@ class KakaoLoginToDjango(SocialLoginView):
     adapter_class = kakao_view.KakaoOAuth2Adapter
     client_class = OAuth2Client
     callback_url = Constants.KAKAO_CALLBACK_URI
+
+class AppleCallbackView(APIView):
+    @swagger_auto_schema(operation_id="애플 로그인 콜백")
+    def post(self, request: Request):
+        keys = ['state', 'code', 'id_token', 'user']
+        
+        print(request.data)
+        
+        state, code, id_token, user = map(lambda key: request.data.get(key, None), keys)
+        
+        decoded_token = jwt.decode(id_token, audience=get_secret('CLIENT_ID'),options={"verify_signature": False})
+        
+        print({state, code, id_token, user})
+        
+        return JsonResponse({})
