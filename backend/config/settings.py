@@ -158,7 +158,7 @@ SOCIALACCOUNT_PROVIDERS = {
     },
     "apple": {
         "APP": {
-            "client_id": "com.ww8007.Join2Gather",
+            "client_id": get_secret('CLIENT_ID'),
 
             "secret": get_secret('APPLE_SECRET'),
             "key": get_secret('APPLE_KEY'),
