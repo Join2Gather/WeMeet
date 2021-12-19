@@ -136,7 +136,7 @@ class KakaoLoginToDjango(SocialLoginView):
 class AppleCallbackView(APIView):
     @swagger_auto_schema(operation_id="애플 로그인 콜백")
     def post(self, request: Request):
-        keys = ['state', 'code', 'id_token', 'user']
+        keys = ['state', 'code', 'id_token']
         
         print(request.data)
         
