@@ -15,7 +15,6 @@ import { useAutoFocus } from '../contexts';
 //import { MaterialCommunityIcon as Icon } from '../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
-	changeAllColor,
 	changeConfirmTime,
 	makeConfirmDates,
 	makeInitialTimePicked,
@@ -112,7 +111,7 @@ export function ModalMinute({
 					setMinute('');
 					setHour('');
 					setModalVisible(false);
-					dispatch(changeAllColor());
+
 					dispatch(makePostIndividualDates());
 				}
 			}
@@ -146,9 +145,10 @@ export function ModalMinute({
 					user,
 				})
 			);
-		} else if (confirmDatesPrepare && uri) {
-			dispatch(postConfirm({ date: confirmDates, id, token, uri, user }));
 		}
+		// } else if (confirmDatesPrepare && uri) {
+		// 	dispatch(postConfirm({ date: confirmDates, id, token, uri, user }));
+		// }
 	}, [
 		postDatesPrepare,
 		uri,
