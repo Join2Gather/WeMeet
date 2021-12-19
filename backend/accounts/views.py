@@ -140,10 +140,10 @@ class AppleCallbackView(APIView):
         
         print(request.data)
         
-        state, code, id_token, user = map(lambda key: request.data.get(key, None), keys)
+        state, code, id_token = map(lambda key: request.data.get(key, None), keys)
         
         decoded_token = jwt.decode(id_token, audience=get_secret('CLIENT_ID'),options={"verify_signature": False})
         
-        print({state, code, id_token, user})
+        print({state, code, decoded_token})
         
         return JsonResponse({})
