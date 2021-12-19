@@ -104,7 +104,7 @@ export const individualSlice = createSlice({
 									for (let j = startingMinute; j <= 6; j++) {
 										makeTime(
 											state.individualDates[idx].times[i][j],
-											'team',
+											date.color ? 'team' : 'everyTime',
 											date.color ? date.color : Colors.grey400
 										);
 									}
@@ -112,7 +112,7 @@ export const individualSlice = createSlice({
 									for (let j = 0; j < endMinute; j++) {
 										makeTime(
 											state.individualDates[idx].times[i][j],
-											'team',
+											date.color ? 'team' : 'everyTime',
 											date.color ? date.color : Colors.grey400
 										);
 									}
@@ -120,7 +120,7 @@ export const individualSlice = createSlice({
 									for (let j = 0; j <= 6; j++) {
 										makeTime(
 											state.individualDates[idx].times[i][j],
-											'team',
+											date.color ? 'team' : 'everyTime',
 											date.color ? date.color : Colors.grey400
 										);
 									}
@@ -250,6 +250,10 @@ export const individualSlice = createSlice({
 				{
 					count: 0,
 					content: 'home',
+				},
+				{
+					count: 0,
+					content: 'everyTime',
 				},
 			];
 			state.individualDates[idx].times[time].forEach((t) => {
