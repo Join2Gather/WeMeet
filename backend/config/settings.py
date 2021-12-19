@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 from .environment import get_secret
+import base64
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -59,8 +60,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
-    'allauth.socialaccount.providers.github',
-    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.apple',
     'django.contrib.sites',  # Admin 페이지를 위해 추가
     'drf_yasg'
 ]
@@ -154,6 +154,16 @@ SOCIALACCOUNT_PROVIDERS = {
     'kakao': {
         'APP': {
             'key': get_secret('KAKAO_REST_API_KEY')
+        }
+    },
+    "apple": {
+        "APP": {
+            "client_id": "com.ww8007.Join2Gather",
+
+            "secret": get_secret('APPLE_SECRET'),
+            "key": get_secret('APPLE_KEY'),
+
+            "certificate_key": base64.b64decode(get_secret('APPLE_CERTIFICATE_KEY_BASE64'))
         }
     }
 }

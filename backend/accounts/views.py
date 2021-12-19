@@ -17,8 +17,6 @@ from config.serializers import ProfilesSerializer
 from drf_yasg.utils import swagger_auto_schema
 
 # Data class for shorthand notation
-
-
 class Constants:
     KAKAO_CALLBACK_URI: str = get_secret('KAKAO_CALLBACK_URI')
     REST_API_KEY: str = get_secret('KAKAO_REST_API_KEY')
@@ -133,3 +131,8 @@ class KakaoLoginToDjango(SocialLoginView):
     adapter_class = kakao_view.KakaoOAuth2Adapter
     client_class = OAuth2Client
     callback_url = Constants.KAKAO_CALLBACK_URI
+
+class AppleCallbackView(APIView):
+    @swagger_auto_schema(operation_id="애플 로그인 콜백")
+    def get(self, request):
+        print(request.GET)
