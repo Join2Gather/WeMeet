@@ -8,6 +8,7 @@ import {
 	View,
 	TextInput,
 	ActivityIndicator,
+	Dimensions,
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
@@ -27,7 +28,7 @@ import { makeTeamTime, setTimeMode } from '../store/timetable';
 import { Button } from '../lib/util/Button';
 import { Sequence } from './Sequence';
 import { current } from '@reduxjs/toolkit';
-
+const screen = Dimensions.get('screen');
 interface props {
 	modalVisible: boolean;
 	setModalVisible: any;
@@ -285,14 +286,13 @@ export function ModalInput({
 											autoFocus={true}
 										/>
 									</View>
-									<View style={styles.blankView} />
+
 									<Button
 										buttonNumber={1}
 										buttonText={'확인'}
 										onPressWithParam={() => onPressNext('time')}
 										pressParam="time"
 									/>
-									<View style={styles.blankView} />
 								</>
 							)}
 						</View>
@@ -386,12 +386,12 @@ export function ModalInput({
 								🎉 모임에 참여가 완료 되었습니다 {'\n'} 가능한 시간을
 								입력해주세요
 							</Text>
+							<View style={styles.buttonOverLine} />
 							<Button
 								buttonNumber={1}
 								buttonText={'확인'}
 								onPressFunction={onPressClose}
 							/>
-							<View style={styles.blankView} />
 						</>
 					)}
 					{mode === 'makeSuccess' && (
@@ -400,12 +400,12 @@ export function ModalInput({
 								🎉 모임 생성 완료 되었습니다 {'\n'} 가능한 시간을 입력해주세요
 								{'\n'}
 							</Text>
+							<View style={styles.buttonOverLine} />
 							<Button
 								buttonNumber={1}
 								buttonText={'확인'}
 								onPressFunction={onPressClose}
 							/>
-							<View style={styles.blankView} />
 						</>
 					)}
 
@@ -546,5 +546,11 @@ const styles = StyleSheet.create({
 		borderWidth: 0.4,
 		width: '110%',
 		marginTop: 15,
+	},
+	buttonOverLine: {
+		borderTopWidth: 0.4,
+		width: screen.width * 0.9,
+		marginTop: 20,
+		borderColor: Colors.black,
 	},
 });
