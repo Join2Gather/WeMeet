@@ -116,7 +116,7 @@ export function ModalSetting({
 		setSettingModalVisible(false);
 		setModalMode('initial');
 		navigation.navigate('SnapShot', { name, color });
-	}, []);
+	}, [color]);
 	const onPressLeaveTeam = useCallback(() => {
 		uri && dispatch(leaveTeam({ id, token, uri, user }));
 		setMode('loadingLeave');
@@ -417,7 +417,7 @@ export function ModalSetting({
 					{mode === 'success' && (
 						<>
 							<View style={styles.blankView} />
-							<View style={styles.rowView}>
+							<View style={[styles.rowView, { justifyContent: 'center' }]}>
 								<Font5Icon
 									name="check-circle"
 									size={19}
@@ -430,19 +430,18 @@ export function ModalSetting({
 							</View>
 							<View style={styles.blankView} />
 							<View style={styles.buttonOverLine} />
-							<View style={styles.blankView} />
+
 							<Button
 								buttonNumber={1}
 								buttonText="확인"
 								onPressFunction={onFinishChangeColor}
 							/>
-							<View style={styles.blankView} />
 						</>
 					)}
 					{mode === 'successLeave' && (
 						<>
 							<View style={styles.blankView} />
-							<View style={styles.rowView}>
+							<View style={[styles.rowView, { justifyContent: 'center' }]}>
 								<Font5Icon
 									name="check-circle"
 									size={19}
@@ -547,7 +546,7 @@ const styles = StyleSheet.create({
 		paddingRight: 5,
 	},
 	buttonOverLine: {
-		borderWidth: 0.4,
+		borderTopWidth: 0.4,
 		width: screen.width * 0.9,
 		marginTop: 20,
 		borderColor: Colors.black,

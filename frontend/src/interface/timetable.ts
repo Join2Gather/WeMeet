@@ -40,7 +40,7 @@ export interface timetable {
 	snapShotError: boolean;
 	createdDate: string;
 	reload: boolean;
-	finTime: findTime[];
+	findTime: findTime[];
 	teamName: string;
 	isInTeamTime: boolean;
 	selectTimeMode: string;
@@ -131,6 +131,7 @@ export interface findTime {
 	startTime: timeType;
 	endTime: timeType;
 	selectTime: number;
+	timeText: string;
 }
 
 export interface timeType {
