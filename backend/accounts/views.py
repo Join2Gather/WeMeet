@@ -1,3 +1,4 @@
+import base64
 from rest_framework.request import Request
 from config.settings import DEBUG
 from typing import Optional
@@ -5,6 +6,7 @@ from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.kakao import views as kakao_view
+from allauth.socialaccount.providers.apple import views as apple_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_framework.views import APIView
 from django.http import JsonResponse
@@ -17,11 +19,14 @@ from config.models import Profiles
 from config.serializers import ProfilesSerializer
 from drf_yasg.utils import swagger_auto_schema
 import jwt
+import uuid
+import datetime
 # Data class for shorthand notation
 
 
 class Constants:
     KAKAO_CALLBACK_URI: str = get_secret('KAKAO_CALLBACK_URI')
+    APPLE_CALLBACK_URI: str = get_secret('APPLE_CALLBACK_URI')
     REST_API_KEY: str = get_secret('KAKAO_REST_API_KEY')
     BASE_URL: str = get_secret('BASE_URL')
 
@@ -137,18 +142,97 @@ class KakaoLoginToDjango(SocialLoginView):
 
 
 class AppleCallbackView(APIView):
+    def generate_client_secret(self, key, team_key, cert, client_id):
+        """Create a JWT signed with an apple provided private key"""
+        now = datetime.datetime.utcnow()
+        claims = {
+            "iss": key,
+            "aud": "https://appleid.apple.com",
+            "sub": client_id,
+            "iat": now,
+            "exp": now + datetime.timedelta(hours=1),
+        }
+        headers = {"kid": team_key, "alg": "ES256"}
+        client_secret = jwt.encode(
+            claims, key=cert, algorithm="ES256", headers=headers
+        )
+        return client_secret
+
     @swagger_auto_schema(operation_id="애플 로그인 콜백")
     def post(self, request: Request):
-        keys = ['state', 'code', 'id_token']
 
-        print(request.data)
+        keys = ['state', 'code', 'id_token']
 
         state, code, id_token = map(
             lambda key: request.data.get(key, None), keys)
 
-        decoded_token = jwt.decode(id_token, audience=get_secret(
-            'CLIENT_ID'), options={"verify_signature": False})
+        client_id = get_secret('CLIENT_ID')
+        APPLE_CALLBACK_URI = Constants.APPLE_CALLBACK_URI
 
-        print({state, code, decoded_token})
+        decoded_token = jwt.decode(id_token, audience=client_id, options={
+                                   "verify_signature": False})
 
-        return JsonResponse({})
+        email = decoded_token.get('email')
+        """
+            Signup or Signin Request
+        """
+        is_sign_in = False
+        try:
+            user: User = User.objects.get(email=email)
+            # 기존에 가입된 유저의 Provider가 kakao가 아니면 에러 발생, 맞으면 로그인
+            # 다른 SNS로 가입된 유저
+            social_user: Optional[SocialAccount] = SocialAccount.objects.get(
+                user=user)
+            if social_user is None:
+                return JsonResponse({'err_msg': 'email exists but not social user'}, status=status.HTTP_400_BAD_REQUEST)
+            if social_user.provider != 'apple':
+                return JsonResponse({'err_msg': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
+            is_sign_in = True
+        except User.DoesNotExist:
+            is_sign_in = False
+
+        key = get_secret('APPLE_SECRET')
+        team_key = get_secret('APPLE_KEY')
+        cert = base64.b64decode(get_secret('APPLE_CERTIFICATE_KEY_BASE64'))
+
+        client_secret = self.generate_client_secret(
+            key, team_key, cert, client_id)
+
+        # 로그인 / 가입 로직
+        data = {'client_id': client_id, 'client_secret': client_secret, 'code': code,
+                'grant_type': 'authorization_code', 'redirect_uri': APPLE_CALLBACK_URI}
+
+        token_url = "https://appleid.apple.com/auth/token"
+        token_response = requests.post(
+            token_url, data=data, headers={'content-type': 'application/x-www-form-urlencoded'})
+
+        accept_status = token_response.status_code
+        sign_type = 'signin' if is_sign_in else 'signup'
+        if accept_status != 200:
+            return JsonResponse({'err_msg': f'failed to {sign_type}'}, status=accept_status)
+
+        token_json = token_response.json()
+        refresh_token = token_json.get('refresh_token')
+
+        email = decoded_token.get('email', '')
+        # name scope를 주어도 id_token에서 이름이 발급되지 않아 임시로 이메일로 대체함.
+        username = email
+
+        if not is_sign_in:
+            password = str(uuid.uuid4())
+            user: User = User.objects.create_user(username, email, password)
+            social_user: SocialAccount = SocialAccount.objects.create(
+                user=user, provider='apple')
+
+        token_object: Token = Token.objects.get_or_create(
+            key=refresh_token, user=user)[0]
+
+        profiles = Profiles.objects.filter(user=user)
+
+        if not profiles.exists():
+            nickname = username
+            Profiles.objects.create(name=nickname, user=user)
+            profiles = Profiles.objects.filter(user=user)
+
+        profiles = [ProfilesSerializer(profile).data for profile in profiles]
+        return JsonResponse({'access_token': token_object, 'profiles': profiles})
