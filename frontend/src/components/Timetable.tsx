@@ -458,10 +458,7 @@ export function Timetable({
 											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
-												mode === 'normal' &&
-													onPressHomeTime(Number(time), day.day, idx);
-												mode === 'startMode' &&
-													onSetStartHour(idx, Number(time), day.day);
+												onPressHomeTime(Number(time), day.day, idx);
 											}}
 										>
 											{day.times[time].map((t, tIdx) => (
@@ -680,7 +677,7 @@ export function Timetable({
 }
 
 const styles = StyleSheet.create({
-	view: { flex: 1, flexDirection: 'column', paddingTop: 25 },
+	view: { flex: 1, flexDirection: 'column', paddingTop: 0 },
 	contentView: {
 		flexDirection: 'row',
 		width: '90%',
