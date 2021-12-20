@@ -31,6 +31,7 @@ import individual, {
 import DatePicker from 'react-native-date-picker';
 import { Spinner } from '.';
 import { findTime } from '../interface';
+import { useIsDarkMode } from '../hooks';
 interface props {
 	modalVisible?: boolean;
 	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>> | null;
@@ -87,6 +88,7 @@ export function ModalTimePicker({
 		postHomePrepare,
 		everyTime,
 		postHomeSuccess,
+		startTimeText,
 	} = useSelector(({ timetable, login, individual }: RootState) => ({
 		postConfirmSuccess: timetable.postConfirmSuccess,
 		confirmClubs: login.confirmClubs,
@@ -97,13 +99,14 @@ export function ModalTimePicker({
 		postHomePrepare: individual.postHomePrepare,
 		everyTime: individual.everyTime,
 		postHomeSuccess: individual.postHomeSuccess,
+		startTimeText: timetable.startTimeText,
 	}));
 	const dispatch = useDispatch();
 	// const [minute, setMinute] = useState(0);
 	// const [hour, setHour] = useState(0);
 	const [secondVisible, setSecond] = useState(false);
 	const [firstVisible, setFirst] = useState(false);
-
+	const { isDark } = useIsDarkMode();
 	useEffect(() => {
 		if (modalVisible) setFirst(true);
 	}, [modalVisible]);
@@ -251,6 +254,7 @@ export function ModalTimePicker({
 				onCancel={onPressClose}
 				androidVariant={'iosClone'}
 				minuteInterval={10}
+				textColor={isDark ? Colors.black : Colors.white}
 				title={
 					isConfirm
 						? findTime && `시작시간 설정\n${findTime[0].timeText}`
@@ -272,10 +276,11 @@ export function ModalTimePicker({
 				onCancel={onPressClose}
 				androidVariant={'iosClone'}
 				minuteInterval={10}
+				textColor={isDark ? Colors.black : Colors.white}
 				title={
 					isConfirm
 						? findTime && `종료시간 설정\n${findTime[0].timeText}`
-						: '종료시간 설정'
+						: `시작 시간 : ${startTimeText}\n종료시간 설정`
 				}
 				confirmText="확인"
 				cancelText="취소"
