@@ -46,6 +46,7 @@ export interface timetable {
 	selectTimeMode: string;
 	modalMode: boolean;
 	isPostRevertSuccess: boolean;
+	startTimeText: string;
 }
 
 export type weekIndex = Array<string>;
