@@ -207,6 +207,7 @@ const initialState: timetable = {
 	selectTimeMode: '',
 	modalMode: false,
 	isPostRevertSuccess: false,
+	startTimeText: '',
 };
 
 export const timetableSlice = createSlice({
@@ -353,6 +354,9 @@ export const timetableSlice = createSlice({
 		},
 		setStartMin: (state, action: PayloadAction<number>) => {
 			state.startMinute = action.payload;
+			state.startTimeText = `${
+				state.startTime > 12 ? state.startTime - 12 : state.startTime
+			}시 ${action.payload}분`;
 		},
 		setEndMin: (state, action: PayloadAction<number>) => {
 			state.endMinute = action.payload;

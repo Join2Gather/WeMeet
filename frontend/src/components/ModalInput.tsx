@@ -332,7 +332,7 @@ export function ModalInput({
 								</View>
 							</View>
 							<View style={styles.blankView} />
-							<View style={styles.rowLine} />
+							<View style={styles.buttonOverLine} />
 							<Button
 								buttonNumber={2}
 								buttonText={'이전'}
@@ -360,7 +360,7 @@ export function ModalInput({
 									hideSliders={true}
 								/>
 							</View>
-							<View style={styles.rowLine} />
+							<View style={styles.buttonOverLine} />
 							<Button
 								buttonNumber={2}
 								buttonText={'이전'}
@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
 	timeInputView: {
 		paddingBottom: 2,
 		backgroundColor: Colors.white,
-		flex: 0.5,
+		flex: 0.6,
 		borderBottomWidth: 0.3,
 		marginLeft: '10%',
 		textAlign: 'center',
