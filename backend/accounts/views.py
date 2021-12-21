@@ -146,13 +146,13 @@ class AppleCallbackView(APIView):
         """Create a JWT signed with an apple provided private key"""
         now = datetime.datetime.utcnow()
         claims = {
-            "iss": key,
+            "iss": team_key,
             "aud": "https://appleid.apple.com",
             "sub": client_id,
             "iat": now,
             "exp": now + datetime.timedelta(hours=1),
         }
-        headers = {"kid": team_key, "alg": "ES256"}
+        headers = {"kid": key, "alg": "ES256"}
         client_secret = jwt.encode(
             claims, key=cert, algorithm="ES256", headers=headers
         )
