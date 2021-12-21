@@ -191,7 +191,7 @@ class AppleCallbackView(APIView):
         except User.DoesNotExist:
             is_sign_in = False
 
-        key = get_secret('APPLE_SECRET')
+        key = get_secret('APPLE_KEY_ID')
         team_key = get_secret('APPLE_KEY')
         cert = base64.b64decode(get_secret('APPLE_CERTIFICATE_KEY_BASE64'))
 
@@ -224,8 +224,11 @@ class AppleCallbackView(APIView):
             social_user: SocialAccount = SocialAccount.objects.create(
                 user=user, provider='apple')
 
-        token_object: Token = Token.objects.get_or_create(
-            key=refresh_token, user=user)[0]
+        if token_object := Token.objects.filter(user=user):
+            token_object = token_object.get()
+        else:
+            token_object: Token = Token.objects.get_or_create(
+                key=refresh_token, user=user)[0]
 
         profiles = Profiles.objects.filter(user=user)
 
@@ -235,4 +238,4 @@ class AppleCallbackView(APIView):
             profiles = Profiles.objects.filter(user=user)
 
         profiles = [ProfilesSerializer(profile).data for profile in profiles]
-        return JsonResponse({'access_token': token_object, 'profiles': profiles})
+        return JsonResponse({'access_token': token_object.key, 'profiles': profiles})
