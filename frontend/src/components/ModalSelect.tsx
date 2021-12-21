@@ -24,11 +24,15 @@ const screen = Dimensions.get('screen');
 interface props {
 	selectModalVisible: boolean;
 	setSelectModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	mode: string;
+	setMode: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export function ModalSelect({
 	selectModalVisible,
 	setSelectModalVisible,
+	mode,
+	setMode,
 }: props) {
 	const { everyTime, id, user, loadingLogin, loginSuccess, token } =
 		useSelector(({ individual, login, loading }: RootState) => ({
@@ -41,7 +45,7 @@ export function ModalSelect({
 			token: login.token,
 		}));
 	const dispatch = useDispatch();
-	const [mode, setMode] = useState('normal');
+
 	const [loginID, setID] = useState('');
 	const [password, setPassword] = useState('');
 
@@ -93,7 +97,7 @@ export function ModalSelect({
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
 						</TouchableHighlight>
 					</View>
-					{mode === 'normal' && (
+					{/* {mode === 'normal' && (
 						<View>
 							<View style={styles.blankView} />
 							<Text style={styles.titleText}>
@@ -162,10 +166,11 @@ export function ModalSelect({
 							</View>
 							<View style={styles.blankView} />
 						</View>
-					)}
+					)} */}
 
 					{mode === 'everytime' && (
 						<View>
+							<View style={styles.blankView} />
 							{/* <Text style={styles.titleText}>에브리 타임</Text> */}
 							<View
 								style={[
@@ -282,6 +287,7 @@ const styles = StyleSheet.create({
 		padding: 10,
 		borderWidth: 1,
 		borderColor: Colors.blue200,
+		width: '80%',
 		// marginLeft: '5%',
 	},
 	buttonText: {
