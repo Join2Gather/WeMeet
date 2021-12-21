@@ -279,11 +279,11 @@ const styles = StyleSheet.create({
 	rowButtonView: {
 		flexDirection: 'row',
 		justifyContent: 'center',
-		marginTop: 20,
+		marginTop: 25,
 		alignSelf: 'center',
 	},
 	viewHeight: {
-		height: 90,
+		height: 115,
 	},
 	touchableBoxView: {
 		flexDirection: 'row',
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignContent: 'center',
 		justifyContent: 'center',
-		// marginTop: 24,
+		marginTop: 25,
 	},
 	infoText: {
 		fontFamily: 'NanumSquareR',
