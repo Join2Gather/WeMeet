@@ -1,12 +1,23 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { Keyboard, StyleSheet, View } from 'react-native';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import {
+	Animated,
+	Keyboard,
+	Platform,
+	StyleSheet,
+	View,
+	Text,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SocialWebviewModal } from './Login/SocialWebviewModal';
 import { LinearGradient } from 'expo-linear-gradient';
+import {
+	appleAuth,
+	AppleButton,
+} from '@invertase/react-native-apple-authentication';
 // prettier-ignore
 import {
   SafeAreaView,
-  Text,
+  
   UnderlineText,
   TextInput,
   TouchableView,
@@ -18,15 +29,80 @@ import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
 import { useSelector } from 'react-redux';
 import { clientBaseURL } from '../lib/api/client';
+import { AppleLogin } from '../components';
+import { useAnimatedValues, useLayout, useToggle } from '../hooks';
+import { interpolate } from '../lib/util';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+
 export default function Login() {
-	const { name } = useSelector(({ login }: RootState) => ({
+	const { name, token } = useSelector(({ login }: RootState) => ({
 		name: login.name,
+		token: login.token,
 	}));
-	const [person, setPerson] = useState('hi');
+
 	const [socialModalVisible, setSocialModalVisible] = useState(false);
 	const [source, setSource] = useState('');
 	const focus = useAutoFocus();
 	const navigation = useNavigation();
+	const AnimatedText = Animated.createAnimatedComponent(Text);
+	const [started, toggleStarted] = useToggle();
+
+	const Title = useMemo(() => ['W', 'E', 'M', 'E', 'E', 'T'], []);
+	const animValues = useAnimatedValues(Title.length);
+	const [layout, setLayout] = useLayout();
+	const startAnimations = useMemo(
+		() =>
+			Title.map((notUsed, index) =>
+				Animated.spring(animValues[index], {
+					useNativeDriver: true,
+					toValue: 1,
+				})
+			),
+		[]
+	);
+	const endAnimations = useMemo(
+		() =>
+			Title.map((notUsed, index) =>
+				Animated.spring(animValues[index], {
+					useNativeDriver: true,
+					toValue: 0,
+				})
+			),
+		[]
+	);
+	const appLoading = useCallback(() => {
+		if (Platform.OS === 'ios')
+			Animated.stagger(200, [...startAnimations, ...endAnimations]).start(
+				toggleStarted
+			);
+		else
+			Animated.sequence([...startAnimations, ...endAnimations]).start(
+				toggleStarted
+			);
+	}, [started]);
+
+	const icons = useMemo(
+		() =>
+			Title.map((t, index) => {
+				const numberOfText = Title.length;
+				const animValue = animValues[index];
+				const transform = {
+					transform: [
+						{
+							translateY: interpolate(animValue, [0, 100]),
+						},
+						{ rotate: interpolate(animValue, ['0deg', '360deg']) },
+					],
+				};
+				return (
+					<AnimatedText key={index} style={[transform, styles.text]}>
+						{t}
+					</AnimatedText>
+				);
+			}),
+		[layout.height]
+	);
+
 	// const goHomeNavigator = useCallback(
 	//   () => navigation.navigate('HomeNavigator'),
 	//   []
@@ -34,12 +110,18 @@ export default function Login() {
 	// prettier-ignore
 	const goTabNavigator = useCallback(() => navigation.navigate('TabNavigator'), []);
 	useEffect(() => {
-		if (name.length) {
-			navigation.navigate('TabNavigator');
+		if (token) {
+			setTimeout(() => {
+				navigation.navigate('TabNavigator');
+			}, 2500);
 		} else {
 			console.log('없음');
 		}
-	}, [name]);
+	}, [token]);
+	useEffect(() => {
+		appLoading();
+	}, []);
+
 	const onPressSocial = useCallback(
 		async (social: any) => {
 			setSocialModalVisible(true);
@@ -74,11 +156,15 @@ export default function Login() {
 								closeSocialModal={onCloseSocial}
 							/>
 						)}
-						{source === '' && (
+						<TouchableOpacity onPress={appLoading}>
+							<View style={[styles.textView]}>
+								{/* <Text style={styles.text}>WE MEET</Text> */}
+								{icons}
+							</View>
+						</TouchableOpacity>
+
+						{token === '' && (
 							<>
-								<View style={[styles.textView]}>
-									<Text style={styles.text}>WE MEET</Text>
-								</View>
 								<TouchableView
 									style={[
 										styles.touchableView,
@@ -91,22 +177,25 @@ export default function Login() {
 								>
 									<Text style={styles.loginText}>카카오 로그인</Text>
 								</TouchableView>
+								<View style={{ height: 15 }} />
+
+								<AppleLogin />
 								<Text style={styles.buttonUnderText}>
 									카카오 계정으로 간편로그인 하세요.
 								</Text>
-								<Text
-									style={{
-										position: 'absolute',
-										bottom: 0,
-										color: Colors.white,
-										fontSize: 11,
-										fontFamily: 'SCDream4',
-									}}
-								>
-									make your plan
-								</Text>
 							</>
 						)}
+						<Text
+							style={{
+								position: 'absolute',
+								bottom: 0,
+								color: Colors.white,
+								fontSize: 11,
+								fontFamily: 'SCDream4',
+							}}
+						>
+							make your plan
+						</Text>
 					</AutoFocusProvider>
 				</View>
 			</SafeAreaView>
@@ -141,7 +230,11 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	textView: { width: '100%', padding: 5, marginBottom: 30 },
+	textView: {
+		padding: 5,
+		marginBottom: 30,
+		flexDirection: 'row',
+	},
 	textInput: { fontSize: 24, padding: 10 },
 	textInputView: { marginTop: 5, borderRadius: 10 },
 	touchableView: {

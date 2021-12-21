@@ -56,6 +56,7 @@ export default function SnapShot({ route }: Props) {
 		joinUri,
 		confirmClubs,
 		confirmDatesTimetable,
+		createdDate,
 	} = useSelector(({ timetable, login, team }: RootState) => ({
 		snapShotDate: timetable.snapShotDate,
 		teamConfirmDate: timetable.teamConfirmDate,
@@ -70,6 +71,7 @@ export default function SnapShot({ route }: Props) {
 		joinUri: team.joinUri,
 		confirmClubs: login.confirmClubs,
 		confirmDatesTimetable: login.confirmDatesTimetable,
+		createdDate: timetable.createdDate,
 	}));
 	// useState
 	const [mode, setMode] = useState('initial');
@@ -214,8 +216,10 @@ export default function SnapShot({ route }: Props) {
 						</View>
 					) : (
 						<>
+							<Text style={styles.titleText}>저장일 : {createdDate}</Text>
 							<View style={styles.rowButtonView}>
 								<View />
+
 								<View style={{ flexDirection: 'row' }}>
 									<View style={[styles.boxView, { backgroundColor: color }]} />
 									<Text style={styles.infoText}>가능 일정</Text>
@@ -336,11 +340,12 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 	},
 	titleText: {
-		fontSize: 17,
+		fontSize: 15,
 		textAlign: 'center',
-		fontFamily: 'NanumSquareR',
-		marginTop: 12,
+		fontFamily: 'NanumSquareBold',
+		marginTop: 25,
 		letterSpacing: -1,
+		height: 25,
 	},
 	stepText: {
 		fontFamily: 'NanumSquareBold',

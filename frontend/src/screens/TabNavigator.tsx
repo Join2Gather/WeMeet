@@ -1,17 +1,13 @@
 import React from 'react';
-import {
-	createBottomTabNavigator,
-	BottomTabBarProps,
-} from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Colors } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import HomeNavigator from './HomeNavigator';
 import Home from './Home';
 import TeamList from './TeamList';
-import type { RouteProp, ParamListBase } from '@react-navigation/native';
+import { RouteProp, ParamListBase } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-
 type TabBarIconProps = { focused: boolean; color: string; size: number };
 
 const icons: Record<string, string[]> = {
@@ -34,21 +30,26 @@ const screenOptions = ({
 	return {
 		tabBarIcon: ({ focused, color, size }: TabBarIconProps) => {
 			const { name } = route;
+
 			const focusedSize = focused ? size + 6 : size;
 			const focusedColor = focused
-				? isInTeamTime
+				? name !== 'Home' && isInTeamTime
 					? teamColor
 					: individualColor
 				: color;
 			const [icon, iconOutline] = icons[name];
+
 			const iconName = focused ? icon : iconOutline;
 			return <Icon name={iconName} size={focusedSize} color={focusedColor} />;
 		},
 		tabBarActiveBackgroundColor: Colors.white,
 		tabBarInactiveBackgroundColor: Colors.white,
-		tabBarActiveTintColor: isInTeamTime ? teamColor : individualColor,
+		tabBarActiveTintColor:
+			route.name !== 'Home' && isInTeamTime ? teamColor : individualColor,
 
+		innerHeight: 40,
 		headerShown: false,
+		tabBarStyle: { height: 85 },
 	};
 };
 const Tab = createBottomTabNavigator();
@@ -60,13 +61,23 @@ export default function TabNavigator() {
 				name="Home"
 				component={Home}
 				options={{
-					tabBarLabel: 'Home',
+					tabBarLabel: '개인 시간표',
+					tabBarLabelStyle: {
+						fontSize: 11,
+						fontFamily: 'NanumSquareBold',
+					},
 				}}
 			/>
 			<Tab.Screen
 				name="HomeNavigator"
 				component={HomeNavigator}
-				options={{ tabBarLabel: 'Team' }}
+				options={{
+					tabBarLabel: '팀 페이지',
+					tabBarLabelStyle: {
+						fontSize: 11,
+						fontFamily: 'NanumSquareBold',
+					},
+				}}
 			/>
 		</Tab.Navigator>
 	);

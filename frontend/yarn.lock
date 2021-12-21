@@ -2468,6 +2468,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@invertase/react-native-apple-authentication@npm:^2.1.5":
+  version: 2.1.5
+  resolution: "@invertase/react-native-apple-authentication@npm:2.1.5"
+  checksum: d6a3dd39b4f13abeb0306acfe548047491b6d3cb6ce968ab168a2af24790178a830cfeef3db64211f2221ff2172a5f95ec973ba6036c3d08681ac7204dcc21a9
+  languageName: node
+  linkType: hard
+
 "@jest/create-cache-key-function@npm:^26.5.0":
   version: 26.6.2
   resolution: "@jest/create-cache-key-function@npm:26.6.2"
@@ -4712,6 +4719,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-apple-authentication@npm:~4.0.3":
+  version: 4.0.3
+  resolution: "expo-apple-authentication@npm:4.0.3"
+  dependencies:
+    "@expo/config-plugins": ^4.0.2
+    expo-modules-core: ~0.4.4
+  checksum: 90da2f1578c7b8411e7e584a240b9ce1165a4d4ac9636e3307e8c7b524c3156a02c3f2ce109860476197cf79e1831636a240ecc28401eb51606664ab9b1abb3d
+  languageName: node
+  linkType: hard
+
 "expo-application@npm:~4.0.0":
   version: 4.0.0
   resolution: "expo-application@npm:4.0.0"
@@ -5259,6 +5276,7 @@ __metadata:
   resolution: "frontend@workspace:."
   dependencies:
     "@babel/core": ^7.12.9
+    "@invertase/react-native-apple-authentication": ^2.1.5
     "@react-native-async-storage/async-storage": ^1.15.13
     "@react-navigation/bottom-tabs": ^6.0.9
     "@react-navigation/drawer": ^6.1.8
@@ -5276,6 +5294,7 @@ __metadata:
     axios: ^0.21.1
     dayjs: ^1.10.7
     expo: ^43.0.3
+    expo-apple-authentication: ~4.0.3
     expo-clipboard: ^2.0.3
     expo-dev-client: ~0.6.3
     expo-file-system: ^13.0.3

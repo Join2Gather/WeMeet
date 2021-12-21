@@ -62,7 +62,7 @@ export function Button({
 						<View
 							style={{
 								height: '100%',
-								borderWidth: 0.4,
+								borderLeftWidth: 0.4,
 							}}
 						/>
 						<TouchableHighlight
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		marginBottom: -20,
 		marginLeft: 1,
-		width: '112%',
+		width: '113%',
 	},
 	closeButtonStyle: {
 		padding: 15,

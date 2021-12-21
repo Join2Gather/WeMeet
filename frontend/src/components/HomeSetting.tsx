@@ -149,7 +149,7 @@ export function HomeSetting({
 												<Font5Icon
 													name="user-alt"
 													size={21}
-													color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+													color={color}
 													style={styles.iconStyle}
 												/>
 												<Text style={styles.touchText}>
@@ -167,7 +167,7 @@ export function HomeSetting({
 												<Font5Icon
 													name="th-list"
 													size={21}
-													color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+													color={color}
 													style={styles.iconStyle}
 												/>
 												<Text style={styles.touchText}>
@@ -185,7 +185,7 @@ export function HomeSetting({
 												<Font5Icon
 													name="check-square"
 													size={21}
-													color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+													color={color}
 													style={styles.iconStyle}
 												/>
 												<Text style={styles.touchText}>
@@ -218,7 +218,7 @@ export function HomeSetting({
 												<Font5Icon
 													name="user-edit"
 													size={21}
-													color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+													color={color}
 													style={styles.iconStyle}
 												/>
 												<Text style={styles.touchText}> 닉네임 변경</Text>
@@ -246,7 +246,7 @@ export function HomeSetting({
 												<Font5Icon
 													name="palette"
 													size={21}
-													color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+													color={color}
 													style={styles.iconStyle}
 												/>
 												<Text style={styles.touchText}> 테마 색상 변경</Text>
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
-		marginLeft: '8%',
+		marginLeft: '10%',
 		marginTop: 15,
 	},
 	blankView: {

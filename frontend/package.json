@@ -7,6 +7,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@invertase/react-native-apple-authentication": "^2.1.5",
     "@react-native-async-storage/async-storage": "^1.15.13",
     "@react-navigation/bottom-tabs": "^6.0.9",
     "@react-navigation/drawer": "^6.1.8",
@@ -20,6 +21,7 @@
     "axios": "^0.21.1",
     "dayjs": "^1.10.7",
     "expo": "^43.0.3",
+    "expo-apple-authentication": "~4.0.3",
     "expo-clipboard": "^2.0.3",
     "expo-dev-client": "~0.6.3",
     "expo-file-system": "^13.0.3",

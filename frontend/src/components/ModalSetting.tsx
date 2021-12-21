@@ -179,7 +179,7 @@ export function ModalSetting({
 											<Font5Icon
 												name="palette"
 												size={21}
-												color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+												color={color}
 												style={styles.iconStyle}
 											/>
 											<Text style={styles.touchText}> 팀 색상 변경</Text>
@@ -207,7 +207,7 @@ export function ModalSetting({
 											<Font5Icon
 												name="user-plus"
 												size={20}
-												color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+												color={color}
 												style={styles.iconStyle}
 											/>
 											<Text style={styles.touchText}>팀원 초대</Text>
@@ -241,7 +241,7 @@ export function ModalSetting({
 											<Font5Icon
 												name="cloud-download-alt"
 												size={17}
-												color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+												color={color}
 												style={styles.iconStyle}
 											/>
 											<Text style={styles.touchText}>저장 시간 불러오기</Text>
@@ -269,7 +269,7 @@ export function ModalSetting({
 											<FontIcon
 												name="close"
 												size={25}
-												color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+												color={color}
 												style={styles.iconStyle}
 											/>
 											<Text style={styles.touchText}>모임에서 나가기</Text>
@@ -365,7 +365,7 @@ export function ModalSetting({
 													<Font5Icon
 														name="save"
 														size={23}
-														color={`rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 0.6)`}
+														color={color}
 														style={styles.iconStyle}
 													/>
 													<Text style={styles.touchText}>{createdDate}</Text>
@@ -485,7 +485,6 @@ const styles = StyleSheet.create({
 	},
 	columnView: {
 		flexDirection: 'column',
-		// borderRadius: 13,
 		alignContent: 'center',
 	},
 	backgroundView: {
@@ -515,21 +514,18 @@ const styles = StyleSheet.create({
 	touchText: {
 		fontSize: 14,
 		textAlign: 'center',
+		textAlignVertical: 'center',
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
 		marginLeft: 10,
-		justifyContent: 'center',
-		textAlignVertical: 'center',
-		// alignSelf: 'center',
-		// alignContent: 'center',
-		// alignItems: 'center',
+		top: 1,
 	},
 	titleText: {
 		fontSize: 20,
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
-		marginLeft: '8%',
+		marginLeft: '10%',
 		marginTop: 15,
 	},
 	blankView: {

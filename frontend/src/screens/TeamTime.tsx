@@ -7,20 +7,13 @@ import {SafeAreaView, View,
 NavigationHeader,  Text} from '../theme';
 import Icon from 'react-native-vector-icons/Fontisto';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import AntIcon from 'react-native-vector-icons/MaterialIcons';
 import { Spinner } from '../components';
 import { Timetable } from '../components/Timetable';
 import { Colors } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-	makeInitialTimetable,
-	makeTeamTime,
-	setIsInTeamTime,
-	setTeamName,
-} from '../store/timetable';
+import { makeInitialTimetable, setIsInTeamTime } from '../store/timetable';
 import { RootState } from '../store';
-import { findTeam } from '../store/login';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 type TeamStackParamList = {
@@ -36,24 +29,20 @@ type Props = NativeStackScreenProps<TeamStackParamList, 'TeamTime'>;
 import { setModalMode, shareUri } from '../store/team';
 import { ModalSetting } from '../components/ModalSetting';
 import { Sequence } from '../components/Sequence';
+import { TouchableHighlight } from 'react-native-gesture-handler';
 
 export default function TeamTime({ route }: Props) {
 	const {
 		uri,
 		color,
-		peopleCount,
 		postDatesPrepare,
 		confirmDatesPrepare,
-		loadingIndividual,
-		loadingGroup,
 		loadingChangeColor,
 		joinName,
 		joinUri,
 		loadingJoin,
 		joinTeamError,
 		error,
-		startHour,
-		endHour,
 		makeReady,
 		createdDate,
 		snapShotError,
@@ -72,8 +61,6 @@ export default function TeamTime({ route }: Props) {
 		joinUri: team.joinUri,
 		joinTeamError: team.joinTeamError,
 		error: team.error,
-		startHour: login.startHour,
-		endHour: login.endHour,
 		makeReady: timetable.makeReady,
 		createdDate: timetable.createdDate,
 		snapShotError: timetable.snapShotError,
@@ -94,26 +81,11 @@ export default function TeamTime({ route }: Props) {
 	const [isTimeMode, setIsTimeMode] = useState(false);
 	const [currentNumber, setCurrent] = useState(0);
 	const [sequence, setSequence] = useState([0, 1, 2]);
-	// useEffect
-	// useEffect(() => {
-	// 	modalMode !== 'make' &&
-	// 		dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
-	// }, [color, peopleCount, startHour, endHour, modalMode]);
 	// initial
 	useEffect(() => {
 		makeReady && dispatch(makeInitialTimetable());
 	}, [name, makeReady]);
-	// useEffect(() => {
-	// 	if (modalMode === 'join') dispatch(setTeamName(joinName));
-	// 	else dispatch(setTeamName(name));
-	// }, [name, joinName]);
-	// URI 찾아오기 로직
-	// useEffect(() => {
-	// 	if (modalMode === 'normal') dispatch(findURI(name));
-	// 	else if (modalMode === 'make') dispatch(findURI(name));
-	// 	else dispatch(putURI(joinUri));
-	// }, [name, modalMode, joinUri]);
-	// 에러 있으면 목록 페이지로 이동
+
 	useEffect(() => {
 		if (joinTeamError || error !== '') {
 			navigation.navigate('TeamList');
@@ -162,41 +134,54 @@ export default function TeamTime({ route }: Props) {
 						title={modalMode === 'join' ? joinName : name}
 						titleStyle={{ paddingLeft: 0 }}
 						Left={() => (
-							<Icon
-								name="angle-left"
-								size={24}
-								onPress={goLeft}
-								color={Colors.white}
-								// style={{ marginLeft: '3%' }}
-							/>
+							<TouchableHighlight underlayColor={color} onPress={goLeft}>
+								<Icon
+									name="angle-left"
+									size={22}
+									color={Colors.white}
+									// style={{ marginLeft: '3%' }}
+								/>
+							</TouchableHighlight>
 						)}
 						Right={() =>
 							isGroup ? (
-								<MIcon
-									name="check-bold"
-									size={22}
-									color={Colors.white}
-									style={{ paddingTop: 1 }}
+								<TouchableHighlight
+									underlayColor={color}
 									onPress={goConfirmPage}
-								/>
+								>
+									<MIcon
+										name="check-bold"
+										size={20}
+										color={Colors.white}
+										style={{ paddingTop: 1 }}
+									/>
+								</TouchableHighlight>
 							) : (
-								<FontAwesome5Icon
-									name="plus"
-									size={25}
-									color={Colors.white}
-									style={{ paddingTop: 1 }}
+								<TouchableHighlight
+									underlayColor={color}
 									onPress={onPressPlusBtn}
-								/>
+								>
+									<FontAwesome5Icon
+										name="plus"
+										size={22}
+										color={Colors.white}
+										style={{ paddingTop: 1 }}
+									/>
+								</TouchableHighlight>
 							)
 						}
 						secondRight={() => (
-							<MaterialIcon
-								name="settings"
-								size={27}
-								color={Colors.white}
-								style={{ paddingTop: 1 }}
+							<TouchableHighlight
+								underlayColor={color}
 								onPress={() => setSettingModalVisible(true)}
-							/>
+							>
+								<MaterialIcon
+									name="settings"
+									size={24}
+									color={Colors.white}
+									style={{ paddingTop: 1 }}
+								/>
+							</TouchableHighlight>
 						)}
 					/>
 
@@ -209,6 +194,8 @@ export default function TeamTime({ route }: Props) {
 										style={{
 											flexDirection: 'row',
 											justifyContent: 'space-evenly',
+											marginTop: 25,
+											height: 45,
 										}}
 									>
 										<TouchableOpacity
@@ -340,7 +327,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 	},
 	viewHeight: {
-		height: 90,
+		height: 110,
 	},
 	touchableBoxView: {
 		flexDirection: 'row',
@@ -356,7 +343,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 	},
 	iconText: {
-		fontFamily: 'NanumSquareR',
+		fontFamily: 'NanumSquareBold',
 		fontSize: 15,
 		textAlign: 'center',
 		letterSpacing: -1,
@@ -417,6 +404,5 @@ const styles = StyleSheet.create({
 	},
 	boxOverView: {
 		flexDirection: 'column',
-		marginTop: 20,
 	},
 });

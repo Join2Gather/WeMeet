@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { loginEveryTime, postEveryTime } from '../store/individual';
 import type { RootState } from '../store';
 import { setModalMode } from '../store/team';
+import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 
 const screen = Dimensions.get('screen');
 
@@ -86,124 +87,148 @@ export function ModalSelect({
 							style={{
 								marginLeft: '90%',
 								width: '9%',
-								marginBottom: 10,
 							}}
 							onPress={onPressCloseBtn}
 						>
-							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={28} />
+							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
 						</TouchableHighlight>
-						<View style={{ height: 20 }} />
-						{mode === 'normal' && (
-							<View>
-								<Text style={styles.titleText}>
-									시간표 등록 방법을 선택하세요
-								</Text>
-								<View style={{ height: 20 }} />
-								<View style={{ flexDirection: 'row' }}>
+					</View>
+					{mode === 'normal' && (
+						<View>
+							<View style={styles.blankView} />
+							<Text style={styles.titleText}>
+								시간표 등록 방법을 선택하세요
+							</Text>
+							<View style={{ height: 20 }} />
+							<View style={styles.backgroundView}>
+								<View style={styles.columnView}>
 									<TouchableHighlight
 										activeOpacity={1}
 										underlayColor={Colors.grey200}
-										style={styles.iconTouchableView}
+										style={[
+											styles.touchButtonStyle,
+											{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
+										]}
 										onPress={() => {
 											setMode('everytime');
 										}}
 									>
-										<View style={{ flexDirection: 'column' }}>
+										<View style={styles.rowView}>
 											<IonicIcon
 												name="alarm-outline"
 												size={28}
 												color="#CF2C1E"
-												style={{ alignSelf: 'center' }}
+												style={{ marginLeft: 10 }}
 											/>
-											<Text style={styles.iconUnderText}>에브리 타임</Text>
+											<Text style={styles.touchText}>에브리 타임</Text>
+											<View style={styles.iconView}>
+												<Font5Icon
+													name="angle-right"
+													size={19}
+													color={Colors.black}
+													style={styles.rightIconStyle}
+												/>
+											</View>
 										</View>
 									</TouchableHighlight>
 									<TouchableHighlight
 										activeOpacity={1}
 										underlayColor={Colors.grey200}
-										style={styles.iconTouchableView}
+										style={[
+											styles.touchButtonStyle,
+											{ borderTopLeftRadius: 0, borderTopRightRadius: 0 },
+										]}
 										onPress={() => {}}
 									>
-										<View style={{ flexDirection: 'column' }}>
+										<View style={styles.rowView}>
 											<AntIcon
 												name="picture"
 												size={28}
 												color={Colors.green400}
-												style={{ alignSelf: 'center' }}
+												style={{ marginLeft: 10 }}
 											/>
-											<Text style={styles.iconUnderText}>갤러리</Text>
+											<Text style={styles.touchText}>갤러리</Text>
+											<View style={styles.iconView}>
+												<Font5Icon
+													name="angle-right"
+													size={19}
+													color={Colors.black}
+													style={styles.rightIconStyle}
+												/>
+											</View>
 										</View>
 									</TouchableHighlight>
 								</View>
-								<View style={{ height: 20 }} />
 							</View>
-						)}
-						{mode === 'everytime' && (
-							<View>
-								{/* <Text style={styles.titleText}>에브리 타임</Text> */}
-								<View
-									style={[
-										styles.textView,
-										{
-											marginBottom: 10,
-										},
-									]}
+							<View style={styles.blankView} />
+						</View>
+					)}
+
+					{mode === 'everytime' && (
+						<View>
+							{/* <Text style={styles.titleText}>에브리 타임</Text> */}
+							<View
+								style={[
+									styles.textView,
+									{
+										marginBottom: 10,
+									},
+								]}
+							>
+								<View style={[styles.textInputView]}>
+									<Icon
+										name="account"
+										size={28}
+										style={{
+											// marginTop: 5,
+											paddingRight: 10,
+										}}
+									/>
+									<TextInput
+										style={[styles.textInput]}
+										value={loginID}
+										onChangeText={(loginID) => setID((text) => loginID)}
+										autoCapitalize="none"
+										placeholder="ID"
+										placeholderTextColor={Colors.grey800}
+									/>
+								</View>
+							</View>
+							<View style={{ marginBottom: 15 }} />
+							<View style={[styles.textView]}>
+								<View style={[styles.textInputView]}>
+									<Icon
+										name="lock"
+										size={28}
+										style={{
+											// marginTop: 5,
+											paddingRight: 10,
+										}}
+									/>
+									<TextInput
+										autoCapitalize="none"
+										autoCompleteType="password"
+										secureTextEntry={true}
+										style={[styles.textInput]}
+										value={password}
+										onChangeText={(userPw) => setPassword((text) => userPw)}
+										placeholder="PASSWORD"
+										placeholderTextColor={Colors.grey800}
+									/>
+								</View>
+							</View>
+							<View style={styles.buttonRowView}>
+								<TouchableHighlight
+									activeOpacity={1}
+									underlayColor={Colors.grey200}
+									style={styles.closeButtonStyle}
+									onPress={onPressLogin}
 								>
-									<View style={[styles.textInputView]}>
-										<Icon
-											name="account"
-											size={28}
-											style={{
-												// marginTop: 5,
-												paddingRight: 10,
-											}}
-										/>
-										<TextInput
-											style={[styles.textInput]}
-											value={loginID}
-											onChangeText={(loginID) => setID((text) => loginID)}
-											autoCapitalize="none"
-											placeholder="ID"
-											placeholderTextColor={Colors.grey800}
-										/>
-									</View>
-								</View>
-								<View style={{ marginBottom: 15 }} />
-								<View style={[styles.textView]}>
-									<View style={[styles.textInputView]}>
-										<Icon
-											name="lock"
-											size={28}
-											style={{
-												// marginTop: 5,
-												paddingRight: 10,
-											}}
-										/>
-										<TextInput
-											autoCapitalize="none"
-											autoCompleteType="password"
-											secureTextEntry={true}
-											style={[styles.textInput]}
-											value={password}
-											onChangeText={(userPw) => setPassword((text) => userPw)}
-											placeholder="PASSWORD"
-											placeholderTextColor={Colors.grey800}
-										/>
-									</View>
-								</View>
-								<View style={styles.buttonRowView}>
-									<TouchableHighlight
-										activeOpacity={1}
-										underlayColor={Colors.grey200}
-										style={styles.closeButtonStyle}
-										onPress={onPressLogin}
-									>
-										<Text style={styles.buttonText}>로그인</Text>
-									</TouchableHighlight>
-								</View>
+									<Text style={styles.buttonText}>로그인</Text>
+								</TouchableHighlight>
 							</View>
-						)}
-					</View>
+						</View>
+					)}
 				</View>
 			</View>
 		</Modal>
@@ -219,14 +244,12 @@ const styles = StyleSheet.create({
 		marginTop: -20,
 	},
 	modalView: {
-		margin: 10,
-		// paddingBottom: 60,
+		// margin: 10,
 		marginBottom: 60,
-		backgroundColor: 'white',
+		backgroundColor: Colors.white,
 		borderRadius: 13,
-		padding: 15,
+		padding: 20,
 		alignItems: 'center',
-		// shadowColor: '#000',
 		shadowColor: 'black',
 		shadowOffset: {
 			width: 1,
@@ -234,7 +257,6 @@ const styles = StyleSheet.create({
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
-		// elevation: 5,
 		width: screen.width * 0.9,
 	},
 	titleText: {
@@ -302,7 +324,7 @@ const styles = StyleSheet.create({
 	iconTouchableView: {
 		flex: 1,
 		height: 80,
-
+		borderWidth: 3,
 		justifyContent: 'center',
 		borderRadius: 15,
 	},
@@ -310,5 +332,47 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		marginTop: 5,
+	},
+	touchButtonStyle: {
+		padding: 5,
+		borderRadius: 13,
+		justifyContent: 'center',
+		paddingLeft: 5,
+		paddingRight: 5,
+	},
+	iconView: {
+		alignItems: 'flex-end',
+		flex: 1,
+	},
+	rightIconStyle: {
+		marginRight: 10,
+	},
+	rowView: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'flex-start',
+		width: screen.width * 0.65,
+		height: screen.height * 0.05,
+		borderRadius: 13,
+	},
+	touchText: {
+		fontSize: 14,
+		textAlign: 'center',
+		textAlignVertical: 'center',
+		fontFamily: 'NanumSquareR',
+		letterSpacing: -1,
+		marginLeft: 10,
+		top: 1,
+	},
+	backgroundView: {
+		borderRadius: 13,
+		backgroundColor: Colors.grey100,
+	},
+	columnView: {
+		flexDirection: 'column',
+		alignContent: 'center',
+	},
+	blankView: {
+		height: 15,
 	},
 });

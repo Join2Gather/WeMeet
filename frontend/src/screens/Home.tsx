@@ -31,6 +31,8 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import { HomeSetting } from '../components/HomeSetting';
 import { Sequence } from '../components/Sequence';
+import { TouchableHighlight } from 'react-native-gesture-handler';
+import { setIsInTeamTime } from '../store/timetable';
 export default function Home() {
 	const {
 		token,
@@ -65,6 +67,11 @@ export default function Home() {
 	}));
 	const dispatch = useDispatch();
 	const { defaultDates } = useMakeTimetable();
+	const navigation = useNavigation();
+	useEffect(() => {
+		const isFocus = navigation.getState().routes;
+		console.log(isFocus);
+	}, [navigation]);
 	useEffect(() => {
 		if (!individualDates.length) {
 		}
@@ -77,7 +84,6 @@ export default function Home() {
 		dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
 	}, [confirmClubs, confirmDatesTimetable]);
 	// navigation
-	const navigation = useNavigation();
 
 	const [scrollEnabled] = useScrollEnabled();
 	const leftRef = useRef<LeftRightNavigationMethods | null>(null);
@@ -137,31 +143,43 @@ export default function Home() {
 					title="내 일정 등록하기"
 					headerColor={individualColor}
 					Left={() => (
-						<Icon
-							name="timetable"
-							size={28}
-							color={Colors.white}
-							style={{ paddingTop: 1 }}
+						<TouchableHighlight
+							underlayColor={individualColor}
 							onPress={() => setSelectModalVisible(true)}
-						/>
+						>
+							<Icon
+								name="timetable"
+								size={25}
+								color={Colors.white}
+								style={{ paddingTop: 1 }}
+							/>
+						</TouchableHighlight>
 					)}
 					Right={() => (
-						<FontAwesome5Icon
-							name="plus"
-							size={25}
-							color={Colors.white}
-							style={{ paddingTop: 2 }}
+						<TouchableHighlight
+							underlayColor={individualColor}
 							onPress={onPressPlus}
-						/>
+						>
+							<FontAwesome5Icon
+								name="plus"
+								size={22}
+								color={Colors.white}
+								style={{ paddingTop: 2 }}
+							/>
+						</TouchableHighlight>
 					)}
 					secondRight={() => (
-						<MaterialIcon
-							name="settings"
-							size={27}
-							color={Colors.white}
-							style={{ paddingTop: 1 }}
+						<TouchableHighlight
+							underlayColor={individualColor}
 							onPress={() => setSettingModalVisible(true)}
-						/>
+						>
+							<MaterialIcon
+								name="settings"
+								size={24}
+								color={Colors.white}
+								style={{ paddingTop: 1 }}
+							/>
+						</TouchableHighlight>
 					)}
 				/>
 
@@ -169,7 +187,7 @@ export default function Home() {
 					<Spinner loading={postEveryTime} />
 					{mode === 'normal' && (
 						<View style={{ flexDirection: 'column' }}>
-							<Text style={styles.titleText}>make your plan</Text>
+							<Text style={styles.titleText}>안녕하세요 {myNickName}님</Text>
 							<View style={styles.rowView}>
 								<>
 									<View
@@ -266,12 +284,10 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignContent: 'center',
 		justifyContent: 'center',
-
 		marginTop: 20,
-		// marginBottom: 20,
 	},
 	viewHeight: {
-		height: 90,
+		height: 110,
 	},
 	infoText: {
 		fontFamily: 'NanumSquareR',
@@ -295,10 +311,11 @@ const styles = StyleSheet.create({
 		marginTop: 1,
 	},
 	titleText: {
-		fontSize: 17,
+		fontSize: 15,
 		textAlign: 'center',
-		fontFamily: 'NanumSquareR',
-		marginTop: 20,
+		fontFamily: 'NanumSquareBold',
+		marginTop: 25,
 		letterSpacing: -1,
+		height: 25,
 	},
 });
