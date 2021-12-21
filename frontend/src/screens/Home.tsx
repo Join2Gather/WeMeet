@@ -16,7 +16,7 @@ import { LeftRightNavigation, Spinner, ModalSelect } from '../components';
 import { Timetable } from '../components/Timetable';
 import type { LeftRightNavigationMethods } from '../components';
 import { Colors } from 'react-native-paper';
-import * as ImagePicker from 'expo-image-picker';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import {
@@ -33,6 +33,7 @@ import { HomeSetting } from '../components/HomeSetting';
 import { Sequence } from '../components/Sequence';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { setIsInTeamTime } from '../store/timetable';
+import Ionic from 'react-native-vector-icons/Ionicons';
 export default function Home() {
 	const {
 		token,
@@ -93,7 +94,7 @@ export default function Home() {
 	const flatListRef = useRef<FlatList | null>(null);
 
 	// image pic1er
-	const [image, setImage] = useState(null);
+
 	const [mode, setMode] = useState('normal');
 	const [isTimeMode, setIsTimeMode] = useState(false);
 	const [currentNumber, setCurrent] = useState(0);
@@ -109,33 +110,9 @@ export default function Home() {
 
 	// modal
 
-	// useEffect(() => {
-	// 	(async () => {
-	// 		if (Platform.OS !== 'web') {
-	// 			const { status } =
-	// 				await ImagePicker.requestMediaLibraryPermissionsAsync();
-	// 			if (status !== 'granted') {
-	// 				alert('카메라 권한을 승인해주세요');
-	// 			}
-	// 		}
-	// 	})();
-	// }, []);
-
-	const pickImage = async () => {
-		const result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.Images,
-			allowsEditing: false,
-			aspect: [4, 3],
-			quality: 1,
-		});
-		if (!result.cancelled) {
-			const imagePath = result.uri;
-			const imageExt = result.uri.split('.').pop();
-			const imageMime = `image/${imageExt}`;
-			dispatch(postImage({ image: imagePath, token: token }));
-		}
-	};
-
+	const open = useCallback(() => {
+		navigation.dispatch(DrawerActions.openDrawer());
+	}, []);
 	return (
 		<SafeAreaView style={{ backgroundColor: individualColor }}>
 			<View style={[styles.view]}>
@@ -143,15 +120,12 @@ export default function Home() {
 					title="내 일정 등록하기"
 					headerColor={individualColor}
 					Left={() => (
-						<TouchableHighlight
-							underlayColor={individualColor}
-							onPress={() => setSelectModalVisible(true)}
-						>
-							<Icon
-								name="timetable"
-								size={25}
+						<TouchableHighlight underlayColor={individualColor} onPress={open}>
+							<Ionic
+								name="menu"
+								size={33}
 								color={Colors.white}
-								style={{ paddingTop: 1 }}
+								// style={{ paddingTop: 1 }}
 							/>
 						</TouchableHighlight>
 					)}
@@ -184,7 +158,6 @@ export default function Home() {
 				/>
 
 				<View style={styles.viewHeight}>
-					<Spinner loading={postEveryTime} />
 					{mode === 'normal' && (
 						<View style={{ flexDirection: 'column' }}>
 							<Text style={styles.titleText}>안녕하세요 {myNickName}님</Text>
@@ -212,6 +185,7 @@ export default function Home() {
 							</View>
 						</View>
 					)}
+					<Spinner loading={postEveryTime} />
 					{isTimeMode && (
 						<View style={{ flexDirection: 'column' }}>
 							<View style={{ height: 30 }} />
@@ -256,10 +230,10 @@ export default function Home() {
 						isHomeTime={true}
 						setCurrent={setCurrent}
 					/>
-					<ModalSelect
+					{/* <ModalSelect
 						selectModalVisible={selectModalVisible}
 						setSelectModalVisible={setSelectModalVisible}
-					/>
+					/> */}
 					<HomeSetting
 						userMeSuccess={userMeSuccess}
 						setSettingModalVisible={setSettingModalVisible}
@@ -284,10 +258,10 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignContent: 'center',
 		justifyContent: 'center',
-		marginTop: 20,
+		marginTop: 25,
 	},
 	viewHeight: {
-		height: 110,
+		height: 115,
 	},
 	infoText: {
 		fontFamily: 'NanumSquareR',
@@ -308,7 +282,7 @@ const styles = StyleSheet.create({
 		marginRight: 3,
 		marginLeft: 15,
 		borderWidth: 0.3,
-		marginTop: 1,
+		// marginTop: 1,
 	},
 	titleText: {
 		fontSize: 15,

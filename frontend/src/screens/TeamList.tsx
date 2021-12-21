@@ -25,7 +25,7 @@ import { hexToRGB } from '../lib/util/hexToRGB';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
-const circleWidth = 15;
+const circleWidth = 14;
 export default function TeamList() {
 	const {
 		user,
@@ -122,6 +122,7 @@ export default function TeamList() {
 					})
 				);
 				dispatch(setTeamName({ name: teamName, uri: teamUri }));
+
 				setTimeout(() => {
 					navigation.navigate('TeamTime', {
 						user,
@@ -144,6 +145,7 @@ export default function TeamList() {
 				}, 50);
 				setMode('normal');
 			}
+			dispatch(setIsInTeamTime(true));
 		}
 	}, [modalMode, mode, teamMakeColor, makeStartHour, makeEndHour]);
 	const goTeamTime = useCallback(
@@ -191,22 +193,24 @@ export default function TeamList() {
 					title="모임 목록"
 					headerColor={individualColor}
 					Left={() => (
-						<FontAwesome5Icon
-							name="redo-alt"
-							size={25}
-							color={Colors.white}
-							style={{ paddingTop: 1 }}
-							onPress={onReload}
-						/>
+						<TouchableHighlight underlayColor={color} onPress={onReload}>
+							<FontAwesome5Icon
+								name="redo-alt"
+								size={22}
+								color={Colors.white}
+								style={{ paddingTop: 1 }}
+							/>
+						</TouchableHighlight>
 					)}
 					Right={() => (
-						<FontAwesome5Icon
-							name="plus"
-							size={25}
-							color={Colors.white}
-							style={{ paddingTop: 1 }}
-							onPress={onMakeTeamTime}
-						/>
+						<TouchableHighlight underlayColor={color} onPress={onMakeTeamTime}>
+							<FontAwesome5Icon
+								name="plus"
+								size={22}
+								color={Colors.white}
+								style={{ paddingTop: 1 }}
+							/>
+						</TouchableHighlight>
 					)}
 				/>
 
@@ -240,14 +244,7 @@ export default function TeamList() {
 									},
 								]}
 							>
-								<View
-									style={{
-										justifyContent: 'flex-start',
-										flexDirection: 'row',
-										alignItems: 'center',
-										width: '100%',
-									}}
-								>
+								<View style={styles.teamView}>
 									<View
 										style={[styles.rowCircle, { backgroundColor: item.color }]}
 									/>
@@ -327,7 +324,7 @@ const styles = StyleSheet.create({
 	headerUnderText: {
 		fontFamily: 'NanumSquareR',
 		fontSize: 16,
-		marginTop: 13,
+		marginTop: 15,
 		marginBottom: 20,
 		letterSpacing: -0.3,
 
@@ -364,21 +361,19 @@ const styles = StyleSheet.create({
 		width: circleWidth,
 		height: circleWidth,
 		borderRadius: circleWidth / 2,
-		position: 'absolute',
-
-		left: '10%',
+		// position: 'absolute',
+		marginLeft: '10%',
+		// top: -7,
 	},
 	teamTitle: {
-		fontSize: 15,
+		fontSize: 13,
 		fontFamily: 'SCDream4',
 		color: '#000',
 		position: 'absolute',
 		letterSpacing: -0.5,
 		left: '18%',
 		overflow: 'hidden',
-		alignSelf: 'center',
-		alignItems: 'center',
-		// maxWidth: 230,
+		textAlign: 'center',
 	},
 	iconStyle: {
 		position: 'absolute',
@@ -432,7 +427,13 @@ const styles = StyleSheet.create({
 		height: 30,
 	},
 	FlatView: {
-		height: screen.height * 0.6,
+		height: '70%',
 		flexGrow: 0,
+	},
+	teamView: {
+		justifyContent: 'flex-start',
+		flexDirection: 'row',
+		alignItems: 'center',
+		width: '100%',
 	},
 });

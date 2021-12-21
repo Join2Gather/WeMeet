@@ -136,68 +136,6 @@ export function HomeSetting({
 					{mode === 'initial' && (
 						<>
 							<>
-								<Text style={styles.titleText}>계정 정보</Text>
-								<View style={styles.blankView} />
-								<View style={[styles.backgroundView]}>
-									<View style={styles.columnView}>
-										<TouchableHighlight
-											activeOpacity={1}
-											underlayColor={Colors.grey300}
-											style={styles.touchButtonStyle}
-										>
-											<View style={styles.rowView}>
-												<Font5Icon
-													name="user-alt"
-													size={21}
-													color={color}
-													style={styles.iconStyle}
-												/>
-												<Text style={styles.touchText}>
-													{' '}
-													닉네임 : {myNickName}
-												</Text>
-											</View>
-										</TouchableHighlight>
-
-										<TouchableHighlight
-											activeOpacity={1}
-											style={styles.touchButtonStyle}
-										>
-											<View style={styles.rowView}>
-												<Font5Icon
-													name="th-list"
-													size={21}
-													color={color}
-													style={styles.iconStyle}
-												/>
-												<Text style={styles.touchText}>
-													{' '}
-													참여중인 모임 수 : {joinClubNum}
-												</Text>
-											</View>
-										</TouchableHighlight>
-
-										<TouchableHighlight
-											activeOpacity={1}
-											style={styles.touchButtonStyle}
-										>
-											<View style={styles.rowView}>
-												<Font5Icon
-													name="check-square"
-													size={21}
-													color={color}
-													style={styles.iconStyle}
-												/>
-												<Text style={styles.touchText}>
-													{' '}
-													확정 모임 수 : {confirmClubNum}
-												</Text>
-											</View>
-										</TouchableHighlight>
-									</View>
-								</View>
-							</>
-							<>
 								<Text style={styles.titleText}>계정 설정</Text>
 								<View style={styles.blankView} />
 								<View style={[styles.backgroundView]}>
