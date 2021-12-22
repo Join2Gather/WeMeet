@@ -24,41 +24,68 @@ PODS:
     - EXJSONUtils
   - Expo (43.0.3):
     - ExpoModulesCore
-  - expo-dev-client (0.6.3):
+  - expo-dev-client (0.7.2):
     - EXManifests
     - expo-dev-launcher
     - expo-dev-menu
     - expo-dev-menu-interface
     - EXUpdatesInterface
-  - expo-dev-launcher (0.8.4):
+  - expo-dev-launcher (0.9.1):
     - EXManifests
-    - expo-dev-launcher/Main (= 0.8.4)
+    - expo-dev-launcher/Main (= 0.9.1)
     - expo-dev-menu-interface
     - EXUpdatesInterface
     - React-Core
-  - expo-dev-launcher/Main (0.8.4):
+  - expo-dev-launcher/Main (0.9.1):
     - EXManifests
     - expo-dev-launcher/Unsafe
     - expo-dev-menu-interface
     - EXUpdatesInterface
     - React-Core
-  - expo-dev-launcher/Unsafe (0.8.4):
+  - expo-dev-launcher/Unsafe (0.9.1):
     - EXManifests
     - expo-dev-menu-interface
     - EXUpdatesInterface
     - React-Core
-  - expo-dev-menu (0.8.4):
-    - expo-dev-menu-interface
-    - expo-dev-menu/Main (= 0.8.4)
-    - React-Core
-  - expo-dev-menu-interface (0.4.1)
-  - expo-dev-menu/Main (0.8.4):
+  - expo-dev-menu (0.8.6):
+    - expo-dev-menu/Main (= 0.8.6)
+  - expo-dev-menu-interface (0.4.2)
+  - expo-dev-menu/GestureHandler (0.8.6)
+  - expo-dev-menu/Main (0.8.6):
     - expo-dev-menu-interface
     - expo-dev-menu/Vendored
     - React-Core
-  - expo-dev-menu/Vendored (0.8.4):
-    - expo-dev-menu-interface
+  - expo-dev-menu/Reanimated (0.8.6):
+    - DoubleConversion
+    - FBLazyVector
+    - FBReactNativeSpec
+    - glog
+    - RCT-Folly
+    - RCTRequired
+    - RCTTypeSafety
+    - React-callinvoker
     - React-Core
+    - React-Core/DevSupport
+    - React-Core/RCTWebSocket
+    - React-CoreModules
+    - React-cxxreact
+    - React-jsi
+    - React-jsiexecutor
+    - React-jsinspector
+    - React-RCTActionSheet
+    - React-RCTAnimation
+    - React-RCTBlob
+    - React-RCTImage
+    - React-RCTLinking
+    - React-RCTNetwork
+    - React-RCTSettings
+    - React-RCTText
+    - React-RCTVibration
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - expo-dev-menu/Vendored (0.8.6):
+    - expo-dev-menu/GestureHandler
+    - expo-dev-menu/Reanimated
   - ExpoModulesCore (0.4.8):
     - React-Core
   - EXScreenOrientation (4.0.3):
@@ -74,7 +101,7 @@ PODS:
     - EXStructuredHeaders
     - EXUpdatesInterface
     - React-Core
-  - EXUpdatesInterface (0.4.0)
+  - EXUpdatesInterface (0.5.0)
   - FBLazyVector (0.64.3)
   - FBReactNativeSpec (0.64.3):
     - RCT-Folly (= 2020.01.13.00)
@@ -596,18 +623,18 @@ SPEC CHECKSUMS:
   EXLinearGradient: 4d727eacb53d19ef25b02dd810e0199b453489ce
   EXManifests: 50e42e01335df4e54109dee7be5a91bfd37347db
   Expo: 5316c3ecdc34eb0cad340d01dc8beec97c7e879e
-  expo-dev-client: f7417249bbede98f5fa3f151ae49c46cabfce82b
-  expo-dev-launcher: 3a2b9470ed2b4ae0c60615f911c347c50cfc2526
-  expo-dev-menu: 07e44bd1432b2bdfe249f76c37a090510c5dcebc
-  expo-dev-menu-interface: 508467f2ba2aedda7a44e5080cc1e9a43ab7375e
+  expo-dev-client: b0a6b5deedba945162633b2d27f02a727e3eaa47
+  expo-dev-launcher: b76cf991b0a63a7df3a832909addcff1d5668675
+  expo-dev-menu: eead0093127f4a0180048195adfd5c8e8855ed89
+  expo-dev-menu-interface: 6ecfd64dc3eab1e7e772170f5e058468fdccaac9
   ExpoModulesCore: a9a9bf32b2da35cd9b7299c80790c03a91ac7d15
   EXScreenOrientation: 80c8c07ab3f2beb8e83ba94ab6ee4fb7a6bf01a6
   EXSplashScreen: 57f329dbf25c5c12800feed79068a056453dc772
   EXStructuredHeaders: 873e7f329c2f6279c1b1e0229df59c9861560b53
   EXUpdates: 061b67c33f0e7f8fd335bbb48697c4a4fc8a5157
-  EXUpdatesInterface: e1c01b4f5ec76bd1d6cc714938f9edf5ef6379b9
+  EXUpdatesInterface: f459b515151bd73fff7a35366eace34a6c6a0d3f
   FBLazyVector: c71c5917ec0ad2de41d5d06a5855f6d5eda06971
-  FBReactNativeSpec: c7e1969c42df00e0748f9116e3f8e3e7cb76b485
+  FBReactNativeSpec: b74b11e7785ab7207432153ba6798aac83e38488
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
   RCTRequired: d34bf57e17cb6e3b2681f4809b13843c021feb6c
