@@ -8,6 +8,7 @@ import TeamList from './TeamList';
 import { RouteProp, ParamListBase } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { Platform } from 'react-native';
 type TabBarIconProps = { focused: boolean; color: string; size: number };
 
 const icons: Record<string, string[]> = {
@@ -23,7 +24,7 @@ const screenOptions = ({
 	const { individualColor, teamColor, isInTeamTime } = useSelector(
 		({ login, timetable }: RootState) => ({
 			individualColor: login.individualColor,
-			teamColor: login.color,
+			teamColor: timetable.color,
 			isInTeamTime: timetable.isInTeamTime,
 		})
 	);
@@ -49,7 +50,7 @@ const screenOptions = ({
 
 		innerHeight: 40,
 		headerShown: false,
-		tabBarStyle: { height: 85 },
+		tabBarStyle: Platform.OS === 'ios' ? { height: 85 } : { height: 50 },
 	};
 };
 const Tab = createBottomTabNavigator();

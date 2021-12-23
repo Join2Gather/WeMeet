@@ -34,16 +34,24 @@ export function ModalSelect({
 	mode,
 	setMode,
 }: props) {
-	const { everyTime, id, user, loadingLogin, loginSuccess, token } =
-		useSelector(({ individual, login, loading }: RootState) => ({
-			// dates: timetable.dates,
-			everyTime: individual.everyTime,
-			id: login.id,
-			user: login.user,
-			loadingLogin: loading['individual/POST_EVERYTIME'],
-			loginSuccess: individual.loginSuccess,
-			token: login.token,
-		}));
+	const {
+		everyTime,
+		id,
+		user,
+		loadingLogin,
+		loginSuccess,
+		token,
+		individualColor,
+	} = useSelector(({ individual, login, loading }: RootState) => ({
+		// dates: timetable.dates,
+		everyTime: individual.everyTime,
+		id: login.id,
+		user: login.user,
+		loadingLogin: loading['individual/POST_EVERYTIME'],
+		loginSuccess: individual.loginSuccess,
+		token: login.token,
+		individualColor: login.individualColor,
+	}));
 	const dispatch = useDispatch();
 
 	const [loginID, setID] = useState('');
@@ -97,76 +105,6 @@ export function ModalSelect({
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
 						</TouchableHighlight>
 					</View>
-					{/* {mode === 'normal' && (
-						<View>
-							<View style={styles.blankView} />
-							<Text style={styles.titleText}>
-								시간표 등록 방법을 선택하세요
-							</Text>
-							<View style={{ height: 20 }} />
-							<View style={styles.backgroundView}>
-								<View style={styles.columnView}>
-									<TouchableHighlight
-										activeOpacity={1}
-										underlayColor={Colors.grey200}
-										style={[
-											styles.touchButtonStyle,
-											{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
-										]}
-										onPress={() => {
-											setMode('everytime');
-										}}
-									>
-										<View style={styles.rowView}>
-											<IonicIcon
-												name="alarm-outline"
-												size={28}
-												color="#CF2C1E"
-												style={{ marginLeft: 10 }}
-											/>
-											<Text style={styles.touchText}>에브리 타임</Text>
-											<View style={styles.iconView}>
-												<Font5Icon
-													name="angle-right"
-													size={19}
-													color={Colors.black}
-													style={styles.rightIconStyle}
-												/>
-											</View>
-										</View>
-									</TouchableHighlight>
-									<TouchableHighlight
-										activeOpacity={1}
-										underlayColor={Colors.grey200}
-										style={[
-											styles.touchButtonStyle,
-											{ borderTopLeftRadius: 0, borderTopRightRadius: 0 },
-										]}
-										onPress={() => {}}
-									>
-										<View style={styles.rowView}>
-											<AntIcon
-												name="picture"
-												size={28}
-												color={Colors.green400}
-												style={{ marginLeft: 10 }}
-											/>
-											<Text style={styles.touchText}>갤러리</Text>
-											<View style={styles.iconView}>
-												<Font5Icon
-													name="angle-right"
-													size={19}
-													color={Colors.black}
-													style={styles.rightIconStyle}
-												/>
-											</View>
-										</View>
-									</TouchableHighlight>
-								</View>
-							</View>
-							<View style={styles.blankView} />
-						</View>
-					)} */}
 
 					{mode === 'everytime' && (
 						<View>
@@ -183,7 +121,8 @@ export function ModalSelect({
 								<View style={[styles.textInputView]}>
 									<Icon
 										name="account"
-										size={28}
+										size={25}
+										color={individualColor}
 										style={{
 											// marginTop: 5,
 											paddingRight: 10,
@@ -195,7 +134,7 @@ export function ModalSelect({
 										onChangeText={(loginID) => setID((text) => loginID)}
 										autoCapitalize="none"
 										placeholder="ID"
-										placeholderTextColor={Colors.grey800}
+										placeholderTextColor={Colors.grey600}
 									/>
 								</View>
 							</View>
@@ -204,7 +143,8 @@ export function ModalSelect({
 								<View style={[styles.textInputView]}>
 									<Icon
 										name="lock"
-										size={28}
+										size={25}
+										color={individualColor}
 										style={{
 											// marginTop: 5,
 											paddingRight: 10,
@@ -218,7 +158,7 @@ export function ModalSelect({
 										value={password}
 										onChangeText={(userPw) => setPassword((text) => userPw)}
 										placeholder="PASSWORD"
-										placeholderTextColor={Colors.grey800}
+										placeholderTextColor={Colors.grey600}
 									/>
 								</View>
 							</View>
@@ -256,6 +196,7 @@ const styles = StyleSheet.create({
 		padding: 20,
 		alignItems: 'center',
 		shadowColor: 'black',
+		elevation: 10,
 		shadowOffset: {
 			width: 1,
 			height: 1,
@@ -276,18 +217,18 @@ const styles = StyleSheet.create({
 		//
 	},
 	textInput: {
-		fontSize: 19,
+		fontSize: 16,
 		flex: 1,
 		fontFamily: 'NanumSquareR',
 		marginLeft: '0%',
 	},
 	textInputView: {
 		flexDirection: 'row',
-		borderRadius: 15,
-		padding: 10,
-		borderWidth: 1,
+		borderBottomWidth: 2,
+		padding: 3,
+
 		borderColor: Colors.blue200,
-		width: '80%',
+		width: '70%',
 		// marginLeft: '5%',
 	},
 	buttonText: {

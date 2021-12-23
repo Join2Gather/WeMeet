@@ -69,7 +69,7 @@ export function ModalInput({
 	const dispatch = useDispatch();
 	// const [name, setName] = useState('2ff148e7-05b9-461e-a2c2-1d3ccce16ba9');
 	const [name, setName] = useState('');
-	const [code, setCode] = useState('ddb6984a-e7b4-4ff0-91f7-2d9fc0044532');
+	const [code, setCode] = useState('');
 	const [mode, setMode] = useState('initial');
 	const [color, setColor] = useState(Colors.red500);
 	const [startTime, setStartTime] = useState('9');
@@ -452,6 +452,7 @@ const styles = StyleSheet.create({
 		padding: 20,
 		alignItems: 'center',
 		shadowColor: 'black',
+		elevation: 10,
 		shadowOffset: {
 			width: 1,
 			height: 1,

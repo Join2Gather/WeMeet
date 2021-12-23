@@ -132,19 +132,38 @@ export default function TeamList() {
 					});
 				}, 50);
 				setMode('normal');
-			} else {
-				dispatch(makeTeamTime({ color, peopleCount, startHour, endHour }));
+			} else if (modalMode === 'join') {
+				dispatch(
+					makeTeamTime({
+						color: teamMakeColor,
+						peopleCount,
+						startHour,
+						endHour,
+					})
+				);
 				dispatch(setTeamName({ name: loginName, uri: loginURI }));
-				setTimeout(() => {
-					navigation.navigate('TeamTime', {
-						user,
-						id,
-						token,
-						modalMode,
-					});
-				}, 50);
-				setMode('normal');
+			} else {
+				dispatch(
+					makeTeamTime({
+						color,
+						peopleCount,
+						startHour,
+						endHour,
+					})
+				);
+				dispatch(setTeamName({ name: loginName, uri: loginURI }));
 			}
+
+			setTimeout(() => {
+				navigation.navigate('TeamTime', {
+					user,
+					id,
+					token,
+					modalMode,
+				});
+			}, 50);
+			setMode('normal');
+
 			dispatch(setIsInTeamTime(true));
 		}
 	}, [modalMode, mode, teamMakeColor, makeStartHour, makeEndHour]);
@@ -193,7 +212,10 @@ export default function TeamList() {
 					title="모임 목록"
 					headerColor={individualColor}
 					Left={() => (
-						<TouchableHighlight underlayColor={color} onPress={onReload}>
+						<TouchableHighlight
+							underlayColor={individualColor}
+							onPress={onReload}
+						>
 							<FontAwesome5Icon
 								name="redo-alt"
 								size={22}
@@ -203,7 +225,10 @@ export default function TeamList() {
 						</TouchableHighlight>
 					)}
 					Right={() => (
-						<TouchableHighlight underlayColor={color} onPress={onMakeTeamTime}>
+						<TouchableHighlight
+							underlayColor={individualColor}
+							onPress={onMakeTeamTime}
+						>
 							<FontAwesome5Icon
 								name="plus"
 								size={22}
@@ -213,7 +238,7 @@ export default function TeamList() {
 						</TouchableHighlight>
 					)}
 				/>
-
+				{/* <Spinner loading={userLoading} /> */}
 				<Text style={[styles.headerUnderText]}>Plan list</Text>
 
 				{!clubs.length && (
