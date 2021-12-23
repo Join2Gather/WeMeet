@@ -178,9 +178,14 @@ export default function SnapShot({ route }: Props) {
 								mode={sequence}
 							/>
 							{currentNumber === 0 && (
-								<Text style={styles.stepText}>
-									모임 시작 시간을 터치해 주세요
-								</Text>
+								<View
+									style={{ flexDirection: 'row', justifyContent: 'center' }}
+								>
+									<Text style={[styles.stepText, { color: color }]}>
+										모임 시작 시간
+									</Text>
+									<Text style={styles.stepText}>을 터치해 주세요</Text>
+								</View>
 							)}
 							{currentNumber === 1 && (
 								<Text style={styles.stepText}>
@@ -335,7 +340,7 @@ const styles = StyleSheet.create({
 		height: 14,
 		marginRight: 3,
 		marginLeft: 15,
-		borderWidth: 0.3,
+		borderWidth: 0.5,
 		marginTop: 1,
 		alignSelf: 'center',
 	},
