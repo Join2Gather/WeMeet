@@ -72,7 +72,7 @@ export default function Login() {
 	);
 	const appLoading = useCallback(() => {
 		if (Platform.OS === 'ios')
-			Animated.stagger(500, [...startAnimations]).start(toggleStarted);
+			Animated.stagger(600, [...startAnimations]).start(toggleStarted);
 		else Animated.sequence([...startAnimations]).start(toggleStarted);
 	}, [started]);
 
@@ -108,7 +108,7 @@ export default function Login() {
 		if (token) {
 			setTimeout(() => {
 				navigation.navigate('TabNavigator');
-			}, 1000);
+			}, 1300);
 		} else {
 			console.log('없음');
 		}
