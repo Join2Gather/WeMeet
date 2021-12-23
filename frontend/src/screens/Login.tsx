@@ -73,10 +73,7 @@ export default function Login() {
 	const appLoading = useCallback(() => {
 		if (Platform.OS === 'ios')
 			Animated.stagger(500, [...startAnimations]).start(toggleStarted);
-		else
-			Animated.sequence([...startAnimations, ...endAnimations]).start(
-				toggleStarted
-			);
+		else Animated.sequence([...startAnimations]).start(toggleStarted);
 	}, [started]);
 
 	const icons = useMemo(
