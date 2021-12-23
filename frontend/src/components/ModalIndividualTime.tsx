@@ -7,6 +7,7 @@ import {
 	TouchableHighlight,
 	View,
 	Dimensions,
+	ScrollView,
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
@@ -88,7 +89,7 @@ export function ModalIndividualTime({
 						</TouchableHighlight>
 					</View>
 
-					<>
+					<ScrollView>
 						{findIndividual && findIndividual[0] && (
 							<>
 								<View style={styles.blankView} />
@@ -107,12 +108,7 @@ export function ModalIndividualTime({
 								>
 									<View style={styles.columnView}>
 										<View style={styles.rowView}>
-											<Text
-												style={
-													(styles.touchText,
-													{ color: Colors.white, fontSize: 16 })
-												}
-											>
+											<Text style={(styles.touchText, { color: Colors.white })}>
 												{findIndividual[0].name}
 											</Text>
 										</View>
@@ -172,20 +168,21 @@ export function ModalIndividualTime({
 									</View>
 								</View>
 							))}
-						{inTimeMode.includes('everyTime') && (
-							<>
-								<View style={styles.blankView} />
-								<View style={styles.rowLine} />
-								<Button
-									buttonNumber={2}
-									buttonText="취소"
-									secondButtonText="삭제"
-									onPressFunction={onPressCloseBtn}
-									secondOnPressFunction={onPressDeleteBtn}
-								/>
-							</>
-						)}
-					</>
+						<View style={styles.blankView} />
+					</ScrollView>
+					{inTimeMode.includes('everyTime') && (
+						<>
+							<View style={styles.blankView} />
+							<View style={styles.rowLine} />
+							<Button
+								buttonNumber={2}
+								buttonText="취소"
+								secondButtonText="삭제"
+								onPressFunction={onPressCloseBtn}
+								secondOnPressFunction={onPressDeleteBtn}
+							/>
+						</>
+					)}
 				</View>
 			</View>
 		</Modal>
@@ -212,9 +209,7 @@ const styles = StyleSheet.create({
 
 		borderRadius: 13,
 
-		margin: 30,
-		marginBottom: 20,
-		marginTop: 20,
+		margin: 20,
 	},
 	backgroundView: {
 		borderRadius: 13,
@@ -242,7 +237,7 @@ const styles = StyleSheet.create({
 		width: screen.width * 0.9,
 	},
 	touchText: {
-		fontSize: 15,
+		fontSize: 14,
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
@@ -255,7 +250,6 @@ const styles = StyleSheet.create({
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
-		marginLeft: '8%',
 	},
 	blankView: {
 		height: 10,
@@ -275,8 +269,8 @@ const styles = StyleSheet.create({
 		borderColor: Colors.black,
 	},
 	rowLine: {
-		borderWidth: 0.4,
-		width: '110%',
+		borderTopWidth: 0.4,
+		width: '113%',
 		marginTop: 15,
 	},
 });
