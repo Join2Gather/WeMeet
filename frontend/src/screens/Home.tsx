@@ -34,6 +34,7 @@ import { Sequence } from '../components/Sequence';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { setIsInTeamTime } from '../store/timetable';
 import Ionic from 'react-native-vector-icons/Ionicons';
+import { StatusBar } from 'expo-status-bar';
 export default function Home() {
 	const {
 		token,
@@ -116,6 +117,7 @@ export default function Home() {
 	return (
 		<SafeAreaView style={{ backgroundColor: individualColor }}>
 			<View style={[styles.view]}>
+				<StatusBar style="light" />
 				<NavigationHeader
 					title="내 일정 등록하기"
 					headerColor={individualColor}
@@ -163,12 +165,21 @@ export default function Home() {
 							<Text style={styles.titleText}>안녕하세요 {myNickName}님</Text>
 							<View style={styles.rowView}>
 								<>
-									<View
-										style={[
-											styles.boxView,
-											{ backgroundColor: individualColor },
-										]}
-									/>
+									<View style={[styles.boxView]}>
+										<View style={{ flex: 1, backgroundColor: Colors.red500 }} />
+										<View
+											style={{ flex: 1, backgroundColor: Colors.orange500 }}
+										/>
+										<View
+											style={{ flex: 1, backgroundColor: Colors.yellow500 }}
+										/>
+										<View
+											style={{ flex: 1, backgroundColor: Colors.green500 }}
+										/>
+										<View
+											style={{ flex: 1, backgroundColor: Colors.blue500 }}
+										/>
+									</View>
 									<Text style={styles.infoText}>모임 일정</Text>
 									<View
 										style={[
@@ -281,8 +292,9 @@ const styles = StyleSheet.create({
 		height: 14,
 		marginRight: 3,
 		marginLeft: 15,
-		borderWidth: 0.3,
+		borderWidth: 0.4,
 		// marginTop: 1,
+		flexDirection: 'column',
 	},
 	titleText: {
 		fontSize: 15,
