@@ -366,7 +366,7 @@ export function Timetable({
 											idx === 0
 												? Colors.red500
 												: idx === 6
-												? Colors.blue500
+												? Colors.blue700
 												: Colors.black,
 									},
 								]}
@@ -723,6 +723,6 @@ const styles = StyleSheet.create({
 	},
 	timeSmallView: {
 		flex: 1,
-		marginBottom: -0.3,
+		marginBottom: -0.01,
 	},
 });
