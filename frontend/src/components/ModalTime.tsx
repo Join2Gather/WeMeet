@@ -9,6 +9,7 @@ import {
 	TextInput,
 	ActivityIndicator,
 	Dimensions,
+	ScrollView,
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
@@ -100,77 +101,83 @@ export function ModalTime({
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
 						</TouchableHighlight>
 					</View>
-					{mode === 'initial' && (
-						<>
-							{findTime && findTime[0] && (
-								<>
-									<View style={styles.blankView} />
-									<Text style={styles.titleText}>선택 시간</Text>
-									<View style={styles.blankView} />
+					<ScrollView>
+						{mode === 'initial' && (
+							<>
+								{findTime && findTime[0] && (
+									<>
+										<View style={styles.blankView} />
+										<Text style={styles.titleText}>선택 시간</Text>
+										<View style={styles.blankView} />
 
-									<View style={[styles.backgroundView]}>
-										<View style={styles.columnView}>
-											<View style={styles.rowView}>
-												<Text style={styles.touchText}>
-													{findTime[0].selectTime > 12
-														? `오후  ${findTime[0].selectTime - 12}시`
-														: `오전  ${findTime[0].selectTime}시`}
-												</Text>
-											</View>
-										</View>
-									</View>
-								</>
-							)}
-
-							<View style={styles.blankView} />
-							<Text style={styles.titleText}>가능 시간</Text>
-							<View style={styles.blankView} />
-							{findTime.map((t) => (
-								<View key={t.startTime.hour}>
-									<View style={[styles.backgroundView]}>
-										<View style={styles.columnView}>
-											<View style={styles.rowView}>
-												<Text style={styles.touchText}>{t.timeText}</Text>
-											</View>
-										</View>
-									</View>
-									<View style={styles.blankView} />
-								</View>
-							))}
-							{isGroup && (
-								<>
-									<View style={styles.blankView} />
-									<Text style={styles.titleText}>참여 인원</Text>
-									<View style={styles.blankView} />
-									{findTime.map((t) => (
-										<View key={t.startTime.hour}>
-											<View style={[styles.backgroundView]}>
-												<View style={styles.columnView}>
-													<View style={styles.rowView}>
-														<Text style={styles.touchText}>{t.people}</Text>
-													</View>
+										<View style={[styles.backgroundView]}>
+											<View style={styles.columnView}>
+												<View style={styles.rowView}>
+													<Text style={styles.touchText}>
+														{findTime[0].selectTime > 12
+															? `오후  ${findTime[0].selectTime - 12}시`
+															: `오전  ${findTime[0].selectTime}시`}
+													</Text>
 												</View>
 											</View>
-											<View style={styles.blankView} />
 										</View>
-									))}
-								</>
-							)}
-							{!isGroup && !isConfirmMode && (
-								<>
-									<View style={styles.blankView} />
-									<View style={styles.rowLine} />
-									<Button
-										buttonNumber={2}
-										buttonText="취소"
-										secondButtonText="삭제"
-										onPressFunction={() =>
-											setTimeModalVisible && setTimeModalVisible(false)
-										}
-										secondOnPressFunction={onPressDelete}
-									/>
-								</>
-							)}
+									</>
+								)}
+
+								<View style={styles.blankView} />
+								<Text style={styles.titleText}>가능 시간</Text>
+								<View style={styles.blankView} />
+								{findTime.map((t) => (
+									<View key={t.startTime.hour}>
+										<View style={[styles.backgroundView]}>
+											<View style={styles.columnView}>
+												<View style={styles.rowView}>
+													<Text style={styles.touchText}>{t.timeText}</Text>
+												</View>
+											</View>
+										</View>
+										<View style={styles.blankView} />
+									</View>
+								))}
+								{isGroup && (
+									<>
+										<View style={styles.blankView} />
+										<Text style={styles.titleText}>참여 인원</Text>
+										<View style={styles.blankView} />
+										{findTime.map((t) => (
+											<View key={t.startTime.hour}>
+												<View style={[styles.backgroundView]}>
+													<View style={styles.columnView}>
+														<View style={styles.rowView}>
+															<Text style={styles.touchText} numberOfLines={5}>
+																{t.people}
+															</Text>
+															<Text style={styles.touchText}> </Text>
+														</View>
+													</View>
+												</View>
+												<View style={styles.blankView} />
+											</View>
+										))}
+									</>
+								)}
+							</>
+						)}
+						<View style={styles.blankView} />
+					</ScrollView>
+					{!isGroup && !isConfirmMode && (
+						<>
+							<View style={styles.blankView} />
+							<View style={styles.rowLine} />
+							<Button
+								buttonNumber={2}
+								buttonText="취소"
+								secondButtonText="삭제"
+								onPressFunction={() =>
+									setTimeModalVisible && setTimeModalVisible(false)
+								}
+								secondOnPressFunction={onPressDelete}
+							/>
 						</>
 					)}
 					{isConfirmMode && (
@@ -233,19 +240,18 @@ const styles = StyleSheet.create({
 	},
 	rowView: {
 		flexDirection: 'row',
-		width: screen.width * 0.53,
-		alignItems: 'center',
-		alignSelf: 'center',
+		width: screen.width * 0.52,
+		// alignItems: 'center',
+		// alignSelf: 'center',
 		justifyContent: 'flex-start',
+		// backgroundColor: Colors.blue100,
 	},
 	columnView: {
 		flexDirection: 'column',
 
 		borderRadius: 13,
 
-		margin: 30,
-		marginBottom: 20,
-		marginTop: 20,
+		margin: 20,
 	},
 	backgroundView: {
 		borderRadius: 13,
@@ -263,6 +269,7 @@ const styles = StyleSheet.create({
 		padding: 20,
 		alignItems: 'center',
 		shadowColor: 'black',
+		elevation: 10,
 		shadowOffset: {
 			width: 1,
 			height: 1,
@@ -272,8 +279,8 @@ const styles = StyleSheet.create({
 		width: screen.width * 0.9,
 	},
 	touchText: {
-		fontSize: 15,
-		textAlign: 'center',
+		fontSize: 13,
+		textAlign: 'left',
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
 		justifyContent: 'center',
@@ -285,7 +292,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
-		marginLeft: '8%',
+		// marginLeft: '8%',
 	},
 	blankView: {
 		height: 10,
@@ -308,8 +315,8 @@ const styles = StyleSheet.create({
 		borderColor: Colors.black,
 	},
 	rowLine: {
-		borderWidth: 0.4,
-		width: '110%',
+		borderTopWidth: 0.4,
+		width: '113%',
 		marginTop: 15,
 	},
 });

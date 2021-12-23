@@ -43,6 +43,7 @@ const initialState: Login = {
 	weekIndex: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
 	joinClubNum: 0,
 	confirmClubNum: 0,
+	appleUser: null,
 };
 
 const USER_ME = 'login/USER_ME';
@@ -70,6 +71,7 @@ export const loginSlice = createSlice({
 			const { id, clubs, dates, kakaoDates, name, token, user } =
 				action.payload;
 			state.kakaoDates = [];
+			state.clubs = [];
 			state.id = id;
 			state.name = name;
 			state.user = user;
@@ -111,7 +113,7 @@ export const loginSlice = createSlice({
 						startTime: d.start,
 						endTime: d.end,
 						color: d.color,
-						name: d.name,
+						name: decodeURIComponent(d.name),
 						selectTime: time,
 					};
 					state.findIndividual = [...state.findIndividual, data];

@@ -132,7 +132,7 @@ export interface findTime {
 	startTime: timeType;
 	endTime: timeType;
 	selectTime: number;
-	timeText: string;
+	timeText?: string;
 }
 
 export interface timeType {

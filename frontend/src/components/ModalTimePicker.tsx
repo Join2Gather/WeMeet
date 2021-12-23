@@ -47,7 +47,7 @@ interface props {
 	user: number;
 	postIndividualDates: any;
 	confirmDates: any;
-
+	onPlusHour: (hour: number) => void;
 	isConfirm?: boolean;
 	date: Date;
 	setDate: React.Dispatch<React.SetStateAction<Date>>;
@@ -77,6 +77,7 @@ export function ModalTimePicker({
 	joinUri,
 	isHomeTime,
 	findTime,
+	onPlusHour,
 }: props) {
 	const {
 		postConfirmSuccess,
@@ -121,7 +122,10 @@ export function ModalTimePicker({
 
 	const [secondVisible, setSecond] = useState(false);
 	const [firstVisible, setFirst] = useState(false);
-	const [startTime, setStartTime] = useState(0);
+	const [startTime, setStartTime] = useState({
+		hour: 0,
+		minute: 0,
+	});
 	const { isDark } = useIsDarkMode();
 	useEffect(() => {
 		if (modalVisible) setFirst(true);
@@ -163,7 +167,11 @@ export function ModalTimePicker({
 			dispatch(makeInitialTimePicked());
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
-			setStartTime(timeHour);
+			setStartTime({
+				hour: timeHour,
+				minute: timeMinute,
+			});
+			onPlusHour(timeHour);
 			setModalVisible && setModalVisible(false);
 			if (isHomeTime)
 				dispatch(setInStartTime({ hour: timeHour, min: timeMinute }));
@@ -206,9 +214,9 @@ export function ModalTimePicker({
 				Alert.alert('경고', '모임 시간 이후 시간으로 선택하실 수 없습니다', [
 					{ text: '확인', onPress: () => {} },
 				]);
-			} else if (startTime > endHour) {
+			} else if (startTime.hour >= timeHour) {
 				initialWithError();
-				Alert.alert('경고', '시작시간 전으로 시간 설정이 불능 합니다', [
+				Alert.alert('경고', '시작시간 전으로 시간 설정이 불가능 합니다', [
 					{ text: '확인', onPress: () => {} },
 				]);
 			} else {
@@ -339,7 +347,9 @@ export function ModalTimePicker({
 						? findTime && findTime.length !== 0
 							? `종료시간 설정\n${findTime[0].timeText}`
 							: ''
-						: `시작 시간 : ${startTimeText}\n종료시간 설정`
+						: `시작 시간 : ${
+								startTime.hour > 12 ? startTime.hour - 12 : startTime.hour
+						  }시 : ${startTime.minute}분 \n종료시간 설정`
 				}
 				confirmText="확인"
 				cancelText="취소"

@@ -141,12 +141,18 @@ export function Timetable({
 	const [date, setDate] = useState<Date>(new Date());
 	const [endHour, setEndHour] = useState(0);
 	const [isConfirmMode, setIsConfirm] = useState(false);
-
 	const [select, setSelect] = useState({
 		idx: 0,
 		time: 0,
 		day: '',
 	});
+
+	// useEffect
+
+	useEffect(() => {
+		date.setMinutes(0);
+	}, [date]);
+
 	const [tableMode, setTableMode] = useState('group');
 	useEffect(() => {
 		mode === undefined && setMode && setMode('normal');
@@ -205,63 +211,6 @@ export function Timetable({
 			dispatch(cloneEveryTime(kakaoDates));
 		}
 	}, [cloneDateSuccess, kakaoDates]);
-
-	const onPressGroupTime = useCallback(
-		(time: number, day: string, is: boolean, idx: number) => {
-			dispatch(setStartHour(time));
-			dispatch(changeDayIdx(idx));
-			dispatch(checkMode({ time, mode: 'group' }));
-			setSelect({ idx, time, day });
-			setIsConfirm(is);
-			setTableMode('gr');
-		},
-		[]
-	);
-
-	const onPressIndividualTime = useCallback(
-		(time: number, day: string, idx: number) => {
-			dispatch(changeDayIdx(idx));
-			dispatch(checkMode({ time, mode: 'in' }));
-			dispatch(setStartHour(time));
-
-			setSelect({ idx, time, day });
-			setTableMode('individual');
-			setCurrent && setCurrent(0);
-		},
-		[]
-	);
-
-	const onPressHomeTime = useCallback(
-		(time: number, day: string, idx: number) => {
-			dispatch(checkInMode({ time, idx, day }));
-			setSelect({ idx, time, day });
-		},
-		[]
-	);
-	useEffect(() => {
-		if (isHomeTime) {
-			if (inTimeMode.includes('team') || inTimeMode.includes('everyTime')) {
-				// 빈 칸 아닐 경우
-				dispatch(findHomeTime({ day: select.day, time: select.time }));
-
-				setTimeout(() => {
-					setInModalVisible(true);
-				}, 100);
-			} else if (inTimeMode.includes('normal')) {
-				// 시간 설정 로직
-				date.setHours(select.time);
-				setDate(new Date(date));
-				setModalVisible && setModalVisible(true);
-				setIsTimeMode && setIsTimeMode(true);
-				setMode && setMode('startMode');
-				setCurrent && setCurrent(1);
-			}
-			return () => {
-				setModalVisible && setModalVisible(false);
-			};
-		}
-	}, [inTimeMode, isHomeTime]);
-
 	useEffect(() => {
 		// 시간 누르기 로직
 		if (!isHomeTime) {
@@ -307,6 +256,71 @@ export function Timetable({
 			}
 		}
 	}, [modalMode, selectTimeMode, mode]);
+	useEffect(() => {
+		if (mode === 'startMinute' && !isTimePicked) {
+			setModalVisible && setModalVisible(true);
+		} else if (mode === 'startMinute' && isTimePicked) {
+			setMode && setMode('normal');
+		}
+	}, [isTimePicked, mode]);
+	useEffect(() => {
+		if (isHomeTime) {
+			if (inTimeMode.includes('team') || inTimeMode.includes('everyTime')) {
+				// 빈 칸 아닐 경우
+				dispatch(findHomeTime({ day: select.day, time: select.time }));
+
+				setTimeout(() => {
+					setInModalVisible(true);
+				}, 100);
+			} else if (inTimeMode.includes('normal')) {
+				// 시간 설정 로직
+				date.setHours(select.time);
+				setDate(new Date(date));
+				setModalVisible && setModalVisible(true);
+				setIsTimeMode && setIsTimeMode(true);
+				setMode && setMode('startMode');
+				setCurrent && setCurrent(1);
+			}
+			return () => {
+				setModalVisible && setModalVisible(false);
+			};
+		}
+	}, [inTimeMode, isHomeTime]);
+
+	// useCallback
+
+	const onPressGroupTime = useCallback(
+		(time: number, day: string, is: boolean, idx: number) => {
+			dispatch(setStartHour(time));
+			dispatch(changeDayIdx(idx));
+			dispatch(checkMode({ time, mode: 'group' }));
+			setSelect({ idx, time, day });
+			setIsConfirm(is);
+			setTableMode('gr');
+		},
+		[]
+	);
+
+	const onPressIndividualTime = useCallback(
+		(time: number, day: string, idx: number) => {
+			dispatch(changeDayIdx(idx));
+			dispatch(checkMode({ time, mode: 'in' }));
+			dispatch(setStartHour(time));
+
+			setSelect({ idx, time, day });
+			setTableMode('individual');
+			setCurrent && setCurrent(0);
+		},
+		[]
+	);
+
+	const onPressHomeTime = useCallback(
+		(time: number, day: string, idx: number) => {
+			dispatch(checkInMode({ time, idx, day }));
+			setSelect({ idx, time, day });
+		},
+		[]
+	);
 	const onPressNext = useCallback(() => {
 		setCurrent && setCurrent(1);
 		onSetStartHour(select.idx, select.time, select.day);
@@ -335,19 +349,12 @@ export function Timetable({
 		[isGroup, date, isConfirm, mode]
 	);
 
-	const onFindHomeTime = useCallback((day: string, time: number) => {
-		dispatch(findHomeTime({ day, time }));
-		setTimeout(() => {
-			setInModalVisible(true);
-		}, 300);
-	}, []);
-	useEffect(() => {
-		if (mode === 'startMinute' && !isTimePicked) {
-			setModalVisible && setModalVisible(true);
-		} else if (mode === 'startMinute' && isTimePicked) {
-			setMode && setMode('normal');
-		}
-	}, [isTimePicked, mode]);
+	const onPlusHour = useCallback(
+		(hour: number) => {
+			date.setHours(hour + 1);
+		},
+		[date]
+	);
 
 	return (
 		<View style={styles.view}>
@@ -669,6 +676,7 @@ export function Timetable({
 						joinUri={joinUri}
 						isHomeTime={isHomeTime}
 						findTime={findTime}
+						onPlusHour={onPlusHour}
 					/>
 				</View>
 			</View>

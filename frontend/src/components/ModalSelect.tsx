@@ -18,6 +18,7 @@ import { loginEveryTime, postEveryTime } from '../store/individual';
 import type { RootState } from '../store';
 import { setModalMode } from '../store/team';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
+import { Button } from '../lib/util/Button';
 
 const screen = Dimensions.get('screen');
 
@@ -162,16 +163,24 @@ export function ModalSelect({
 									/>
 								</View>
 							</View>
+							<View style={styles.blankView} />
 							<View style={styles.buttonRowView}>
-								<TouchableHighlight
+								{/* <TouchableHighlight
 									activeOpacity={1}
 									underlayColor={Colors.grey200}
 									style={styles.closeButtonStyle}
 									onPress={onPressLogin}
 								>
 									<Text style={styles.buttonText}>로그인</Text>
-								</TouchableHighlight>
+								</TouchableHighlight> */}
 							</View>
+							<View style={styles.blankView} />
+							{/* <View style={styles.button}/> */}
+							<Button
+								buttonNumber={1}
+								buttonText="로그인"
+								onPressFunction={onPressLogin}
+							/>
 						</View>
 					)}
 				</View>
@@ -212,8 +221,8 @@ const styles = StyleSheet.create({
 		marginBottom: 15,
 	},
 	textView: {
-		width: '90%',
-		marginLeft: '5%',
+		width: '100%',
+		// marginLeft: '5%',
 		//
 	},
 	textInput: {
@@ -229,7 +238,7 @@ const styles = StyleSheet.create({
 
 		borderColor: Colors.blue200,
 		width: '70%',
-		// marginLeft: '5%',
+		marginLeft: '20%',
 	},
 	buttonText: {
 		textAlign: 'center',
@@ -249,8 +258,8 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 	closeButtonStyle: {
-		padding: 15,
-		width: '50%',
+		padding: 0,
+		width: '100%',
 		height: '100%',
 		borderRadius: 13,
 	},
@@ -321,5 +330,11 @@ const styles = StyleSheet.create({
 	},
 	blankView: {
 		height: 15,
+	},
+	buttonOverLine: {
+		borderTopWidth: 0.4,
+		width: '90%',
+		marginTop: 20,
+		borderColor: Colors.black,
 	},
 });

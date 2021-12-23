@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
 		alignContent: 'center',
 		alignSelf: 'center',
 		marginBottom: -20,
-		width: '70%',
+		width: '113%',
 		// marginTop: 15,
 	},
 	buttonWithTwoView: {
@@ -105,7 +105,8 @@ const styles = StyleSheet.create({
 		padding: 15,
 		width: '100%',
 		height: '100%',
-		borderRadius: 13,
+		borderBottomRightRadius: 13,
+		borderBottomLeftRadius: 13,
 	},
 	twoButtonStyle: {
 		padding: 15,
