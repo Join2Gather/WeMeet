@@ -384,13 +384,14 @@ export function ModalSetting({
 								</View>
 							</View>
 							<View style={styles.blankView} />
+							<View style={styles.buttonOverLine} />
 							<Button
 								buttonNumber={1}
 								buttonText={'이전'}
 								onPressWithParam={() => setMode('initial')}
 								pressParam="initial"
 							/>
-							<View style={styles.blankView} />
+							{/* <View style={styles.blankView} /> */}
 						</>
 					)}
 					{mode === 'loading' && (
@@ -503,6 +504,7 @@ const styles = StyleSheet.create({
 		padding: 20,
 		alignItems: 'center',
 		shadowColor: 'black',
+		elevation: 10,
 		shadowOffset: {
 			width: 1,
 			height: 1,

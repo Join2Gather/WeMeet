@@ -588,7 +588,11 @@ export const timetableSlice = createSlice({
 				state.responseGroup[day].avail_time.forEach((t, idx) => {
 					if (t.starting_hours <= time && t.end_hours >= time) {
 						const data = {
-							people: state.responseGroup[day].avail_people[idx],
+							people:
+								state.responseGroup[day].avail_people[idx].length !== 1
+									? state.responseGroup[day].avail_people[idx].join(', ')
+									: state.responseGroup[day].avail_people[idx],
+
 							startTime: {
 								hour: t.starting_hours,
 								minute: t.starting_minutes,
@@ -612,6 +616,14 @@ export const timetableSlice = createSlice({
 									: `오전  ${t.end_hours}`
 							} : ${t.end_minutes < 10 ? '0' + t.end_minutes : t.end_minutes}`,
 						};
+
+						// data.people.forEach((p:any) => {
+						// 	p.
+						// })
+						console.log(
+							data.people,
+							state.responseGroup[day].avail_people[idx].length
+						);
 						state.findTime = [...state.findTime, data];
 					}
 				});

@@ -194,8 +194,8 @@ export default function TeamTime({ route }: Props) {
 										style={{
 											flexDirection: 'row',
 											justifyContent: 'space-evenly',
-											marginTop: 25,
-											height: 45,
+											// marginTop: 25,
+											height: 25,
 										}}
 									>
 										<TouchableOpacity
@@ -229,7 +229,7 @@ export default function TeamTime({ route }: Props) {
 											<Text style={styles.iconText}>개인</Text>
 										</TouchableOpacity>
 									</View>
-									<View style={{ flexDirection: 'row' }}>
+									<View style={styles.rowView}>
 										<View
 											style={[styles.boxView, { backgroundColor: color }]}
 										/>
@@ -326,13 +326,19 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignSelf: 'center',
 	},
+	rowView: {
+		flexDirection: 'row',
+		alignContent: 'center',
+		justifyContent: 'center',
+		marginTop: 25,
+	},
 	viewHeight: {
-		height: 110,
+		height: 115,
 	},
 	touchableBoxView: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginBottom: 20,
+		// marginBottom: 25,
 		justifyContent: 'center',
 		alignContent: 'center',
 		alignSelf: 'center',
@@ -352,11 +358,6 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		justifyContent: 'center',
 		textAlignVertical: 'center',
-	},
-	rowView: {
-		flexDirection: 'row',
-		alignContent: 'center',
-		justifyContent: 'center',
 	},
 	infoText: {
 		fontFamily: 'NanumSquareR',
@@ -378,8 +379,8 @@ const styles = StyleSheet.create({
 		height: 14,
 		marginRight: 3,
 		marginLeft: 15,
-		borderWidth: 0.3,
-		marginTop: 1,
+		borderWidth: 0.5,
+		// marginTop: 1,
 		alignSelf: 'center',
 	},
 	titleText: {
@@ -404,5 +405,6 @@ const styles = StyleSheet.create({
 	},
 	boxOverView: {
 		flexDirection: 'column',
+		marginTop: 25,
 	},
 });

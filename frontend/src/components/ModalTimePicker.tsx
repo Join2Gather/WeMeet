@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import { Alert, Platform, StyleSheet } from 'react-native';
 // import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -47,7 +47,7 @@ interface props {
 	user: number;
 	postIndividualDates: any;
 	confirmDates: any;
-
+	onPlusHour: (hour: number) => void;
 	isConfirm?: boolean;
 	date: Date;
 	setDate: React.Dispatch<React.SetStateAction<Date>>;
@@ -77,6 +77,7 @@ export function ModalTimePicker({
 	joinUri,
 	isHomeTime,
 	findTime,
+	onPlusHour,
 }: props) {
 	const {
 		postConfirmSuccess,
@@ -89,6 +90,8 @@ export function ModalTimePicker({
 		everyTime,
 		postHomeSuccess,
 		startTimeText,
+		startHour,
+		endHour,
 	} = useSelector(({ timetable, login, individual }: RootState) => ({
 		postConfirmSuccess: timetable.postConfirmSuccess,
 		confirmClubs: login.confirmClubs,
@@ -100,12 +103,29 @@ export function ModalTimePicker({
 		everyTime: individual.everyTime,
 		postHomeSuccess: individual.postHomeSuccess,
 		startTimeText: timetable.startTimeText,
+		startHour: timetable.startHour,
+		endHour: timetable.endHour,
 	}));
 	const dispatch = useDispatch();
 	// const [minute, setMinute] = useState(0);
 	// const [hour, setHour] = useState(0);
+
+	const [checkTime, setCheck] = useState({
+		start: 0,
+		end: 0,
+	});
+	useEffect(() => {
+		!isHomeTime &&
+			setCheck((prev) => ({ ...prev, start: startHour, end: endHour }));
+		isHomeTime && setCheck((prev) => ({ ...prev, start: 0, end: 24 }));
+	}, [isHomeTime, startHour, endHour]);
+
 	const [secondVisible, setSecond] = useState(false);
 	const [firstVisible, setFirst] = useState(false);
+	const [startTime, setStartTime] = useState({
+		hour: 0,
+		minute: 0,
+	});
 	const { isDark } = useIsDarkMode();
 	useEffect(() => {
 		if (modalVisible) setFirst(true);
@@ -137,25 +157,43 @@ export function ModalTimePicker({
 		isHomeTime,
 		isHomeTimePicked,
 	]);
+	const initialWithError = useCallback(() => {
+		setCurrent && setCurrent(0);
+		setIsTimeMode && setIsTimeMode(false);
+		setMode && setMode('normal');
+	}, []);
 	const onPressConfirm = useCallback(
 		(date) => {
 			dispatch(makeInitialTimePicked());
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
-			setCurrent && setCurrent(2);
+			setStartTime({
+				hour: timeHour,
+				minute: timeMinute,
+			});
+			onPlusHour(timeHour);
 			setModalVisible && setModalVisible(false);
-			if (isHomeTime) {
+			if (isHomeTime)
 				dispatch(setInStartTime({ hour: timeHour, min: timeMinute }));
-			} else {
+			else {
 				dispatch(setStartHour(timeHour));
 				dispatch(setStartMin(timeMinute));
 			}
-			setMode && setMode('endMode');
-			setTimeout(() => {
-				setSecond(true);
-			}, 100);
+			console.log(checkTime);
+			if (timeHour < checkTime.start) {
+				initialWithError();
+				Alert.alert('경고', '모임 시간 이전 시간으로 선택하실 수 없습니다', [
+					{ text: '확인', onPress: () => {} },
+				]);
+			} else {
+				setCurrent && setCurrent(2);
+				setMode && setMode('endMode');
+				setTimeout(() => {
+					setSecond(true);
+				}, 100);
+			}
 		},
-		[mode, isConfirm, date, modalVisible, isHomeTime]
+		[mode, isConfirm, date, modalVisible, isHomeTime, checkTime]
 	);
 	const onPressEndConfirm = useCallback(
 		(date) => {
@@ -165,26 +203,35 @@ export function ModalTimePicker({
 			setCurrent && setCurrent(0);
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
-			if (isHomeTime) {
+			if (isHomeTime)
 				dispatch(setInEndTime({ hour: timeHour, min: timeMinute }));
-			} else {
+			else {
 				dispatch(setEndHour(timeHour));
 				dispatch(setEndMin(timeMinute));
 			}
-			if (isHomeTime) {
-				dispatch(checkHomeIstBlank());
+			if (checkTime.end < timeHour) {
+				initialWithError();
+				Alert.alert('경고', '모임 시간 이후 시간으로 선택하실 수 없습니다', [
+					{ text: '확인', onPress: () => {} },
+				]);
+			} else if (startTime.hour >= timeHour) {
+				initialWithError();
+				Alert.alert('경고', '시작시간 전으로 시간 설정이 불가능 합니다', [
+					{ text: '확인', onPress: () => {} },
+				]);
 			} else {
-				if (isConfirm) {
-					dispatch(checkIsExist('end'));
-					dispatch(changeConfirmTime());
-					setCurrent && setCurrent(3);
-				} else {
-					dispatch(checkIsBlank('end'));
+				if (isHomeTime) dispatch(checkHomeIstBlank());
+				else {
+					if (isConfirm) {
+						dispatch(checkIsExist('end'));
+						dispatch(changeConfirmTime());
+						setCurrent && setCurrent(3);
+					} else dispatch(checkIsBlank('end'));
 				}
+				setMode && setMode('loading');
 			}
-			setMode && setMode('loading');
 		},
-		[isConfirm, isHomeTime]
+		[isConfirm, isHomeTime, checkTime, startTime]
 	);
 
 	// 닫기 버튼
@@ -195,13 +242,17 @@ export function ModalTimePicker({
 		setIsTimeMode && setIsTimeMode(false);
 		setCurrent && setCurrent(0);
 		setMode && setMode('normal');
-		isHomeTime && dispatch(initialTimeMode());
-	}, [setModalVisible, modalVisible]);
+		if (isHomeTime) {
+			dispatch(initialTimeMode());
+			initialWithError();
+		}
+	}, [setModalVisible, modalVisible, isHomeTime]);
 
 	// 에브리 타임 시간 전송
 	useEffect(() => {
 		if (postHomePrepare) {
 			dispatch(postEveryTime({ data: everyTime, id, token, user }));
+			dispatch(initialTimeMode());
 		}
 	}, [postHomePrepare, everyTime]);
 	// 개인 시간 전송
@@ -254,10 +305,18 @@ export function ModalTimePicker({
 				onCancel={onPressClose}
 				androidVariant={'iosClone'}
 				minuteInterval={10}
-				textColor={isDark ? Colors.black : Colors.white}
+				textColor={
+					Platform.OS === 'ios'
+						? isDark
+							? Colors.black
+							: Colors.white
+						: Colors.black
+				}
 				title={
 					isConfirm
-						? findTime && `시작시간 설정\n${findTime[0].timeText}`
+						? findTime && findTime.length !== 0
+							? `시작시간 설정\n${findTime[0].timeText}`
+							: ``
 						: '시작시간 설정'
 				}
 				confirmText="확인"
@@ -276,11 +335,21 @@ export function ModalTimePicker({
 				onCancel={onPressClose}
 				androidVariant={'iosClone'}
 				minuteInterval={10}
-				textColor={isDark ? Colors.black : Colors.white}
+				textColor={
+					Platform.OS === 'ios'
+						? isDark
+							? Colors.black
+							: Colors.white
+						: Colors.black
+				}
 				title={
 					isConfirm
-						? findTime && `종료시간 설정\n${findTime[0].timeText}`
-						: `시작 시간 : ${startTimeText}\n종료시간 설정`
+						? findTime && findTime.length !== 0
+							? `종료시간 설정\n${findTime[0].timeText}`
+							: ''
+						: `시작 시간 : ${
+								startTime.hour > 12 ? startTime.hour - 12 : startTime.hour
+						  }시 : ${startTime.minute}분 \n종료시간 설정`
 				}
 				confirmText="확인"
 				cancelText="취소"
@@ -304,7 +373,7 @@ const styles = StyleSheet.create({
 		borderRadius: 13,
 		padding: 15,
 		alignItems: 'center',
-
+		elevation: 10,
 		shadowColor: 'black',
 		shadowOffset: {
 			width: 1,

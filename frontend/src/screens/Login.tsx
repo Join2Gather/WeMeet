@@ -47,7 +47,7 @@ export default function Login() {
 	const AnimatedText = Animated.createAnimatedComponent(Text);
 	const [started, toggleStarted] = useToggle();
 
-	const Title = useMemo(() => ['W', 'E', 'M', 'E', 'E', 'T'], []);
+	const Title = useMemo(() => ['WE ', 'MEET'], []);
 	const animValues = useAnimatedValues(Title.length);
 	const [layout, setLayout] = useLayout();
 	const startAnimations = useMemo(
@@ -72,13 +72,8 @@ export default function Login() {
 	);
 	const appLoading = useCallback(() => {
 		if (Platform.OS === 'ios')
-			Animated.stagger(200, [...startAnimations, ...endAnimations]).start(
-				toggleStarted
-			);
-		else
-			Animated.sequence([...startAnimations, ...endAnimations]).start(
-				toggleStarted
-			);
+			Animated.stagger(600, [...startAnimations]).start(toggleStarted);
+		else Animated.sequence([...startAnimations]).start(toggleStarted);
 	}, [started]);
 
 	const icons = useMemo(
@@ -89,7 +84,7 @@ export default function Login() {
 				const transform = {
 					transform: [
 						{
-							translateY: interpolate(animValue, [0, 100]),
+							translateY: interpolate(animValue, [-400, 0]),
 						},
 						{ rotate: interpolate(animValue, ['0deg', '360deg']) },
 					],
@@ -113,7 +108,7 @@ export default function Login() {
 		if (token) {
 			setTimeout(() => {
 				navigation.navigate('TabNavigator');
-			}, 2500);
+			}, 1300);
 		} else {
 			console.log('없음');
 		}
@@ -179,7 +174,7 @@ export default function Login() {
 								</TouchableView>
 								<View style={{ height: 15 }} />
 
-								<AppleLogin />
+								{Platform.OS === 'ios' && <AppleLogin />}
 								<Text style={styles.buttonUnderText}>
 									카카오 계정으로 간편로그인 하세요.
 								</Text>

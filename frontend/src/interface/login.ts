@@ -26,6 +26,7 @@ export interface Login {
 	weekIndex: string[];
 	joinClubNum: number;
 	confirmClubNum: number;
+	appleUser: string | null;
 }
 
 export interface kakaoLoginAPI {

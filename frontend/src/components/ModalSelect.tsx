@@ -18,30 +18,43 @@ import { loginEveryTime, postEveryTime } from '../store/individual';
 import type { RootState } from '../store';
 import { setModalMode } from '../store/team';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
+import { Button } from '../lib/util/Button';
 
 const screen = Dimensions.get('screen');
 
 interface props {
 	selectModalVisible: boolean;
 	setSelectModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	mode: string;
+	setMode: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export function ModalSelect({
 	selectModalVisible,
 	setSelectModalVisible,
+	mode,
+	setMode,
 }: props) {
-	const { everyTime, id, user, loadingLogin, loginSuccess, token } =
-		useSelector(({ individual, login, loading }: RootState) => ({
-			// dates: timetable.dates,
-			everyTime: individual.everyTime,
-			id: login.id,
-			user: login.user,
-			loadingLogin: loading['individual/POST_EVERYTIME'],
-			loginSuccess: individual.loginSuccess,
-			token: login.token,
-		}));
+	const {
+		everyTime,
+		id,
+		user,
+		loadingLogin,
+		loginSuccess,
+		token,
+		individualColor,
+	} = useSelector(({ individual, login, loading }: RootState) => ({
+		// dates: timetable.dates,
+		everyTime: individual.everyTime,
+		id: login.id,
+		user: login.user,
+		loadingLogin: loading['individual/POST_EVERYTIME'],
+		loginSuccess: individual.loginSuccess,
+		token: login.token,
+		individualColor: login.individualColor,
+	}));
 	const dispatch = useDispatch();
-	const [mode, setMode] = useState('normal');
+
 	const [loginID, setID] = useState('');
 	const [password, setPassword] = useState('');
 
@@ -93,79 +106,10 @@ export function ModalSelect({
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
 						</TouchableHighlight>
 					</View>
-					{mode === 'normal' && (
-						<View>
-							<View style={styles.blankView} />
-							<Text style={styles.titleText}>
-								시간표 등록 방법을 선택하세요
-							</Text>
-							<View style={{ height: 20 }} />
-							<View style={styles.backgroundView}>
-								<View style={styles.columnView}>
-									<TouchableHighlight
-										activeOpacity={1}
-										underlayColor={Colors.grey200}
-										style={[
-											styles.touchButtonStyle,
-											{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
-										]}
-										onPress={() => {
-											setMode('everytime');
-										}}
-									>
-										<View style={styles.rowView}>
-											<IonicIcon
-												name="alarm-outline"
-												size={28}
-												color="#CF2C1E"
-												style={{ marginLeft: 10 }}
-											/>
-											<Text style={styles.touchText}>에브리 타임</Text>
-											<View style={styles.iconView}>
-												<Font5Icon
-													name="angle-right"
-													size={19}
-													color={Colors.black}
-													style={styles.rightIconStyle}
-												/>
-											</View>
-										</View>
-									</TouchableHighlight>
-									<TouchableHighlight
-										activeOpacity={1}
-										underlayColor={Colors.grey200}
-										style={[
-											styles.touchButtonStyle,
-											{ borderTopLeftRadius: 0, borderTopRightRadius: 0 },
-										]}
-										onPress={() => {}}
-									>
-										<View style={styles.rowView}>
-											<AntIcon
-												name="picture"
-												size={28}
-												color={Colors.green400}
-												style={{ marginLeft: 10 }}
-											/>
-											<Text style={styles.touchText}>갤러리</Text>
-											<View style={styles.iconView}>
-												<Font5Icon
-													name="angle-right"
-													size={19}
-													color={Colors.black}
-													style={styles.rightIconStyle}
-												/>
-											</View>
-										</View>
-									</TouchableHighlight>
-								</View>
-							</View>
-							<View style={styles.blankView} />
-						</View>
-					)}
 
 					{mode === 'everytime' && (
 						<View>
+							<View style={styles.blankView} />
 							{/* <Text style={styles.titleText}>에브리 타임</Text> */}
 							<View
 								style={[
@@ -178,7 +122,8 @@ export function ModalSelect({
 								<View style={[styles.textInputView]}>
 									<Icon
 										name="account"
-										size={28}
+										size={25}
+										color={individualColor}
 										style={{
 											// marginTop: 5,
 											paddingRight: 10,
@@ -190,7 +135,7 @@ export function ModalSelect({
 										onChangeText={(loginID) => setID((text) => loginID)}
 										autoCapitalize="none"
 										placeholder="ID"
-										placeholderTextColor={Colors.grey800}
+										placeholderTextColor={Colors.grey600}
 									/>
 								</View>
 							</View>
@@ -199,7 +144,8 @@ export function ModalSelect({
 								<View style={[styles.textInputView]}>
 									<Icon
 										name="lock"
-										size={28}
+										size={25}
+										color={individualColor}
 										style={{
 											// marginTop: 5,
 											paddingRight: 10,
@@ -213,20 +159,28 @@ export function ModalSelect({
 										value={password}
 										onChangeText={(userPw) => setPassword((text) => userPw)}
 										placeholder="PASSWORD"
-										placeholderTextColor={Colors.grey800}
+										placeholderTextColor={Colors.grey600}
 									/>
 								</View>
 							</View>
+							<View style={styles.blankView} />
 							<View style={styles.buttonRowView}>
-								<TouchableHighlight
+								{/* <TouchableHighlight
 									activeOpacity={1}
 									underlayColor={Colors.grey200}
 									style={styles.closeButtonStyle}
 									onPress={onPressLogin}
 								>
 									<Text style={styles.buttonText}>로그인</Text>
-								</TouchableHighlight>
+								</TouchableHighlight> */}
 							</View>
+							<View style={styles.blankView} />
+							{/* <View style={styles.button}/> */}
+							<Button
+								buttonNumber={1}
+								buttonText="로그인"
+								onPressFunction={onPressLogin}
+							/>
 						</View>
 					)}
 				</View>
@@ -251,6 +205,7 @@ const styles = StyleSheet.create({
 		padding: 20,
 		alignItems: 'center',
 		shadowColor: 'black',
+		elevation: 10,
 		shadowOffset: {
 			width: 1,
 			height: 1,
@@ -266,23 +221,24 @@ const styles = StyleSheet.create({
 		marginBottom: 15,
 	},
 	textView: {
-		width: '90%',
-		marginLeft: '5%',
+		width: '100%',
+		// marginLeft: '5%',
 		//
 	},
 	textInput: {
-		fontSize: 19,
+		fontSize: 16,
 		flex: 1,
 		fontFamily: 'NanumSquareR',
 		marginLeft: '0%',
 	},
 	textInputView: {
 		flexDirection: 'row',
-		borderRadius: 15,
-		padding: 10,
-		borderWidth: 1,
+		borderBottomWidth: 2,
+		padding: 3,
+
 		borderColor: Colors.blue200,
-		// marginLeft: '5%',
+		width: '70%',
+		marginLeft: '20%',
 	},
 	buttonText: {
 		textAlign: 'center',
@@ -302,8 +258,8 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 	closeButtonStyle: {
-		padding: 15,
-		width: '50%',
+		padding: 0,
+		width: '100%',
 		height: '100%',
 		borderRadius: 13,
 	},
@@ -374,5 +330,11 @@ const styles = StyleSheet.create({
 	},
 	blankView: {
 		height: 15,
+	},
+	buttonOverLine: {
+		borderTopWidth: 0.4,
+		width: '90%',
+		marginTop: 20,
+		borderColor: Colors.black,
 	},
 });
