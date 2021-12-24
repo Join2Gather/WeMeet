@@ -336,6 +336,8 @@ class ClubLeaveView(APIView):
     def post(self, request: Request, user: int, profile: Any, uri: str, club: Any):
         ClubEntries.objects.filter(
             profile=profile, club=club).delete()
+        ProfileDatesToSnapshot.objects.filter(
+            profile_date__profile=profile, profile_date__club=club, snapshot=None).delete()
 
         return JsonResponse({'success': True})
 

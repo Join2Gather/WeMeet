@@ -43,8 +43,9 @@ def get_token(profile, key: str) -> Token:
 
 class ClubTestCase(TestCase):
 
-    @given(from_model(UserModel), from_model(Clubs), text(min_size=40))
-    def test_join_leave(self, user: UserModel, club: Clubs, key: str):
+    @given(from_model(UserModel), from_model(Clubs), text(min_size=40), lists(from_model(ProfileDates, profile=from_model(Profiles, user=from_model(UserModel)),
+                            date=from_model(Dates), club=from_model(Clubs, uri=text().filter(lambda x: x and '/' not in x))), min_size=1))
+    def test_join_leave(self, user: UserModel, club: Clubs, key: str, profile_dates: List[ProfileDates]):
         profile = Profiles.objects.create(name=user.username, user=user)
         token = get_token(profile, key)
 
@@ -52,7 +53,6 @@ class ClubTestCase(TestCase):
 
         user.save()
         club.save()
-
         self.assertFalse(ClubEntries.objects.filter(
             profile=profile.id, club=club.id).exists())
 
@@ -63,13 +63,31 @@ class ClubTestCase(TestCase):
 
         self.assertEquals(ClubEntries.objects.filter(
             profile=profile.id, club=club.id).count(), 1)
+        
+        for profile_date in profile_dates:
+            profile_date.profile = profile
+            profile_date.club = club
+            profile_date.save()
+            ProfileDatesToSnapshot.objects.get_or_create(profile_date=profile_date, snapshot=None)
+        
+        snapshot_response = self.mock_request(user, token, params={'profile': profile.id,
+                                                                'user': profile.user.id, 'uri': club.uri}, view_name='club_confirm_view', view=ClubConfirmView, mode='post')
+        self.check_match_serializer_type(snapshot_response, ClubConfirmView.post)
+        
+        snapshot_data = tuple(ProfileDatesToSnapshot.objects.filter(snapshot__isnull=False).order_by('id'))
 
         leave_response = self.mock_request(user, token, params={'profile': profile.id,
                                                                 'user': profile.user.id, 'uri': club.uri}, view_name='club_leave_view', view=ClubLeaveView, mode='post')
         self.check_match_serializer_type(leave_response, ClubLeaveView.post)
+        
+        snapshot_data_after_leave = tuple(ProfileDatesToSnapshot.objects.filter(snapshot__isnull=False).order_by('id'))
 
         self.assertFalse(ClubEntries.objects.filter(
-            profile=profile.id, club=club.id).exists())
+        profile=profile.id, club=club.id).exists())
+        self.assertFalse(ProfileDatesToSnapshot.objects.filter(
+        profile_date__club=club, profile_date__profile=profile, snapshot=None).exists())
+        
+        self.assertEquals(snapshot_data, snapshot_data_after_leave)
 
     @given(text(min_size=1, max_size=100), text(min_size=1, max_size=100))
     def test_default_club_color(self, name: str, uri: str):
