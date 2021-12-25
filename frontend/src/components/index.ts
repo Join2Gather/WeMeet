@@ -11,3 +11,5 @@ export * from './ModalTime';
 export * from './HomeSetting';
 
 export * from './AppleLogin';
+
+export * from './ModalConfirm';
