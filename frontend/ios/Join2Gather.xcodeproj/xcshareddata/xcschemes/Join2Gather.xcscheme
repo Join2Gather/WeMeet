@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "signin.app"
+               BuildableName = "Join2Gather.app"
                BlueprintName = "Join2Gather"
                ReferencedContainer = "container:Join2Gather.xcodeproj">
             </BuildableReference>
@@ -55,7 +55,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "signin.app"
+            BuildableName = "Join2Gather.app"
             BlueprintName = "Join2Gather"
             ReferencedContainer = "container:Join2Gather.xcodeproj">
          </BuildableReference>
@@ -72,7 +72,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "signin.app"
+            BuildableName = "Join2Gather.app"
             BlueprintName = "Join2Gather"
             ReferencedContainer = "container:Join2Gather.xcodeproj">
          </BuildableReference>

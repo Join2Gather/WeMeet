@@ -55,6 +55,8 @@ interface props {
 	joinUri: string;
 	isHomeTime: boolean;
 	findTime?: findTime[];
+	count?: number;
+	setCount?: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export function ModalTimePicker({
@@ -78,6 +80,8 @@ export function ModalTimePicker({
 	isHomeTime,
 	findTime,
 	onPlusHour,
+	count,
+	setCount,
 }: props) {
 	const {
 		postConfirmSuccess,
@@ -92,6 +96,7 @@ export function ModalTimePicker({
 		startTimeText,
 		startHour,
 		endHour,
+		confirmCount,
 	} = useSelector(({ timetable, login, individual }: RootState) => ({
 		postConfirmSuccess: timetable.postConfirmSuccess,
 		confirmClubs: login.confirmClubs,
@@ -105,6 +110,7 @@ export function ModalTimePicker({
 		startTimeText: timetable.startTimeText,
 		startHour: timetable.startHour,
 		endHour: timetable.endHour,
+		confirmCount: timetable.confirmCount,
 	}));
 	const dispatch = useDispatch();
 	// const [minute, setMinute] = useState(0);
@@ -220,18 +226,29 @@ export function ModalTimePicker({
 					{ text: '확인', onPress: () => {} },
 				]);
 			} else {
-				if (isHomeTime) dispatch(checkHomeIstBlank());
-				else {
+				if (isHomeTime) {
+					dispatch(checkHomeIstBlank());
+					setMode && setMode('loading');
+				} else {
 					if (isConfirm) {
+						console.log(confirmCount, 'confirmCount', count, 'count');
+						if (confirmCount === count) {
+							setCurrent && setCurrent(3);
+							setCount && setCount(1);
+						} else {
+							setCurrent && setCurrent(0);
+							setCount && setCount((count) => count + 1);
+						}
 						dispatch(checkIsExist('end'));
 						dispatch(changeConfirmTime());
-						setCurrent && setCurrent(3);
-					} else dispatch(checkIsBlank('end'));
+					} else {
+						dispatch(checkIsBlank('end'));
+					}
+					setMode && setMode('loading');
 				}
-				setMode && setMode('loading');
 			}
 		},
-		[isConfirm, isHomeTime, checkTime, startTime]
+		[isConfirm, isHomeTime, checkTime, startTime, count, confirmCount]
 	);
 
 	// 닫기 버튼
@@ -315,7 +332,7 @@ export function ModalTimePicker({
 				title={
 					isConfirm
 						? findTime && findTime.length !== 0
-							? `시작시간 설정\n${findTime[0].timeText}`
+							? `시작시간 설정\n 가능 시간 : [ ${findTime[0].timeText} ]`
 							: ``
 						: '시작시간 설정'
 				}

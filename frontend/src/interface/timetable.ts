@@ -47,6 +47,7 @@ export interface timetable {
 	modalMode: boolean;
 	isPostRevertSuccess: boolean;
 	startTimeText: string;
+	confirmCount: number;
 }
 
 export type weekIndex = Array<string>;

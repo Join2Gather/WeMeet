@@ -208,6 +208,7 @@ const initialState: timetable = {
 	modalMode: false,
 	isPostRevertSuccess: false,
 	startTimeText: '',
+	confirmCount: 1,
 };
 
 export const timetableSlice = createSlice({
@@ -310,7 +311,6 @@ export const timetableSlice = createSlice({
 		POST_CONFIRM_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.confirmDatesPrepare = false;
 			state.postConfirmSuccess = true;
-			state.responseGroup = action.payload;
 		},
 		GET_SNAPSHOT_SUCCESS: (
 			state,
@@ -673,6 +673,9 @@ export const timetableSlice = createSlice({
 		setTimeModalMode: (state, action: PayloadAction<boolean>) => {
 			state.modalMode = action.payload;
 		},
+		setConfirmCount: (state, action: PayloadAction<number>) => {
+			state.confirmCount = action.payload;
+		},
 
 		// checkTimeMode(state, action:PayloadAction<)
 	},
@@ -687,7 +690,7 @@ export const {
 	setEndMin,
 	checkIsBlank,
 	toggleTimePick,
-
+	setConfirmCount,
 	setDay,
 	makePostIndividualDates,
 	makeConfirmDates,

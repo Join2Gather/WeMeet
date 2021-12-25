@@ -8,8 +8,7 @@
 			"distribution": "internal"
 		},
 		"preview": {
-			"distribution": "internal",
-			"credentialsSource": "local"
+			"distribution": "internal"
 		},
 		"production": {}
 	},

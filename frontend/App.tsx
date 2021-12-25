@@ -10,6 +10,16 @@ import rootReducer, { rootSaga } from './src/store';
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 
+import * as Notifications from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+	handleNotification: async () => ({
+		shouldShowAlert: true,
+		shouldPlaySound: true,
+		shouldSetBadge: true,
+	}),
+});
+
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(
 	rootReducer,

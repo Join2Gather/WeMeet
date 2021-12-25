@@ -7,7 +7,7 @@ import {SafeAreaView, View,
 NavigationHeader,  Text} from '../theme';
 import Icon from 'react-native-vector-icons/Fontisto';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Spinner } from '../components';
+import { ModalConfirm, Spinner } from '../components';
 import { Timetable } from '../components/Timetable';
 import { Colors } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -77,6 +77,7 @@ export default function TeamTime({ route }: Props) {
 	//modal
 	const [modalVisible, setModalVisible] = useState(false);
 	const [settingModalVisible, setSettingModalVisible] = useState(false);
+	const [confirmModalVisible, setConfirm] = useState(false);
 	const [mode, setMode] = useState('normal');
 	const [isTimeMode, setIsTimeMode] = useState(false);
 	const [currentNumber, setCurrent] = useState(0);
@@ -94,22 +95,8 @@ export default function TeamTime({ route }: Props) {
 
 	// useCallback
 	const goConfirmPage = useCallback(() => {
-		Alert.alert('', '모임 시간을 정하셨나요?', [
-			{ text: '취소', onPress: () => {} },
-			{
-				text: '확인',
-				onPress: () => {
-					navigation.navigate('SnapShot', {
-						name,
-						color,
-						timetableMode: 'confirm',
-						isConfirm: true,
-						uri,
-					});
-				},
-			},
-		]);
-	}, [name, color]);
+		setConfirm(true);
+	}, []);
 	const goLeft = useCallback(() => {
 		navigation.goBack();
 		dispatch(setModalMode('normal'));
@@ -311,6 +298,13 @@ export default function TeamTime({ route }: Props) {
 							name={name}
 							onShareURI={onShareURI}
 							snapShotError={snapShotError}
+						/>
+						<ModalConfirm
+							color={color}
+							confirmModalVisible={confirmModalVisible}
+							name={name}
+							setConfirm={setConfirm}
+							uri={uri}
 						/>
 					</ScrollView>
 				</View>
