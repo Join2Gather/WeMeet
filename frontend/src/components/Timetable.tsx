@@ -146,7 +146,7 @@ export function Timetable({
 		time: 0,
 		day: '',
 	});
-
+	const [count, setCount] = useState(1);
 	// useEffect
 
 	useEffect(() => {
@@ -677,6 +677,8 @@ export function Timetable({
 						isHomeTime={isHomeTime}
 						findTime={findTime}
 						onPlusHour={onPlusHour}
+						count={count}
+						setCount={setCount}
 					/>
 				</View>
 			</View>
