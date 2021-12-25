@@ -78,7 +78,7 @@ class DateCalculator(ABC):
     # 반드시 @property decorator를 붙여서 override 할 것.
     @ property
     def filter_expression(self):
-        return {'profile': self.obj.id, 'profiledatestosnapshot__snapshot': None}
+        return {'profile': self.obj.id, 'profiledatestosnapshot__snapshot': None, 'profiledatestosnapshot__isnull': False}
 
     def calculate(self):
         """
@@ -158,7 +158,7 @@ class ClubsWithDateCalculator(DateCalculator):
 
     @ property
     def filter_expression(self):
-        return {'club': self.obj.id, 'profiledatestosnapshot__snapshot': None}
+        return {'club': self.obj.id, 'profiledatestosnapshot__snapshot': None, 'profiledatestosnapshot__isnull': False}
 
     def append_date(self, date, club, is_temporary_reserved):
         dates = self.dates
