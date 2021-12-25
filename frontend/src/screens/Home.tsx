@@ -8,6 +8,7 @@ import {
 	ScrollView,
 } from 'react-native';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
+import Constants from 'expo-constants';
 // prettier-ignore
 import {SafeAreaView, View, UnderlineText,TopBar,
 NavigationHeader, MaterialCommunityIcon as Icon, Text} from '../theme';
@@ -35,6 +36,47 @@ import { TouchableHighlight } from 'react-native-gesture-handler';
 import { setIsInTeamTime } from '../store/timetable';
 import Ionic from 'react-native-vector-icons/Ionicons';
 import { StatusBar } from 'expo-status-bar';
+
+import * as Notifications from 'expo-notifications';
+
+export async function allowsNotificationsAsync() {
+	const settings = await Notifications.getPermissionsAsync();
+	return (
+		settings.granted ||
+		settings.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL
+	);
+}
+async function registerForPushNotificationsAsync() {
+	let token;
+	if (Constants.isDevice) {
+		const { status: existingStatus } =
+			await Notifications.getPermissionsAsync();
+		let finalStatus = existingStatus;
+		if (existingStatus !== 'granted') {
+			const { status } = await Notifications.requestPermissionsAsync();
+			finalStatus = status;
+		}
+		if (finalStatus !== 'granted') {
+			alert('Failed to get push token for push notification!');
+			return;
+		}
+		token = (await Notifications.getExpoPushTokenAsync()).data;
+		console.log(token);
+	} else {
+		alert('Must use physical device for Push Notifications');
+	}
+
+	if (Platform.OS === 'android') {
+		Notifications.setNotificationChannelAsync('default', {
+			name: 'default',
+			importance: Notifications.AndroidImportance.MAX,
+			vibrationPattern: [0, 250, 250, 250],
+			lightColor: '#FF231F7C',
+		});
+	}
+
+	return token;
+}
 export default function Home() {
 	const {
 		token,
@@ -67,6 +109,20 @@ export default function Home() {
 		joinClubNum: login.joinClubNum,
 		confirmClubNum: login.confirmClubNum,
 	}));
+
+	// useEffect(() => {
+	// 	allowsNotificationsAsync();
+	// 	registerForPushNotificationsAsync();
+	// 	Notifications.scheduleNotificationAsync({
+	// 		content: {
+	// 			title: "Time's up!",
+	// 			body: 'Change sides!',
+	// 		},
+	// 		trigger: {
+	// 			seconds: 1, //onPress가 클릭이 되면 60초 뒤에 알람이 발생합니다.
+	// 		},
+	// 	});
+	// }, []);
 	const dispatch = useDispatch();
 	const { defaultDates } = useMakeTimetable();
 	const navigation = useNavigation();
