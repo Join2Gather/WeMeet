@@ -27,6 +27,7 @@ export interface Login {
 	joinClubNum: number;
 	confirmClubNum: number;
 	appleUser: string | null;
+	isConfirmProve: boolean;
 }
 
 export interface kakaoLoginAPI {

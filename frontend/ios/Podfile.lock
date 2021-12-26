@@ -5,6 +5,8 @@ PODS:
     - ExpoModulesCore
   - EXApplication (4.0.0):
     - ExpoModulesCore
+  - EXCalendar (10.0.3):
+    - ExpoModulesCore
   - EXClipboard (2.0.3):
     - ExpoModulesCore
   - EXConstants (13.0.0):
@@ -19,6 +21,8 @@ PODS:
   - EXKeepAwake (10.0.0):
     - ExpoModulesCore
   - EXLinearGradient (10.0.3):
+    - ExpoModulesCore
+  - EXLocalization (11.0.0):
     - ExpoModulesCore
   - EXManifests (0.2.2):
     - EXJSONUtils
@@ -443,6 +447,7 @@ DEPENDENCIES:
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - EXAppleAuthentication (from `../node_modules/expo-apple-authentication/ios`)
   - EXApplication (from `../node_modules/expo-application/ios`)
+  - EXCalendar (from `../node_modules/expo-calendar/ios`)
   - EXClipboard (from `../node_modules/expo-clipboard/ios`)
   - EXConstants (from `../node_modules/expo-constants/ios`)
   - EXFileSystem (from `../node_modules/expo-file-system/ios`)
@@ -451,6 +456,7 @@ DEPENDENCIES:
   - EXJSONUtils (from `../node_modules/expo-json-utils/ios`)
   - EXKeepAwake (from `../node_modules/expo-keep-awake/ios`)
   - EXLinearGradient (from `../node_modules/expo-linear-gradient/ios`)
+  - EXLocalization (from `../node_modules/expo-localization/ios`)
   - EXManifests (from `../node_modules/expo-manifests/ios`)
   - EXNotifications (from `../node_modules/expo-notifications/ios`)
   - Expo (from `../node_modules/expo/ios`)
@@ -521,6 +527,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-apple-authentication/ios"
   EXApplication:
     :path: "../node_modules/expo-application/ios"
+  EXCalendar:
+    :path: "../node_modules/expo-calendar/ios"
   EXClipboard:
     :path: "../node_modules/expo-clipboard/ios"
   EXConstants:
@@ -537,6 +545,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-keep-awake/ios"
   EXLinearGradient:
     :path: "../node_modules/expo-linear-gradient/ios"
+  EXLocalization:
+    :path: "../node_modules/expo-localization/ios"
   EXManifests:
     :path: "../node_modules/expo-manifests/ios"
   EXNotifications:
@@ -645,6 +655,7 @@ SPEC CHECKSUMS:
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   EXAppleAuthentication: 1852eb070102106305516dea9bd82811e8d5f6e5
   EXApplication: 0e15240e4d125b62f1cae48759ffbbd32b9286a6
+  EXCalendar: 27af518cab013bd6ccc5a9ef007be0e9e7465ef0
   EXClipboard: ead52260683fc856e58f5cc70f5ea5999bb9c049
   EXConstants: 5d18484e38e8eacef7695a82214b6ac90133dedf
   EXFileSystem: 99aac7962c11c680681819dd9cbca24e20e5b1e7
@@ -653,6 +664,7 @@ SPEC CHECKSUMS:
   EXJSONUtils: f515cf71710855d7ba5bfc6752af3b9a6f6aad01
   EXKeepAwake: 8aa32396a5972d26e75e538603aad0f032396503
   EXLinearGradient: 4d727eacb53d19ef25b02dd810e0199b453489ce
+  EXLocalization: bb38414618b30a177482c9a6f5594ec6eb0898c1
   EXManifests: 50e42e01335df4e54109dee7be5a91bfd37347db
   EXNotifications: 4a2beb5a2a7292ba64165413811b7c495bcb1297
   Expo: 5316c3ecdc34eb0cad340d01dc8beec97c7e879e

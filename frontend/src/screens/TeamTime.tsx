@@ -7,7 +7,7 @@ import {SafeAreaView, View,
 NavigationHeader,  Text} from '../theme';
 import Icon from 'react-native-vector-icons/Fontisto';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ModalConfirm, Spinner } from '../components';
+import { ModalConfirm, ModalDatePicker, Spinner } from '../components';
 import { Timetable } from '../components/Timetable';
 import { Colors } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -47,6 +47,7 @@ export default function TeamTime({ route }: Props) {
 		createdDate,
 		snapShotError,
 		name,
+		isConfirmProve,
 	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
 		uri: timetable.teamURI,
 		color: timetable.color,
@@ -65,6 +66,7 @@ export default function TeamTime({ route }: Props) {
 		createdDate: timetable.createdDate,
 		snapShotError: timetable.snapShotError,
 		name: timetable.teamName,
+		isConfirmProve: login.isConfirmProve,
 	}));
 	// navigation
 	const { id, user, token, modalMode } = route.params;
@@ -82,6 +84,7 @@ export default function TeamTime({ route }: Props) {
 	const [isTimeMode, setIsTimeMode] = useState(false);
 	const [currentNumber, setCurrent] = useState(0);
 	const [sequence, setSequence] = useState([0, 1, 2]);
+	const [dateVisible, setDateVisible] = useState(false);
 	// initial
 	useEffect(() => {
 		makeReady && dispatch(makeInitialTimetable());
@@ -298,6 +301,13 @@ export default function TeamTime({ route }: Props) {
 							name={name}
 							onShareURI={onShareURI}
 							snapShotError={snapShotError}
+							isConfirmProve={isConfirmProve}
+							dateVisible={dateVisible}
+							setDateVisible={setDateVisible}
+						/>
+						<ModalDatePicker
+							dateVisible={dateVisible}
+							setDateVisible={setDateVisible}
 						/>
 						<ModalConfirm
 							color={color}
