@@ -44,6 +44,7 @@ const initialState: Login = {
 	joinClubNum: 0,
 	confirmClubNum: 0,
 	appleUser: null,
+	isConfirmProve: false,
 };
 
 const USER_ME = 'login/USER_ME';
@@ -81,24 +82,31 @@ export const loginSlice = createSlice({
 				club.name = decodeURIComponent(club.name);
 			});
 			state.kakaoDates = kakaoDates;
+			state.dates = dates;
 		},
 		findTeam: (
 			state,
 			action: PayloadAction<{ uri?: string; name?: string }>
 		) => {
 			let data;
+			let dateInfo;
 			if (action.payload.name) {
 				data = state.clubs.find((club) => club.name === action.payload.name);
+				dateInfo = state.dates.find(
+					(date: any) =>
+						decodeURIComponent(date.club.name) === action.payload.name
+				);
 			} else if (action.payload.uri) {
 				data = state.clubs.find((club) => club.uri === action.payload.uri);
 			}
-			if (data) {
+			if (data && dateInfo) {
 				state.name = data.name;
 				state.uri = data.uri;
 				state.color = data.color;
 				state.peopleCount = data.people_count;
 				state.startHour = data.starting_hours;
 				state.endHour = data.end_hours;
+				state.isConfirmProve = !dateInfo.is_temporary_reserved;
 			}
 		},
 		findHomeTime: (
@@ -132,6 +140,7 @@ export const loginSlice = createSlice({
 				sat: [],
 			};
 			const { clubs, dates, nickname } = action.payload;
+			state.dates = dates;
 			state.joinClubNum = clubs.length;
 			state.nickname = nickname;
 			state.confirmDatesTimetable = dates.filter(
