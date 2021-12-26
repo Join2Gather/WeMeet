@@ -4878,6 +4878,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-calendar@npm:~10.0.3":
+  version: 10.0.3
+  resolution: "expo-calendar@npm:10.0.3"
+  dependencies:
+    "@expo/config-plugins": ^4.0.2
+    expo-modules-core: ~0.4.4
+  checksum: 1a00127ab1f301301adac9355f45412e236a5c9966330c499cc7d1d61072f98de77b46f34b812acf413383b0d295481671f65638fa2a69e6c7e75182869df5ac
+  languageName: node
+  linkType: hard
+
 "expo-clipboard@npm:^2.0.3":
   version: 2.0.3
   resolution: "expo-clipboard@npm:2.0.3"
@@ -5025,6 +5035,15 @@ __metadata:
     qs: ^6.9.1
     url-parse: ^1.4.4
   checksum: 2501a421e4bbe2eb37b413f5180d619f8525fcc27b45f92771a88ad4d5a32f1ed5d3492a71cb7b955588a99461c61b06c4f923c93f5acdd8f3775123c758e00d
+  languageName: node
+  linkType: hard
+
+"expo-localization@npm:~11.0.0":
+  version: 11.0.0
+  resolution: "expo-localization@npm:11.0.0"
+  dependencies:
+    rtl-detect: ^1.0.2
+  checksum: fc5537a4c7b0f24f79c0de2178a46b2f27b1109a1703bdfc51285b01a7cc1a404ef9ade16f2cbd9ac06c478799a2777853379a7cf8975eed43c466bed6b431ad
   languageName: node
   linkType: hard
 
@@ -5484,6 +5503,7 @@ __metadata:
     dayjs: ^1.10.7
     expo: ^43.0.3
     expo-apple-authentication: ~4.0.3
+    expo-calendar: ~10.0.3
     expo-clipboard: ^2.0.3
     expo-constants: ^13.0.0
     expo-dev-client: ^0.7.2
@@ -5493,6 +5513,7 @@ __metadata:
     expo-image-picker: ^11.0.3
     expo-linear-gradient: ^10.0.3
     expo-linking: ^3.0.0
+    expo-localization: ~11.0.0
     expo-notifications: ~0.13.3
     expo-screen-orientation: ^4.0.3
     expo-splash-screen: ~0.13.5
@@ -9110,6 +9131,13 @@ __metadata:
   version: 4.8.5
   resolution: "rsvp@npm:4.8.5"
   checksum: 2d8ef30d8febdf05bdf856ccca38001ae3647e41835ca196bc1225333f79b94ae44def733121ca549ccc36209c9b689f6586905e2a043873262609744da8efc1
+  languageName: node
+  linkType: hard
+
+"rtl-detect@npm:^1.0.2":
+  version: 1.0.4
+  resolution: "rtl-detect@npm:1.0.4"
+  checksum: d562535baa0db62f57f0a1d4676297bff72fd6b94e88f0f0900d5c3e810ab512c5c4cadffd3e05fbe8d9c74310c919afa3ea8c1001c244e5555e8eef12d02d6f
   languageName: node
   linkType: hard
 
