@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 import FontIcon from 'react-native-vector-icons/FontAwesome';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import { changeColor, leaveTeam, setModalMode } from '../store/team';
@@ -22,6 +23,8 @@ import { Button } from '../lib/util/Button';
 import { changeTimetableColor, getSnapShot } from '../store/timetable';
 import { getUserMe, makeGroupColor } from '../store/login';
 import { useNavigation } from '@react-navigation/core';
+import MakeAlarm from '../lib/util/MakeAlarm';
+import { ModalDatePicker } from './ModalDatePicker';
 
 const screen = Dimensions.get('screen');
 
@@ -38,6 +41,9 @@ interface props {
 	name: string;
 	onShareURI: () => void;
 	snapShotError: boolean;
+	isConfirmProve: boolean;
+	dateVisible: boolean;
+	setDateVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function ModalSetting({
@@ -52,10 +58,16 @@ export function ModalSetting({
 	name,
 	onShareURI,
 	snapShotError,
+	isConfirmProve,
+	dateVisible,
+	setDateVisible,
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
+	const [subMode, setSubMode] = useState('initial');
+	const [alarmTime, setAlarmTime] = useState('1');
 	const [pickColor, setPickColor] = useState(Colors.red500);
+
 	// const [color, setColor] = useState(Colors.red500);
 	const [RGBColor, setRGBColor] = useState({
 		r: 0,
@@ -126,6 +138,11 @@ export function ModalSetting({
 		navigation.goBack();
 		setSettingModalVisible(false);
 	}, []);
+
+	const onPressMakeAlarm = useCallback(() => {
+		setMode('alarm');
+		// const add = MakeAlarm({title, });
+	}, []);
 	return (
 		<Modal
 			animationType="fade"
@@ -180,7 +197,7 @@ export function ModalSetting({
 												name="palette"
 												size={21}
 												color={color}
-												style={styles.iconStyle}
+												style={[styles.iconStyle, { marginTop: 10 }]}
 											/>
 											<Text style={styles.touchText}> 팀 색상 변경</Text>
 											<View style={styles.iconView}>
@@ -208,7 +225,7 @@ export function ModalSetting({
 												name="user-plus"
 												size={20}
 												color={color}
-												style={styles.iconStyle}
+												style={[styles.iconStyle, { marginTop: 10 }]}
 											/>
 											<Text style={styles.touchText}>팀원 초대</Text>
 											<View style={styles.iconView}>
@@ -242,8 +259,9 @@ export function ModalSetting({
 												name="cloud-download-alt"
 												size={17}
 												color={color}
-												style={styles.iconStyle}
+												style={[styles.iconStyle, { marginTop: 15 }]}
 											/>
+
 											<Text style={styles.touchText}>저장 시간 불러오기</Text>
 											<View style={styles.iconView}>
 												<Font5Icon
@@ -255,7 +273,30 @@ export function ModalSetting({
 											</View>
 										</View>
 									</TouchableHighlight>
-
+									<TouchableHighlight
+										activeOpacity={1}
+										underlayColor={Colors.grey300}
+										onPress={onPressMakeAlarm}
+										style={[styles.touchButtonStyle, { borderRadius: 0 }]}
+									>
+										<View style={styles.rowView}>
+											<Ionicons
+												name="alarm"
+												size={25}
+												color={color}
+												style={styles.iconStyle}
+											/>
+											<Text style={styles.touchText}>알람 추가하기</Text>
+											<View style={styles.iconView}>
+												<Font5Icon
+													name="angle-right"
+													size={19}
+													color={Colors.black}
+													style={styles.rightIconStyle}
+												/>
+											</View>
+										</View>
+									</TouchableHighlight>
 									<TouchableHighlight
 										activeOpacity={1}
 										underlayColor={Colors.grey300}
@@ -394,6 +435,111 @@ export function ModalSetting({
 							{/* <View style={styles.blankView} /> */}
 						</>
 					)}
+					{mode === 'alarm' && (
+						<>
+							{!isConfirmProve && (
+								<>
+									<View style={styles.blankView} />
+									<TouchableHighlight
+										activeOpacity={1}
+										underlayColor={Colors.grey300}
+										// onPress={goSnapShotPage}
+										style={styles.touchButtonStyle}
+									>
+										<View style={styles.rowView}>
+											<Font5Icon
+												name="ban"
+												size={23}
+												color={Colors.red500}
+												style={styles.iconStyle}
+											/>
+											<Text style={styles.touchText}>
+												아직 모임 시간이 정해지지 않았습니다
+											</Text>
+										</View>
+									</TouchableHighlight>
+									<View style={styles.blankView} />
+									<View style={styles.buttonOverLine} />
+
+									<Button
+										buttonNumber={1}
+										buttonText={'이전'}
+										onPressWithParam={() => setMode('initial')}
+										pressParam="initial"
+									/>
+								</>
+							)}
+							{isConfirmProve && subMode === 'initial' && (
+								<>
+									<Text style={styles.titleText}>
+										캘린더 아이콘을 터치 하여 주세요
+									</Text>
+
+									<TouchableHighlight
+										activeOpacity={1}
+										underlayColor={Colors.grey300}
+										onPress={() => {
+											setSettingModalVisible(false);
+											setDateVisible(true);
+										}}
+										style={styles.touchButtonStyle}
+									>
+										<View style={styles.rowView}>
+											<Font5Icon
+												name="calendar-alt"
+												size={23}
+												color={color}
+												style={styles.iconStyle}
+											/>
+											<Text style={styles.touchText}>{'종료일 설정'}</Text>
+											<View style={styles.iconView}>
+												<Font5Icon
+													name="angle-right"
+													size={19}
+													color={Colors.black}
+													style={styles.rightIconStyle}
+												/>
+											</View>
+										</View>
+									</TouchableHighlight>
+
+									<Button
+										buttonNumber={1}
+										buttonText="확인"
+										// onPressWithParam={() => onPressNext('send')}
+										pressParam="send"
+									/>
+								</>
+							)}
+							{isConfirmProve && subMode === 'time' && (
+								<>
+									<Text style={styles.titleText}>
+										알람을 모임 몇 시간 전으로 설정 할까요?
+									</Text>
+
+									<View style={[styles.textInputView]}>
+										<TextInput
+											// onFocus={focus}
+											keyboardType="number-pad"
+											style={[styles.textInput, { color: Colors.black }]}
+											value={alarmTime}
+											onChangeText={(time) => setAlarmTime((text) => time)}
+											placeholder="1"
+											placeholderTextColor={Colors.grey600}
+											autoFocus={true}
+										/>
+									</View>
+
+									<Button
+										buttonNumber={1}
+										buttonText="확인"
+										// onPressWithParam={() => onPressNext('send')}
+										pressParam="send"
+									/>
+								</>
+							)}
+						</>
+					)}
 					{mode === 'loading' && (
 						<>
 							<View style={styles.blankView} />
@@ -464,6 +610,10 @@ export function ModalSetting({
 					)}
 				</View>
 			</View>
+			<ModalDatePicker
+				dateVisible={dateVisible}
+				setDateVisible={setDateVisible}
+			/>
 		</Modal>
 		// </AutoFocusProvider>
 	);
@@ -551,8 +701,28 @@ const styles = StyleSheet.create({
 	},
 	iconStyle: {
 		marginLeft: 10,
+		width: 30,
+		height: 30,
+		// backgroundColor: Colors.blue100,
+		marginTop: 5,
+		textAlign: 'center',
+
+		alignContent: 'center',
 	},
 	rightIconStyle: {
 		marginRight: 10,
+	},
+	textInputView: {
+		paddingBottom: 2,
+		backgroundColor: Colors.white,
+		borderBottomWidth: 0.3,
+		width: '70%',
+		marginLeft: '15%',
+		padding: 10,
+		marginBottom: 15,
+	},
+	textInput: {
+		fontSize: 18,
+		fontFamily: 'NanumSquareR',
 	},
 });
