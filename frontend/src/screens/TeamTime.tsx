@@ -7,7 +7,12 @@ import {SafeAreaView, View,
 NavigationHeader,  Text} from '../theme';
 import Icon from 'react-native-vector-icons/Fontisto';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ModalConfirm, ModalDatePicker, Spinner } from '../components';
+import {
+	DayOfWeek,
+	ModalConfirm,
+	ModalDatePicker,
+	Spinner,
+} from '../components';
 import { Timetable } from '../components/Timetable';
 import { Colors } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -273,6 +278,7 @@ export default function TeamTime({ route }: Props) {
 							)}
 						</View>
 					</View>
+					<DayOfWeek />
 					<ScrollView style={{ backgroundColor: Colors.white }}>
 						<Timetable
 							mode={mode}

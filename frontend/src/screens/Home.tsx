@@ -13,7 +13,12 @@ import Constants from 'expo-constants';
 import {SafeAreaView, View, UnderlineText,TopBar,
 NavigationHeader, MaterialCommunityIcon as Icon, Text} from '../theme';
 import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
-import { LeftRightNavigation, Spinner, ModalSelect } from '../components';
+import {
+	LeftRightNavigation,
+	Spinner,
+	ModalSelect,
+	DayOfWeek,
+} from '../components';
 import { Timetable } from '../components/Timetable';
 import type { LeftRightNavigationMethods } from '../components';
 import { Colors } from 'react-native-paper';
@@ -282,6 +287,7 @@ export default function Home() {
 						</View>
 					)}
 				</View>
+				<DayOfWeek />
 				<ScrollView style={{ backgroundColor: Colors.white }}>
 					<Timetable
 						modalVisible={modalVisible}

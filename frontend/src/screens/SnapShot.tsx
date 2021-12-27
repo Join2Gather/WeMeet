@@ -40,6 +40,7 @@ import { initialIndividualTimetable } from '../store/individual';
 import team from '../store/team';
 import { ModalLoading } from '../components/ModalLoading';
 import { Sequence } from '../components/Sequence';
+import { DayOfWeek } from '../components';
 
 export default function SnapShot({ route }: Props) {
 	const {
@@ -244,6 +245,7 @@ export default function SnapShot({ route }: Props) {
 						</>
 					)}
 				</View>
+				<DayOfWeek />
 				<ScrollView style={{ backgroundColor: Colors.white }}>
 					{timetableMode === 'confirm' ? (
 						<Timetable
