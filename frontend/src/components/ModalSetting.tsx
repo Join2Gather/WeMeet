@@ -474,7 +474,7 @@ export function ModalSetting({
 									<Text style={styles.titleText}>
 										캘린더 아이콘을 터치 하여 주세요
 									</Text>
-
+									<View style={styles.blankView} />
 									<TouchableHighlight
 										activeOpacity={1}
 										underlayColor={Colors.grey300}
@@ -502,7 +502,7 @@ export function ModalSetting({
 											</View>
 										</View>
 									</TouchableHighlight>
-
+									<View style={styles.buttonOverLine} />
 									<Button
 										buttonNumber={1}
 										buttonText="확인"
