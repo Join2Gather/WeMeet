@@ -110,10 +110,17 @@ export function ModalTime({
 										<Text style={styles.titleText}>선택 시간</Text>
 										<View style={styles.blankView} />
 
-										<View style={[styles.backgroundView]}>
+										<View
+											style={[
+												styles.backgroundView,
+												{ backgroundColor: color },
+											]}
+										>
 											<View style={styles.columnView}>
 												<View style={styles.rowView}>
-													<Text style={styles.touchText}>
+													<Text
+														style={[styles.touchText, { color: Colors.white }]}
+													>
 														{findTime[0].selectTime > 12
 															? `오후  ${findTime[0].selectTime - 12}시`
 															: `오전  ${findTime[0].selectTime}시`}
