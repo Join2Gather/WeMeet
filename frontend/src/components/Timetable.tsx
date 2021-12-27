@@ -25,8 +25,6 @@ import { ModalTime } from './';
 import { ModalTimePicker } from './ModalTimePicker';
 import { findHomeTime } from '../store/login';
 import { ModalIndividualTime } from './ModalIndividualTime';
-import { delay } from 'redux-saga/effects';
-const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 const boxHeight = 28.0;
 const inBoxHeight = 7.0;
@@ -358,32 +356,6 @@ export function Timetable({
 
 	return (
 		<View style={styles.view}>
-			<View style={styles.rowDayOfWeekView}>
-				<View style={styles.timeView}>
-					<View style={styles.dayOfWeekView}></View>
-				</View>
-				<View style={styles.contentView}>
-					{dayOfWeek.map((dayText, idx) => (
-						<View style={styles.dayOfWeekView} key={idx}>
-							<Text
-								style={[
-									styles.dayOfText,
-									{
-										color:
-											idx === 0
-												? Colors.red500
-												: idx === 6
-												? Colors.blue700
-												: Colors.black,
-									},
-								]}
-							>
-								{dayText}
-							</Text>
-						</View>
-					))}
-				</View>
-			</View>
 			<View style={styles.rowView}>
 				<View style={[styles.timeView, {}]}>
 					{individualTimesText
@@ -693,13 +665,6 @@ const styles = StyleSheet.create({
 		width: '90%',
 		justifyContent: 'space-evenly',
 	},
-	dayOfWeekView: {
-		width: screen.width / 9,
-	},
-	dayOfText: {
-		textAlign: 'center',
-		fontFamily: 'NanumSquareR',
-	},
 	timeView: {
 		width: screen.width / 13,
 	},
@@ -715,10 +680,6 @@ const styles = StyleSheet.create({
 	},
 	rowView: {
 		flexDirection: 'row',
-	},
-	rowDayOfWeekView: {
-		flexDirection: 'row',
-		paddingBottom: 10,
 	},
 	boxView: {
 		height: 28,
