@@ -21,7 +21,7 @@ import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import { changeColor, leaveTeam, setModalMode } from '../store/team';
 import { Button } from '../lib/util/Button';
 import { changeTimetableColor, getSnapShot } from '../store/timetable';
-import { getUserMe, makeGroupColor } from '../store/login';
+import { getUserMe, makeGroupColor, setAlarmTime } from '../store/login';
 import { useNavigation } from '@react-navigation/core';
 import MakeAlarm from '../lib/util/MakeAlarm';
 import { ModalDatePicker } from './ModalDatePicker';
@@ -31,6 +31,10 @@ const screen = Dimensions.get('screen');
 interface props {
 	settingModalVisible: boolean;
 	setSettingModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	settingMode: string;
+	setSetting: React.Dispatch<React.SetStateAction<string>>;
+	subMode: string;
+	setSubMode: React.Dispatch<React.SetStateAction<string>>;
 	user: number;
 	id: number;
 	token: string;
@@ -44,6 +48,7 @@ interface props {
 	isConfirmProve: boolean;
 	dateVisible: boolean;
 	setDateVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	alarmTime: number;
 }
 
 export function ModalSetting({
@@ -61,11 +66,15 @@ export function ModalSetting({
 	isConfirmProve,
 	dateVisible,
 	setDateVisible,
+	alarmTime,
+	setSetting,
+	settingMode,
+	subMode,
+	setSubMode,
 }: props) {
 	const dispatch = useDispatch();
-	const [mode, setMode] = useState('initial');
-	const [subMode, setSubMode] = useState('initial');
-	const [alarmTime, setAlarmTime] = useState('1');
+
+	const [time, setTime] = useState('1');
 	const [pickColor, setPickColor] = useState(Colors.red500);
 
 	// const [color, setColor] = useState(Colors.red500);
@@ -76,21 +85,21 @@ export function ModalSetting({
 	});
 	const navigation = useNavigation();
 	useEffect(() => {
-		if (mode === 'loading') {
+		if (settingMode === 'loading') {
 			setTimeout(() => {
-				setMode('success');
+				setSetting('success');
 			}, 500);
-		} else if (mode === 'loadingSave') {
+		} else if (settingMode === 'loadingSave') {
 			setTimeout(() => {
-				setMode('snapShot');
+				setSetting('snapShot');
 			}, 500);
-		} else if (mode === 'loadingLeave') {
+		} else if (settingMode === 'loadingLeave') {
 			setTimeout(() => {
-				setMode('successLeave');
+				setSetting('successLeave');
 			}, 500);
 			dispatch(getUserMe({ id, token, user }));
 		}
-	}, [mode]);
+	}, [settingMode]);
 
 	// useCallback
 	useEffect(() => {
@@ -99,11 +108,11 @@ export function ModalSetting({
 	}, [color]);
 	const onPressCloseButton = useCallback(() => {
 		setSettingModalVisible(false);
-		setMode('initial');
+		setSetting('initial');
 	}, []);
 
-	const onPressSetMode = useCallback((mode: string) => {
-		setMode(mode);
+	const onPresssetSetting = useCallback((mode: string) => {
+		setSetting(mode);
 	}, []);
 	// 팀 색 변경
 	const onPressChangeColor = useCallback(() => {
@@ -111,17 +120,17 @@ export function ModalSetting({
 		dispatch(getUserMe({ id, token, user }));
 		dispatch(makeGroupColor(pickColor));
 
-		setMode('loading');
+		setSetting('loading');
 	}, [pickColor]);
 	const onPressGetSnapShot = useCallback(() => {
 		uri && dispatch(getSnapShot({ id, token, user, uri }));
-		setMode('loadingSave');
+		setSetting('loadingSave');
 	}, []);
 	const onFinishChangeColor = useCallback(() => {
 		dispatch(changeTimetableColor(pickColor));
 		setPickColor(Colors.red500);
 		setSettingModalVisible(false);
-		setMode('initial');
+		setSetting('initial');
 	}, [pickColor]);
 
 	const goSnapShotPage = useCallback(() => {
@@ -131,18 +140,31 @@ export function ModalSetting({
 	}, [color]);
 	const onPressLeaveTeam = useCallback(() => {
 		uri && dispatch(leaveTeam({ id, token, uri, user }));
-		setMode('loadingLeave');
+		setSetting('loadingLeave');
 	}, []);
 	const onCloseLeaveTeam = useCallback(() => {
-		setMode('initial');
+		setSetting('initial');
 		navigation.goBack();
 		setSettingModalVisible(false);
 	}, []);
 
 	const onPressMakeAlarm = useCallback(() => {
-		setMode('alarm');
+		setSetting('alarm');
 		// const add = MakeAlarm({title, });
 	}, []);
+
+	const onPressSetTime = useCallback(() => {
+		setSubMode('time');
+		dispatch(setAlarmTime(Number(time)));
+	}, [time]);
+
+	const onPressPrevious = useCallback(() => {
+		setSetting('initial');
+	}, []);
+	const onPressAlarmPrevious = useCallback(() => {
+		setSubMode('initial');
+	}, []);
+
 	return (
 		<Modal
 			animationType="fade"
@@ -176,7 +198,7 @@ export function ModalSetting({
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
 						</TouchableHighlight>
 					</View>
-					{mode === 'initial' && (
+					{settingMode === 'initial' && (
 						<>
 							<View style={styles.blankView} />
 							<Text style={styles.titleText}>팀 설정</Text>
@@ -186,7 +208,7 @@ export function ModalSetting({
 									<TouchableHighlight
 										activeOpacity={1}
 										underlayColor={Colors.grey300}
-										onPress={() => onPressSetMode('color')}
+										onPress={() => onPresssetSetting('color')}
 										style={[
 											styles.touchButtonStyle,
 											{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
@@ -286,7 +308,7 @@ export function ModalSetting({
 												color={color}
 												style={styles.iconStyle}
 											/>
-											<Text style={styles.touchText}>알람 추가하기</Text>
+											<Text style={styles.touchText}>알람 설정하기</Text>
 											<View style={styles.iconView}>
 												<Font5Icon
 													name="angle-right"
@@ -326,9 +348,10 @@ export function ModalSetting({
 									</TouchableHighlight>
 								</View>
 							</View>
+							<View style={styles.blankView} />
 						</>
 					)}
-					{mode === 'color' && (
+					{settingMode === 'color' && (
 						<>
 							<Text style={styles.titleText}>모임 색상을 선택해 주세요</Text>
 							<View style={styles.blankView} />
@@ -360,13 +383,13 @@ export function ModalSetting({
 								buttonNumber={2}
 								buttonText={'이전'}
 								secondButtonText={'확인'}
-								onPressWithParam={() => setMode('initial')}
+								onPressWithParam={() => setSetting('initial')}
 								pressParam="initial"
 								secondOnPressFunction={() => onPressChangeColor()}
 							/>
 						</>
 					)}
-					{mode === 'snapShot' && (
+					{settingMode === 'snapShot' && (
 						<>
 							<View style={styles.blankView} />
 							<Text style={[styles.titleText]}>저장 시간 불러오기</Text>
@@ -429,13 +452,13 @@ export function ModalSetting({
 							<Button
 								buttonNumber={1}
 								buttonText={'이전'}
-								onPressWithParam={() => setMode('initial')}
+								onPressWithParam={() => setSetting('initial')}
 								pressParam="initial"
 							/>
 							{/* <View style={styles.blankView} /> */}
 						</>
 					)}
-					{mode === 'alarm' && (
+					{settingMode === 'alarm' && (
 						<>
 							{!isConfirmProve && (
 								<>
@@ -464,16 +487,19 @@ export function ModalSetting({
 									<Button
 										buttonNumber={1}
 										buttonText={'이전'}
-										onPressWithParam={() => setMode('initial')}
+										onPressWithParam={() => setSetting('initial')}
 										pressParam="initial"
 									/>
 								</>
 							)}
-							{isConfirmProve && subMode === 'initial' && (
+							{isConfirmProve && subMode === 'time' && (
 								<>
-									<Text style={styles.titleText}>
-										캘린더 아이콘을 터치 하여 주세요
+									<Text
+										style={[styles.titleText, { justifyContent: 'center' }]}
+									>
+										알람 기한을 설정해 주세요
 									</Text>
+									<View style={styles.blankView} />
 									<View style={styles.blankView} />
 									<TouchableHighlight
 										activeOpacity={1}
@@ -502,66 +528,85 @@ export function ModalSetting({
 											</View>
 										</View>
 									</TouchableHighlight>
+									<View style={styles.blankView} />
 									<View style={styles.buttonOverLine} />
 									<Button
 										buttonNumber={1}
-										buttonText="확인"
-										// onPressWithParam={() => onPressNext('send')}
-										pressParam="send"
+										buttonText="이전"
+										onPressFunction={onPressAlarmPrevious}
 									/>
 								</>
 							)}
-							{isConfirmProve && subMode === 'time' && (
+							{isConfirmProve && subMode === 'initial' && (
 								<>
 									<Text style={styles.titleText}>
-										알람을 모임 몇 시간 전으로 설정 할까요?
+										{'알람을 모임 몇 시간 전으로 설정\n 할까요?'}
 									</Text>
-
-									<View style={[styles.textInputView]}>
-										<TextInput
-											// onFocus={focus}
-											keyboardType="number-pad"
-											style={[styles.textInput, { color: Colors.black }]}
-											value={alarmTime}
-											onChangeText={(time) => setAlarmTime((text) => time)}
-											placeholder="1"
-											placeholderTextColor={Colors.grey600}
-											autoFocus={true}
-										/>
+									<View style={styles.blankView} />
+									<View style={styles.blankView} />
+									<View
+										style={{
+											flexDirection: 'row',
+											justifyContent: 'center',
+											alignItems: 'center',
+											alignContent: 'center',
+										}}
+									>
+										<View style={[styles.textInputView]}>
+											<TextInput
+												// onFocus={focus}
+												keyboardType="number-pad"
+												style={[styles.textInput, { color: Colors.black }]}
+												value={time}
+												onChangeText={(time) => setTime(time)}
+												placeholder="1"
+												placeholderTextColor={Colors.grey600}
+												autoFocus={true}
+											/>
+										</View>
+										<Text
+											style={[
+												styles.touchText,
+												{ paddingBottom: 10, marginLeft: 0, fontSize: 15 },
+											]}
+										>
+											시간
+										</Text>
 									</View>
-
+									<View style={styles.buttonOverLine} />
 									<Button
-										buttonNumber={1}
-										buttonText="확인"
-										// onPressWithParam={() => onPressNext('send')}
-										pressParam="send"
+										buttonNumber={2}
+										buttonText="이전"
+										secondButtonText="확인"
+										onPressFunction={onPressPrevious}
+										secondOnPressFunction={onPressSetTime}
 									/>
 								</>
 							)}
 						</>
 					)}
-					{mode === 'loading' && (
+					{settingMode === 'loading' && (
 						<>
 							<View style={styles.blankView} />
 							<ActivityIndicator size={'large'} color={color} />
 							<View style={styles.blankView} />
 						</>
 					)}
-					{mode === 'loadingSave' && (
+					{settingMode === 'loadingSave' && (
 						<>
 							<View style={styles.blankView} />
 							<ActivityIndicator size={'large'} color={color} />
 							<View style={styles.blankView} />
 						</>
 					)}
-					{mode === 'loadingLeave' && (
+					{settingMode === 'loadingLeave' && (
 						<>
 							<View style={styles.blankView} />
 							<ActivityIndicator size={'large'} color={color} />
 							<View style={styles.blankView} />
 						</>
 					)}
-					{mode === 'success' && (
+					{settingMode === 'success' && (
 						<>
 							<View style={styles.blankView} />
 							<View style={[styles.rowView, { justifyContent: 'center' }]}>
@@ -585,7 +630,7 @@ export function ModalSetting({
 							/>
 						</>
 					)}
-					{mode === 'successLeave' && (
+					{settingMode === 'successLeave' && (
 						<>
 							<View style={styles.blankView} />
 							<View style={[styles.rowView, { justifyContent: 'center' }]}>
@@ -610,10 +655,14 @@ export function ModalSetting({
 					)}
 				</View>
 			</View>
-			<ModalDatePicker
+			{/* <ModalDatePicker
 				dateVisible={dateVisible}
 				setDateVisible={setDateVisible}
-			/>
+				name={name}
+				alarmTime={Number(alarmTime)}
+				setSetting={setSetting}
+				setSubMode={setSubMode}
+			/> */}
 		</Modal>
 		// </AutoFocusProvider>
 	);
@@ -714,15 +763,17 @@ const styles = StyleSheet.create({
 	},
 	textInputView: {
 		paddingBottom: 2,
-		backgroundColor: Colors.white,
+		backgroundColor: Colors.grey100,
 		borderBottomWidth: 0.3,
-		width: '70%',
-		marginLeft: '15%',
-		padding: 10,
+		width: '20%',
+		textAlign: 'center',
+		// marginLeft: '15%',
+		padding: 5,
 		marginBottom: 15,
 	},
 	textInput: {
 		fontSize: 18,
 		fontFamily: 'NanumSquareR',
+		textAlign: 'center',
 	},
 });
