@@ -241,8 +241,6 @@ export function Timetable({
 		}
 	}, [select, selectTimeMode, tableMode, isHomeTime]);
 	useEffect(() => {
-		console.log('mode :', mode);
-		console.log('selectTimeMode', selectTimeMode);
 		if (modalMode === true && !isHomeTime) {
 			if (
 				selectTimeMode.includes('individual') ||
