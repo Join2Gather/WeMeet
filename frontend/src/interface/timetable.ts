@@ -48,6 +48,7 @@ export interface timetable {
 	isPostRevertSuccess: boolean;
 	startTimeText: string;
 	confirmCount: number;
+	alarmArray: alarm_time[];
 }
 
 export type weekIndex = Array<string>;
@@ -210,6 +211,14 @@ export interface post_time {
 	starting_minutes: number;
 	end_hours: number;
 	end_minutes: number;
+}
+
+export interface alarm_time {
+	starting_hours: number;
+	starting_minutes: number;
+	end_hours: number;
+	end_minutes: number;
+	dayOfWeek: number;
 }
 
 export interface responseIndividualTimetable {
