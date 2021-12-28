@@ -6,7 +6,7 @@ from django.http.response import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework import status
-from config.models import Profiles
+from config.models import ProfileDatesToSnapshot, Profiles
 from config.models import ProfileDates
 from config.models import Dates
 from drf_yasg.utils import swagger_auto_schema
@@ -96,7 +96,7 @@ class EverytimeCalendarView(APIView):
 
         # 기존에 생성된 튜플은 지워주는게 사용에 용이
         ProfileDates.objects.filter(
-            profile=profile, club=None, is_temporary_reserved=False).delete()
+            profile=profile, club=None, is_temporary_reserved=False).delete() 
 
         for idx, day in enumerate(week):
             times = request.data.get(day) or []
@@ -109,8 +109,9 @@ class EverytimeCalendarView(APIView):
                 date = Dates.objects.get_or_create(
                     day=idx, starting_hours=starting_hours,
                     starting_minutes=starting_minutes, end_hours=end_hours, end_minutes=end_minutes)[0]
-                ProfileDates.objects.get_or_create(
-                    profile=profile, date=date, club=None, is_temporary_reserved=False)
+                profile_date = ProfileDates.objects.get_or_create(
+                    profile=profile, date=date, club=None, is_temporary_reserved=False)[0]
+                ProfileDatesToSnapshot.objects.get_or_create(snapshot=None, profile_date=profile_date)
 
         profile = Profiles.objects.get(id=profile.id)
         result = ProfilesSerializer(profile).data
