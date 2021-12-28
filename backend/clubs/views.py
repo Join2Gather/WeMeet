@@ -414,6 +414,9 @@ class ClubConfirmRevertView(APIView):
         profile_dates = ProfileDates.objects.filter(
             profiledatestosnapshot__snapshot=snapshot)
         for profile_date in profile_dates:
+            profile_date.is_temporary_reserved = True
+            profile_date.save()
+
             ProfileDatesToSnapshot.objects.create(
                 profile_date=profile_date, snapshot=None)
 
