@@ -18,13 +18,15 @@ import {
 	toggleTimePick,
 } from '../store/timetable';
 import type { make60, timeType } from '../interface';
-import { Text, TouchableView } from '../theme';
+import { Text } from '../theme';
 import { RootState } from '../store';
 import { checkInMode, initialTimeMode, kakaoLogin } from '../store/individual';
 import { ModalTime } from './';
 import { ModalTimePicker } from './ModalTimePicker';
 import { findHomeTime } from '../store/login';
 import { ModalIndividualTime } from './ModalIndividualTime';
+import { TouchableOpacity } from 'react-native';
+import { Spinner } from './Spinner';
 
 const boxHeight = 28.0;
 const inBoxHeight = 7.0;
@@ -104,6 +106,7 @@ export function Timetable({
 		selectTimeMode,
 		modalMode,
 		inTimeMode,
+		isInitial,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
@@ -131,6 +134,7 @@ export function Timetable({
 			selectTimeMode: timetable.selectTimeMode,
 			modalMode: timetable.modalMode,
 			inTimeMode: individual.inTimeMode,
+			isInitial: timetable.isInitial,
 		})
 	);
 	const dispatch = useDispatch();
@@ -145,8 +149,11 @@ export function Timetable({
 		day: '',
 	});
 	const [count, setCount] = useState(1);
+	const [loading, setLoading] = useState('');
 	// useEffect
-
+	useEffect(() => {
+		console.log(isGroup, 'isGroup');
+	}, [isGroup]);
 	useEffect(() => {
 		date.setMinutes(0);
 	}, [date]);
@@ -160,7 +167,7 @@ export function Timetable({
 	}, [endIdx, endHourTimetable]);
 	// 최초 렌더링 개인 페이지 정보 받아오기
 	useEffect(() => {
-		if (!loadingJoin && !joinTeamError) {
+		if (isInitial) {
 			if (uri && isGroup) {
 				if (timeMode === 'make')
 					dispatch(getGroupDates({ id, user, token, uri: joinUri }));
@@ -187,21 +194,12 @@ export function Timetable({
 					})
 				);
 			}
+			setLoading('loading');
+			setTimeout(() => {
+				setLoading('');
+			}, 500);
 		}
-	}, [
-		uri,
-		id,
-		user,
-		token,
-		isGroup,
-		loadingJoin,
-		joinTeamError,
-		joinUri,
-		timeMode,
-		reload,
-		color,
-		confirmDatesPrepare,
-	]);
+	}, [uri, isGroup, reload, isInitial]);
 
 	useEffect(() => {
 		if (cloneDateSuccess) {
@@ -261,10 +259,14 @@ export function Timetable({
 	}, [isTimePicked, mode]);
 	useEffect(() => {
 		if (isHomeTime) {
-			if (inTimeMode.includes('team') || inTimeMode.includes('everyTime')) {
+			console.log(inTimeMode);
+			if (
+				inTimeMode.includes('home') ||
+				inTimeMode.includes('team') ||
+				inTimeMode.includes('everyTime')
+			) {
 				// 빈 칸 아닐 경우
 				dispatch(findHomeTime({ day: select.day, time: select.time }));
-
 				setTimeout(() => {
 					setInModalVisible(true);
 				}, 100);
@@ -323,6 +325,9 @@ export function Timetable({
 		setTimeModalVisible(false);
 	}, [select]);
 
+	useEffect(() => {
+		console.log('mode', mode);
+	}, [mode]);
 	const onSetStartHour = useCallback(
 		(idx: number, time: number, day: string) => {
 			dispatch(toggleTimePick());
@@ -340,7 +345,7 @@ export function Timetable({
 			}, 100);
 			setTimeout(() => {
 				setMode && setMode('startMinute');
-			}, 500);
+			}, 100);
 		},
 		[isGroup, date, isConfirm, mode]
 	);
@@ -380,13 +385,14 @@ export function Timetable({
 								</View>
 						  ))}
 				</View>
+				<Spinner loading={loading} />
 				<View style={styles.contentView}>
 					{isGroup ? (
 						<>
 							{teamDatesWith60.map((day, idx) => (
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
-										<TouchableView
+										<TouchableOpacity
 											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
@@ -421,7 +427,7 @@ export function Timetable({
 													]}
 												/>
 											))}
-										</TouchableView>
+										</TouchableOpacity>
 									))}
 								</View>
 							))}
@@ -431,7 +437,7 @@ export function Timetable({
 							{individualDates.map((day, idx) => (
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
-										<TouchableView
+										<TouchableOpacity
 											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
@@ -463,7 +469,7 @@ export function Timetable({
 													]}
 												/>
 											))}
-										</TouchableView>
+										</TouchableOpacity>
 									))}
 								</View>
 							))}
@@ -473,7 +479,7 @@ export function Timetable({
 							{snapShotDate.map((day, idx) => (
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
-										<TouchableView
+										<TouchableOpacity
 											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
@@ -505,7 +511,7 @@ export function Timetable({
 													]}
 												/>
 											))}
-										</TouchableView>
+										</TouchableOpacity>
 									))}
 								</View>
 							))}
@@ -515,7 +521,7 @@ export function Timetable({
 							{teamConfirmDate.map((day, idx) => (
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
-										<TouchableView
+										<TouchableOpacity
 											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
@@ -551,7 +557,7 @@ export function Timetable({
 													]}
 												/>
 											))}
-										</TouchableView>
+										</TouchableOpacity>
 									))}
 								</View>
 							))}
@@ -561,17 +567,12 @@ export function Timetable({
 							{dates.map((day, idx) => (
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
-										<TouchableView
+										<TouchableOpacity
 											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
 												mode === 'normal' &&
-													onPressIndividualTime(
-														Number(time),
-														day.day,
-
-														idx
-													);
+													onPressIndividualTime(Number(time), day.day, idx);
 												mode === 'startMode' &&
 													onSetStartHour(idx, Number(time), day.day);
 											}}
@@ -601,7 +602,7 @@ export function Timetable({
 													]}
 												/>
 											))}
-										</TouchableView>
+										</TouchableOpacity>
 									))}
 								</View>
 							))}
