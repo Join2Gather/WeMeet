@@ -96,7 +96,7 @@ class EverytimeCalendarView(APIView):
 
         # 기존에 생성된 튜플은 지워주는게 사용에 용이
         ProfileDates.objects.filter(
-            profile=profile, club=None, is_temporary_reserved=False).delete() 
+            profile=profile, club=None, is_temporary_reserved=False).delete()
 
         for idx, day in enumerate(week):
             times = request.data.get(day) or []
@@ -111,7 +111,8 @@ class EverytimeCalendarView(APIView):
                     starting_minutes=starting_minutes, end_hours=end_hours, end_minutes=end_minutes)[0]
                 profile_date = ProfileDates.objects.get_or_create(
                     profile=profile, date=date, club=None, is_temporary_reserved=False)[0]
-                ProfileDatesToSnapshot.objects.get_or_create(snapshot=None, profile_date=profile_date)
+                ProfileDatesToSnapshot.objects.get_or_create(
+                    snapshot=None, profile_date=profile_date)
 
         profile = Profiles.objects.get(id=profile.id)
         result = ProfilesSerializer(profile).data

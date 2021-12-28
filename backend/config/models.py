@@ -79,7 +79,7 @@ class Dates(models.Model):
         return f"{week_day} {self.starting_hours}:{self.starting_minutes}~{self.end_hours}:{self.end_minutes}"
 
 
-# 프로필, 날짜, 모임관의 연관 테이블
+# 프로필, 날짜, 모임간의 연관 테이블
 class ProfileDates(models.Model):
 
     is_temporary_reserved = models.BooleanField()

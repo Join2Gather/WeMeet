@@ -378,9 +378,9 @@ class ClubConfirmView(APIView):
         snapshot = ClubSnapshots.objects.create(profile=profile, club=club)
 
         profile_dates_to_snapshots = ProfileDatesToSnapshot.objects \
-                .prefetch_related('profile_date') \
-                .filter(profile_date__profile=profile, profile_date__club=club, snapshot=None)
-        
+            .prefetch_related('profile_date') \
+            .filter(profile_date__profile=profile, profile_date__club=club, snapshot=None)
+
         for profile_dates_to_snapshot in profile_dates_to_snapshots:
             ProfileDatesToSnapshot.objects.get_or_create(
                 profile_date=profile_dates_to_snapshot.profile_date, snapshot=snapshot)
