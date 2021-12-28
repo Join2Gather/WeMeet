@@ -38,7 +38,6 @@ export function ModalIndividualTime({
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('normal');
-	console.log(inTimeMode);
 
 	const onPressCloseBtn = useCallback(() => {
 		setInModalVisible && setInModalVisible(false);
@@ -250,6 +249,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
+		marginLeft: '1%',
 	},
 	blankView: {
 		height: 10,
