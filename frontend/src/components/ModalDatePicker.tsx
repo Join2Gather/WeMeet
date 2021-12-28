@@ -5,36 +5,84 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
-
+import * as Calendar from 'expo-calendar';
 import DatePicker from 'react-native-date-picker';
 import { useIsDarkMode } from '../hooks';
 import dayjs from 'dayjs';
-import ko from 'dayjs/locale/ko';
+import 'dayjs/locale/ko';
 import MakeAlarm from '../lib/util/MakeAlarm';
 dayjs.locale('ko');
 interface props {
 	dateVisible: boolean;
 	setDateVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	name: string;
+	alarmTime: number;
+	setSetting: React.Dispatch<React.SetStateAction<string>>;
+	setSubMode: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export function ModalDatePicker({ dateVisible, setDateVisible }: props) {
-	const { postConfirmSuccess } = useSelector(
+export function ModalDatePicker({
+	dateVisible,
+	setDateVisible,
+	name,
+	alarmTime,
+	setSetting,
+	setSubMode,
+}: props) {
+	const { postConfirmSuccess, alarmArray, color } = useSelector(
 		({ timetable, login, individual }: RootState) => ({
 			postConfirmSuccess: timetable.postConfirmSuccess,
+			alarmArray: timetable.alarmArray,
+			color: login.individualColor,
 		})
 	);
 	const dispatch = useDispatch();
 	// const [minute, setMinute] = useState(0);
 	// const [hour, setHour] = useState(0);
-	const [date, setDate] = useState(new Date());
+	const [date, setDate] = useState(dayjs().toDate());
 
 	const onPressClose = useCallback(() => {
 		setVisible(false);
 		setDateVisible(false);
+		setSetting('initial');
+		setSubMode('initial');
 	}, []);
 
 	// const add = MakeAlarm()
 	const [visible, setVisible] = useState(false);
+	const [today] = useState(dayjs().format('YYYY-MM-DD'));
+
+	useEffect(() => {}, [alarmArray]);
+	const onPressConfirm = useCallback(
+		(date) => {
+			setDate(date);
+			alarmArray.forEach((alarm) => {
+				const calStartTime = dayjs()
+					.set('day', alarm.dayOfWeek)
+					.set('h', alarm.starting_hours)
+					.set('m', alarm.starting_minutes)
+					.toDate();
+
+				const calEndTime = dayjs()
+					.set('day', alarm.dayOfWeek)
+					.set('h', alarm.end_hours)
+					.set('m', alarm.end_minutes)
+					.toDate();
+
+				MakeAlarm({
+					title: name,
+					calEndTime,
+					calStartTime,
+					endDate: date,
+					alarmTime,
+					color,
+				});
+			});
+			setSetting('initial');
+			setSubMode('initial');
+		},
+		[date, name, alarmArray, color, alarmTime]
+	);
 
 	useEffect(() => {
 		dateVisible && setVisible(true);
@@ -48,6 +96,8 @@ export function ModalDatePicker({ dateVisible, setDateVisible }: props) {
 				date={date}
 				mode="date"
 				onConfirm={(date) => {
+					setVisible(false);
+					onPressConfirm(date);
 					setDateVisible(false);
 				}}
 				onDateChange={(date) => setDate(date)}
@@ -61,10 +111,19 @@ export function ModalDatePicker({ dateVisible, setDateVisible }: props) {
 							: Colors.white
 						: Colors.black
 				}
-				title={'알람 기한 설정'}
+				title={`오늘 날짜 : ${today}`}
 				confirmText="확인"
 				cancelText="취소"
 			/>
+			{/* <MakeAlarm
+				title={name}
+				alarmTime={1}
+				calEndTime={calEndTime}
+				calStartTime={calStartTime}
+				endDate={date}
+				isOpen={isOpen}
+				setIsOpen={setIsOpen}
+			/> */}
 		</>
 	);
 }
