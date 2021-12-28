@@ -26,6 +26,13 @@ import { TouchableHighlight } from 'react-native-gesture-handler';
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
 const circleWidth = 14;
+
+interface goTeam {
+	id?: string;
+	name?: string;
+	uri?: string;
+}
+
 export default function TeamList() {
 	const {
 		user,
@@ -168,12 +175,12 @@ export default function TeamList() {
 		}
 	}, [modalMode, mode, teamMakeColor, makeStartHour, makeEndHour]);
 	const goTeamTime = useCallback(
-		(name?: string, uri?: string) => {
+		({ id, name, uri }: goTeam) => {
 			if (modalMode === 'join') {
 				dispatch(findTeam({ uri }));
 				setMode('next');
 			} else if (modalMode === 'normal') {
-				dispatch(findTeam({ name }));
+				dispatch(findTeam({ id }));
 				setMode('next');
 			} else if (modalMode === 'make') {
 				name && setMake(name);
@@ -259,7 +266,7 @@ export default function TeamList() {
 					renderItem={({ item }) => (
 						<View>
 							<TouchableHighlight
-								onPress={() => goTeamTime(item.name)}
+								onPress={() => goTeamTime({ id: item.id })}
 								activeOpacity={0.1}
 								underlayColor={Colors.grey300}
 								style={[
