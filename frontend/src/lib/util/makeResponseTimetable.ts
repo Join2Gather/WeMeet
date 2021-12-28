@@ -74,7 +74,7 @@ export function makeHomeTimetable(state: individual) {
 						for (let j = startingMinute; j <= 6; j++) {
 							makeTime(
 								state.individualDates[idx].times[i][j],
-								'home',
+								'everyTime',
 								greyColor
 							);
 						}
@@ -82,7 +82,7 @@ export function makeHomeTimetable(state: individual) {
 						for (let j = 0; j < endMinute; j++) {
 							makeTime(
 								state.individualDates[idx].times[i][j],
-								'home',
+								'everyTime',
 								greyColor
 							);
 						}
@@ -90,7 +90,7 @@ export function makeHomeTimetable(state: individual) {
 						for (let j = 0; j <= 6; j++) {
 							makeTime(
 								state.individualDates[idx].times[i][j],
-								'home',
+								'everyTime',
 								greyColor
 							);
 						}
