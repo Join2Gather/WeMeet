@@ -34,6 +34,7 @@ import {
 	makeInitialConfirmTime,
 	makeTeamTime,
 	postConfirm,
+	postRevert,
 	postSnapShot,
 } from '../store/timetable';
 import { initialIndividualTimetable } from '../store/individual';
@@ -58,6 +59,7 @@ export default function SnapShot({ route }: Props) {
 		confirmClubs,
 		confirmDatesTimetable,
 		createdDate,
+		uri,
 	} = useSelector(({ timetable, login, team }: RootState) => ({
 		snapShotDate: timetable.snapShotDate,
 		teamConfirmDate: timetable.teamConfirmDate,
@@ -73,6 +75,7 @@ export default function SnapShot({ route }: Props) {
 		confirmClubs: login.confirmClubs,
 		confirmDatesTimetable: login.confirmDatesTimetable,
 		createdDate: timetable.createdDate,
+		uri: timetable.teamURI,
 	}));
 	// useState
 	const [mode, setMode] = useState('initial');
@@ -82,7 +85,7 @@ export default function SnapShot({ route }: Props) {
 	const [sequence] = useState([0, 1, 2, 3]);
 	const [currentNumber, setCurrent] = useState(0);
 	// navigation
-	const { name, color, timetableMode, isConfirm, uri } = route.params;
+	const { name, color, timetableMode, isConfirm } = route.params;
 	const navigation = useNavigation();
 	const dispatch = useDispatch();
 
@@ -139,7 +142,14 @@ export default function SnapShot({ route }: Props) {
 		dispatch(makeTeamTime({ color, endHour, startHour, peopleCount }));
 		setLoading('loading');
 	}, [confirmDates, timeMode, joinUri]);
-	const onPressRevert = useCallback(() => {}, []);
+	const onPressRevert = useCallback(() => {
+		setLoading('revert');
+		setLoadingVisible(true);
+	}, []);
+	const onPressRevertOk = useCallback(() => {
+		dispatch(postRevert({ id, uri, user, token }));
+		setLoading('loading');
+	}, []);
 	return (
 		<SafeAreaView style={{ backgroundColor: color }}>
 			<View style={[styles.view]}>
@@ -273,6 +283,7 @@ export default function SnapShot({ route }: Props) {
 						loadingMode={loadingMode}
 						setLoading={setLoading}
 						onPressOk={onPressOk}
+						onPressRevertOk={onPressRevertOk}
 						goLeft={goLeft}
 					/>
 				</ScrollView>
