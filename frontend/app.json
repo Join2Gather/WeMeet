@@ -1,7 +1,7 @@
 {
 	"expo": {
-		"name": "Join2Gather",
-		"slug": "Join2Gather",
+		"name": "We Meet",
+		"slug": "WeMeet",
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
