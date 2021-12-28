@@ -270,7 +270,6 @@ export const individualSlice = createSlice({
 				}
 			});
 			// state.inTimeMode = modeSelect[0].content;
-			console.log(state.inTimeMode);
 		},
 		makePostHomeDates: (state) => {
 			const data = {
@@ -309,8 +308,7 @@ export const individualSlice = createSlice({
 		deleteHomeTime: (state, action: PayloadAction<findTime[]>) => {
 			const findTime = action.payload;
 			const startHour = findTime[0].startTime.hour;
-			console.log(startHour);
-			console.log(state.everyTime);
+
 			state.everyTime[state.dayString] = state.everyTime[
 				state.dayString
 			].filter((time) => time.starting_hours !== startHour);
