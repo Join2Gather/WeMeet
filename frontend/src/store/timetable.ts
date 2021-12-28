@@ -210,6 +210,7 @@ const initialState: timetable = {
 	startTimeText: '',
 	confirmCount: 1,
 	alarmArray: [],
+	isInitial: true,
 };
 
 export const timetableSlice = createSlice({
@@ -274,7 +275,7 @@ export const timetableSlice = createSlice({
 				: makeConfirmWith(state, state.dates);
 
 			const find = state.confirmDatesTimetable.find(
-				(team) => team.club.name === state.teamName
+				(team) => team.club?.name === state.teamName
 			);
 			if (find) {
 				state.weekIndex.forEach((dayOfWeek, idx) => {
@@ -691,7 +692,9 @@ export const timetableSlice = createSlice({
 		setConfirmCount: (state, action: PayloadAction<number>) => {
 			state.confirmCount = action.payload;
 		},
-
+		toggleIsInitial: (state, action: PayloadAction<boolean>) => {
+			state.isInitial = action.payload;
+		},
 		// checkTimeMode(state, action:PayloadAction<)
 	},
 	extraReducers: {},
@@ -728,6 +731,7 @@ export const {
 	setIsInTeamTime,
 	checkMode,
 	setTimeModalMode,
+	toggleIsInitial,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;
