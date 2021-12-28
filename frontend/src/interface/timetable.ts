@@ -49,6 +49,7 @@ export interface timetable {
 	startTimeText: string;
 	confirmCount: number;
 	alarmArray: alarm_time[];
+	isInitial: boolean;
 }
 
 export type weekIndex = Array<string>;
