@@ -16,13 +16,21 @@ async def get_year_semester(session: aiohttp.ClientSession):
     parsed = etree.fromstring(data)
 
     datetime_format = '%Y-%m-%d'
-
-    result = [semester for semester in parsed.xpath(
-        '//response/semester') if datetime.strptime(semester.attrib['start_date'], datetime_format) <= datetime.now() <= datetime.strptime(semester.attrib['end_date'], datetime_format)]
+    
+    # result는 최신순으로 정렬되어 있음.
+    result = parsed.xpath('//response/semester')
+    
+    if filtered := [semester for semester in result
+                if datetime.strptime(semester.attrib['start_date'], datetime_format) <= datetime.now() <= datetime.strptime(semester.attrib['end_date'], datetime_format)]:
+        result = filtered
+    else:
+        # 현재 진행되는 학기가 없다면, 마지막에 끝난 학기를 불러온다.
+        result = [semester for semester in result
+                if datetime.strptime(semester.attrib['end_date'], datetime_format) <= datetime.now()]
 
     result = result[0]
     year, semester = result.attrib['year'], result.attrib['semester']
-
+    
     return year, semester
 
 
