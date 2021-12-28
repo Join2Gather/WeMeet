@@ -45,6 +45,7 @@ const initialState: Login = {
 	confirmClubNum: 0,
 	appleUser: null,
 	isConfirmProve: false,
+	alarmTime: 1,
 };
 
 const USER_ME = 'login/USER_ME';
@@ -86,18 +87,19 @@ export const loginSlice = createSlice({
 		},
 		findTeam: (
 			state,
-			action: PayloadAction<{ uri?: string; name?: string }>
+			action: PayloadAction<{ uri?: string; name?: string; id?: string }>
 		) => {
 			let data;
 			let dateInfo;
 			if (action.payload.name) {
 				data = state.clubs.find((club) => club.name === action.payload.name);
-				dateInfo = state.dates.find(
-					(date: any) =>
-						decodeURIComponent(date.club.name) === action.payload.name
-				);
 			} else if (action.payload.uri) {
 				data = state.clubs.find((club) => club.uri === action.payload.uri);
+			} else if (action.payload.id) {
+				data = state.clubs.find((club) => club.id === action.payload.id);
+				dateInfo = state.dates.find(
+					(date: any) => date.club.id === action.payload.id
+				);
 			}
 			if (data && dateInfo) {
 				state.name = data.name;
@@ -107,6 +109,14 @@ export const loginSlice = createSlice({
 				state.startHour = data.starting_hours;
 				state.endHour = data.end_hours;
 				state.isConfirmProve = !dateInfo.is_temporary_reserved;
+			} else {
+				state.name = data.name;
+				state.uri = data.uri;
+				state.color = data.color;
+				state.peopleCount = data.people_count;
+				state.startHour = data.starting_hours;
+				state.endHour = data.end_hours;
+				state.isConfirmProve = false;
 			}
 		},
 		findHomeTime: (
@@ -200,6 +210,9 @@ export const loginSlice = createSlice({
 		changeTeamColor: (state, action: PayloadAction<string>) => {
 			state.individualColor = action.payload;
 		},
+		setAlarmTime: (state, action: PayloadAction<number>) => {
+			state.alarmTime = action.payload;
+		},
 	},
 	extraReducers: {},
 });
@@ -210,6 +223,7 @@ export const {
 	makeGroupColor,
 	changeTeamColor,
 	findHomeTime,
+	setAlarmTime,
 } = loginSlice.actions;
 
 export default loginSlice.reducer;
