@@ -231,7 +231,6 @@ export function ModalTimePicker({
 					setMode && setMode('loading');
 				} else {
 					if (isConfirm) {
-						console.log(confirmCount, 'confirmCount', count, 'count');
 						if (confirmCount === count) {
 							setCurrent && setCurrent(3);
 							setCount && setCount(1);

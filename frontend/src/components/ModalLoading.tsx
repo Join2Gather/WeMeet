@@ -128,8 +128,9 @@ export function ModalLoading({
 									color={Colors.green500}
 								/>
 								<Text style={styles.touchText}>
-									{' '}
-									변경 사항이 저장 되었습니다
+									{
+										' 변경 사항이 저장 되었습니다\n 이제 설정 버튼을 눌러 알람을 추가할 수 있습니다'
+									}
 								</Text>
 							</View>
 							<View style={styles.blankView} />

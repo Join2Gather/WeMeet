@@ -24,7 +24,7 @@ import {
 	makeIndividualTimetable,
 	makeSnapShotDate,
 } from '../lib/util';
-
+import _ from 'lodash';
 const GET_INDIVIDUAL = 'timetable/GET_INDIVIDUAL';
 const GET_GROUP = 'timetable/GET_GROUP';
 const POST_INDIVIDUAL = 'timetable/POST_INDIVIDUAL';
@@ -209,6 +209,7 @@ const initialState: timetable = {
 	isPostRevertSuccess: false,
 	startTimeText: '',
 	confirmCount: 1,
+	alarmArray: [],
 };
 
 export const timetableSlice = createSlice({
@@ -267,9 +268,23 @@ export const timetableSlice = createSlice({
 		) => {
 			state.confirmClubs = action.payload.confirmClubs;
 			state.confirmDatesTimetable = action.payload.confirmDatesTimetable;
+			state.alarmArray = [];
 			action.payload.isGroup
 				? makeConfirmWith(state, state.teamConfirmDate)
 				: makeConfirmWith(state, state.dates);
+
+			const find = state.confirmDatesTimetable.find(
+				(team) => team.club.name === state.teamName
+			);
+			if (find) {
+				state.weekIndex.forEach((dayOfWeek, idx) => {
+					if (find[dayOfWeek].length) {
+						let data = _.cloneDeep(find[dayOfWeek][0]);
+						data['dayOfWeek'] = idx;
+						state.alarmArray = [...state.alarmArray, data];
+					}
+				});
+			}
 		},
 		GET_INDIVIDUAL_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.responseIndividual = {

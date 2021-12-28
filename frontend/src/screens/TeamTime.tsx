@@ -53,6 +53,7 @@ export default function TeamTime({ route }: Props) {
 		snapShotError,
 		name,
 		isConfirmProve,
+		alarmTime,
 	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
 		uri: timetable.teamURI,
 		color: timetable.color,
@@ -72,6 +73,7 @@ export default function TeamTime({ route }: Props) {
 		snapShotError: timetable.snapShotError,
 		name: timetable.teamName,
 		isConfirmProve: login.isConfirmProve,
+		alarmTime: login.alarmTime,
 	}));
 	// navigation
 	const { id, user, token, modalMode } = route.params;
@@ -86,6 +88,8 @@ export default function TeamTime({ route }: Props) {
 	const [settingModalVisible, setSettingModalVisible] = useState(false);
 	const [confirmModalVisible, setConfirm] = useState(false);
 	const [mode, setMode] = useState('normal');
+	const [settingMode, setSetting] = useState('initial');
+	const [subMode, setSubMode] = useState('initial');
 	const [isTimeMode, setIsTimeMode] = useState(false);
 	const [currentNumber, setCurrent] = useState(0);
 	const [sequence, setSequence] = useState([0, 1, 2]);
@@ -310,11 +314,21 @@ export default function TeamTime({ route }: Props) {
 							isConfirmProve={isConfirmProve}
 							dateVisible={dateVisible}
 							setDateVisible={setDateVisible}
+							alarmTime={alarmTime}
+							setSetting={setSetting}
+							settingMode={settingMode}
+							subMode={subMode}
+							setSubMode={setSubMode}
 						/>
 						<ModalDatePicker
 							dateVisible={dateVisible}
 							setDateVisible={setDateVisible}
+							name={name}
+							alarmTime={alarmTime}
+							setSetting={setSetting}
+							setSubMode={setSubMode}
 						/>
+
 						<ModalConfirm
 							color={color}
 							confirmModalVisible={confirmModalVisible}

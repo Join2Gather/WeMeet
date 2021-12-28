@@ -146,18 +146,19 @@ export function ModalInput({
 		setCurrent(0);
 		if (modalMode === 'join') {
 			const uri = joinUri;
-			goTeamTime(uri);
+			goTeamTime({ uri });
 			setCode('');
 		} else if (modalMode === 'make') {
 			setColor(Colors.red500);
 			setStartTime('9');
 			setEndTime('22');
-			goTeamTime(name);
+			goTeamTime({ name });
 			setName('');
 		}
+		dispatch(setModalMode('normal'));
 	}, [name, startTime, endTime, color, joinName]);
 	const onPressCloseButton = useCallback(() => {
-		dispatch(setModalMode('make'));
+		dispatch(setModalMode('normal'));
 		dispatch(initialError());
 		setModalVisible(false);
 		setMode('initial');
