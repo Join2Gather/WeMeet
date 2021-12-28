@@ -12,7 +12,7 @@ import {
 	ScrollView,
 } from 'react-native';
 import { Colors } from 'react-native-paper';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 import FontIcon from 'react-native-vector-icons/FontAwesome';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -21,7 +21,13 @@ import type { findTime } from '../interface/timetable';
 import type { individualTime } from '../interface';
 import { findTeam } from '../store/login';
 import { Button } from '../lib/util/Button';
-import { deletePostTime, setTimeModalMode } from '../store/timetable';
+import {
+	deletePostTime,
+	makeTeamTime,
+	setTimeModalMode,
+	toggleIsInitial,
+} from '../store/timetable';
+import { RootState } from '../store';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -45,6 +51,13 @@ export function ModalTime({
 	tableMode,
 	isGroup,
 }: props) {
+	const { startHour, endHour, peopleCount } = useSelector(
+		({ login }: RootState) => ({
+			startHour: login.startHour,
+			endHour: login.endHour,
+			peopleCount: login.peopleCount,
+		})
+	);
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
 
@@ -58,8 +71,14 @@ export function ModalTime({
 
 	const onPressDelete = useCallback(() => {
 		dispatch(deletePostTime());
+		setMode('initial');
 		setTimeModalVisible && setTimeModalVisible(false);
-		setMode('loading');
+		dispatch(toggleIsInitial(true));
+		dispatch(setTimeModalMode(false));
+		setTimeout(() => {
+			color &&
+				dispatch(makeTeamTime({ color, endHour, startHour, peopleCount }));
+		}, 100);
 	}, []);
 
 	const onPressCloseBtn = useCallback(() => {
@@ -299,7 +318,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
-		// marginLeft: '8%',
+		marginLeft: '1%',
 	},
 	blankView: {
 		height: 10,
