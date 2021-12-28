@@ -14,6 +14,7 @@ import {
 	checkIsExist,
 	checkIsBlank,
 	makeInitialTimePicked,
+	toggleIsInitial,
 } from '../store/timetable';
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
@@ -144,6 +145,7 @@ export function ModalTimePicker({
 			} else {
 				if (!isConfirm && !isTimePicked) {
 					dispatch(makePostIndividualDates());
+					dispatch(toggleIsInitial(true));
 				} else if (isConfirm && !isTimeNoExist) {
 					dispatch(makeConfirmDates());
 				}
@@ -186,7 +188,7 @@ export function ModalTimePicker({
 				dispatch(setStartMin(timeMinute));
 			}
 			console.log(checkTime);
-			if (timeHour < checkTime.start) {
+			if (timeHour + 1 < checkTime.start) {
 				initialWithError();
 				Alert.alert('경고', '모임 시간 이전 시간으로 선택하실 수 없습니다', [
 					{ text: '확인', onPress: () => {} },
@@ -209,18 +211,19 @@ export function ModalTimePicker({
 			setCurrent && setCurrent(0);
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
+			console.log(checkTime, timeHour);
 			if (isHomeTime)
 				dispatch(setInEndTime({ hour: timeHour, min: timeMinute }));
 			else {
 				dispatch(setEndHour(timeHour));
 				dispatch(setEndMin(timeMinute));
 			}
-			if (checkTime.end < timeHour) {
+			if (checkTime.end < timeHour + 1) {
 				initialWithError();
 				Alert.alert('경고', '모임 시간 이후 시간으로 선택하실 수 없습니다', [
 					{ text: '확인', onPress: () => {} },
 				]);
-			} else if (startTime.hour >= timeHour) {
+			} else if (startTime.hour >= timeHour - 1) {
 				initialWithError();
 				Alert.alert('경고', '시작시간 전으로 시간 설정이 불가능 합니다', [
 					{ text: '확인', onPress: () => {} },

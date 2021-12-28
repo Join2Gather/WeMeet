@@ -96,9 +96,10 @@ export const loginSlice = createSlice({
 			} else if (action.payload.uri) {
 				data = state.clubs.find((club) => club.uri === action.payload.uri);
 			} else if (action.payload.id) {
-				data = state.clubs.find((club) => club.id === action.payload.id);
+				console.log(action.payload);
+				data = state.clubs.find((club) => club?.id === action.payload.id);
 				dateInfo = state.dates.find(
-					(date: any) => date.club.id === action.payload.id
+					(date: any) => date?.club?.id === action.payload.id
 				);
 			}
 			if (data && dateInfo) {

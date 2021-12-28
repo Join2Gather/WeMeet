@@ -23,6 +23,7 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import { TouchableHighlight } from 'react-native-gesture-handler';
+import { AutoFocusProvider } from '../contexts';
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
 const circleWidth = 14;
@@ -102,6 +103,8 @@ export default function TeamList() {
 		g: 0,
 		b: 0,
 	});
+	const [loading, setLoading] = useState('');
+
 	const dispatch = useDispatch();
 
 	// useEffect
@@ -112,9 +115,9 @@ export default function TeamList() {
 		const result = hexToRGB(individualColor);
 		result && setRGBColor(result);
 	}, [individualColor]);
-	useEffect(() => {
-		dispatch(setModalMode('normal'));
-	}, [joinTeamError]);
+	// useEffect(() => {
+	// 	dispatch(setModalMode('normal'));
+	// }, [joinTeamError]);
 	// useCallback
 	// Navigation 이동
 	useEffect(() => {
@@ -128,7 +131,7 @@ export default function TeamList() {
 						endHour: makeEndHour,
 					})
 				);
-				dispatch(setTeamName({ name: teamName, uri: teamUri }));
+				dispatch(setTeamName({ name: makeName, uri: teamUri }));
 
 				setTimeout(() => {
 					navigation.navigate('TeamTime', {
@@ -173,7 +176,7 @@ export default function TeamList() {
 
 			dispatch(setIsInTeamTime(true));
 		}
-	}, [modalMode, mode, teamMakeColor, makeStartHour, makeEndHour]);
+	}, [modalMode, mode, teamMakeColor, makeStartHour, makeEndHour, makeName]);
 	const goTeamTime = useCallback(
 		({ id, name, uri }: goTeam) => {
 			if (modalMode === 'join') {
@@ -184,6 +187,7 @@ export default function TeamList() {
 				setMode('next');
 			} else if (modalMode === 'make') {
 				name && setMake(name);
+				// dispatch(findTeam({ name }));
 				setMode('next');
 			}
 
@@ -204,6 +208,10 @@ export default function TeamList() {
 	}, [sequence]);
 	const onReload = useCallback(() => {
 		dispatch(getUserMe({ id, user, token }));
+		setLoading('loading');
+		setTimeout(() => {
+			setLoading('');
+		}, 500);
 	}, []);
 	return (
 		<SafeAreaView
@@ -249,51 +257,57 @@ export default function TeamList() {
 				<Text style={[styles.headerUnderText]}>Plan list</Text>
 
 				{!clubs.length && (
-					<TouchableView
-						style={[
-							styles.teamListTouchableView,
-							{ width: '100%', justifyContent: 'space-between' },
-						]}
-					>
-						<View style={styles.rowCircle} />
-						<Text style={styles.teamTitle}>아직 아무런 모임이 없네요 😭</Text>
-					</TouchableView>
+					<View style={{ flexDirection: 'column', marginLeft: '17%', flex: 1 }}>
+						<Text style={styles.noListText}>아직 아무런 모임이 없네요 😭</Text>
+
+						<Text style={styles.noListText}>
+							1. 상단의 "+" 버튼을 눌러 모임을 생성 하거나
+						</Text>
+						<Text style={styles.noListText}>
+							2. 하단의 "모임 참여"를 눌러 모임에 참여해 보세요
+						</Text>
+					</View>
 				)}
 				{/* <Spinner loading={loadingUserMe} /> */}
-				<FlatList
-					style={styles.FlatView}
-					data={clubs}
-					renderItem={({ item }) => (
-						<View>
-							<TouchableHighlight
-								onPress={() => goTeamTime({ id: item.id })}
-								activeOpacity={0.1}
-								underlayColor={Colors.grey300}
-								style={[
-									styles.teamListTouchableView,
-									{
-										opacity: 1,
-									},
-								]}
-							>
-								<View style={styles.teamView}>
-									<View
-										style={[styles.rowCircle, { backgroundColor: item.color }]}
-									/>
-									<Text
-										numberOfLines={1}
-										ellipsizeMode="tail"
-										style={styles.teamTitle}
-									>
-										{item.name}
-									</Text>
-									<Icons size={15} name="right" style={styles.iconStyle} />
-								</View>
-							</TouchableHighlight>
-						</View>
-					)}
-					keyExtractor={(item, index) => String(item.id)}
-				/>
+				<View style={{ flex: 1 }}>
+					<FlatList
+						style={styles.FlatView}
+						data={clubs}
+						renderItem={({ item }) => (
+							<View>
+								<TouchableHighlight
+									onPress={() => goTeamTime({ id: item.id })}
+									activeOpacity={0.1}
+									underlayColor={Colors.grey300}
+									style={[
+										styles.teamListTouchableView,
+										{
+											opacity: 1,
+										},
+									]}
+								>
+									<View style={styles.teamView}>
+										<View
+											style={[
+												styles.rowCircle,
+												{ backgroundColor: item.color },
+											]}
+										/>
+										<Text
+											numberOfLines={1}
+											ellipsizeMode="tail"
+											style={styles.teamTitle}
+										>
+											{item.name}
+										</Text>
+										<Icons size={15} name="right" style={styles.iconStyle} />
+									</View>
+								</TouchableHighlight>
+							</View>
+						)}
+						keyExtractor={(item, index) => String(item.id)}
+					/>
+				</View>
 				{/* <View
 					style={[
 						styles.blurView,
@@ -317,6 +331,7 @@ export default function TeamList() {
 				{/* <View
 					style={[styles.blurView, { padding: dimensions.screen.width }]}
 				></View> */}
+				<Spinner loading={loading} />
 				<ModalInput
 					modalVisible={modalVisible}
 					setModalVisible={setModalVisible}
@@ -335,31 +350,34 @@ export default function TeamList() {
 					individualColor={individualColor}
 					sequence={sequence}
 				/>
-				<TouchableView
-					style={[
-						styles.touchableView,
-						{
-							backgroundColor: `rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 2)`,
-						},
-					]}
-					onPress={onJoinTeamTime}
-				>
-					<Text style={styles.loginText}>모임 참여</Text>
-				</TouchableView>
+
+				<View style={{ flex: 0.3 }}>
+					<TouchableView
+						style={[
+							styles.touchableView,
+							{
+								backgroundColor: `rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 2)`,
+							},
+						]}
+						onPress={onJoinTeamTime}
+					>
+						<Text style={styles.loginText}>모임 참여</Text>
+					</TouchableView>
+				</View>
 			</View>
 		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
-	view: { justifyContent: 'center', backgroundColor: Colors.white },
+	view: { justifyContent: 'center', backgroundColor: Colors.white, flex: 1 },
 	headerUnderText: {
 		fontFamily: 'NanumSquareR',
 		fontSize: 16,
 		marginTop: 15,
 		marginBottom: 20,
 		letterSpacing: -0.3,
-
+		flex: 0.05,
 		textAlign: 'center',
 	},
 
@@ -407,6 +425,15 @@ const styles = StyleSheet.create({
 		overflow: 'hidden',
 		textAlign: 'center',
 	},
+	noListText: {
+		fontSize: 13,
+		fontFamily: 'SCDream4',
+		letterSpacing: -0.5,
+		overflow: 'hidden',
+		textAlign: 'left',
+		marginBottom: 30,
+		// textAlign: 'center',
+	},
 	iconStyle: {
 		position: 'absolute',
 		right: '10%',
@@ -431,13 +458,14 @@ const styles = StyleSheet.create({
 			width: 1,
 			height: 1,
 		},
+
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
 		marginTop: 50,
 	},
 	teamListTouchableView: {
 		flexDirection: 'row',
-		height: 40,
+
 		// borderRadius: 10,
 		width: '100%',
 		justifyContent: 'center',
@@ -448,6 +476,8 @@ const styles = StyleSheet.create({
 			width: 1,
 			height: 1,
 		},
+		paddingTop: 10,
+		paddingBottom: 10,
 	},
 	blurView: {
 		paddingTop: 5,
@@ -459,7 +489,7 @@ const styles = StyleSheet.create({
 		height: 30,
 	},
 	FlatView: {
-		height: '70%',
+		height: '65%',
 		flexGrow: 0,
 	},
 	teamView: {

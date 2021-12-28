@@ -17,7 +17,11 @@ import { Timetable } from '../components/Timetable';
 import { Colors } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
-import { makeInitialTimetable, setIsInTeamTime } from '../store/timetable';
+import {
+	makeInitialTimetable,
+	setIsInTeamTime,
+	toggleIsInitial,
+} from '../store/timetable';
 import { RootState } from '../store';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
@@ -113,6 +117,7 @@ export default function TeamTime({ route }: Props) {
 		navigation.goBack();
 		dispatch(setModalMode('normal'));
 		dispatch(setIsInTeamTime(false));
+		dispatch(toggleIsInitial(true));
 	}, []);
 	// 공유하기 버튼
 	const onShareURI = useCallback(() => {
@@ -123,6 +128,13 @@ export default function TeamTime({ route }: Props) {
 	const onPressPlusBtn = useCallback(() => {
 		setIsTimeMode(true);
 		setMode('startMode');
+	}, []);
+
+	const onPressGrInBtn = useCallback((groupMode) => {
+		setGroupMode(groupMode);
+		setTimeout(() => {
+			!groupMode && dispatch(toggleIsInitial(false));
+		}, 500);
 	}, []);
 	return (
 		<>
@@ -199,7 +211,7 @@ export default function TeamTime({ route }: Props) {
 									>
 										<TouchableOpacity
 											style={styles.touchableBoxView}
-											onPress={() => setGroupMode(true)}
+											onPress={() => onPressGrInBtn(true)}
 										>
 											<MIcon
 												name={
@@ -214,7 +226,7 @@ export default function TeamTime({ route }: Props) {
 										</TouchableOpacity>
 										<TouchableOpacity
 											style={[styles.touchableBoxView, { marginLeft: 70 }]}
-											onPress={() => setGroupMode(false)}
+											onPress={() => onPressGrInBtn(false)}
 										>
 											<MIcon
 												name={

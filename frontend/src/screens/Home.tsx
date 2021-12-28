@@ -133,7 +133,6 @@ export default function Home() {
 	const navigation = useNavigation();
 	useEffect(() => {
 		const isFocus = navigation.getState().routes;
-		console.log(isFocus);
 	}, [navigation]);
 	useEffect(() => {
 		if (!individualDates.length) {

@@ -310,6 +310,7 @@ export function HomeSetting({
 								<Text style={styles.errorText}> 서버 오류</Text>
 							</View>
 							<View style={styles.blankView} />
+							<View style={styles.buttonOverLine} />
 							<Button
 								buttonNumber={1}
 								buttonText="확인"
@@ -318,7 +319,6 @@ export function HomeSetting({
 									setMode('error');
 								}}
 							/>
-							<View style={styles.blankView} />
 						</>
 					)}
 				</View>
