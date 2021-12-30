@@ -17,13 +17,14 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Alert } from 'react-native';
 import {
 	appleAuth,
 	AppleButton,
 } from '@invertase/react-native-apple-authentication';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { setAppleToken } from '../store/login';
 
 /**
  * You'd technically persist this somewhere for later use.
@@ -52,10 +53,7 @@ async function fetchAndUpdateCredentialState(
 /**
  * Starts the Sign In flow.
  */
-async function onAppleButtonPress(
-	updateCredentialStateForUser: any,
-	user: any
-) {
+async function onAppleButtonPress(setToken: any, user: any) {
 	console.warn('Beginning Apple Authentication');
 
 	// start a login request
@@ -76,20 +74,23 @@ async function onAppleButtonPress(
 		} = appleAuthRequestResponse;
 
 		user = newUser;
+		Alert.alert(`'token: ', ${identityToken}`);
 
-		fetchAndUpdateCredentialState(updateCredentialStateForUser, user).catch(
-			(error) => updateCredentialStateForUser(`Error: ${error.code}`)
+		fetchAndUpdateCredentialState(setToken, user).catch((error) =>
+			setToken(`Error: ${error.code}`)
 		);
 
 		if (identityToken) {
 			// e.g. sign in with Firebase Auth using `nonce` & `identityToken`
-			console.log(nonce, identityToken);
+			console.log('nonce', nonce, identityToken);
+			setToken(identityToken);
 		} else {
-			// no token - failed sign-in?
+			Alert.alert('로그인 실패');
 		}
 
 		if (realUserStatus === appleAuth.UserStatus.LIKELY_REAL) {
 			console.log("I'm a real person!");
+			Alert.alert('good');
 		}
 
 		console.warn(`Apple Authentication Completed, ${user}, ${email}`);
@@ -107,37 +108,40 @@ interface errorType {
 }
 
 export function AppleLogin() {
-	const { user } = useSelector(({ login }: RootState) => ({
-		user: login.user,
-	}));
-	const [credentialStateForUser, updateCredentialStateForUser] =
-		useState<any>(-1);
+	var user = '';
+	// const [credentialStateForUser, updateCredentialStateForUser] =
+	// 	useState<any>(-1);
+	const [userToken, setToken] = useState('');
+	const dispatch = useDispatch();
 	useEffect(() => {
-		if (!appleAuth.isSupported) return;
+		dispatch(setAppleToken(userToken));
+	}, [userToken]);
+	// useEffect(() => {
+	// 	if (!appleAuth.isSupported) return;
 
-		fetchAndUpdateCredentialState(updateCredentialStateForUser, user).catch(
-			(error: errorType) => updateCredentialStateForUser(`Error: ${error.code}`)
-		);
-	}, []);
+	// 	fetchAndUpdateCredentialState(updateCredentialStateForUser, user).catch(
+	// 		(error: errorType) => updateCredentialStateForUser(`Error: ${error.code}`)
+	// 	);
+	// }, []);
 
-	useEffect(() => {
-		if (!appleAuth.isSupported) return;
+	// useEffect(() => {
+	// 	if (!appleAuth.isSupported) return;
 
-		return appleAuth.onCredentialRevoked(async () => {
-			console.warn('Credential Revoked');
-			fetchAndUpdateCredentialState(updateCredentialStateForUser, user).catch(
-				(error) => updateCredentialStateForUser(`Error: ${error.code}`)
-			);
-		});
-	}, []);
+	// 	return appleAuth.onCredentialRevoked(async () => {
+	// 		console.warn('Credential Revoked');
+	// 		fetchAndUpdateCredentialState(updateCredentialStateForUser, user).catch(
+	// 			(error) => updateCredentialStateForUser(`Error: ${error.code}`)
+	// 		);
+	// 	});
+	// }, []);
 
-	if (!appleAuth.isSupported) {
-		return (
-			<View style={[styles.container, styles.horizontal]}>
-				<Text>Apple Authentication is not supported on this device.</Text>
-			</View>
-		);
-	}
+	// if (!appleAuth.isSupported) {
+	// 	return (
+	// 		<View style={[styles.container, styles.horizontal]}>
+	// 			<Text>Apple Authentication is not supported on this device.</Text>
+	// 		</View>
+	// 	);
+	// }
 
 	return (
 		<AppleButton
@@ -145,7 +149,7 @@ export function AppleLogin() {
 			cornerRadius={10}
 			buttonStyle={AppleButton.Style.WHITE}
 			buttonType={AppleButton.Type.SIGN_IN}
-			onPress={() => onAppleButtonPress(updateCredentialStateForUser, user)}
+			onPress={() => onAppleButtonPress(setToken, user)}
 		/>
 	);
 }
