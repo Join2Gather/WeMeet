@@ -211,6 +211,7 @@ const initialState: timetable = {
 	confirmCount: 1,
 	alarmArray: [],
 	isInitial: true,
+	isOverlap: false,
 };
 
 export const timetableSlice = createSlice({
@@ -271,8 +272,8 @@ export const timetableSlice = createSlice({
 			state.confirmDatesTimetable = action.payload.confirmDatesTimetable;
 			state.alarmArray = [];
 			action.payload.isGroup
-				? makeConfirmWith(state, state.teamConfirmDate)
-				: makeConfirmWith(state, state.dates);
+				? makeConfirmWith(state, state.teamConfirmDate, true)
+				: makeConfirmWith(state, state.dates, false);
 
 			const find = state.confirmDatesTimetable.find(
 				(team) => team.club?.name === state.teamName
@@ -309,8 +310,8 @@ export const timetableSlice = createSlice({
 		GET_GROUP_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.responseGroup = action.payload;
 			makeGroupTimeTableWith60(state, state.teamDatesWith60);
-			makeGroupTimeTableWith60(state, state.teamConfirmDate);
 			addEveryTime(state, state.teamConfirmDate);
+			makeGroupTimeTableWith60(state, state.teamConfirmDate);
 		},
 		GET_GROUP_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
@@ -481,13 +482,12 @@ export const timetableSlice = createSlice({
 			if (!state.isTimeNotExist) {
 				for (let i = state.startTime; i <= state.endTime; i++) {
 					if (i === state.startTime) {
-						for (let j = startingMinute; j <= 6; j++) {
+						for (let j = startingMinute; j <= 5; j++) {
 							if (j === startingMinute) {
 								state.teamConfirmDate[dayIdx].times[i][j].borderTop = true;
 							}
 							state.teamConfirmDate[dayIdx].times[i][j].color = state.color;
 							state.teamConfirmDate[dayIdx].times[i][j].mode = 'confirm';
-							state.teamConfirmDate[dayIdx].times[i][j].borderWidth = 2;
 						}
 					} else if (i === state.endTime) {
 						for (let j = 0; j <= endMinute; j++) {
@@ -496,13 +496,11 @@ export const timetableSlice = createSlice({
 							}
 							state.teamConfirmDate[dayIdx].times[i][j].color = state.color;
 							state.teamConfirmDate[dayIdx].times[i][j].mode = 'confirm';
-							state.teamConfirmDate[dayIdx].times[i][j].borderWidth = 2;
 						}
 					} else {
-						for (let j = 0; j <= 6; j++) {
+						for (let j = 0; j <= 5; j++) {
 							state.teamConfirmDate[dayIdx].times[i][j].color = state.color;
 							state.teamConfirmDate[dayIdx].times[i][j].mode = 'confirm';
-							state.teamConfirmDate[dayIdx].times[i][j].borderWidth = 2;
 						}
 					}
 				}
@@ -534,34 +532,7 @@ export const timetableSlice = createSlice({
 					(day: any) => day.starting_hours !== startHour
 				);
 			const dayIdx = state.dayIdx;
-
-			deleteDate(
-				state,
-				state.dates,
-				startHour,
-				startMinute,
-				endHour,
-				endMinute,
-				dayIdx
-			);
-			deleteDate(
-				state,
-				state.teamDatesWith60,
-				startHour,
-				startMinute,
-				endHour,
-				endMinute,
-				dayIdx
-			);
-			deleteDate(
-				state,
-				state.teamConfirmDate,
-				startHour,
-				startMinute,
-				endHour,
-				endMinute,
-				dayIdx
-			);
+			state.isOverlap = false;
 			state.postDatesPrepare = true;
 		},
 		makeConfirmDates: (state) => {
@@ -695,6 +666,9 @@ export const timetableSlice = createSlice({
 		toggleIsInitial: (state, action: PayloadAction<boolean>) => {
 			state.isInitial = action.payload;
 		},
+		makeInitialOverlap: (state) => {
+			state.isOverlap = false;
+		},
 		// checkTimeMode(state, action:PayloadAction<)
 	},
 	extraReducers: {},
@@ -732,6 +706,7 @@ export const {
 	checkMode,
 	setTimeModalMode,
 	toggleIsInitial,
+	makeInitialOverlap,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;

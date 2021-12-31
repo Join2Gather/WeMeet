@@ -13,16 +13,37 @@ export function makeIndividualTimetable(state: timetable) {
 
 			for (let i = d.starting_hours; i <= d.end_hours; i++) {
 				if (i === d.starting_hours) {
-					for (let j = startingMinute; j <= 6; j++) {
-						makeTime(state.dates[idx].times[i][j], 'individual', color);
+					for (let j = startingMinute; j <= 5; j++) {
+						if (state.dates[idx].times[i][j].color !== Colors.white) {
+							makeTime(
+								state.dates[idx].times[i][j],
+								'individual',
+								Colors.black
+							);
+							state.isOverlap = true;
+						} else makeTime(state.dates[idx].times[i][j], 'individual', color);
 					}
 				} else if (i === d.end_hours) {
 					for (let j = 0; j < endMinute; j++) {
-						makeTime(state.dates[idx].times[i][j], 'individual', color);
+						if (state.dates[idx].times[i][j].color !== Colors.white) {
+							makeTime(
+								state.dates[idx].times[i][j],
+								'individual',
+								Colors.black
+							);
+							state.isOverlap = true;
+						} else makeTime(state.dates[idx].times[i][j], 'individual', color);
 					}
 				} else {
-					for (let j = 0; j <= 6; j++) {
-						makeTime(state.dates[idx].times[i][j], 'individual', color);
+					for (let j = 0; j <= 5; j++) {
+						if (state.dates[idx].times[i][j].color !== Colors.white) {
+							makeTime(
+								state.dates[idx].times[i][j],
+								'individual',
+								Colors.black
+							);
+							state.isOverlap = true;
+						} else makeTime(state.dates[idx].times[i][j], 'individual', color);
 					}
 				}
 			}
@@ -44,7 +65,7 @@ export function makeGroupTimeTableWith60(state: timetable, dates: any) {
 
 				for (let i = d.starting_hours; i <= d.end_hours; i++) {
 					if (i === d.starting_hours) {
-						for (let j = startingMinute; j <= 6; j++) {
+						for (let j = startingMinute; j <= 5; j++) {
 							makeTime(dates[idx].times[i][j], 'team', color);
 						}
 					} else if (i === d.end_hours) {
@@ -52,7 +73,7 @@ export function makeGroupTimeTableWith60(state: timetable, dates: any) {
 							makeTime(dates[idx].times[i][j], 'team', color);
 						}
 					} else {
-						for (let j = 0; j <= 6; j++) {
+						for (let j = 0; j <= 5; j++) {
 							makeTime(dates[idx].times[i][j], 'team', color);
 						}
 					}
@@ -71,7 +92,7 @@ export function makeHomeTimetable(state: individual) {
 
 				for (let i = d.starting_hours; i <= d.end_hours; i++) {
 					if (i === d.starting_hours) {
-						for (let j = startingMinute; j <= 6; j++) {
+						for (let j = startingMinute; j <= 5; j++) {
 							makeTime(
 								state.individualDates[idx].times[i][j],
 								'everyTime',
@@ -87,7 +108,7 @@ export function makeHomeTimetable(state: individual) {
 							);
 						}
 					} else {
-						for (let j = 0; j <= 6; j++) {
+						for (let j = 0; j <= 5; j++) {
 							makeTime(
 								state.individualDates[idx].times[i][j],
 								'everyTime',
@@ -109,7 +130,7 @@ export function addEveryTime(state: timetable, date: any) {
 				for (let i = d.starting_hours; i <= d.end_hours; i++) {
 					if (i <= state.startHour && i >= state.endHour) {
 						if (i === d.starting_hours) {
-							for (let j = startingMinute; j <= 6; j++) {
+							for (let j = startingMinute; j <= 5; j++) {
 								makeTime(
 									date[idx].times[i][j].times[i][j],
 									'everyTime',
@@ -125,7 +146,7 @@ export function addEveryTime(state: timetable, date: any) {
 								);
 							}
 						} else {
-							for (let j = 0; j <= 6; j++) {
+							for (let j = 0; j <= 5; j++) {
 								makeTime(
 									date[idx].times[i][j].times[i][j],
 									'everyTime',
@@ -140,7 +161,11 @@ export function addEveryTime(state: timetable, date: any) {
 	}
 }
 
-export function makeConfirmWith(state: timetable, dates: any) {
+export function makeConfirmWith(
+	state: timetable,
+	dates: any,
+	isGroup: boolean
+) {
 	state.confirmDatesTimetable.map((date) => {
 		state.weekIndex.map((day, idx) => {
 			date[day].map((d: any) => {
@@ -149,7 +174,7 @@ export function makeConfirmWith(state: timetable, dates: any) {
 				if (state.teamName !== date.club?.name) {
 					for (let i = d.starting_hours; i <= d.end_hours; i++) {
 						if (i === d.starting_hours) {
-							for (let j = startingMinute; j <= 6; j++) {
+							for (let j = startingMinute; j <= 5; j++) {
 								if (dates[idx].times[i]) {
 									makeTime(dates[idx]?.times[i][j], 'other', greyColor);
 								}
@@ -161,7 +186,7 @@ export function makeConfirmWith(state: timetable, dates: any) {
 								}
 							}
 						} else {
-							for (let j = 0; j <= 6; j++) {
+							for (let j = 0; j <= 5; j++) {
 								if (dates[idx].times[i]) {
 									makeTime(dates[idx]?.times[i][j], 'other', greyColor);
 								}
@@ -187,7 +212,7 @@ export function makeSnapShotDate(
 			const endMinute = Math.round(d.end_minutes / 10);
 			for (let i = d.starting_hours; i <= d.end_hours; i++) {
 				if (i === d.starting_hours) {
-					for (let j = startingMinute; j <= 6; j++) {
+					for (let j = startingMinute; j <= 5; j++) {
 						makeTime(state.snapShotDate[idx].times[i][j], 'start', color);
 					}
 				} else if (i === d.end_hours) {
@@ -195,7 +220,7 @@ export function makeSnapShotDate(
 						makeTime(state.snapShotDate[idx].times[i][j], 'start', color);
 					}
 				} else {
-					for (let j = 0; j <= 6; j++) {
+					for (let j = 0; j <= 5; j++) {
 						makeTime(state.snapShotDate[idx].times[i][j], 'start', color);
 					}
 				}
@@ -215,7 +240,7 @@ export function deleteDate(
 ) {
 	for (let i = startHour; i <= endHour; i++) {
 		if (i === startHour) {
-			for (let j = startMinute; j <= 6; j++) {
+			for (let j = startMinute; j <= 5; j++) {
 				date[dayIdx].times[i][j].color = Colors.white;
 				if (j === 0 || j === 7) {
 					date[dayIdx].times[i][j].borderTop = true;
@@ -232,7 +257,7 @@ export function deleteDate(
 				}
 			}
 		} else {
-			for (let j = 0; j <= 6; j++) {
+			for (let j = 0; j <= 5; j++) {
 				date[dayIdx].times[i][j].color = Colors.white;
 				if (j === 0 || j === 7) {
 					date[dayIdx].times[i][j].borderTop = true;
@@ -247,7 +272,7 @@ export function makeTime(changeTime: any, mode: string, funcColor: string) {
 	if (changeTime) {
 		changeTime.color = funcColor;
 		changeTime.mode = mode;
-		changeTime.borderBottom = false;
+		// changeTime.borderBottom = false;
 		changeTime.borderTop = false;
 	}
 }

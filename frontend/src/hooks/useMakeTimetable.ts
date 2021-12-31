@@ -7,13 +7,12 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 
 	for (let i = startHour; i < endHour; i++) {
 		times[i] = [];
-		for (let j = 0; j <= 60; j += 10) {
+		for (let j = 0; j <= 50; j += 10) {
 			if (j === 0) {
 				times[i].push({
 					color: Colors.white,
 					mode: 'normal',
 					minute: j,
-					borderWidth: 0.3,
 					borderBottom: false,
 					borderTop: true,
 				});
@@ -22,7 +21,6 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 					color: Colors.white,
 					mode: 'normal',
 					minute: j,
-					borderWidth: 0.3,
 					borderBottom: false,
 					borderTop: false,
 				});

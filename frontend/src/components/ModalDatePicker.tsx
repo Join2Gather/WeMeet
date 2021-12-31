@@ -1,11 +1,10 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { Alert, Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 // import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
-import * as Calendar from 'expo-calendar';
 import DatePicker from 'react-native-date-picker';
 import { useIsDarkMode } from '../hooks';
 import dayjs from 'dayjs';
@@ -15,6 +14,7 @@ dayjs.locale('ko');
 interface props {
 	dateVisible: boolean;
 	setDateVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	setSettingModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 	name: string;
 	alarmTime: number;
 	setSetting: React.Dispatch<React.SetStateAction<string>>;
@@ -28,10 +28,10 @@ export function ModalDatePicker({
 	alarmTime,
 	setSetting,
 	setSubMode,
+	setSettingModalVisible,
 }: props) {
-	const { postConfirmSuccess, alarmArray, color } = useSelector(
-		({ timetable, login, individual }: RootState) => ({
-			postConfirmSuccess: timetable.postConfirmSuccess,
+	const {  alarmArray, color } = useSelector(
+		({ timetable, login }: RootState) => ({
 			alarmArray: timetable.alarmArray,
 			color: login.individualColor,
 		})
@@ -78,8 +78,9 @@ export function ModalDatePicker({
 					color,
 				});
 			});
-			setSetting('initial');
-			setSubMode('initial');
+			setSettingModalVisible(true);
+			setSetting('loading');
+			setSubMode('loading');
 		},
 		[date, name, alarmArray, color, alarmTime]
 	);
@@ -115,15 +116,6 @@ export function ModalDatePicker({
 				confirmText="확인"
 				cancelText="취소"
 			/>
-			{/* <MakeAlarm
-				title={name}
-				alarmTime={1}
-				calEndTime={calEndTime}
-				calStartTime={calStartTime}
-				endDate={date}
-				isOpen={isOpen}
-				setIsOpen={setIsOpen}
-			/> */}
 		</>
 	);
 }

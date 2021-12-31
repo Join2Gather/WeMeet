@@ -50,6 +50,7 @@ export interface timetable {
 	confirmCount: number;
 	alarmArray: alarm_time[];
 	isInitial: boolean;
+	isOverlap: boolean;
 }
 
 export type weekIndex = Array<string>;
@@ -119,7 +120,6 @@ export interface timeProps {
 	color: string;
 	mode: string;
 	minute: number;
-	borderWidth: number;
 	borderColor?: string;
 	borderTop?: boolean;
 	borderBottom?: boolean;

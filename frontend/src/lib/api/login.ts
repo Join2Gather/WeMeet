@@ -4,11 +4,10 @@ import { makeHeader } from '../util/header';
 import client from './client';
 import type { nicknameAPI, userMeAPI } from '../../interface';
 
-export const getUserMe = ({ id, token, user }: userMeAPI) => {
+export const getUserMe = ({ token }: userMeAPI) => {
 	const headers = makeHeader(token);
-	return client.get(`users/${user}/profiles/${id}/`, {
-		headers,
-	});
+
+	return client.get('users/me/', { headers });
 };
 
 export const changeNickname = ({ id, token, user, nickname }: nicknameAPI) => {

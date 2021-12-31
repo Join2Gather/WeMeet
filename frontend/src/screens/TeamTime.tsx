@@ -58,6 +58,7 @@ export default function TeamTime({ route }: Props) {
 		name,
 		isConfirmProve,
 		alarmTime,
+		isOverlap,
 	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
 		uri: timetable.teamURI,
 		color: timetable.color,
@@ -78,6 +79,7 @@ export default function TeamTime({ route }: Props) {
 		name: timetable.teamName,
 		isConfirmProve: login.isConfirmProve,
 		alarmTime: login.alarmTime,
+		isOverlap: timetable.isOverlap,
 	}));
 	// navigation
 	const { id, user, token, modalMode } = route.params;
@@ -109,6 +111,15 @@ export default function TeamTime({ route }: Props) {
 		}
 	}, [joinTeamError, loadingJoin, error]);
 
+	useEffect(() => {
+		isOverlap &&
+			Alert.alert(
+				'경고',
+				`개인 일정과 겹치는 시간이 존재 합니다.\n 개인 시간표에서 수정해 주세요`,
+				[{ text: '확인', onPress: () => {} }]
+			);
+	}, [isOverlap]);
+
 	// useCallback
 	const goConfirmPage = useCallback(() => {
 		setConfirm(true);
@@ -117,7 +128,6 @@ export default function TeamTime({ route }: Props) {
 		navigation.goBack();
 		dispatch(setModalMode('normal'));
 		dispatch(setIsInTeamTime(false));
-		dispatch(toggleIsInitial(true));
 	}, []);
 	// 공유하기 버튼
 	const onShareURI = useCallback(() => {
@@ -201,45 +211,47 @@ export default function TeamTime({ route }: Props) {
 							{/* <Spinner loading={loadingIndividual} /> */}
 							{mode === 'normal' && (
 								<View style={styles.boxOverView}>
-									<View
-										style={{
-											flexDirection: 'row',
-											justifyContent: 'space-evenly',
-											// marginTop: 25,
-											height: 25,
-										}}
-									>
-										<TouchableOpacity
-											style={styles.touchableBoxView}
-											onPress={() => onPressGrInBtn(true)}
+									<>
+										<View
+											style={{
+												flexDirection: 'row',
+												justifyContent: 'center',
+												// marginTop: 25,
+												height: 25,
+											}}
 										>
-											<MIcon
-												name={
-													isGroup
-														? 'checkbox-marked-outline'
-														: 'checkbox-blank-outline'
-												}
-												size={24}
-												color={color !== '' ? color : Colors.blue500}
-											/>
-											<Text style={styles.iconText}>그룹</Text>
-										</TouchableOpacity>
-										<TouchableOpacity
-											style={[styles.touchableBoxView, { marginLeft: 70 }]}
-											onPress={() => onPressGrInBtn(false)}
-										>
-											<MIcon
-												name={
-													isGroup
-														? 'checkbox-blank-outline'
-														: 'checkbox-marked-outline'
-												}
-												size={23}
-												color={color !== '' ? color : Colors.blue500}
-											/>
-											<Text style={styles.iconText}>개인</Text>
-										</TouchableOpacity>
-									</View>
+											<TouchableOpacity
+												style={styles.touchableBoxView}
+												onPress={() => onPressGrInBtn(true)}
+											>
+												<MIcon
+													name={
+														isGroup
+															? 'checkbox-marked-outline'
+															: 'checkbox-blank-outline'
+													}
+													size={24}
+													color={color !== '' ? color : Colors.blue500}
+												/>
+												<Text style={styles.iconText}>그룹</Text>
+											</TouchableOpacity>
+											<TouchableOpacity
+												style={[styles.touchableBoxView, { marginLeft: 70 }]}
+												onPress={() => onPressGrInBtn(false)}
+											>
+												<MIcon
+													name={
+														isGroup
+															? 'checkbox-blank-outline'
+															: 'checkbox-marked-outline'
+													}
+													size={23}
+													color={color !== '' ? color : Colors.blue500}
+												/>
+												<Text style={styles.iconText}>개인</Text>
+											</TouchableOpacity>
+										</View>
+									</>
 									<View style={styles.rowView}>
 										<View
 											style={[styles.boxView, { backgroundColor: color }]}
@@ -259,6 +271,13 @@ export default function TeamTime({ route }: Props) {
 											]}
 										/>
 										<Text style={styles.infoText}>비어있는 일정</Text>
+										<View
+											style={[
+												styles.boxView,
+												{ backgroundColor: Colors.black },
+											]}
+										/>
+										<Text style={styles.infoText}>겹쳐진 일정</Text>
 									</View>
 								</View>
 							)}
@@ -335,6 +354,7 @@ export default function TeamTime({ route }: Props) {
 						<ModalDatePicker
 							dateVisible={dateVisible}
 							setDateVisible={setDateVisible}
+							setSettingModalVisible={setSettingModalVisible}
 							name={name}
 							alarmTime={alarmTime}
 							setSetting={setSetting}
@@ -347,6 +367,7 @@ export default function TeamTime({ route }: Props) {
 							name={name}
 							setConfirm={setConfirm}
 							uri={uri}
+							isOverlap={isOverlap}
 						/>
 					</ScrollView>
 				</View>

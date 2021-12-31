@@ -71,8 +71,6 @@ export interface date {
 }
 
 export interface userMeAPI {
-	user: number;
-	id: number;
 	token: string;
 }
 
