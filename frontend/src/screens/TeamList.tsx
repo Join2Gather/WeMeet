@@ -111,7 +111,7 @@ export default function TeamList() {
 
 	// useEffect
 	useEffect(() => {
-		dispatch(getUserMe({ id, token, user }));
+		dispatch(getUserMe({ token }));
 	}, [joinTeam]);
 	useEffect(() => {
 		const result = hexToRGB(individualColor);
@@ -178,7 +178,15 @@ export default function TeamList() {
 
 			dispatch(setIsInTeamTime(true));
 		}
-	}, [modalMode, mode, teamMakeColor, makeStartHour, makeEndHour, makeName]);
+	}, [
+		modalMode,
+		mode,
+		teamMakeColor,
+		makeStartHour,
+		makeEndHour,
+		makeName,
+		loginURI,
+	]);
 	const goTeamTime = useCallback(
 		({ id, name, uri }: goTeam) => {
 			if (modalMode === 'join') {
@@ -209,7 +217,7 @@ export default function TeamList() {
 		setModalVisible(true);
 	}, [sequence]);
 	const onReload = useCallback(() => {
-		dispatch(getUserMe({ id, user, token }));
+		dispatch(getUserMe({ token }));
 		setLoading('loading');
 		setTimeout(() => {
 			setLoading('');

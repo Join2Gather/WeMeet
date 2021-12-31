@@ -142,11 +142,11 @@ export function ModalInput({
 		dispatch(initialError());
 		setModalVisible(false);
 		setColor(Colors.red500);
-		dispatch(getUserMe({ id, token, user }));
+		dispatch(getUserMe({token}));
 	}, []);
 	const onPressClose = useCallback(() => {
 		dispatch(initialError());
-		dispatch(getUserMe({ id, token, user }));
+		dispatch(getUserMe({token}));
 		setModalVisible(false);
 		setMode('initial');
 		setCurrent(0);

@@ -97,7 +97,7 @@ export function ModalSetting({
 			setTimeout(() => {
 				setSetting('successLeave');
 			}, 500);
-			dispatch(getUserMe({ id, token, user }));
+			dispatch(getUserMe({ token }));
 		}
 	}, [settingMode]);
 
@@ -117,7 +117,7 @@ export function ModalSetting({
 	// 팀 색 변경
 	const onPressChangeColor = useCallback(() => {
 		uri && dispatch(changeColor({ color: pickColor, id, token, user, uri }));
-		dispatch(getUserMe({ id, token, user }));
+		dispatch(getUserMe({ token }));
 		dispatch(makeGroupColor(pickColor));
 
 		setSetting('loading');

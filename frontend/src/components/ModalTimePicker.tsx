@@ -304,7 +304,7 @@ export function ModalTimePicker({
 	}, [postDatesPrepare, uri, joinUri]);
 	useEffect(() => {
 		if (postConfirmSuccess || postHomeSuccess) {
-			dispatch(getUserMe({ id, user, token }));
+			dispatch(getUserMe({ token }));
 			dispatch(initialIndividualTimetable());
 		}
 	}, [postConfirmSuccess, postHomeSuccess]);
