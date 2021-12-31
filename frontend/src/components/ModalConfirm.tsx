@@ -12,12 +12,8 @@ import {
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
-import Font5Icon from 'react-native-vector-icons/FontAwesome5';
-import FontIcon from 'react-native-vector-icons/FontAwesome';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { hexToRGB } from '../lib/util/hexToRGB';
-import { ColorPicker, fromHsv } from 'react-native-color-picker';
-import { changeColor, leaveTeam, setModalMode } from '../store/team';
+import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 import { Button } from '../lib/util/Button';
 import {
 	changeTimetableColor,
@@ -35,6 +31,7 @@ interface props {
 	color: string;
 	name: string;
 	uri: string;
+	isOverlap: boolean;
 }
 
 export function ModalConfirm({
@@ -43,11 +40,18 @@ export function ModalConfirm({
 	color,
 	name,
 	uri,
+	isOverlap,
 }: props) {
 	const dispatch = useDispatch();
-	const [mode, setMode] = useState('initial');
+	const [mode, setMode] = useState('');
 	const [confirmCount, setCount] = useState('1');
 	const navigation = useNavigation();
+
+	useEffect(() => {
+		isOverlap && setMode('error');
+		!isOverlap && setMode('initial');
+	}, [isOverlap]);
+
 	// useCallback
 	const onPressCloseBtn = useCallback(() => {
 		setConfirm(false);
@@ -149,6 +153,42 @@ export function ModalConfirm({
 								/>
 							</>
 						)}
+						{mode === 'error' && (
+							<>
+								<View style={styles.blankView} />
+								<TouchableHighlight
+									activeOpacity={1}
+									underlayColor={Colors.grey300}
+									// onPress={goSnapShotPage}
+									style={styles.touchButtonStyle}
+								>
+									<View style={styles.rowView}>
+										<View style={{ flexDirection: 'column' }}>
+											<View style={{ flexDirection: 'row' }}>
+												<Font5Icon
+													name="ban"
+													size={21}
+													color={Colors.red500}
+													style={styles.iconStyle}
+												/>
+												<Text style={styles.touchText}>
+													개인 일정과 겹치는 시간이 존재 합니다.{'\n'}
+												</Text>
+											</View>
+											<Text style={styles.touchText}>
+												확인 후 확정을 진행해 주세요.{'\n'}
+											</Text>
+										</View>
+									</View>
+								</TouchableHighlight>
+								<View style={styles.buttonOverLine} />
+								<Button
+									buttonNumber={1}
+									buttonText="확인"
+									onPressFunction={onPressCloseBtn}
+								/>
+							</>
+						)}
 					</>
 				</View>
 			</View>
@@ -240,5 +280,13 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontFamily: 'NanumSquareR',
 		textAlign: 'center',
+	},
+	rowView: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'flex-start',
+		width: screen.width * 0.65,
+		height: screen.height * 0.05,
+		borderRadius: 13,
 	},
 });
