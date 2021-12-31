@@ -96,7 +96,6 @@ export const loginSlice = createSlice({
 			} else if (action.payload.uri) {
 				data = state.clubs.find((club) => club.uri === action.payload.uri);
 			} else if (action.payload.id) {
-				console.log(action.payload);
 				data = state.clubs.find((club) => club?.id === action.payload.id);
 				dateInfo = state.dates.find(
 					(date: any) => date?.club?.id === action.payload.id
@@ -119,6 +118,9 @@ export const loginSlice = createSlice({
 				state.endHour = data.end_hours;
 				state.isConfirmProve = false;
 			}
+		},
+		confirmProve: (state) => {
+			state.isConfirmProve = true;
 		},
 		findHomeTime: (
 			state,
@@ -214,6 +216,9 @@ export const loginSlice = createSlice({
 		setAlarmTime: (state, action: PayloadAction<number>) => {
 			state.alarmTime = action.payload;
 		},
+		setAppleToken: (state, action: PayloadAction<string>) => {
+			state.token = action.payload;
+		},
 	},
 	extraReducers: {},
 });
@@ -225,6 +230,8 @@ export const {
 	changeTeamColor,
 	findHomeTime,
 	setAlarmTime,
+	setAppleToken,
+	confirmProve,
 } = loginSlice.actions;
 
 export default loginSlice.reducer;
