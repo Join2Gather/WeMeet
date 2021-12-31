@@ -42,6 +42,7 @@ import team from '../store/team';
 import { ModalLoading } from '../components/ModalLoading';
 import { Sequence } from '../components/Sequence';
 import { DayOfWeek } from '../components';
+import { confirmProve } from '../store/login';
 
 export default function SnapShot({ route }: Props) {
 	const {
@@ -140,6 +141,7 @@ export default function SnapShot({ route }: Props) {
 			dispatch(postSnapShot({ uri, id, token, user }));
 		}
 		dispatch(makeTeamTime({ color, endHour, startHour, peopleCount }));
+		dispatch(confirmProve());
 		setLoading('loading');
 	}, [confirmDates, timeMode, joinUri]);
 	const onPressRevert = useCallback(() => {
