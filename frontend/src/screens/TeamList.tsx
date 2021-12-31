@@ -14,16 +14,18 @@ import { RootState } from '../store';
 import { initialError, setModalMode } from '../store/team';
 import { ModalInput, Spinner } from '../components';
 import { NavigationHeader } from '../theme';
-import FontAweSome from 'react-native-vector-icons/FontAwesome5';
-import Material from 'react-native-vector-icons/MaterialCommunityIcons';
 import { findTeam, getUserMe } from '../store/login';
 import { Colors } from 'react-native-paper';
-import { makeTeamTime, setIsInTeamTime, setTeamName } from '../store/timetable';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import {
+	makeInitialOverlap,
+	makeTeamTime,
+	setIsInTeamTime,
+	setTeamName,
+	toggleIsInitial,
+} from '../store/timetable';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import { TouchableHighlight } from 'react-native-gesture-handler';
-import { AutoFocusProvider } from '../contexts';
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
 const circleWidth = 14;
@@ -213,6 +215,11 @@ export default function TeamList() {
 			setLoading('');
 		}, 500);
 	}, []);
+	const onPressGoTeamTime = useCallback((item) => {
+		dispatch(toggleIsInitial(true));
+		dispatch(makeInitialOverlap());
+		goTeamTime({ id: item.id });
+	}, []);
 	return (
 		<SafeAreaView
 			style={{ backgroundColor: modalVisible ? Colors.white : individualColor }}
@@ -254,10 +261,14 @@ export default function TeamList() {
 					)}
 				/>
 				{/* <Spinner loading={userLoading} /> */}
-				<Text style={[styles.headerUnderText]}>Plan list</Text>
+				{clubs.length && (
+					<Text style={[styles.headerUnderText]}>Plan list</Text>
+				)}
 
 				{!clubs.length && (
-					<View style={{ flexDirection: 'column', marginLeft: '17%', flex: 1 }}>
+					<View
+						style={{ flexDirection: 'column', marginLeft: '11%', flex: 0.3 }}
+					>
 						<Text style={styles.noListText}>아직 아무런 모임이 없네요 😭</Text>
 
 						<Text style={styles.noListText}>
@@ -276,7 +287,7 @@ export default function TeamList() {
 						renderItem={({ item }) => (
 							<View>
 								<TouchableHighlight
-									onPress={() => goTeamTime({ id: item.id })}
+									onPress={() => onPressGoTeamTime(item)}
 									activeOpacity={0.1}
 									underlayColor={Colors.grey300}
 									style={[
@@ -377,7 +388,7 @@ const styles = StyleSheet.create({
 		marginTop: 15,
 		marginBottom: 20,
 		letterSpacing: -0.3,
-		flex: 0.05,
+		flex: 0.03,
 		textAlign: 'center',
 	},
 
@@ -412,7 +423,7 @@ const styles = StyleSheet.create({
 		height: circleWidth,
 		borderRadius: circleWidth / 2,
 		// position: 'absolute',
-		marginLeft: '10%',
+		marginLeft: '11%',
 		// top: -7,
 	},
 	teamTitle: {
@@ -421,7 +432,7 @@ const styles = StyleSheet.create({
 		color: '#000',
 		position: 'absolute',
 		letterSpacing: -0.5,
-		left: '18%',
+		left: '21%',
 		overflow: 'hidden',
 		textAlign: 'center',
 	},
@@ -436,7 +447,7 @@ const styles = StyleSheet.create({
 	},
 	iconStyle: {
 		position: 'absolute',
-		right: '10%',
+		right: '11%',
 		alignItems: 'center',
 		alignContent: 'center',
 		alignSelf: 'center',
@@ -476,8 +487,8 @@ const styles = StyleSheet.create({
 			width: 1,
 			height: 1,
 		},
-		paddingTop: 10,
-		paddingBottom: 10,
+		paddingTop: 13,
+		paddingBottom: 13,
 	},
 	blurView: {
 		paddingTop: 5,
