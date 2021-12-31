@@ -127,11 +127,15 @@ export function ModalSetting({
 		setSetting('loadingSave');
 	}, []);
 	const onFinishChangeColor = useCallback(() => {
-		dispatch(changeTimetableColor(pickColor));
-		setPickColor(Colors.red500);
+		if (subMode === 'loading') {
+			setSubMode('initial');
+		} else {
+			dispatch(changeTimetableColor(pickColor));
+			setPickColor(Colors.red500);
+		}
 		setSettingModalVisible(false);
 		setSetting('initial');
-	}, [pickColor]);
+	}, [pickColor, subMode]);
 
 	const goSnapShotPage = useCallback(() => {
 		setSettingModalVisible(false);
