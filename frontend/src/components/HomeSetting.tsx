@@ -14,6 +14,7 @@ import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionic from 'react-native-vector-icons/Ionicons';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import { Button } from '../lib/util/Button';
@@ -35,10 +36,8 @@ interface props {
 	id: number;
 	token: string;
 	color: string;
-	myNickName: string;
-	joinClubNum: number;
-	confirmClubNum: number;
 	userMeSuccess: boolean;
+	onPressChangeTime: () => void;
 }
 
 export function HomeSetting({
@@ -48,10 +47,8 @@ export function HomeSetting({
 	id,
 	token,
 	color,
-	myNickName,
-	joinClubNum,
-	confirmClubNum,
 	userMeSuccess,
+	onPressChangeTime,
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
@@ -100,6 +97,7 @@ export function HomeSetting({
 		setSettingModalVisible(false);
 		setPickColor(Colors.red500);
 	}, []);
+
 	return (
 		<Modal
 			animationType="fade"
@@ -170,7 +168,35 @@ export function HomeSetting({
 												</View>
 											</View>
 										</TouchableHighlight>
-
+										<TouchableHighlight
+											activeOpacity={1}
+											underlayColor={Colors.grey300}
+											onPress={onPressChangeTime}
+											style={[
+												styles.touchButtonStyle,
+												{
+													borderRadius: 0,
+												},
+											]}
+										>
+											<View style={styles.rowView}>
+												<Ionic
+													name="time"
+													size={25}
+													color={color}
+													style={[styles.iconStyle, { marginLeft: 8 }]}
+												/>
+												<Text style={styles.touchText}> 홈 시간 설정</Text>
+												<View style={styles.iconView}>
+													<Font5Icon
+														name="angle-right"
+														size={19}
+														color={Colors.black}
+														style={styles.rightIconStyle}
+													/>
+												</View>
+											</View>
+										</TouchableHighlight>
 										<TouchableHighlight
 											activeOpacity={1}
 											underlayColor={Colors.grey300}
