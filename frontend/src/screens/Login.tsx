@@ -27,17 +27,22 @@ import {
 import { useAutoFocus, AutoFocusProvider } from '../contexts';
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { clientBaseURL } from '../lib/api/client';
 import { AppleLogin } from '../components';
 import { useAnimatedValues, useLayout, useToggle } from '../hooks';
 import { interpolate } from '../lib/util';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+import { cloneHomeDate, setTodayDate } from '../store/individual';
+dayjs.locale('ko');
 
 export default function Login() {
-	const { name, token } = useSelector(({ login }: RootState) => ({
+	const { name, token, homeTime } = useSelector(({ login }: RootState) => ({
 		name: login.name,
 		token: login.token,
+		homeTime: login.homeTime,
 	}));
 
 	const [socialModalVisible, setSocialModalVisible] = useState(false);
@@ -106,13 +111,14 @@ export default function Login() {
 	const goTabNavigator = useCallback(() => navigation.navigate('TabNavigator'), []);
 	useEffect(() => {
 		if (token) {
+			dispatch(cloneHomeDate({ start: homeTime.start, end: homeTime.end }));
 			setTimeout(() => {
 				navigation.navigate('TabNavigator');
 			}, 1300);
 		} else {
 			console.log('없음');
 		}
-	}, [token]);
+	}, [token, homeTime]);
 	useEffect(() => {
 		appLoading();
 	}, []);
@@ -129,6 +135,11 @@ export default function Login() {
 	const onCloseSocial = useCallback(async () => {
 		setSocialModalVisible(false);
 	}, []);
+	const [date, setDate] = useState(dayjs().format('d'));
+	const dispatch = useDispatch();
+	useEffect(() => {
+		dispatch(setTodayDate(Number(date)));
+	}, [date]);
 
 	return (
 		<LinearGradient
