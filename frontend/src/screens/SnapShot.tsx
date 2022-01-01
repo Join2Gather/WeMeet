@@ -257,7 +257,7 @@ export default function SnapShot({ route }: Props) {
 						</>
 					)}
 				</View>
-				<DayOfWeek />
+				<DayOfWeek isTeam={true} />
 				<ScrollView style={{ backgroundColor: Colors.white }}>
 					{timetableMode === 'confirm' ? (
 						<Timetable
