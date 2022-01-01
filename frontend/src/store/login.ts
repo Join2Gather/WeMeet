@@ -4,11 +4,13 @@ import * as api from '../lib/api/login';
 import { takeLatest } from 'redux-saga/effects';
 import { createAction } from 'redux-actions';
 import type {
+	homeTime,
 	kakaoLoginAPI,
 	Login,
 	nicknameAPI,
 	userMeAPI,
 } from '../interface';
+import { startCase } from 'lodash';
 
 const initialState: Login = {
 	id: 0,
@@ -46,6 +48,11 @@ const initialState: Login = {
 	appleUser: null,
 	isConfirmProve: false,
 	alarmTime: 1,
+	homeTime: {
+		start: 0,
+		end: 24,
+	},
+	loading: '',
 };
 
 const USER_ME = 'login/USER_ME';
@@ -219,6 +226,13 @@ export const loginSlice = createSlice({
 		setAppleToken: (state, action: PayloadAction<string>) => {
 			state.token = action.payload;
 		},
+		setHomeTime: (state, action: PayloadAction<homeTime>) => {
+			state.homeTime.start = action.payload.start;
+			state.homeTime.end = action.payload.end;
+		},
+		setAppLoading: (state, action: PayloadAction<string>) => {
+			state.loading = action.payload;
+		},
 	},
 	extraReducers: {},
 });
@@ -232,6 +246,8 @@ export const {
 	setAlarmTime,
 	setAppleToken,
 	confirmProve,
+	setHomeTime,
+	setAppLoading,
 } = loginSlice.actions;
 
 export default loginSlice.reducer;
