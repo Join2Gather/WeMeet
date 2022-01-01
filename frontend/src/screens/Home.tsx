@@ -18,6 +18,7 @@ import {
 	Spinner,
 	ModalSelect,
 	DayOfWeek,
+	ModalHomeTimePicker,
 } from '../components';
 import { Timetable } from '../components/Timetable';
 import type { LeftRightNavigationMethods } from '../components';
@@ -98,6 +99,10 @@ export default function Home() {
 		myNickName,
 		joinClubNum,
 		confirmClubNum,
+		individualCount,
+		groupCount,
+		endHour,
+		appLoading,
 	} = useSelector(({ login, individual, loading }: RootState) => ({
 		token: login.token,
 		id: login.id,
@@ -113,6 +118,10 @@ export default function Home() {
 		myNickName: login.nickname,
 		joinClubNum: login.joinClubNum,
 		confirmClubNum: login.confirmClubNum,
+		individualCount: individual.individualCount,
+		groupCount: individual.groupCount,
+		endHour: login.homeTime.end,
+		appLoading: login.loading,
 	}));
 
 	// useEffect(() => {
@@ -140,7 +149,7 @@ export default function Home() {
 		dispatch(cloneIndividualDates(defaultDates));
 	}, []);
 	useEffect(() => {
-		dispatch(getUserMe({ id, token, user }));
+		dispatch(getUserMe({ token }));
 	}, []);
 	useEffect(() => {
 		dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
@@ -160,6 +169,7 @@ export default function Home() {
 	const [isTimeMode, setIsTimeMode] = useState(false);
 	const [currentNumber, setCurrent] = useState(0);
 	const [sequence, setSequence] = useState([0, 1, 2]);
+	const [homeVisible, setHomeVisible] = useState(false);
 	const onPressPlus = useCallback(() => {
 		setIsTimeMode(true);
 		setMode('startMode');
@@ -173,6 +183,11 @@ export default function Home() {
 
 	const open = useCallback(() => {
 		navigation.dispatch(DrawerActions.openDrawer());
+	}, []);
+
+	const onPressChangeTime = useCallback(() => {
+		setSettingModalVisible(false);
+		setHomeVisible(true);
 	}, []);
 	return (
 		<SafeAreaView style={{ backgroundColor: individualColor }}>
@@ -222,7 +237,32 @@ export default function Home() {
 				<View style={styles.viewHeight}>
 					{mode === 'normal' && (
 						<View style={{ flexDirection: 'column' }}>
-							<Text style={styles.titleText}>안녕하세요 {myNickName}님</Text>
+							{/* <Text style={styles.titleText}>안녕하세요 {myNickName}님</Text> */}
+							{groupCount !== 0 && individualCount !== 0 && (
+								<>
+									<Text style={styles.titleText}>
+										오늘은 {individualCount}개의 개인 일정과
+									</Text>
+									<Text style={styles.titleText}>
+										오늘은 {individualCount}개의 팀 일정이 있어요
+									</Text>
+								</>
+							)}
+							{groupCount !== 0 && individualCount === 0 && (
+								<Text style={styles.titleText}>
+									오늘은 {groupCount}개의 팀 일정이 있어요
+								</Text>
+							)}
+							{!groupCount && individualCount !== 0 && (
+								<Text style={styles.titleText}>
+									오늘은 {individualCount}개의 개인 일정이 있어요
+								</Text>
+							)}
+							{!groupCount && individualCount === 0 && (
+								<Text style={styles.titleText}>
+									오늘은 아무런 일정이 없네요
+								</Text>
+							)}
 							<View style={styles.rowView}>
 								<>
 									<View style={[styles.boxView]}>
@@ -256,7 +296,7 @@ export default function Home() {
 							</View>
 						</View>
 					)}
-					<Spinner loading={postEveryTime} />
+					<Spinner loading={appLoading} />
 					{isTimeMode && (
 						<View style={{ flexDirection: 'column' }}>
 							<View style={{ height: 30 }} />
@@ -286,7 +326,7 @@ export default function Home() {
 						</View>
 					)}
 				</View>
-				<DayOfWeek />
+				<DayOfWeek isTeam={false} />
 				<ScrollView style={{ backgroundColor: Colors.white }}>
 					<Timetable
 						modalVisible={modalVisible}
@@ -297,15 +337,16 @@ export default function Home() {
 						individualDates={individualDates}
 						isGroup={false}
 						individualTimesText={individualTimesText}
-						endIdx={25}
+						endIdx={endHour}
 						color={individualColor}
 						isHomeTime={true}
 						setCurrent={setCurrent}
 					/>
-					{/* <ModalSelect
-						selectModalVisible={selectModalVisible}
-						setSelectModalVisible={setSelectModalVisible}
-					/> */}
+					<ModalHomeTimePicker
+						homeVisible={homeVisible}
+						setHomeVisible={setHomeVisible}
+						setSettingModalVisible={setSettingModalVisible}
+					/>
 					<HomeSetting
 						userMeSuccess={userMeSuccess}
 						setSettingModalVisible={setSettingModalVisible}
@@ -314,9 +355,7 @@ export default function Home() {
 						id={id}
 						token={token}
 						color={individualColor}
-						myNickName={myNickName}
-						joinClubNum={joinClubNum}
-						confirmClubNum={confirmClubNum}
+						onPressChangeTime={onPressChangeTime}
 					/>
 				</ScrollView>
 			</View>
