@@ -313,7 +313,7 @@ export default function TeamTime({ route }: Props) {
 							)}
 						</View>
 					</View>
-					<DayOfWeek />
+					<DayOfWeek isTeam={true} />
 					<ScrollView style={{ backgroundColor: Colors.white }}>
 						<Timetable
 							mode={mode}
