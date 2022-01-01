@@ -186,6 +186,7 @@ export default function TeamList() {
 		makeEndHour,
 		makeName,
 		loginURI,
+		loginName,
 	]);
 	const goTeamTime = useCallback(
 		({ id, name, uri }: goTeam) => {
@@ -213,7 +214,9 @@ export default function TeamList() {
 	}, [sequence]);
 	const onJoinTeamTime = useCallback(() => {
 		setSequence((sequence) => sequence.filter((idx) => idx !== 3));
+		setMode('initial');
 		dispatch(setModalMode('join'));
+
 		setModalVisible(true);
 	}, [sequence]);
 	const onReload = useCallback(() => {
