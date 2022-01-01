@@ -138,15 +138,18 @@ export function ModalInput({
 	}, []);
 	const onCloseError = useCallback(() => {
 		setMode('initial');
-		dispatch(setTimeMode('make'));
+		dispatch(setTimeMode('normal'));
+		dispatch(setModalMode('normal'));
+		setModalMode('normal');
 		dispatch(initialError());
 		setModalVisible(false);
 		setColor(Colors.red500);
-		dispatch(getUserMe({ id, token, user }));
+		dispatch(getUserMe({ token }));
+		setCurrent(0);
 	}, []);
 	const onPressClose = useCallback(() => {
 		dispatch(initialError());
-		dispatch(getUserMe({ id, token, user }));
+		dispatch(getUserMe({ token }));
 		setModalVisible(false);
 		setMode('initial');
 		setCurrent(0);
@@ -241,18 +244,19 @@ export function ModalInput({
 													style={{ alignSelf: 'center' }}
 													color={Colors.red300}
 												/>
+
 												<Text style={styles.errorText}>
 													{' '}
 													잘못된 공유 코드 입니다
 												</Text>
 											</View>
 											<View style={styles.blankView} />
+											<View style={styles.buttonOverLine} />
 											<Button
 												buttonNumber={1}
 												buttonText="확인"
 												onPressFunction={onCloseError}
 											/>
-											<View style={styles.blankView} />
 										</>
 									)}
 									{mode === 'initial' && modalMode === 'join' && (

@@ -228,8 +228,8 @@ export const timetableSlice = createSlice({
 			state.peopleCount = peopleCount;
 			state.color = color;
 			const { defaultDatesWith60, timesText } = useMakeTimeTableWith60(
-				action.payload.startHour,
-				action.payload.endHour
+				startHour,
+				endHour
 			);
 			// 시간표 생성
 			state.dates = defaultDatesWith60;
@@ -300,6 +300,7 @@ export const timetableSlice = createSlice({
 			};
 			state.responseIndividual = action.payload;
 			state.postIndividualDates = action.payload;
+
 			makeIndividualTimetable(state);
 			addEveryTime(state, state.dates);
 			state.reload = false;
@@ -515,10 +516,12 @@ export const timetableSlice = createSlice({
 					end_hours: state.endTime,
 					end_minutes: state.endMinute,
 				};
+
 				state.postIndividualDates[state.weekIndex[state.dayIdx]] = [
 					...state.postIndividualDates[state.weekIndex[state.dayIdx]],
 					data,
 				];
+
 				state.postDatesPrepare = true;
 			}
 		},
@@ -669,6 +672,14 @@ export const timetableSlice = createSlice({
 		makeInitialOverlap: (state) => {
 			state.isOverlap = false;
 		},
+		makeInitialIndividual: (state) => {
+			const { defaultDatesWith60, timesText } = useMakeTimeTableWith60(
+				state.startHour,
+				state.endHour
+			);
+			// 시간표 생성
+			state.dates = defaultDatesWith60;
+		},
 		// checkTimeMode(state, action:PayloadAction<)
 	},
 	extraReducers: {},
@@ -707,6 +718,7 @@ export const {
 	setTimeModalMode,
 	toggleIsInitial,
 	makeInitialOverlap,
+	makeInitialIndividual,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;

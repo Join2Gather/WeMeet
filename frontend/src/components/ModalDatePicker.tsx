@@ -7,9 +7,9 @@ import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
 import DatePicker from 'react-native-date-picker';
 import { useIsDarkMode } from '../hooks';
+import MakeAlarm from '../lib/util/MakeAlarm';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
-import MakeAlarm from '../lib/util/MakeAlarm';
 dayjs.locale('ko');
 interface props {
 	dateVisible: boolean;
@@ -30,7 +30,7 @@ export function ModalDatePicker({
 	setSubMode,
 	setSettingModalVisible,
 }: props) {
-	const {  alarmArray, color } = useSelector(
+	const { alarmArray, color } = useSelector(
 		({ timetable, login }: RootState) => ({
 			alarmArray: timetable.alarmArray,
 			color: login.individualColor,
@@ -40,6 +40,13 @@ export function ModalDatePicker({
 	// const [minute, setMinute] = useState(0);
 	// const [hour, setHour] = useState(0);
 	const [date, setDate] = useState(dayjs().toDate());
+
+	useEffect(() => {
+		setDate(dayjs().toDate());
+		return () => {
+			dayjs().toDate();
+		};
+	}, []);
 
 	const onPressClose = useCallback(() => {
 		setVisible(false);
@@ -105,6 +112,7 @@ export function ModalDatePicker({
 				onCancel={onPressClose}
 				androidVariant={'iosClone'}
 				minuteInterval={10}
+				minimumDate={date}
 				textColor={
 					Platform.OS === 'ios'
 						? isDark

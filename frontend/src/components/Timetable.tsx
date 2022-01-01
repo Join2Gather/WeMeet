@@ -12,6 +12,8 @@ import {
 	getGroupDates,
 	getIndividualDates,
 	getOtherConfirmDates,
+	makeInitialIndividual,
+	makeTeamTime,
 	setDay,
 	setStartHour,
 	setTimeModalMode,
@@ -109,6 +111,7 @@ export function Timetable({
 		inTimeMode,
 		isInitial,
 		isOverlap,
+		todayDate,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
@@ -138,6 +141,7 @@ export function Timetable({
 			inTimeMode: individual.inTimeMode,
 			isInitial: timetable.isInitial,
 			isOverlap: timetable.isOverlap,
+			todayDate: individual.todayDate,
 		})
 	);
 	const dispatch = useDispatch();
@@ -187,25 +191,28 @@ export function Timetable({
 					);
 				}, 200);
 			} else if (uri && !isGroup) {
-				if (timeMode == 'make')
-					dispatch(getIndividualDates({ id, user, token, uri: joinUri }));
-				else {
-					dispatch(getIndividualDates({ id, user, token, uri }));
-				}
-				dispatch(
-					getOtherConfirmDates({
-						confirmClubs,
-						confirmDatesTimetable,
-						isGroup: false,
-					})
-				);
+				dispatch(makeInitialIndividual());
+				setTimeout(() => {
+					if (timeMode == 'make')
+						dispatch(getIndividualDates({ id, user, token, uri: joinUri }));
+					else {
+						dispatch(getIndividualDates({ id, user, token, uri }));
+					}
+					dispatch(
+						getOtherConfirmDates({
+							confirmClubs,
+							confirmDatesTimetable,
+							isGroup: false,
+						})
+					);
+				}, 100);
 			}
 			setLoading('loading');
 			setTimeout(() => {
 				setLoading('');
 			}, 500);
 		}
-	}, [uri, isGroup, reload, isInitial]);
+	}, [uri, isGroup, isInitial]);
 
 	useEffect(() => {
 		if (cloneDateSuccess) {
