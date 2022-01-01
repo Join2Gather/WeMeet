@@ -29,6 +29,13 @@ export interface Login {
 	appleUser: string | null;
 	isConfirmProve: boolean;
 	alarmTime: number;
+	homeTime: homeTime;
+	loading: string;
+}
+
+export interface homeTime {
+	start: number;
+	end: number;
 }
 
 export interface kakaoLoginAPI {
