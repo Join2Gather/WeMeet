@@ -14,11 +14,19 @@ import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import type { findTime } from '../interface/timetable';
-import { deletePostTime, setTimeModalMode } from '../store/timetable';
+import {
+	deletePostTime,
+	makeTeamTime,
+	setTeamName,
+	setTimeModalMode,
+	toggleIsInitial,
+} from '../store/timetable';
 import { Button } from '../lib/util/Button';
 import { deleteHomeTime, initialTimeMode } from '../store/individual';
 import { RootState } from '../store';
 import { Spinner } from '.';
+import { findTeam, initialFindIn } from '../store/login';
+import { useNavigation } from '@react-navigation/native';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -36,8 +44,38 @@ export function ModalIndividualTime({
 	findIndividual,
 	inTimeMode,
 }: props) {
+	const {
+		user,
+		id,
+		token,
+		loginName,
+		loginURI,
+		color,
+		peopleCount,
+		startHour,
+		endHour,
+	} = useSelector(({ login }: RootState) => ({
+		user: login.user,
+		id: login.id,
+		token: login.token,
+		loginURI: login.uri,
+		loginName: login.name,
+		color: login.color,
+		peopleCount: login.peopleCount,
+		startHour: login.startHour,
+		endHour: login.endHour,
+	}));
 	const dispatch = useDispatch();
+	const navigation = useNavigation();
 	const [mode, setMode] = useState('normal');
+	const [teamId, setId] = useState('');
+
+	useEffect(() => {
+		if (findIndividual && findIndividual[0]?.id) {
+			const id = String(findIndividual[0].id);
+			dispatch(findTeam({ id: id }));
+		}
+	}, [findIndividual, teamId]);
 
 	const onPressCloseBtn = useCallback(() => {
 		setInModalVisible && setInModalVisible(false);
@@ -53,6 +91,35 @@ export function ModalIndividualTime({
 			setInModalVisible && setInModalVisible(false);
 		}, 1000);
 	}, [findIndividual]);
+	const onPressMove = useCallback(() => {
+		console.log(teamId);
+
+		dispatch(toggleIsInitial(true));
+		setTimeout(() => {
+			dispatch(
+				makeTeamTime({
+					color,
+					peopleCount,
+					startHour,
+					endHour,
+				})
+			);
+			dispatch(setTeamName({ name: loginName, uri: loginURI }));
+		}, 100);
+		setTimeout(() => {
+			navigation.navigate('HomeNavigator');
+		}, 200);
+		setTimeout(() => {
+			navigation.navigate('TeamTime', {
+				user,
+				id,
+				token,
+				modalMode: 'normal',
+			});
+		}, 300);
+		setInModalVisible && setInModalVisible(false);
+		dispatch(initialTimeMode());
+	}, [teamId, findIndividual, color, loginName, loginURI]);
 	return (
 		<Modal
 			animationType="fade"
@@ -62,7 +129,7 @@ export function ModalIndividualTime({
 				Alert.alert('Modal has been closed.');
 			}}
 		>
-			<Spinner loading={mode} />
+			{/* <Spinner loading={mode} /> */}
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
 					<View
@@ -169,6 +236,19 @@ export function ModalIndividualTime({
 							))}
 						<View style={styles.blankView} />
 					</ScrollView>
+					{inTimeMode.includes('team') && (
+						<>
+							<View style={styles.blankView} />
+							<View style={styles.rowLine} />
+							<Button
+								buttonNumber={2}
+								buttonText="취소"
+								secondButtonText="이동"
+								onPressFunction={onPressCloseBtn}
+								secondOnPressFunction={onPressMove}
+							/>
+						</>
+					)}
 					{inTimeMode.includes('everyTime') && (
 						<>
 							<View style={styles.blankView} />
@@ -234,6 +314,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
 		width: screen.width * 0.9,
+		maxHeight: screen.height * 0.7,
 	},
 	touchText: {
 		fontSize: 14,
