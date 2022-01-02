@@ -176,7 +176,7 @@ export function Timetable({
 	// 최초 렌더링 개인 페이지 정보 받아오기
 	useEffect(() => {
 		if (isInitial) {
-			if (uri && isGroup) {
+			if (uri) {
 				if (timeMode === 'make')
 					dispatch(getGroupDates({ id, user, token, uri: joinUri }));
 				else dispatch(getGroupDates({ id, user, token, uri }));
@@ -186,11 +186,11 @@ export function Timetable({
 						getOtherConfirmDates({
 							confirmClubs,
 							confirmDatesTimetable,
-							isGroup,
+							isGroup: true,
 						})
 					);
 				}, 200);
-			} else if (uri && !isGroup) {
+
 				dispatch(makeInitialIndividual());
 				setTimeout(() => {
 					if (timeMode == 'make')
@@ -214,12 +214,12 @@ export function Timetable({
 		}
 	}, [uri, isGroup, isInitial]);
 
-	useEffect(() => {
-		if (cloneDateSuccess) {
-			dispatch(kakaoLogin(kakaoDates));
-			dispatch(cloneEveryTime(kakaoDates));
-		}
-	}, [cloneDateSuccess, kakaoDates]);
+	// useEffect(() => {
+	// 	if (cloneDateSuccess) {
+	// 		dispatch(kakaoLogin(kakaoDates));
+	// 		dispatch(cloneEveryTime(kakaoDates));
+	// 	}
+	// }, [cloneDateSuccess, kakaoDates]);
 	useEffect(() => {
 		// 시간 누르기 로직
 		if (!isHomeTime) {
@@ -553,16 +553,24 @@ export function Timetable({
 																Number(time) === endHour
 																	? borderWidth
 																	: t.borderTop
-																	? borderWidth
+																	? t.borderWidth
 																	: 0,
+
 															borderBottomWidth:
 																Number(time) === endHour - 1 && tIdx === 5
 																	? borderWidth
+																	: t.borderBottom
+																	? t.borderWidth
 																	: 0,
 															borderLeftWidth:
-																Number(time) === endHour ? 0 : borderWidth,
+																Number(time) === endHour
+																	? t.borderWidth
+																	: t.borderWidth,
+
 															borderRightWidth:
-																Number(time) === endHour ? 0 : borderWidth,
+																Number(time) === endHour
+																	? t.borderWidth
+																	: t.borderWidth,
 														},
 													]}
 												/>
