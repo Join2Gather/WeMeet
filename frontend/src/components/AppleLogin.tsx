@@ -74,7 +74,6 @@ async function onAppleButtonPress(setToken: any, user: any) {
 		} = appleAuthRequestResponse;
 
 		user = newUser;
-		Alert.alert(`'token: ', ${identityToken}`);
 
 		fetchAndUpdateCredentialState(setToken, user).catch((error) =>
 			setToken(`Error: ${error.code}`)

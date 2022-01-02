@@ -322,6 +322,7 @@ export function makeTime(changeTime: any, mode: string, funcColor: string) {
 	if (changeTime) {
 		changeTime.color = funcColor;
 		changeTime.mode = mode;
+		changeTime.borderWidth = 0.3;
 		// changeTime.borderBottom = false;
 		changeTime.borderTop = false;
 	}

@@ -24,6 +24,7 @@ import individual, {
 	cloneINDates,
 	initialIndividualTimetable,
 	initialTimeMode,
+	makeHomeTime,
 	makePostHomeDates,
 	postEveryTime,
 	setInEndTime,
@@ -306,11 +307,15 @@ export function ModalTimePicker({
 		if (postConfirmSuccess || postHomeSuccess) {
 			dispatch(getUserMe({ token }));
 			dispatch(initialIndividualTimetable());
+			setTimeout(() => {
+				dispatch(makeHomeTime());
+				dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
+			}, 100);
 		}
 	}, [postConfirmSuccess, postHomeSuccess]);
-	useEffect(() => {
-		dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
-	}, [confirmClubs, confirmDatesTimetable]);
+	// useEffect(() => {
+	// 	dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
+	// }, []);
 	return (
 		<>
 			<Spinner loading={mode} />

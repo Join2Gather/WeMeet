@@ -162,11 +162,19 @@ export const individualSlice = createSlice({
 				});
 		},
 		initialIndividualTimetable: (state) => {
-			const { defaultDatesWith60, timesText } = useMakeTimeTableWith60(0, 25);
+			const { defaultDatesWith60, timesText } = useMakeTimeTableWith60(
+				state.homeTime.start,
+				state.homeTime.end
+			);
+
 			state.individualDates = defaultDatesWith60;
+			state.individualTimesText = timesText;
+		},
+		makeHomeTime: (state) => {
 			makeHomeTimetable(state);
 			state.postHomeSuccess = false;
 		},
+
 		cloneHomeDate: (state, action: PayloadAction<homeTime>) => {
 			const { start, end } = action.payload;
 			state.homeTime.start = start;
@@ -390,6 +398,7 @@ export const {
 	deleteHomeTime,
 	setTodayDate,
 	cloneHomeDate,
+	makeHomeTime,
 } = individualSlice.actions;
 
 export default individualSlice.reducer;

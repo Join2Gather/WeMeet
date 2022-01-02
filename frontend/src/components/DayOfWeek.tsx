@@ -14,10 +14,10 @@ interface props {
 
 export function DayOfWeek({ isTeam }: props) {
 	const { todayDate, inColor, teamColor } = useSelector(
-		({ individual, login }: RootState) => ({
+		({ individual, login, timetable }: RootState) => ({
 			todayDate: individual.todayDate,
 			inColor: login.individualColor,
-			teamColor: login.color,
+			teamColor: timetable.color,
 		})
 	);
 	return (

@@ -303,6 +303,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
 		width: screen.width * 0.9,
+		maxHeight: screen.height * 0.7,
 	},
 	touchText: {
 		fontSize: 13,

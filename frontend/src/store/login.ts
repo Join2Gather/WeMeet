@@ -10,7 +10,6 @@ import type {
 	nicknameAPI,
 	userMeAPI,
 } from '../interface';
-import { startCase } from 'lodash';
 
 const initialState: Login = {
 	id: 0,
@@ -103,10 +102,11 @@ export const loginSlice = createSlice({
 			} else if (action.payload.uri) {
 				data = state.clubs.find((club) => club.uri === action.payload.uri);
 			} else if (action.payload.id) {
-				data = state.clubs.find((club) => club?.id === action.payload.id);
+				data = state.clubs.find((club) => club?.id == action.payload.id);
 				dateInfo = state.dates.find(
 					(date: any) => date?.club?.id === action.payload.id
 				);
+				console.log(data);
 			}
 			if (data && dateInfo) {
 				state.name = data.name;
@@ -143,10 +143,14 @@ export const loginSlice = createSlice({
 						color: d.color,
 						name: decodeURIComponent(d.name),
 						selectTime: time,
+						id: d.id,
 					};
 					state.findIndividual = [...state.findIndividual, data];
 				}
 			});
+		},
+		initialFindIn: (state) => {
+			// state. = [];
 		},
 		USER_ME_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.confirmClubs = [];
@@ -192,6 +196,7 @@ export const loginSlice = createSlice({
 								},
 								color: day.color,
 								name: day.club === null ? '개인 시간표' : day.club.name,
+								id: day.club?.id,
 							};
 							state.inDates[dayString] = [...state.inDates[dayString], data];
 						});
@@ -248,6 +253,7 @@ export const {
 	confirmProve,
 	setHomeTime,
 	setAppLoading,
+	initialFindIn,
 } = loginSlice.actions;
 
 export default loginSlice.reducer;

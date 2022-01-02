@@ -121,6 +121,7 @@ export interface timeProps {
 	mode: string;
 	minute: number;
 	borderColor?: string;
+	borderWidth?: number;
 	borderTop?: boolean;
 	borderBottom?: boolean;
 	people?: Array<string>;
@@ -136,6 +137,7 @@ export interface findTime {
 	endTime: timeType;
 	selectTime: number;
 	timeText?: string;
+	id?: number;
 }
 
 export interface timeType {

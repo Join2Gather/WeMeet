@@ -128,6 +128,7 @@ export default function TeamTime({ route }: Props) {
 		navigation.goBack();
 		dispatch(setModalMode('normal'));
 		dispatch(setIsInTeamTime(false));
+		dispatch(toggleIsInitial(false));
 	}, []);
 	// 공유하기 버튼
 	const onShareURI = useCallback(() => {
@@ -271,13 +272,17 @@ export default function TeamTime({ route }: Props) {
 											]}
 										/>
 										<Text style={styles.infoText}>비어있는 일정</Text>
-										<View
-											style={[
-												styles.boxView,
-												{ backgroundColor: Colors.black },
-											]}
-										/>
-										<Text style={styles.infoText}>겹쳐진 일정</Text>
+										{isOverlap && (
+											<>
+												<View
+													style={[
+														styles.boxView,
+														{ backgroundColor: Colors.black },
+													]}
+												/>
+												<Text style={styles.infoText}>겹쳐진 일정</Text>
+											</>
+										)}
 									</View>
 								</View>
 							)}

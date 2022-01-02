@@ -15,6 +15,7 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 					minute: j,
 					borderBottom: false,
 					borderTop: true,
+					borderWidth: 0.3,
 				});
 			} else {
 				times[i].push({
@@ -23,6 +24,7 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 					minute: j,
 					borderBottom: false,
 					borderTop: false,
+					borderWidth: 0.3,
 				});
 			}
 		}
