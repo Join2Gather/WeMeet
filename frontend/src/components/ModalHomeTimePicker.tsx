@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform } from 'react-native';
 // import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -7,12 +7,10 @@ import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
 import DatePicker from 'react-native-date-picker';
 import { useIsDarkMode } from '../hooks';
-import MakeAlarm from '../lib/util/MakeAlarm';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import { setAppLoading, setHomeTime } from '../store/login';
 import { cloneDates } from '../store/timetable';
-import { Spinner } from '.';
 import { cloneINDates } from '../store/individual';
 dayjs.locale('ko');
 interface props {
@@ -22,13 +20,14 @@ interface props {
 }
 
 export function ModalHomeTimePicker({ homeVisible, setHomeVisible }: props) {
-	const { alarmArray, color, confirmClubs, confirmDatesTimetable } =
-		useSelector(({ timetable, login }: RootState) => ({
+	const { alarmArray, confirmClubs, confirmDatesTimetable } = useSelector(
+		({ timetable, login }: RootState) => ({
 			alarmArray: timetable.alarmArray,
-			color: login.individualColor,
+
 			confirmClubs: login.confirmClubs,
 			confirmDatesTimetable: login.confirmDatesTimetable,
-		}));
+		})
+	);
 	const dispatch = useDispatch();
 	// const [minute, setMinute] = useState(0);
 	// const [hour, setHour] = useState(0);
@@ -60,12 +59,6 @@ export function ModalHomeTimePicker({ homeVisible, setHomeVisible }: props) {
 	const onPressFirstConfirm = useCallback((date) => {
 		setDate(date);
 		const start = dayjs(date);
-		const startHour = start.get('h');
-		// setSecondDate(
-		// 	dayjs()
-		// 		.set('h', startHour + 2)
-		// 		.toDate()
-		// );
 
 		setTimeout(() => {
 			setSecond(true);

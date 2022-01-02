@@ -7,7 +7,6 @@ import {
 	TouchableHighlight,
 	View,
 	TextInput,
-	ActivityIndicator,
 	Dimensions,
 } from 'react-native';
 import { Colors } from 'react-native-paper';
@@ -15,12 +14,7 @@ import { useDispatch } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 import { Button } from '../lib/util/Button';
-import {
-	changeTimetableColor,
-	getSnapShot,
-	setConfirmCount,
-} from '../store/timetable';
-import { getUserMe, makeGroupColor } from '../store/login';
+import { setConfirmCount } from '../store/timetable';
 import { useNavigation } from '@react-navigation/core';
 
 const screen = Dimensions.get('screen');
