@@ -304,6 +304,7 @@ export const timetableSlice = createSlice({
 			makeIndividualTimetable(state);
 			addEveryTime(state, state.dates);
 			state.reload = false;
+			state.isInitial = false;
 		},
 		GET_INDIVIDUAL_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
@@ -488,6 +489,7 @@ export const timetableSlice = createSlice({
 								state.teamConfirmDate[dayIdx].times[i][j].borderTop = true;
 							}
 							state.teamConfirmDate[dayIdx].times[i][j].color = state.color;
+							state.teamConfirmDate[dayIdx].times[i][j].borderWidth = 2;
 							state.teamConfirmDate[dayIdx].times[i][j].mode = 'confirm';
 						}
 					} else if (i === state.endTime) {
@@ -496,11 +498,13 @@ export const timetableSlice = createSlice({
 								state.teamConfirmDate[dayIdx].times[i][j].borderBottom = true;
 							}
 							state.teamConfirmDate[dayIdx].times[i][j].color = state.color;
+							state.teamConfirmDate[dayIdx].times[i][j].borderWidth = 2;
 							state.teamConfirmDate[dayIdx].times[i][j].mode = 'confirm';
 						}
 					} else {
 						for (let j = 0; j <= 5; j++) {
 							state.teamConfirmDate[dayIdx].times[i][j].color = state.color;
+							state.teamConfirmDate[dayIdx].times[i][j].borderWidth = 2;
 							state.teamConfirmDate[dayIdx].times[i][j].mode = 'confirm';
 						}
 					}
