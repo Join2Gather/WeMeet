@@ -75,6 +75,7 @@ export interface date {
 	end: timeType;
 	color: string;
 	name: string;
+	id: number;
 }
 
 export interface userMeAPI {
