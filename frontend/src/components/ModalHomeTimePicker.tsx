@@ -75,7 +75,7 @@ export function ModalHomeTimePicker({ homeVisible, setHomeVisible }: props) {
 		(second) => {
 			const start = date.getHours();
 
-			const end = second.getHours();
+			const end = second.getHours() + 1;
 			console.log(start, end);
 			dispatch(cloneDates({ start: start, end: end }));
 			dispatch(setHomeTime({ start: start, end: end }));
