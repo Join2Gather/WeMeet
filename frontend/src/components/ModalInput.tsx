@@ -286,7 +286,6 @@ export function ModalInput({
 											<Text style={styles.titleText}>모임명을 입력하세요</Text>
 											<View style={[styles.textInputView]}>
 												<TextInput
-													onFocus={focus}
 													style={[styles.textInput, { color: Colors.black }]}
 													value={name}
 													onChangeText={(name) => setName((text) => name)}
@@ -318,7 +317,6 @@ export function ModalInput({
 									<Text style={styles.timeInputText}>시작 시간 : </Text>
 									<View style={styles.timeInputView}>
 										<TextInput
-											onFocus={focus}
 											style={[styles.timeInput, { color: Colors.black }]}
 											value={startTime}
 											onChangeText={(hour) => setStartTime((text) => hour)}
@@ -333,7 +331,6 @@ export function ModalInput({
 									<Text style={styles.timeInputText}>종료 시간 : </Text>
 									<View style={styles.timeInputView}>
 										<TextInput
-											onFocus={focus}
 											style={[styles.timeInput, { color: Colors.black }]}
 											value={endTime}
 											onChangeText={(hour) => setEndTime((text) => hour)}
