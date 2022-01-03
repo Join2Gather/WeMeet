@@ -14,8 +14,15 @@ export function makeIndividualTimetable(state: timetable) {
 
 			for (let i = d.starting_hours; i <= d.end_hours; i++) {
 				if (d.starting_hours === d.end_hours) {
-					for (let j = startingMinute; j <= endMinute; j++) {
-						makeTime(state.dates[idx].times[i][j], 'individual', color);
+					for (let j = startingMinute; j < endMinute; j++) {
+						if (state.dates[idx].times[i][j].color !== Colors.white) {
+							makeTime(
+								state.dates[idx].times[i][j],
+								'individual',
+								Colors.grey600
+							);
+							state.isOverlap = true;
+						} else makeTime(state.dates[idx].times[i][j], 'individual', color);
 					}
 				} else {
 					if (i === d.starting_hours) {
@@ -24,7 +31,7 @@ export function makeIndividualTimetable(state: timetable) {
 								makeTime(
 									state.dates[idx].times[i][j],
 									'individual',
-									Colors.black
+									Colors.grey600
 								);
 								state.isOverlap = true;
 							} else
@@ -36,7 +43,7 @@ export function makeIndividualTimetable(state: timetable) {
 								makeTime(
 									state.dates[idx].times[i][j],
 									'individual',
-									Colors.black
+									Colors.grey600
 								);
 								state.isOverlap = true;
 							} else
@@ -48,7 +55,7 @@ export function makeIndividualTimetable(state: timetable) {
 								makeTime(
 									state.dates[idx].times[i][j],
 									'individual',
-									Colors.black
+									Colors.grey600
 								);
 								state.isOverlap = true;
 							} else
@@ -75,7 +82,7 @@ export function makeGroupTimeTableWith60(state: timetable, dates: any) {
 
 				for (let i = d.starting_hours; i <= d.end_hours; i++) {
 					if (d.starting_hours === d.end_hours) {
-						for (let j = startingMinute; j <= endMinute; j++) {
+						for (let j = startingMinute; j < endMinute; j++) {
 							makeTime(dates[idx].times[i][j], 'team', color);
 						}
 					} else {
@@ -108,7 +115,7 @@ export function makeHomeTimetable(state: individual) {
 
 				for (let i = d.starting_hours; i <= d.end_hours; i++) {
 					if (d.starting_hours === d.end_hours) {
-						for (let j = startingMinute; j <= endMinute; j++) {
+						for (let j = startingMinute; j < endMinute; j++) {
 							makeTime(
 								state.individualDates[idx].times[i][j],
 								'team',
@@ -162,7 +169,7 @@ export function addEveryTime(state: timetable, date: any) {
 				for (let i = d.starting_hours; i <= d.end_hours; i++) {
 					if (i <= state.startHour && i >= state.endHour) {
 						if (d.starting_hours === d.end_hours) {
-							for (let j = startingMinute; j <= endMinute; j++) {
+							for (let j = startingMinute; j < endMinute; j++) {
 								makeTime(date[idx].times[i][j], 'everyTime', greyColor);
 							}
 						} else {
@@ -212,7 +219,7 @@ export function makeConfirmWith(
 				if (state.teamName !== date.club?.name) {
 					for (let i = d.starting_hours; i <= d.end_hours; i++) {
 						if (d.starting_hours === d.end_hours) {
-							for (let j = startingMinute; j <= endMinute; j++) {
+							for (let j = startingMinute; j < endMinute; j++) {
 								makeTime(dates[idx]?.times[i][j], 'other', greyColor);
 							}
 						} else {
@@ -256,7 +263,7 @@ export function makeSnapShotDate(
 			const endMinute = Math.round(d.end_minutes / 10);
 			for (let i = d.starting_hours; i <= d.end_hours; i++) {
 				if (d.starting_hours === d.end_hours) {
-					for (let j = startingMinute; j <= endMinute; j++) {
+					for (let j = startingMinute; j < endMinute; j++) {
 						makeTime(state.snapShotDate[idx].times[i][j], 'start', color);
 					}
 				} else {
