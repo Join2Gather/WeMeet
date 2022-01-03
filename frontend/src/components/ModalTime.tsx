@@ -6,7 +6,6 @@ import {
 	Text,
 	TouchableHighlight,
 	View,
-	TextInput,
 	ActivityIndicator,
 	Dimensions,
 	ScrollView,
@@ -14,16 +13,14 @@ import {
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
-import FontIcon from 'react-native-vector-icons/FontAwesome';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { hexToRGB } from '../lib/util/hexToRGB';
 import type { findTime } from '../interface/timetable';
-import type { individualTime } from '../interface';
-import { findTeam } from '../store/login';
 import { Button } from '../lib/util/Button';
 import {
 	deletePostTime,
 	makeTeamTime,
+	setSelectIdx,
 	setTimeModalMode,
 	toggleIsInitial,
 } from '../store/timetable';
@@ -51,15 +48,18 @@ export function ModalTime({
 	tableMode,
 	isGroup,
 }: props) {
-	const { startHour, endHour, peopleCount } = useSelector(
-		({ login }: RootState) => ({
+	const { startHour, endHour, peopleCount, selectIdx } = useSelector(
+		({ login, timetable }: RootState) => ({
 			startHour: login.startHour,
 			endHour: login.endHour,
 			peopleCount: login.peopleCount,
+			selectIdx: timetable.selectIdx,
 		})
 	);
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
+
+	const [check, setCheck] = useState(0);
 
 	useEffect(() => {
 		if (mode == 'loading') {
@@ -85,6 +85,10 @@ export function ModalTime({
 		setTimeModalVisible && setTimeModalVisible(false);
 		setMode('initial');
 		dispatch(setTimeModalMode(false));
+	}, []);
+
+	const onPressTimeText = useCallback((idx: number) => {
+		dispatch(setSelectIdx(idx));
 	}, []);
 
 	return (
@@ -138,7 +142,10 @@ export function ModalTime({
 											<View style={styles.columnView}>
 												<View style={styles.rowView}>
 													<Text
-														style={[styles.touchText, { color: Colors.white }]}
+														style={[
+															styles.touchText,
+															{ color: Colors.grey100 },
+														]}
 													>
 														{findTime[0].selectTime > 12
 															? `오후  ${findTime[0].selectTime - 12}시`
@@ -153,19 +160,64 @@ export function ModalTime({
 								<View style={styles.blankView} />
 								<Text style={styles.titleText}>가능 시간</Text>
 								<View style={styles.blankView} />
-								{findTime.map((t) => (
+								{findTime.map((t, idx) => (
 									<View key={t.startTime.hour}>
 										<View style={[styles.backgroundView]}>
-											<View style={styles.columnView}>
-												<View style={styles.rowView}>
-													<Text style={styles.touchText}>{t.timeText}</Text>
-												</View>
+											<View style={[styles.columnView, { margin: 0 }]}>
+												<TouchableHighlight
+													activeOpacity={1}
+													underlayColor={Colors.grey300}
+													onPress={() => onPressTimeText(idx)}
+													style={[
+														styles.touchButtonStyle,
+														{
+															backgroundColor: isConfirmMode
+																? idx == selectIdx
+																	? Colors.grey600
+																	: Colors.grey100
+																: Colors.grey100,
+														},
+													]}
+												>
+													<View style={styles.rowView}>
+														<Text
+															style={[
+																styles.touchText,
+																{
+																	color: isConfirmMode
+																		? idx === selectIdx
+																			? Colors.white
+																			: Colors.grey800
+																		: Colors.black,
+																},
+															]}
+														>
+															{t.timeText}
+														</Text>
+														{isConfirmMode && (
+															<MIcon
+																name={
+																	idx === selectIdx
+																		? 'checkbox-marked'
+																		: 'checkbox-blank-outline'
+																}
+																size={20}
+																style={{ position: 'absolute', right: 0 }}
+																color={
+																	idx === selectIdx
+																		? Colors.white
+																		: Colors.black
+																}
+															/>
+														)}
+													</View>
+												</TouchableHighlight>
 											</View>
 										</View>
 										<View style={styles.blankView} />
 									</View>
 								))}
-								{isGroup && (
+								{isGroup ? (
 									<>
 										<View style={styles.blankView} />
 										<Text style={styles.titleText}>참여 인원</Text>
@@ -186,6 +238,54 @@ export function ModalTime({
 											</View>
 										))}
 									</>
+								) : (
+									isConfirmMode && (
+										<>
+											<View style={styles.blankView} />
+											<Text style={styles.titleText}>참여 인원</Text>
+											<View style={styles.blankView} />
+											{findTime.map((t, idx) => (
+												<View key={t.startTime.hour}>
+													<View style={[styles.backgroundView]}>
+														<View style={[styles.columnView, { margin: 0 }]}>
+															<TouchableHighlight
+																activeOpacity={1}
+																underlayColor={Colors.grey300}
+																onPress={() => onPressTimeText(idx)}
+																style={[
+																	styles.touchButtonStyle,
+																	{
+																		backgroundColor:
+																			idx == selectIdx
+																				? Colors.grey600
+																				: Colors.grey100,
+																	},
+																]}
+															>
+																<View style={styles.rowView}>
+																	<Text
+																		style={[
+																			styles.touchText,
+																			{
+																				color:
+																					idx === selectIdx
+																						? Colors.white
+																						: Colors.grey800,
+																			},
+																		]}
+																		numberOfLines={5}
+																	>
+																		{t.people}
+																	</Text>
+																</View>
+															</TouchableHighlight>
+														</View>
+													</View>
+													<View style={styles.blankView} />
+												</View>
+											))}
+										</>
+									)
 								)}
 							</>
 						)}
@@ -267,15 +367,14 @@ const styles = StyleSheet.create({
 	rowView: {
 		flexDirection: 'row',
 		width: screen.width * 0.52,
-		// alignItems: 'center',
-		// alignSelf: 'center',
+
 		justifyContent: 'flex-start',
-		// backgroundColor: Colors.blue100,
+		alignItems: 'center',
 	},
 	columnView: {
 		flexDirection: 'column',
 
-		borderRadius: 13,
+		// borderRadius: 13,
 
 		margin: 20,
 	},
@@ -328,12 +427,15 @@ const styles = StyleSheet.create({
 		width: '100%',
 	},
 	touchButtonStyle: {
-		padding: 5,
-		borderRadius: 10,
+		padding: 20,
+		borderRadius: 13,
 		// alignItems: 'center',
 		// alignContent: 'center',
 		// alignSelf: 'center',
 		justifyContent: 'center',
+		alignItems: 'center',
+		alignContent: 'center',
+		alignSelf: 'center',
 	},
 	buttonOverLine: {
 		borderWidth: 0.4,
