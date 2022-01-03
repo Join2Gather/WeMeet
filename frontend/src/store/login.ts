@@ -49,7 +49,7 @@ const initialState: Login = {
 	alarmTime: 1,
 	homeTime: {
 		start: 0,
-		end: 24,
+		end: 25,
 	},
 	loading: '',
 };
@@ -103,10 +103,10 @@ export const loginSlice = createSlice({
 				data = state.clubs.find((club) => club.uri === action.payload.uri);
 			} else if (action.payload.id) {
 				data = state.clubs.find((club) => club?.id == action.payload.id);
-				dateInfo = state.dates.find(
+				dateInfo = state.confirmDatesTimetable.find(
 					(date: any) => date?.club?.id === action.payload.id
 				);
-				console.log(data);
+				if (dateInfo) console.log(dateInfo, 'hihi');
 			}
 			if (data && dateInfo) {
 				state.name = data.name;
@@ -115,7 +115,7 @@ export const loginSlice = createSlice({
 				state.peopleCount = data.people_count;
 				state.startHour = data.starting_hours;
 				state.endHour = data.end_hours;
-				state.isConfirmProve = !dateInfo.is_temporary_reserved;
+				state.isConfirmProve = true;
 			} else {
 				state.name = data.name;
 				state.uri = data.uri;
@@ -149,9 +149,6 @@ export const loginSlice = createSlice({
 				}
 			});
 		},
-		initialFindIn: (state) => {
-			// state. = [];
-		},
 		USER_ME_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.confirmClubs = [];
 			state.inDates = {
@@ -163,10 +160,15 @@ export const loginSlice = createSlice({
 				fri: [],
 				sat: [],
 			};
-			const { clubs, dates, nickname } = action.payload;
+			const { clubs, dates, nickname, id, name, user } = action.payload;
+			state.id = id;
+			state.name = name;
 			state.dates = dates;
+			state.user = user;
 			state.joinClubNum = clubs.length;
 			state.nickname = nickname;
+			state.clubs = clubs;
+			state.dates = dates;
 			state.confirmDatesTimetable = dates.filter(
 				(da: any) => !da.is_temporary_reserved
 			);
@@ -253,7 +255,6 @@ export const {
 	confirmProve,
 	setHomeTime,
 	setAppLoading,
-	initialFindIn,
 } = loginSlice.actions;
 
 export default loginSlice.reducer;
