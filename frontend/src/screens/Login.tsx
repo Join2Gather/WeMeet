@@ -1,28 +1,12 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import {
-	Animated,
-	Keyboard,
-	Platform,
-	StyleSheet,
-	View,
-	Text,
-} from 'react-native';
+import { Animated, Platform, StyleSheet, View, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SocialWebviewModal } from './Login/SocialWebviewModal';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-	appleAuth,
-	AppleButton,
-} from '@invertase/react-native-apple-authentication';
-// prettier-ignore
-import {
-  SafeAreaView,
-  
-  UnderlineText,
-  TextInput,
-  TouchableView,
-  TopBar,
-  MaterialCommunityIcon as Icon,
+	SafeAreaView,
+	TouchableView,
+	MaterialCommunityIcon as Icon,
 } from '../theme/navigation';
 import { useAutoFocus, AutoFocusProvider } from '../contexts';
 import { Colors } from 'react-native-paper';
@@ -36,6 +20,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import { cloneHomeDate, setTodayDate } from '../store/individual';
+import { getUserMe } from '../store/login';
 dayjs.locale('ko');
 
 export default function Login() {
@@ -111,6 +96,7 @@ export default function Login() {
 	const goTabNavigator = useCallback(() => navigation.navigate('TabNavigator'), []);
 	useEffect(() => {
 		if (token) {
+			dispatch(getUserMe({ token }));
 			dispatch(cloneHomeDate({ start: homeTime.start, end: homeTime.end }));
 			setTimeout(() => {
 				navigation.navigate('TabNavigator');
