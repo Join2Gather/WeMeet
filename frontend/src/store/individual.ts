@@ -78,7 +78,7 @@ const initialState: individual = {
 	groupCount: 0,
 	homeTime: {
 		start: 0,
-		end: 0,
+		end: 24,
 	},
 };
 
@@ -115,7 +115,7 @@ export const individualSlice = createSlice({
 							}
 							for (let i = d.starting_hours; i <= d.end_hours; i++) {
 								if (d.starting_hours === d.end_hours) {
-									for (let j = startingMinute; j <= endMinute; j++) {
+									for (let j = startingMinute; j < endMinute; j++) {
 										if (state.individualDates[idx].times[i])
 											makeTime(
 												state.individualDates[idx].times[i][j],
@@ -217,7 +217,7 @@ export const individualSlice = createSlice({
 
 						for (let i = d.starting_hours; i <= d.end_hours; i++) {
 							if (d.starting_hours === d.end_hours) {
-								for (let j = startingMinute; j <= endMinute; j++) {
+								for (let j = startingMinute; j < endMinute; j++) {
 									makeTime(
 										state.individualDates[idx].times[i][j],
 										'team',

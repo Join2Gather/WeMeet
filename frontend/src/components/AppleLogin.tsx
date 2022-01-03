@@ -80,6 +80,7 @@ async function onAppleButtonPress(setToken: any, user: any) {
 		);
 
 		if (identityToken) {
+			Alert.alert('Token', identityToken);
 			// e.g. sign in with Firebase Auth using `nonce` & `identityToken`
 			console.log('nonce', nonce, identityToken);
 			setToken(identityToken);

@@ -15,6 +15,7 @@ import {
 	checkIsBlank,
 	makeInitialTimePicked,
 	toggleIsInitial,
+	setSelectIdx,
 } from '../store/timetable';
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
@@ -99,6 +100,7 @@ export function ModalTimePicker({
 		startHour,
 		endHour,
 		confirmCount,
+		selectIdx,
 	} = useSelector(({ timetable, login, individual }: RootState) => ({
 		postConfirmSuccess: timetable.postConfirmSuccess,
 		confirmClubs: login.confirmClubs,
@@ -113,6 +115,7 @@ export function ModalTimePicker({
 		startHour: timetable.startHour,
 		endHour: timetable.endHour,
 		confirmCount: timetable.confirmCount,
+		selectIdx: timetable.selectIdx,
 	}));
 	const dispatch = useDispatch();
 	// const [minute, setMinute] = useState(0);
@@ -216,6 +219,7 @@ export function ModalTimePicker({
 			setCurrent && setCurrent(0);
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
+			dispatch(setSelectIdx(0));
 			if (isHomeTime)
 				dispatch(setInEndTime({ hour: timeHour, min: timeMinute }));
 			else {
@@ -265,6 +269,7 @@ export function ModalTimePicker({
 		setIsTimeMode && setIsTimeMode(false);
 		setCurrent && setCurrent(0);
 		setMode && setMode('normal');
+		dispatch(setSelectIdx(0));
 		if (isHomeTime) {
 			dispatch(initialTimeMode());
 			initialWithError();
@@ -342,7 +347,7 @@ export function ModalTimePicker({
 				title={
 					isConfirm
 						? findTime && findTime.length !== 0
-							? `시작시간 설정\n 가능 시간 : [ ${findTime[0].timeText} ]`
+							? `시작시간 설정\n 가능 시간 : [ ${findTime[selectIdx].timeText} ]`
 							: ``
 						: '시작시간 설정'
 				}
@@ -372,7 +377,7 @@ export function ModalTimePicker({
 				title={
 					isConfirm
 						? findTime && findTime.length !== 0
-							? `종료시간 설정\n${findTime[0].timeText}`
+							? `종료시간 설정\n${findTime[selectIdx].timeText}`
 							: ''
 						: `시작 시간 : ${
 								startTime.hour > 12 ? startTime.hour - 12 : startTime.hour

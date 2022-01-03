@@ -143,9 +143,6 @@ export default function TeamTime({ route }: Props) {
 
 	const onPressGrInBtn = useCallback((groupMode) => {
 		setGroupMode(groupMode);
-		setTimeout(() => {
-			!groupMode && dispatch(toggleIsInitial(false));
-		}, 500);
 	}, []);
 	return (
 		<>
@@ -258,6 +255,17 @@ export default function TeamTime({ route }: Props) {
 											style={[styles.boxView, { backgroundColor: color }]}
 										/>
 										<Text style={styles.infoText}>가능 일정</Text>
+										{isOverlap && (
+											<>
+												<View
+													style={[
+														styles.boxView,
+														{ backgroundColor: Colors.grey600 },
+													]}
+												/>
+												<Text style={styles.infoText}>겹쳐진 일정</Text>
+											</>
+										)}
 										<View
 											style={[
 												styles.boxView,
@@ -272,17 +280,6 @@ export default function TeamTime({ route }: Props) {
 											]}
 										/>
 										<Text style={styles.infoText}>비어있는 일정</Text>
-										{isOverlap && (
-											<>
-												<View
-													style={[
-														styles.boxView,
-														{ backgroundColor: Colors.black },
-													]}
-												/>
-												<Text style={styles.infoText}>겹쳐진 일정</Text>
-											</>
-										)}
 									</View>
 								</View>
 							)}

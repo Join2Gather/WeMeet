@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { StyleSheet, ScrollView, Alert } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 // prettier-ignore
 import {SafeAreaView, View,

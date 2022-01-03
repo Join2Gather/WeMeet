@@ -23,8 +23,6 @@ import { Button } from '../lib/util/Button';
 import { changeTimetableColor, getSnapShot } from '../store/timetable';
 import { getUserMe, makeGroupColor, setAlarmTime } from '../store/login';
 import { useNavigation } from '@react-navigation/core';
-import MakeAlarm from '../lib/util/MakeAlarm';
-import { ModalDatePicker } from './ModalDatePicker';
 
 const screen = Dimensions.get('screen');
 

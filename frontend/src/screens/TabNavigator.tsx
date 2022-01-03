@@ -4,7 +4,6 @@ import { Colors } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import HomeNavigator from './HomeNavigator';
 import Home from './Home';
-import TeamList from './TeamList';
 import { RouteProp, ParamListBase } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';

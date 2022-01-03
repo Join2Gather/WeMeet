@@ -3,8 +3,9 @@ import React, { useEffect } from 'react';
 import { WebView } from 'react-native-webview';
 import { useDispatch } from 'react-redux';
 import { kakaoLogin } from '../../store/individual';
-import { getSocialLogin } from '../../store/login';
+import { getSocialLogin, setAppleToken } from '../../store/login';
 import type { kakaoLoginAPI } from '../../interface';
+import { getUserMe } from '../../lib/api/login';
 // import { useAsyncStorage } from '@react-native-community/async-storage';
 // const { setItem } = useAsyncStorage('토큰 key 값');
 
@@ -36,9 +37,11 @@ export function SocialWebview({ closeSocialModal, source }: any) {
 			dates: result.profiles[0].dates,
 		};
 		// let userToken = result.Authorization;
-
+		console.log('token', data.token);
 		try {
-			dispatch(getSocialLogin(data));
+			dispatch(setAppleToken(data.token));
+			dispatch(getUserMe({ token: data.token }));
+			// dispatch(getSocialLogin(data));
 		} catch (e) {
 			console.log(e);
 		}

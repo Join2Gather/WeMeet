@@ -12,10 +12,8 @@ import {
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { hexToRGB } from '../lib/util/hexToRGB';
 import type { findTime } from '../interface/timetable';
 import {
-	deletePostTime,
 	makeTeamTime,
 	setTeamName,
 	setTimeModalMode,
@@ -25,7 +23,7 @@ import { Button } from '../lib/util/Button';
 import { deleteHomeTime, initialTimeMode } from '../store/individual';
 import { RootState } from '../store';
 import { Spinner } from '.';
-import { findTeam, initialFindIn } from '../store/login';
+import { findTeam } from '../store/login';
 import { useNavigation } from '@react-navigation/native';
 const screen = Dimensions.get('screen');
 
@@ -71,11 +69,11 @@ export function ModalIndividualTime({
 	const [teamId, setId] = useState('');
 
 	useEffect(() => {
-		if (findIndividual && findIndividual[0]?.id) {
+		if (findIndividual && findIndividual[0]?.id && inModalVisible) {
 			const id = String(findIndividual[0].id);
 			dispatch(findTeam({ id: id }));
 		}
-	}, [findIndividual, teamId]);
+	}, [findIndividual, teamId, inModalVisible]);
 
 	const onPressCloseBtn = useCallback(() => {
 		setInModalVisible && setInModalVisible(false);
@@ -159,7 +157,7 @@ export function ModalIndividualTime({
 						{findIndividual && findIndividual[0] && (
 							<>
 								<View style={styles.blankView} />
-								<Text style={styles.titleText}>모임명</Text>
+								<Text style={[styles.titleText]}>모임명</Text>
 								<View style={styles.blankView} />
 
 								<View
@@ -174,7 +172,12 @@ export function ModalIndividualTime({
 								>
 									<View style={styles.columnView}>
 										<View style={styles.rowView}>
-											<Text style={(styles.touchText, { color: Colors.white })}>
+											<Text
+												style={
+													(styles.touchText,
+													{ color: Colors.white, fontSize: 15 })
+												}
+											>
 												{findIndividual[0].name}
 											</Text>
 										</View>

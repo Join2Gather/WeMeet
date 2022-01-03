@@ -51,6 +51,7 @@ export interface timetable {
 	alarmArray: alarm_time[];
 	isInitial: boolean;
 	isOverlap: boolean;
+	selectIdx: number;
 }
 
 export type weekIndex = Array<string>;

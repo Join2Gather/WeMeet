@@ -9,21 +9,18 @@ import {
 	TextInput,
 	ActivityIndicator,
 	Dimensions,
-	Platform,
 	KeyboardAvoidingView,
 } from 'react-native';
 
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import {
-	changeColor,
 	initialError,
 	inputTeamName,
 	joinTeam,
 	postTeamName,
 	setModalMode,
 } from '../store/team';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
@@ -33,7 +30,7 @@ import { makeTeamTime, setTimeMode } from '../store/timetable';
 import { Button } from '../lib/util/Button';
 import { Sequence } from './Sequence';
 import { current } from '@reduxjs/toolkit';
-import { AutoFocusProvider, useAutoFocus } from '../contexts';
+import { useAutoFocus } from '../contexts';
 const screen = Dimensions.get('screen');
 interface props {
 	modalVisible: boolean;
@@ -75,7 +72,7 @@ export function ModalInput({
 	const dispatch = useDispatch();
 	// const [name, setName] = useState('2ff148e7-05b9-461e-a2c2-1d3ccce16ba9');
 	const [name, setName] = useState('');
-	const [code, setCode] = useState('55ea52d6-649e-41e1-9034-ee6cc7d6bd69');
+	const [code, setCode] = useState('');
 	const [mode, setMode] = useState('initial');
 	const [color, setColor] = useState(Colors.red500);
 	const [startTime, setStartTime] = useState('9');
@@ -92,7 +89,7 @@ export function ModalInput({
 	useEffect(() => {
 		mode === 'send' && modeChange();
 	}, [mode]);
-	const focus = useAutoFocus();
+
 	// useCallback
 	const modeChange = useCallback(() => {
 		if (mode === 'send') {
@@ -267,7 +264,6 @@ export function ModalInput({
 
 											<View style={[styles.textInputView]}>
 												<TextInput
-													onFocus={focus}
 													style={[styles.textInput, { color: Colors.black }]}
 													value={code}
 													onChangeText={(code) => setCode((text) => code)}
@@ -290,7 +286,6 @@ export function ModalInput({
 											<Text style={styles.titleText}>모임명을 입력하세요</Text>
 											<View style={[styles.textInputView]}>
 												<TextInput
-													onFocus={focus}
 													style={[styles.textInput, { color: Colors.black }]}
 													value={name}
 													onChangeText={(name) => setName((text) => name)}
@@ -322,7 +317,6 @@ export function ModalInput({
 									<Text style={styles.timeInputText}>시작 시간 : </Text>
 									<View style={styles.timeInputView}>
 										<TextInput
-											onFocus={focus}
 											style={[styles.timeInput, { color: Colors.black }]}
 											value={startTime}
 											onChangeText={(hour) => setStartTime((text) => hour)}
@@ -337,7 +331,6 @@ export function ModalInput({
 									<Text style={styles.timeInputText}>종료 시간 : </Text>
 									<View style={styles.timeInputView}>
 										<TextInput
-											onFocus={focus}
 											style={[styles.timeInput, { color: Colors.black }]}
 											value={endTime}
 											onChangeText={(hour) => setEndTime((text) => hour)}
@@ -426,23 +419,6 @@ export function ModalInput({
 								/>
 							</>
 						)}
-
-						{/* <View style={styles.buttonRowView}>
-						<TouchableHighlight
-							activeOpacity={0.1}
-							underlayColor={Colors.grey200}
-							style={styles.closeButtonStyle}
-							onPress={() => {
-								joinTeamError
-									? onCloseError()
-									: mode === '3'
-									? onMoveTeamTime()
-									: onChangeInput();
-							}}
-						>
-							<Text style={styles.buttonText}>확인</Text>
-						</TouchableHighlight>
-					</View> */}
 					</View>
 				</View>
 			</KeyboardAvoidingView>
@@ -516,7 +492,6 @@ const styles = StyleSheet.create({
 	},
 	textInputView: {
 		paddingBottom: 2,
-		backgroundColor: Colors.grey100,
 		borderBottomWidth: 0.3,
 		width: '60%',
 		justifyContent: 'center',
