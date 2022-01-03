@@ -212,6 +212,7 @@ const initialState: timetable = {
 	alarmArray: [],
 	isInitial: true,
 	isOverlap: false,
+	selectIdx: 0,
 };
 
 export const timetableSlice = createSlice({
@@ -323,6 +324,7 @@ export const timetableSlice = createSlice({
 			// state.loginSuccess = true;
 			state.postDatesPrepare = false;
 			state.reload = true;
+			state.isInitial = true;
 		},
 		POST_INDIVIDUAL_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
@@ -683,6 +685,10 @@ export const timetableSlice = createSlice({
 			);
 			// 시간표 생성
 			state.dates = defaultDatesWith60;
+			state.timesText = timesText;
+		},
+		setSelectIdx: (state, action: PayloadAction<number>) => {
+			state.selectIdx = action.payload;
 		},
 		// checkTimeMode(state, action:PayloadAction<)
 	},
@@ -723,6 +729,7 @@ export const {
 	toggleIsInitial,
 	makeInitialOverlap,
 	makeInitialIndividual,
+	setSelectIdx,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;
