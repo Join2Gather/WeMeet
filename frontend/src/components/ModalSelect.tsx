@@ -8,13 +8,17 @@ import {
 	View,
 	TextInput,
 	Dimensions,
+	ActivityIndicator,
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import AntIcon from 'react-native-vector-icons/AntDesign';
-import IonicIcon from 'react-native-vector-icons/Ionicons';
+import Material from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { loginEveryTime, postEveryTime } from '../store/individual';
+import {
+	initialIndividualError,
+	loginEveryTime,
+	postEveryTime,
+} from '../store/individual';
 import type { RootState } from '../store';
 import { setModalMode } from '../store/team';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
@@ -27,6 +31,7 @@ interface props {
 	setSelectModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 	mode: string;
 	setMode: React.Dispatch<React.SetStateAction<string>>;
+	color: string;
 }
 
 export function ModalSelect({
@@ -34,6 +39,7 @@ export function ModalSelect({
 	setSelectModalVisible,
 	mode,
 	setMode,
+	color,
 }: props) {
 	const {
 		everyTime,
@@ -43,6 +49,7 @@ export function ModalSelect({
 		loginSuccess,
 		token,
 		individualColor,
+		loginError,
 	} = useSelector(({ individual, login, loading }: RootState) => ({
 		// dates: timetable.dates,
 		everyTime: individual.everyTime,
@@ -52,6 +59,7 @@ export function ModalSelect({
 		loginSuccess: individual.loginSuccess,
 		token: login.token,
 		individualColor: login.individualColor,
+		loginError: individual.error,
 	}));
 	const dispatch = useDispatch();
 
@@ -60,20 +68,25 @@ export function ModalSelect({
 
 	const onPressLogin = useCallback(() => {
 		dispatch(loginEveryTime({ id: loginID, password: password }));
-		setSelectModalVisible(false);
-		setMode('normal');
+		setMode('loading');
+		// setTimeout(() => setMode('loading2'), 500);
 	}, [loginID, password]);
 	const onPressCloseBtn = useCallback(() => {
 		setModalMode('normal');
 		setMode('normal');
 		setSelectModalVisible(false);
+		dispatch(initialIndividualError());
 	}, []);
 	useEffect(() => {
-		loginSuccess &&
-			dispatch(
-				postEveryTime({ id: id, user: user, data: everyTime, token: token })
-			);
+		if (loginSuccess) {
+			dispatch(postEveryTime({ id, user, data: everyTime, token }));
+			setMode('loading2');
+			setTimeout(() => setMode('success'), 500);
+		}
 	}, [loginSuccess, id, user, everyTime, token]);
+	useEffect(() => {
+		loginError === 'everyTime' && setMode('error');
+	}, [loginError]);
 	return (
 		// <AutoFocusProvider contentContainerStyle={[styles.keyboardAwareFocus]}>
 		<Modal
@@ -103,12 +116,17 @@ export function ModalSelect({
 							}}
 							onPress={onPressCloseBtn}
 						>
-							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
+							<Icon
+								style={{ alignSelf: 'flex-end' }}
+								name="close"
+								size={25}
+								color={Colors.black}
+							/>
 						</TouchableHighlight>
 					</View>
 
 					{mode === 'everytime' && (
-						<View>
+						<>
 							<View style={styles.blankView} />
 							{/* <Text style={styles.titleText}>에브리 타임</Text> */}
 							<View
@@ -130,7 +148,7 @@ export function ModalSelect({
 										}}
 									/>
 									<TextInput
-										style={[styles.textInput]}
+										style={[styles.textInput, { borderColor: color }]}
 										value={loginID}
 										onChangeText={(loginID) => setID((text) => loginID)}
 										autoCapitalize="none"
@@ -154,8 +172,8 @@ export function ModalSelect({
 									<TextInput
 										autoCapitalize="none"
 										autoCompleteType="password"
-										secureTextEntry={true}
-										style={[styles.textInput]}
+										// secureTextEntry={true}
+										style={[styles.textInput, { borderColor: color }]}
 										value={password}
 										onChangeText={(userPw) => setPassword((text) => userPw)}
 										placeholder="PASSWORD"
@@ -175,13 +193,78 @@ export function ModalSelect({
 								</TouchableHighlight> */}
 							</View>
 							<View style={styles.blankView} />
-							{/* <View style={styles.button}/> */}
+							<View style={styles.buttonOverLine} />
 							<Button
 								buttonNumber={1}
 								buttonText="로그인"
 								onPressFunction={onPressLogin}
 							/>
-						</View>
+						</>
+					)}
+					{mode === 'loading' && (
+						<>
+							<View style={styles.blankView} />
+							<ActivityIndicator size={'large'} color={color} />
+							<Text style={[styles.buttonText, { marginTop: 15 }]}>
+								로그인 중
+							</Text>
+							<View style={styles.blankView} />
+						</>
+					)}
+					{mode === 'loading2' && (
+						<>
+							<View style={styles.blankView} />
+							<ActivityIndicator size={'large'} color={color} />
+							<Text style={[styles.buttonText, { marginTop: 15 }]}>
+								동기화 중
+							</Text>
+							<View style={styles.blankView} />
+						</>
+					)}
+					{mode === 'success' && (
+						<>
+							<View style={styles.blankView} />
+							<View style={[styles.rowView, { justifyContent: 'center' }]}>
+								<Font5Icon
+									name="check-circle"
+									size={19}
+									color={Colors.green500}
+								/>
+								<Text style={styles.touchText}>
+									{' '}
+									시간표 연동이 완료 되었습니다
+								</Text>
+							</View>
+							<View style={styles.blankView} />
+							<View style={styles.buttonOverLine} />
+
+							<Button
+								buttonNumber={1}
+								buttonText="확인"
+								onPressFunction={onPressCloseBtn}
+							/>
+						</>
+					)}
+					{mode === 'error' && (
+						<>
+							<View style={styles.blankView} />
+							<View style={[styles.rowView, { justifyContent: 'center' }]}>
+								<Material
+									name={'error-outline'}
+									size={25}
+									color={Colors.red300}
+								/>
+								<Text style={styles.touchText}> 로그인 실패</Text>
+							</View>
+							<View style={styles.blankView} />
+							<View style={styles.buttonOverLine} />
+							<Button
+								buttonNumber={1}
+								buttonText="확인"
+								onPressFunction={onPressCloseBtn}
+							/>
+							<View />
+						</>
 					)}
 				</View>
 			</View>
@@ -230,6 +313,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		fontFamily: 'NanumSquareR',
 		marginLeft: '0%',
+		color: Colors.black,
 	},
 	textInputView: {
 		flexDirection: 'row',
@@ -333,7 +417,7 @@ const styles = StyleSheet.create({
 	},
 	buttonOverLine: {
 		borderTopWidth: 0.4,
-		width: '90%',
+		width: '112%',
 		marginTop: 20,
 		borderColor: Colors.black,
 	},
