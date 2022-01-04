@@ -1,8 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { Platform } from 'react-native';
-// import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { Alert, Platform } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
 import DatePicker from 'react-native-date-picker';
@@ -58,7 +56,8 @@ export function ModalHomeTimePicker({ homeVisible, setHomeVisible }: props) {
 
 	const onPressFirstConfirm = useCallback((date) => {
 		setDate(date);
-		const start = dayjs(date);
+		const start = date.getHours();
+		console.log(start);
 
 		setTimeout(() => {
 			setSecond(true);
@@ -68,12 +67,18 @@ export function ModalHomeTimePicker({ homeVisible, setHomeVisible }: props) {
 		(second) => {
 			const start = date.getHours();
 
-			const end = second.getHours() + 1;
-			console.log(start, end);
-			dispatch(cloneDates({ start: start, end: end }));
-			dispatch(setHomeTime({ start: start, end: end }));
-
-			// dispatch(setApp)
+			let end = second.getHours();
+			if (end === 0) {
+				end = 24;
+			}
+			if (end < start) {
+				Alert.alert('경고', '종료 시간이 시작 시간보다 작을 수 없습니다', [
+					{ text: '확인' },
+				]);
+			} else {
+				dispatch(cloneDates({ start: start, end: end }));
+				dispatch(setHomeTime({ start: start, end: end }));
+			}
 			setTimeout(() => {
 				dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
 			}, 100);
