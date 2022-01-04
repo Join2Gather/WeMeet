@@ -11,6 +11,7 @@ import {
 	DayOfWeek,
 	ModalConfirm,
 	ModalDatePicker,
+	ModalInfo,
 	Spinner,
 } from '../components';
 import { Timetable } from '../components/Timetable';
@@ -59,6 +60,8 @@ export default function TeamTime({ route }: Props) {
 		isConfirmProve,
 		alarmTime,
 		isOverlap,
+		seeTips,
+		seeTimeTips,
 	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
 		uri: timetable.teamURI,
 		color: timetable.color,
@@ -80,6 +83,8 @@ export default function TeamTime({ route }: Props) {
 		isConfirmProve: login.isConfirmProve,
 		alarmTime: login.alarmTime,
 		isOverlap: timetable.isOverlap,
+		seeTips: login.seeTips,
+		seeTimeTips: login.seeTimeTips,
 	}));
 	// navigation
 	const { id, user, token, modalMode } = route.params;
@@ -100,16 +105,25 @@ export default function TeamTime({ route }: Props) {
 	const [currentNumber, setCurrent] = useState(0);
 	const [sequence, setSequence] = useState([0, 1, 2]);
 	const [dateVisible, setDateVisible] = useState(false);
+	const [infoVisible, setInfoVisible] = useState(true);
 	// initial
 	useEffect(() => {
 		makeReady && dispatch(makeInitialTimetable());
 	}, [name, makeReady]);
 
 	useEffect(() => {
+		!seeTimeTips && setInfoVisible(false);
+	}, [seeTimeTips]);
+
+	useEffect(() => {
 		if (joinTeamError || error !== '') {
 			navigation.navigate('TeamList');
 		}
 	}, [joinTeamError, loadingJoin, error]);
+
+	useEffect(() => {
+		!seeTimeTips && setInfoVisible(false);
+	}, [seeTimeTips]);
 
 	useEffect(() => {
 		isOverlap &&
@@ -156,7 +170,7 @@ export default function TeamTime({ route }: Props) {
 							<TouchableHighlight underlayColor={color} onPress={goLeft}>
 								<Icon
 									name="angle-left"
-									size={22}
+									size={23}
 									color={Colors.white}
 									// style={{ marginLeft: '3%' }}
 								/>
@@ -167,10 +181,11 @@ export default function TeamTime({ route }: Props) {
 								<TouchableHighlight
 									underlayColor={color}
 									onPress={goConfirmPage}
+									style={{ padding: 5 }}
 								>
 									<MIcon
 										name="check-bold"
-										size={20}
+										size={23}
 										color={Colors.white}
 										style={{ paddingTop: 1 }}
 									/>
@@ -179,12 +194,12 @@ export default function TeamTime({ route }: Props) {
 								<TouchableHighlight
 									underlayColor={color}
 									onPress={onPressPlusBtn}
+									style={{ padding: 5 }}
 								>
 									<FontAwesome5Icon
 										name="plus"
-										size={22}
+										size={25}
 										color={Colors.white}
-										style={{ paddingTop: 1 }}
 									/>
 								</TouchableHighlight>
 							)
@@ -193,10 +208,20 @@ export default function TeamTime({ route }: Props) {
 							<TouchableHighlight
 								underlayColor={color}
 								onPress={() => setSettingModalVisible(true)}
+								style={{ padding: 5 }}
 							>
-								<MaterialIcon
-									name="settings"
-									size={24}
+								<MaterialIcon name="settings" size={27} color={Colors.white} />
+							</TouchableHighlight>
+						)}
+						thirdRight={() => (
+							<TouchableHighlight
+								underlayColor={color}
+								onPress={() => setInfoVisible(true)}
+								style={{ padding: 5 }}
+							>
+								<FontAwesome5Icon
+									name="question-circle"
+									size={25}
 									color={Colors.white}
 									style={{ paddingTop: 1 }}
 								/>
@@ -372,6 +397,12 @@ export default function TeamTime({ route }: Props) {
 							isOverlap={isOverlap}
 						/>
 					</ScrollView>
+					<ModalInfo
+						infoVisible={infoVisible}
+						setInfoVisible={setInfoVisible}
+						seeTips={seeTips}
+						color={color}
+					/>
 				</View>
 			</SafeAreaView>
 		</>
