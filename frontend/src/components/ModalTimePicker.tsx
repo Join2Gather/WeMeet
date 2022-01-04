@@ -1,6 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { Alert, Platform, StyleSheet } from 'react-native';
-// import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { Alert, Platform } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import {
 	changeConfirmTime,
@@ -149,7 +148,6 @@ export function ModalTimePicker({
 			} else {
 				if (!isConfirm && !isTimePicked) {
 					dispatch(makePostIndividualDates());
-					dispatch(toggleIsInitial(true));
 				} else if (isConfirm && !isTimeNoExist) {
 					dispatch(makeConfirmDates());
 				}
