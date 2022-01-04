@@ -52,6 +52,8 @@ const initialState: Login = {
 		end: 25,
 	},
 	loading: '',
+	seeTips: true,
+	seeTimeTips: true,
 };
 
 const USER_ME = 'login/USER_ME';
@@ -240,6 +242,12 @@ export const loginSlice = createSlice({
 		setAppLoading: (state, action: PayloadAction<string>) => {
 			state.loading = action.payload;
 		},
+		setTipMode: (state, action: PayloadAction<boolean>) => {
+			state.seeTips = action.payload;
+		},
+		setTimeTipMode: (state, action: PayloadAction<boolean>) => {
+			state.seeTimeTips = action.payload;
+		},
 	},
 	extraReducers: {},
 });
@@ -255,6 +263,8 @@ export const {
 	confirmProve,
 	setHomeTime,
 	setAppLoading,
+	setTipMode,
+	setTimeTipMode,
 } = loginSlice.actions;
 
 export default loginSlice.reducer;
