@@ -19,6 +19,7 @@ import {
 	ModalSelect,
 	DayOfWeek,
 	ModalHomeTimePicker,
+	ModalInfo,
 } from '../components';
 import { Timetable } from '../components/Timetable';
 import type { LeftRightNavigationMethods } from '../components';
@@ -87,8 +88,7 @@ export default function Home() {
 	const {
 		token,
 		individualDates,
-		loginEveryTime,
-		postEveryTime,
+
 		id,
 		user,
 		userMeSuccess,
@@ -96,32 +96,29 @@ export default function Home() {
 		confirmDatesTimetable,
 		individualTimesText,
 		individualColor,
-		myNickName,
-		joinClubNum,
-		confirmClubNum,
+
 		individualCount,
 		groupCount,
 		endHour,
 		appLoading,
+		seeTips,
 	} = useSelector(({ login, individual, loading }: RootState) => ({
 		token: login.token,
 		id: login.id,
 		user: login.user,
 		individualDates: individual.individualDates,
-		loginEveryTime: loading['individual/LOGIN_EVERYTIME'],
-		postEveryTime: loading['individual/POST_EVERYTIME'],
+
 		userMeSuccess: login.userMeSuccess,
 		confirmClubs: login.confirmClubs,
 		confirmDatesTimetable: login.confirmDatesTimetable,
 		individualTimesText: individual.individualTimesText,
 		individualColor: login.individualColor,
-		myNickName: login.nickname,
-		joinClubNum: login.joinClubNum,
-		confirmClubNum: login.confirmClubNum,
+
 		individualCount: individual.individualCount,
 		groupCount: individual.groupCount,
 		endHour: login.homeTime.end,
 		appLoading: login.loading,
+		seeTips: login.seeTips,
 	}));
 
 	// useEffect(() => {
@@ -161,8 +158,12 @@ export default function Home() {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [selectModalVisible, setSelectModalVisible] = useState(false);
 	const [settingModalVisible, setSettingModalVisible] = useState(false);
+	const [infoVisible, setInfoVisible] = useState(true);
 	const flatListRef = useRef<FlatList | null>(null);
 
+	useEffect(() => {
+		!seeTips && setInfoVisible(false);
+	}, [seeTips]);
 	// image pic1er
 
 	const [mode, setMode] = useState('normal');
@@ -197,10 +198,14 @@ export default function Home() {
 					title="내 일정 등록하기"
 					headerColor={individualColor}
 					Left={() => (
-						<TouchableHighlight underlayColor={individualColor} onPress={open}>
+						<TouchableHighlight
+							underlayColor={individualColor}
+							onPress={open}
+							style={{ padding: 0 }}
+						>
 							<Ionic
 								name="menu"
-								size={33}
+								size={36}
 								color={Colors.white}
 								// style={{ paddingTop: 1 }}
 							/>
@@ -210,12 +215,13 @@ export default function Home() {
 						<TouchableHighlight
 							underlayColor={individualColor}
 							onPress={onPressPlus}
+							style={{ padding: 5 }}
 						>
 							<FontAwesome5Icon
 								name="plus"
-								size={22}
+								size={25}
 								color={Colors.white}
-								style={{ paddingTop: 2 }}
+								style={{}}
 							/>
 						</TouchableHighlight>
 					)}
@@ -223,10 +229,20 @@ export default function Home() {
 						<TouchableHighlight
 							underlayColor={individualColor}
 							onPress={() => setSettingModalVisible(true)}
+							style={{ padding: 5 }}
 						>
-							<MaterialIcon
-								name="settings"
-								size={24}
+							<MaterialIcon name="settings" size={27} color={Colors.white} />
+						</TouchableHighlight>
+					)}
+					thirdRight={() => (
+						<TouchableHighlight
+							underlayColor={individualColor}
+							onPress={() => setInfoVisible(true)}
+							style={{ padding: 5 }}
+						>
+							<FontAwesome5Icon
+								name="question-circle"
+								size={25}
 								color={Colors.white}
 								style={{ paddingTop: 1 }}
 							/>
@@ -356,6 +372,11 @@ export default function Home() {
 						token={token}
 						color={individualColor}
 						onPressChangeTime={onPressChangeTime}
+					/>
+					<ModalInfo
+						infoVisible={infoVisible}
+						setInfoVisible={setInfoVisible}
+						seeTips={seeTips}
 					/>
 				</ScrollView>
 			</View>

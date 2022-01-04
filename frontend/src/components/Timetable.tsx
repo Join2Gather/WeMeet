@@ -177,6 +177,8 @@ export function Timetable({
 	useEffect(() => {
 		if (isInitial) {
 			if (uri) {
+				dispatch(makeInitialIndividual());
+
 				if (timeMode === 'make')
 					dispatch(getGroupDates({ id, user, token, uri: joinUri }));
 				else dispatch(getGroupDates({ id, user, token, uri }));
@@ -191,13 +193,12 @@ export function Timetable({
 					);
 				}, 200);
 
-				dispatch(makeInitialIndividual());
+				if (timeMode == 'make')
+					dispatch(getIndividualDates({ id, user, token, uri: joinUri }));
+				else {
+					dispatch(getIndividualDates({ id, user, token, uri }));
+				}
 				setTimeout(() => {
-					if (timeMode == 'make')
-						dispatch(getIndividualDates({ id, user, token, uri: joinUri }));
-					else {
-						dispatch(getIndividualDates({ id, user, token, uri }));
-					}
 					dispatch(
 						getOtherConfirmDates({
 							confirmClubs,

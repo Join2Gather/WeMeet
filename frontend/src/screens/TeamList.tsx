@@ -248,10 +248,11 @@ export default function TeamList() {
 						<TouchableHighlight
 							underlayColor={individualColor}
 							onPress={onReload}
+							style={{ padding: 5 }}
 						>
 							<FontAwesome5Icon
 								name="redo-alt"
-								size={22}
+								size={25}
 								color={Colors.white}
 								style={{ paddingTop: 1 }}
 							/>
@@ -261,10 +262,11 @@ export default function TeamList() {
 						<TouchableHighlight
 							underlayColor={individualColor}
 							onPress={onMakeTeamTime}
+							style={{ padding: 5 }}
 						>
 							<FontAwesome5Icon
 								name="plus"
-								size={22}
+								size={25}
 								color={Colors.white}
 								style={{ paddingTop: 1 }}
 							/>
@@ -272,16 +274,20 @@ export default function TeamList() {
 					)}
 				/>
 				{/* <Spinner loading={userLoading} /> */}
-				{clubs.length && (
+				{clubs.length !== 0 && (
 					<Text style={[styles.headerUnderText]}>Plan list</Text>
 				)}
 
 				{!clubs.length && (
 					<View
-						style={{ flexDirection: 'column', marginLeft: '11%', flex: 0.3 }}
+						style={{
+							flexDirection: 'column',
+							marginLeft: '16%',
+							marginTop: 20,
+							flex: 0.3,
+						}}
 					>
 						<Text style={styles.noListText}>아직 아무런 모임이 없네요 😭</Text>
-
 						<Text style={styles.noListText}>
 							1. 상단의 "+" 버튼을 눌러 모임을 생성 하거나
 						</Text>

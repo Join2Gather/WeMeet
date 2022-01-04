@@ -20,7 +20,11 @@ import { hexToRGB } from '../lib/util/hexToRGB';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import { changeColor, leaveTeam, setModalMode } from '../store/team';
 import { Button } from '../lib/util/Button';
-import { changeTimetableColor, getSnapShot } from '../store/timetable';
+import {
+	changeTimetableColor,
+	deleteAllIndividual,
+	getSnapShot,
+} from '../store/timetable';
 import { getUserMe, makeGroupColor, setAlarmTime } from '../store/login';
 import { useNavigation } from '@react-navigation/core';
 
@@ -166,7 +170,11 @@ export function ModalSetting({
 	const onPressAlarmPrevious = useCallback(() => {
 		setSubMode('initial');
 	}, []);
-
+	const onPressDeleteAll = useCallback(() => {
+		dispatch(deleteAllIndividual());
+		setSetting('loading');
+		setSubMode('loading');
+	}, []);
 	return (
 		<Modal
 			animationType="fade"
@@ -249,7 +257,10 @@ export function ModalSetting({
 												name="user-plus"
 												size={20}
 												color={color}
-												style={[styles.iconStyle, { marginTop: 10 }]}
+												style={[
+													styles.iconStyle,
+													{ marginTop: 10, marginLeft: 13 },
+												]}
 											/>
 											<Text style={styles.touchText}>팀원 초대</Text>
 											<View style={styles.iconView}>
@@ -311,6 +322,32 @@ export function ModalSetting({
 												style={styles.iconStyle}
 											/>
 											<Text style={styles.touchText}>알람 설정하기</Text>
+											<View style={styles.iconView}>
+												<Font5Icon
+													name="angle-right"
+													size={19}
+													color={Colors.black}
+													style={styles.rightIconStyle}
+												/>
+											</View>
+										</View>
+									</TouchableHighlight>
+									<TouchableHighlight
+										activeOpacity={1}
+										underlayColor={Colors.grey300}
+										onPress={() => setSetting('question')}
+										style={[styles.touchButtonStyle, { borderRadius: 0 }]}
+									>
+										<View style={styles.rowView}>
+											<Font5Icon
+												name="trash"
+												size={23}
+												color={color}
+												style={styles.iconStyle}
+											/>
+											<Text style={[styles.touchText, { fontSize: 15 }]}>
+												모든 일정 삭제하기
+											</Text>
 											<View style={styles.iconView}>
 												<Font5Icon
 													name="angle-right"
@@ -652,6 +689,31 @@ export function ModalSetting({
 								buttonNumber={1}
 								buttonText="확인"
 								onPressFunction={onCloseLeaveTeam}
+							/>
+						</>
+					)}
+					{settingMode === 'question' && (
+						<>
+							<View style={styles.blankView} />
+							<View style={[styles.rowView, { justifyContent: 'center' }]}>
+								{/* <Font5Icon
+									name="check-circle"
+									size={19}
+									color={Colors.green500}
+								/> */}
+								<Text style={styles.touchText}>
+									{' '}
+									정말로 모든 일정을 삭제 하시겠어요?
+								</Text>
+							</View>
+							<View style={styles.blankView} />
+							<View style={styles.buttonOverLine} />
+							<Button
+								buttonNumber={2}
+								buttonText="취소"
+								secondButtonText="네"
+								onPressFunction={onPressCloseButton}
+								secondOnPressFunction={onPressDeleteAll}
 							/>
 						</>
 					)}

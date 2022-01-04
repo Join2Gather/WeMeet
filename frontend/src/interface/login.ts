@@ -31,6 +31,8 @@ export interface Login {
 	alarmTime: number;
 	homeTime: homeTime;
 	loading: string;
+	seeTips: boolean;
+	seeTimeTips: boolean;
 }
 
 export interface homeTime {

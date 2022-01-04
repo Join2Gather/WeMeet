@@ -10,6 +10,7 @@ import {
 	ActivityIndicator,
 	Dimensions,
 	KeyboardAvoidingView,
+	Platform,
 } from 'react-native';
 
 import { Colors } from 'react-native-paper';
@@ -177,7 +178,11 @@ export function ModalInput({
 				Alert.alert('Modal has been closed.');
 			}}
 		>
-			<KeyboardAvoidingView behavior={'padding'} style={styles.safeAreaView}>
+			<KeyboardAvoidingView
+				behavior={'padding'}
+				enabled={Platform.OS === 'ios' ? true : false}
+				style={styles.safeAreaView}
+			>
 				<View style={styles.centeredView}>
 					<View style={styles.modalView}>
 						{!loadingJoin && (
@@ -554,6 +559,7 @@ const styles = StyleSheet.create({
 	},
 	safeAreaView: {
 		flex: 1,
+		// marginTop: 50,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},

@@ -218,36 +218,40 @@ export const individualSlice = createSlice({
 						for (let i = d.starting_hours; i <= d.end_hours; i++) {
 							if (d.starting_hours === d.end_hours) {
 								for (let j = startingMinute; j < endMinute; j++) {
-									makeTime(
-										state.individualDates[idx].times[i][j],
-										'team',
-										Colors.grey400
-									);
+									if (state.individualDates[idx].times[i])
+										makeTime(
+											state.individualDates[idx].times[i][j],
+											'team',
+											Colors.grey400
+										);
 								}
 							} else {
 								if (i === d.starting_hours) {
 									for (let j = startingMinute; j <= 5; j++) {
-										makeTime(
-											state.individualDates[idx].times[i][j],
-											'team',
-											Colors.grey400
-										);
+										if (state.individualDates[idx].times[i])
+											makeTime(
+												state.individualDates[idx].times[i][j],
+												'team',
+												Colors.grey400
+											);
 									}
 								} else if (i === d.end_hours) {
 									for (let j = 0; j < endMinute; j++) {
-										makeTime(
-											state.individualDates[idx].times[i][j],
-											'team',
-											Colors.grey400
-										);
+										if (state.individualDates[idx].times[i])
+											makeTime(
+												state.individualDates[idx].times[i][j],
+												'team',
+												Colors.grey400
+											);
 									}
 								} else {
 									for (let j = 0; j <= 5; j++) {
-										makeTime(
-											state.individualDates[idx].times[i][j],
-											'team',
-											Colors.grey400
-										);
+										if (state.individualDates[idx].times[i])
+											makeTime(
+												state.individualDates[idx].times[i][j],
+												'team',
+												Colors.grey400
+											);
 									}
 								}
 							}
@@ -256,7 +260,7 @@ export const individualSlice = createSlice({
 			);
 		},
 		LOGIN_EVERYTIME_FAILURE: (state, action: PayloadAction<any>) => {
-			state.error = action.payload;
+			state.error = 'everyTime';
 		},
 		cloneIndividualDates: (state, action: PayloadAction<make_days[]>) => {
 			state.cloneDateSuccess = true;
@@ -379,6 +383,9 @@ export const individualSlice = createSlice({
 		setTodayDate: (state, action: PayloadAction<number>) => {
 			state.todayDate = action.payload;
 		},
+		initialIndividualError: (state) => {
+			state.error = '';
+		},
 	},
 	extraReducers: {},
 });
@@ -399,6 +406,7 @@ export const {
 	setTodayDate,
 	cloneHomeDate,
 	makeHomeTime,
+	initialIndividualError,
 } = individualSlice.actions;
 
 export default individualSlice.reducer;

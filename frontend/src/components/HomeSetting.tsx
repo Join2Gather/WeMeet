@@ -19,13 +19,7 @@ import { hexToRGB } from '../lib/util/hexToRGB';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import { Button } from '../lib/util/Button';
 import Material from 'react-native-vector-icons/MaterialIcons';
-import {
-	changeNickname,
-	changeTeamColor,
-	getUserMe,
-	makeGroupColor,
-} from '../store/login';
-import { useNavigation } from '@react-navigation/core';
+import { changeNickname, changeTeamColor } from '../store/login';
 
 const screen = Dimensions.get('screen');
 
@@ -131,6 +125,7 @@ export function HomeSetting({
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
 						</TouchableHighlight>
 					</View>
+
 					{mode === 'initial' && (
 						<>
 							<>
