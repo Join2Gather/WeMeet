@@ -100,12 +100,16 @@ export function ModalConfirm({
 					<>
 						{mode === 'initial' && (
 							<>
-								<Text style={styles.titleText}>모임 시간을 정하셨나요?</Text>
+								<View style={styles.blankView} />
+								<Text style={[styles.touchText, { fontSize: 15 }]}>
+									모임 시간을 정하셨나요?
+								</Text>
+								<View style={styles.blankView} />
 								<View style={styles.buttonOverLine} />
 								<Button
 									buttonNumber={2}
 									buttonText="취소"
-									secondButtonText="다음"
+									secondButtonText="네"
 									onPressFunction={onPressCloseBtn}
 									secondOnPressWithParam={() => setMode('count')}
 									secondParam={'count'}
@@ -119,7 +123,6 @@ export function ModalConfirm({
 								<View style={{ flexDirection: 'row' }}>
 									<View style={[styles.textInputView]}>
 										<TextInput
-											// onFocus={focus}
 											style={[styles.textInput, { color: Colors.black }]}
 											value={confirmCount}
 											keyboardType="number-pad"
