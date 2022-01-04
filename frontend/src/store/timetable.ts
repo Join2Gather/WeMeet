@@ -572,6 +572,7 @@ export const timetableSlice = createSlice({
 		},
 		changeTimetableColor: (state, action: PayloadAction<string>) => {
 			state.color = action.payload;
+			state.isInitial = true;
 		},
 		findTimeFromResponse: (
 			state,
@@ -684,11 +685,24 @@ export const timetableSlice = createSlice({
 				state.endHour
 			);
 			// 시간표 생성
+			state.teamDatesWith60 = defaultDatesWith60;
 			state.dates = defaultDatesWith60;
 			state.timesText = timesText;
 		},
 		setSelectIdx: (state, action: PayloadAction<number>) => {
 			state.selectIdx = action.payload;
+		},
+		deleteAllIndividual: (state) => {
+			state.postIndividualDates = {
+				sun: [],
+				mon: [],
+				tue: [],
+				wed: [],
+				thu: [],
+				fri: [],
+				sat: [],
+			};
+			state.postDatesPrepare = true;
 		},
 		// checkTimeMode(state, action:PayloadAction<)
 	},
@@ -730,6 +744,7 @@ export const {
 	makeInitialOverlap,
 	makeInitialIndividual,
 	setSelectIdx,
+	deleteAllIndividual,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;
