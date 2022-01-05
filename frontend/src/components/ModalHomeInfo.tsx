@@ -66,7 +66,13 @@ export function ModalHomeInfo({
 
 					<View style={{ justifyContent: 'flex-start' }}>
 						<View style={styles.blankView} />
-						<Text style={styles.touchText}>
+						<Text style={styles.touchText}></Text>
+						<Text
+							style={[
+								styles.touchText,
+								{ marginLeft: screen.width * 0.15 + 1 },
+							]}
+						>
 							WE MEET에 오신걸 환영 합니다 😆
 						</Text>
 						<View style={{ flexDirection: 'row', marginTop: 15 }}>
