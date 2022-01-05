@@ -213,6 +213,7 @@ const initialState: timetable = {
 	isInitial: true,
 	isOverlap: false,
 	selectIdx: 0,
+	loading: '',
 };
 
 export const timetableSlice = createSlice({
@@ -304,7 +305,7 @@ export const timetableSlice = createSlice({
 
 			makeIndividualTimetable(state);
 			addEveryTime(state, state.dates);
-			state.reload = false;
+
 			state.isInitial = false;
 		},
 		GET_INDIVIDUAL_FAILURE: (state, action: PayloadAction<any>) => {
@@ -315,6 +316,7 @@ export const timetableSlice = createSlice({
 			makeGroupTimeTableWith60(state, state.teamDatesWith60);
 			addEveryTime(state, state.teamConfirmDate);
 			makeGroupTimeTableWith60(state, state.teamConfirmDate);
+			state.reload = false;
 		},
 		GET_GROUP_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
@@ -495,8 +497,11 @@ export const timetableSlice = createSlice({
 							state.teamConfirmDate[dayIdx].times[i][j].mode = 'confirm';
 						}
 					} else if (i === state.endTime) {
-						for (let j = 0; j <= endMinute; j++) {
-							if (j === endMinute) {
+						if (endMinute === 0) {
+							state.teamConfirmDate[dayIdx].times[i - 1][5].borderBottom = true;
+						}
+						for (let j = 0; j < endMinute; j++) {
+							if (j === endMinute - 1) {
 								state.teamConfirmDate[dayIdx].times[i][j].borderBottom = true;
 							}
 							state.teamConfirmDate[dayIdx].times[i][j].color = state.color;
@@ -704,6 +709,9 @@ export const timetableSlice = createSlice({
 			};
 			state.postDatesPrepare = true;
 		},
+		setTimetableLoading: (state, action: PayloadAction<string>) => {
+			state.loading = action.payload;
+		},
 		// checkTimeMode(state, action:PayloadAction<)
 	},
 	extraReducers: {},
@@ -745,6 +753,7 @@ export const {
 	makeInitialIndividual,
 	setSelectIdx,
 	deleteAllIndividual,
+	setTimetableLoading,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;
