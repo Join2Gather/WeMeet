@@ -17,7 +17,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Alert } from 'react-native';
+import { StyleSheet, View, Text, Alert, ScrollView } from 'react-native';
 import {
 	appleAuth,
 	AppleButton,
@@ -25,6 +25,10 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { setAppleToken } from '../store/login';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import { Colors } from 'react-native-paper';
+
+import jwtDecode from 'jwt-decode';
 
 /**
  * You'd technically persist this somewhere for later use.
@@ -53,55 +57,11 @@ async function fetchAndUpdateCredentialState(
 /**
  * Starts the Sign In flow.
  */
-async function onAppleButtonPress(setToken: any, user: any) {
-	console.warn('Beginning Apple Authentication');
+// async function onAppleButtonPress(setToken: any, user: any) {
+// 	console.warn('Beginning Apple Authentication');
 
-	// start a login request
-	try {
-		const appleAuthRequestResponse = await appleAuth.performRequest({
-			requestedOperation: appleAuth.Operation.LOGIN,
-			requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-		});
-
-		console.log('appleAuthRequestResponse', appleAuthRequestResponse);
-
-		const {
-			user: newUser,
-			email,
-			nonce,
-			identityToken,
-			realUserStatus /* etc */,
-		} = appleAuthRequestResponse;
-
-		user = newUser;
-
-		fetchAndUpdateCredentialState(setToken, user).catch((error) =>
-			setToken(`Error: ${error.code}`)
-		);
-
-		if (identityToken) {
-			Alert.alert('Token', identityToken);
-			// e.g. sign in with Firebase Auth using `nonce` & `identityToken`
-			console.log('nonce', nonce, identityToken);
-			setToken(identityToken);
-		} else {
-			Alert.alert('로그인 실패');
-		}
-
-		if (realUserStatus === appleAuth.UserStatus.LIKELY_REAL) {
-			console.log("I'm a real person!");
-			Alert.alert('good');
-		}
-
-		console.warn(`Apple Authentication Completed, ${user}, ${email}`);
-	} catch (error: any) {
-		if (error.code === appleAuth.Error.CANCELED) {
-			console.warn('User canceled Apple Sign in.');
-		} else {
-			console.error(error);
-		}
-	}
-}
+// 	// start a login request
+// }
 
 interface errorType {
 	code: number;
@@ -111,11 +71,62 @@ export function AppleLogin() {
 	var user = '';
 	// const [credentialStateForUser, updateCredentialStateForUser] =
 	// 	useState<any>(-1);
-	const [userToken, setToken] = useState('');
+	const [userToken, setToken] = useState<any>('');
+	const [status, setStatus] = useState<any>('');
+	const [email, setEmail] = useState<any>('');
+	const [fullName, setFullName] = useState<any>('');
+	const [identityToken, setInToken] = useState<any>('');
+	const [state, setState] = useState<any>('');
+	const [users, setUsers] = useState<any>('');
+	const [authCode, setAuthCode] = useState<any>('');
 	const dispatch = useDispatch();
 	useEffect(() => {
 		dispatch(setAppleToken(userToken));
 	}, [userToken]);
+
+	const onAppleButtonPress = async () => {
+		let response: object = {};
+		let appleId: string = '';
+		let appleToken: string = '';
+		let appleEmail: string = '';
+		try {
+			const appleAuthRequestResponse = await AppleAuthentication.signInAsync({
+				requestedScopes: [
+					AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+					AppleAuthentication.AppleAuthenticationScope.EMAIL,
+				],
+			});
+
+			const {
+				realUserStatus,
+				authorizationCode,
+				email,
+				fullName,
+				identityToken,
+				state,
+				user,
+			} = appleAuthRequestResponse;
+			console.log(appleAuthRequestResponse);
+			// fetchAndUpdateCredentialState(setToken, user).catch((error) =>
+			// 	// setToken(`Error: ${error.code}`)
+			// );
+
+			if (identityToken) {
+				const decoded = jwtDecode(identityToken);
+				console.log(decoded);
+
+				// setToken(access_token);
+			} else {
+				Alert.alert('로그인 실패');
+			}
+		} catch (error: any) {
+			if (error.code === appleAuth.Error.CANCELED) {
+				console.warn('User canceled Apple Sign in.');
+			} else {
+				console.error(error);
+			}
+		}
+	};
 	// useEffect(() => {
 	// 	if (!appleAuth.isSupported) return;
 
@@ -138,7 +149,7 @@ export function AppleLogin() {
 	// if (!appleAuth.isSupported) {
 	// 	return (
 	// 		<View style={[styles.container, styles.horizontal]}>
-	// 			<Text>Apple Authentication is not supported on this device.</Text>
+	// 			<Text style={styles.textColor}>Apple Authentication is not supported on this device.</Text>
 	// 		</View>
 	// 	);
 	// }
@@ -149,7 +160,7 @@ export function AppleLogin() {
 			cornerRadius={10}
 			buttonStyle={AppleButton.Style.WHITE}
 			buttonType={AppleButton.Type.SIGN_IN}
-			onPress={() => onAppleButtonPress(setToken, user)}
+			onPress={() => onAppleButtonPress()}
 		/>
 	);
 }
@@ -186,5 +197,9 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		padding: 10,
+	},
+	textColor: {
+		color: Colors.black,
+		fontSize: 30,
 	},
 });
