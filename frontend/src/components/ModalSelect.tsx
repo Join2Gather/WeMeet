@@ -23,6 +23,7 @@ import type { RootState } from '../store';
 import { setModalMode } from '../store/team';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 import { Button } from '../lib/util/Button';
+import { CloseButton } from '../theme';
 
 const screen = Dimensions.get('screen');
 
@@ -99,31 +100,7 @@ export function ModalSelect({
 		>
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
-					<View
-						style={[
-							styles.textView,
-							{
-								marginBottom: 10,
-							},
-						]}
-					>
-						<TouchableHighlight
-							activeOpacity={1}
-							underlayColor={Colors.white}
-							style={{
-								marginLeft: '90%',
-								width: '9%',
-							}}
-							onPress={onPressCloseBtn}
-						>
-							<Icon
-								style={{ alignSelf: 'flex-end' }}
-								name="close"
-								size={25}
-								color={Colors.black}
-							/>
-						</TouchableHighlight>
-					</View>
+					<CloseButton closeBtn={onPressCloseBtn} />
 
 					{mode === 'everytime' && (
 						<>

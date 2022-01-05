@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Button } from '../lib/util/Button';
+import { CloseButton } from '../theme';
 
 const screen = Dimensions.get('screen');
 
@@ -55,28 +56,7 @@ export function ModalLoading({
 		>
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
-					<View
-						style={
-							(styles.textView,
-							[
-								{
-									marginBottom: 10,
-								},
-							])
-						}
-					>
-						<TouchableHighlight
-							activeOpacity={1}
-							underlayColor={Colors.white}
-							style={{
-								marginLeft: '90%',
-								width: '9%',
-							}}
-							onPress={onPressCloseBtn}
-						>
-							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
-						</TouchableHighlight>
-					</View>
+					<CloseButton closeBtn={onPressCloseBtn} />
 					{loadingMode === 'initial' && (
 						<>
 							<View style={styles.blankView} />
