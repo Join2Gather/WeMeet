@@ -6,3 +6,5 @@ export * from './Text';
 export * from './MaterialCommunityIcon';
 export * from './TextInput';
 export * from './TopBar';
+export * from './TouchHeaderIconView';
+export * from './ClosButton';
