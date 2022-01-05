@@ -29,6 +29,7 @@ import {
 import { getUserMe, makeGroupColor, setAlarmTime } from '../store/login';
 import { useNavigation } from '@react-navigation/core';
 import { CloseButton } from '../theme';
+import { initialIndividualTimetable } from '../store/individual';
 
 const screen = Dimensions.get('screen');
 
@@ -148,6 +149,8 @@ export function ModalSetting({
 	}, [color]);
 	const onPressLeaveTeam = useCallback(() => {
 		uri && dispatch(leaveTeam({ id, token, uri, user }));
+		dispatch(initialIndividualTimetable());
+		dispatch(getUserMe({ token }));
 		setSetting('loadingLeave');
 	}, []);
 	const onCloseLeaveTeam = useCallback(() => {
@@ -176,6 +179,9 @@ export function ModalSetting({
 		dispatch(deleteAllIndividual());
 		setSetting('loading');
 		setSubMode('loading');
+	}, []);
+	const onPressLeaveTeamFirst = useCallback(() => {
+		setSetting('questionOut');
 	}, []);
 	return (
 		<Modal
@@ -342,7 +348,7 @@ export function ModalSetting({
 									<TouchableHighlight
 										activeOpacity={1}
 										underlayColor={Colors.grey300}
-										onPress={onPressLeaveTeam}
+										onPress={onPressLeaveTeamFirst}
 										style={[
 											styles.touchButtonStyle,
 											{ borderTopLeftRadius: 0, borderTopRightRadius: 0 },
@@ -678,15 +684,30 @@ export function ModalSetting({
 							/>
 						</>
 					)}
+					{settingMode === 'questionOut' && (
+						<>
+							<View style={styles.blankView} />
+							<View style={[styles.rowView, { justifyContent: 'center' }]}>
+								<Text style={styles.touchText}>
+									{' '}
+									정말로 모임에서 나가시겠어요?
+								</Text>
+							</View>
+							<View style={styles.blankView} />
+							<View style={styles.buttonOverLine} />
+							<Button
+								buttonNumber={2}
+								buttonText="취소"
+								secondButtonText="네"
+								onPressFunction={onPressCloseButton}
+								secondOnPressFunction={onPressLeaveTeam}
+							/>
+						</>
+					)}
 					{settingMode === 'question' && (
 						<>
 							<View style={styles.blankView} />
 							<View style={[styles.rowView, { justifyContent: 'center' }]}>
-								{/* <Font5Icon
-									name="check-circle"
-									size={19}
-									color={Colors.green500}
-								/> */}
 								<Text style={styles.touchText}>
 									{' '}
 									정말로 모든 일정을 삭제 하시겠어요?
