@@ -9,25 +9,32 @@ import {
 	TextInput,
 	ActivityIndicator,
 	Dimensions,
+	KeyboardAvoidingView,
+	Platform,
 } from 'react-native';
+
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import {
-	changeColor,
 	initialError,
 	inputTeamName,
 	joinTeam,
 	postTeamName,
 	setModalMode,
 } from '../store/team';
+
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ColorPicker, fromHsv } from 'react-native-color-picker';
+// import { ColorPicker, fromHsv } from 'react-native-color-picker';
+// import { CromaColorPicker as ColorPicker } from 'croma-color-picker';
+
 import Material from 'react-native-vector-icons/MaterialIcons';
 import { getUserMe } from '../store/login';
-import { makeTeamTime, setTimeMode } from '../store/timetable';
+import { setTimeMode } from '../store/timetable';
 import { Button } from '../lib/util/Button';
 import { Sequence } from './Sequence';
 import { current } from '@reduxjs/toolkit';
+import ColorPicker from 'react-native-wheel-color-picker';
+import { CloseButton } from '../theme';
 const screen = Dimensions.get('screen');
 interface props {
 	modalVisible: boolean;
@@ -72,9 +79,30 @@ export function ModalInput({
 	const [code, setCode] = useState('');
 	const [mode, setMode] = useState('initial');
 	const [color, setColor] = useState(Colors.red500);
+	const [hsvColor, setHSV] = useState({
+		hue: 0,
+		sat: 0,
+		val: 0,
+	});
 	const [startTime, setStartTime] = useState('9');
+
 	const [endTime, setEndTime] = useState('22');
 	const [currentNumber, setCurrent] = useState(0);
+
+	const onSatValPickerChange = useCallback(({ sat, val }) => {
+		setHSV((prevState) => ({
+			...prevState,
+			sat: sat,
+			val: val,
+		}));
+	}, []);
+
+	const onHuePickerChange = useCallback((hue) => {
+		setHSV((prevState) => ({
+			...prevState,
+			hue: hue,
+		}));
+	}, []);
 
 	// useEffect
 	useEffect(() => {
@@ -132,15 +160,18 @@ export function ModalInput({
 	}, []);
 	const onCloseError = useCallback(() => {
 		setMode('initial');
-		dispatch(setTimeMode('make'));
+		dispatch(setTimeMode('normal'));
+		dispatch(setModalMode('normal'));
+		setModalMode('normal');
 		dispatch(initialError());
 		setModalVisible(false);
 		setColor(Colors.red500);
-		dispatch(getUserMe({ id, token, user }));
+		dispatch(getUserMe({ token }));
+		setCurrent(0);
 	}, []);
 	const onPressClose = useCallback(() => {
 		dispatch(initialError());
-		dispatch(getUserMe({ id, token, user }));
+		dispatch(getUserMe({ token }));
 		setModalVisible(false);
 		setMode('initial');
 		setCurrent(0);
@@ -155,7 +186,6 @@ export function ModalInput({
 			goTeamTime({ name });
 			setName('');
 		}
-		dispatch(setModalMode('normal'));
 	}, [name, startTime, endTime, color, joinName]);
 	const onPressCloseButton = useCallback(() => {
 		dispatch(setModalMode('normal'));
@@ -172,264 +202,232 @@ export function ModalInput({
 				Alert.alert('Modal has been closed.');
 			}}
 		>
-			<View style={styles.centeredView}>
-				<View style={styles.modalView}>
-					{!loadingJoin && (
-						<View
-							style={[
-								styles.textView,
-								{
-									marginBottom: 10,
-								},
-							]}
-						>
+			<KeyboardAvoidingView
+				behavior={'padding'}
+				enabled={Platform.OS === 'ios' ? true : false}
+				style={styles.safeAreaView}
+			>
+				<View style={styles.centeredView}>
+					<View style={styles.modalView}>
+						{!loadingJoin && (
 							<>
-								<TouchableHighlight
-									activeOpacity={1}
-									underlayColor={Colors.white}
-									style={{
-										marginLeft: '90%',
-										width: '9%',
-									}}
-									onPress={onPressCloseButton}
-								>
-									<Icon
-										style={{ alignSelf: 'flex-end' }}
-										name="close"
-										size={25}
-									/>
-								</TouchableHighlight>
-								<View style={styles.blankView} />
-								<Sequence
-									color={individualColor}
-									currentNumber={currentNumber}
-									mode={sequence}
-								/>
-								<View style={styles.blankView} />
+								<CloseButton closeBtn={onPressCloseButton} />
+								<>
+									{!loadingJoin && mode === 'makeError' && (
+										<>
+											<View style={styles.errorView}>
+												<Material
+													name={'error-outline'}
+													size={23}
+													style={{ alignSelf: 'center' }}
+													color={Colors.red300}
+												/>
+												<Text style={styles.errorText}> 서버 오류</Text>
+											</View>
+											<View style={styles.blankView} />
+											<View style={styles.buttonOverLine} />
+											<Button
+												buttonNumber={1}
+												buttonText="확인"
+												onPressFunction={onCloseError}
+											/>
+										</>
+									)}
+									{!loadingJoin && mode === 'joinError' && (
+										<>
+											<View style={styles.errorView}>
+												<Material
+													name={'error-outline'}
+													size={23}
+													style={{ alignSelf: 'center' }}
+													color={Colors.red300}
+												/>
+
+												<Text style={styles.errorText}>
+													{' '}
+													잘못된 공유 코드 입니다
+												</Text>
+											</View>
+											<View style={styles.blankView} />
+											<View style={styles.buttonOverLine} />
+											<Button
+												buttonNumber={1}
+												buttonText="확인"
+												onPressFunction={onCloseError}
+											/>
+										</>
+									)}
+									{mode === 'initial' && modalMode === 'join' && (
+										<>
+											<Text style={styles.titleText}>
+												공유 코드를 입력하세요
+											</Text>
+
+											<View style={[styles.textInputView]}>
+												<TextInput
+													style={[styles.textInput, { color: Colors.black }]}
+													value={code}
+													onChangeText={(code) => setCode((text) => code)}
+													placeholder="Enter your Code"
+													placeholderTextColor={Colors.grey600}
+													autoFocus={true}
+												/>
+											</View>
+											<View style={styles.buttonOverLine} />
+											<Button
+												buttonNumber={1}
+												buttonText="확인"
+												onPressWithParam={() => onPressNext('send')}
+												pressParam="send"
+											/>
+										</>
+									)}
+									{mode === 'initial' && modalMode === 'make' && (
+										<>
+											<Text style={styles.titleText}>모임명을 입력하세요</Text>
+											<View style={[styles.textInputView]}>
+												<TextInput
+													style={[styles.textInput, { color: Colors.black }]}
+													value={name}
+													onChangeText={(name) => setName((text) => name)}
+													placeholder="Enter your ID"
+													placeholderTextColor={Colors.grey600}
+													autoFocus={true}
+												/>
+											</View>
+
+											<View style={styles.buttonOverLine} />
+											<Button
+												buttonNumber={1}
+												buttonText={'확인'}
+												onPressWithParam={() => onPressNext('time')}
+												pressParam="time"
+											/>
+										</>
+									)}
+								</>
 							</>
-
-							{!loadingJoin && mode === 'makeError' && (
-								<>
-									<View style={styles.errorView}>
-										<Material
-											name={'error-outline'}
-											size={23}
-											style={{ alignSelf: 'center' }}
-											color={Colors.red300}
-										/>
-										<Text style={styles.errorText}> 서버 오류</Text>
-									</View>
-									<Button
-										buttonNumber={1}
-										buttonText="확인"
-										onPressFunction={onCloseError}
-									/>
-								</>
-							)}
-							{!loadingJoin && mode === 'joinError' && (
-								<>
-									<View style={styles.errorView}>
-										<Material
-											name={'error-outline'}
-											size={23}
-											style={{ alignSelf: 'center' }}
-											color={Colors.red300}
-										/>
-										<Text style={styles.errorText}>
-											{' '}
-											잘못된 공유 코드 입니다
-										</Text>
-									</View>
-									<View style={styles.blankView} />
-									<Button
-										buttonNumber={1}
-										buttonText="확인"
-										onPressFunction={onCloseError}
-									/>
-									<View style={styles.blankView} />
-								</>
-							)}
-							{mode === 'initial' && modalMode === 'join' && (
-								<>
-									<Text style={styles.titleText}>공유 코드를 입력하세요</Text>
-
-									<View style={[styles.textInputView]}>
+						)}
+						{mode === 'time' && (
+							<>
+								<Text style={styles.titleText}>모임 시간을 입력해 주세요</Text>
+								<Text style={[styles.titleUnderText]}>
+									[ 24시간 단위로 입력해 주세요 ]
+								</Text>
+								<View style={styles.rowView}>
+									<Text style={styles.timeInputText}>시작 시간 : </Text>
+									<View style={styles.timeInputView}>
 										<TextInput
-											// onFocus={focus}
-											style={[styles.textInput, { color: Colors.black }]}
-											value={code}
-											onChangeText={(code) => setCode((text) => code)}
-											placeholder="Enter your Code"
+											style={[styles.timeInput, { color: Colors.black }]}
+											value={startTime}
+											onChangeText={(hour) => setStartTime((text) => hour)}
+											placeholder="09"
 											placeholderTextColor={Colors.grey600}
 											autoFocus={true}
 										/>
 									</View>
-
-									<Button
-										buttonNumber={1}
-										buttonText="확인"
-										onPressWithParam={() => onPressNext('send')}
-										pressParam="send"
-									/>
-								</>
-							)}
-							{mode === 'initial' && modalMode === 'make' && (
-								<>
-									<Text style={styles.titleText}>모임명을 입력하세요</Text>
-									<View style={[styles.textInputView]}>
+								</View>
+								<View style={styles.blankView} />
+								<View style={styles.rowView}>
+									<Text style={styles.timeInputText}>종료 시간 : </Text>
+									<View style={styles.timeInputView}>
 										<TextInput
-											// onFocus={focus}
-											style={[styles.textInput, { color: Colors.black }]}
-											value={name}
-											onChangeText={(name) => setName((text) => name)}
-											placeholder="Enter your ID"
+											style={[styles.timeInput, { color: Colors.black }]}
+											value={endTime}
+											onChangeText={(hour) => setEndTime((text) => hour)}
+											placeholder="22"
 											placeholderTextColor={Colors.grey600}
-											autoFocus={true}
 										/>
 									</View>
-
-									<Button
-										buttonNumber={1}
-										buttonText={'확인'}
-										onPressWithParam={() => onPressNext('time')}
-										pressParam="time"
-									/>
-								</>
-							)}
-						</View>
-					)}
-					{mode === 'time' && (
-						<>
-							<Text style={styles.titleText}>모임 시간을 입력해 주세요</Text>
-							<Text style={[styles.titleUnderText]}>
-								[ 24시간 단위로 입력해 주세요 ]
-							</Text>
-							<View style={styles.rowView}>
-								<Text style={styles.timeInputText}>시작 시간 : </Text>
-								<View style={styles.timeInputView}>
-									<TextInput
-										// onFocus={focus}123
-										style={[styles.timeInput, { color: Colors.black }]}
-										value={startTime}
-										onChangeText={(hour) => setStartTime((text) => hour)}
-										placeholder="09"
-										placeholderTextColor={Colors.grey600}
-										autoFocus={true}
-									/>
 								</View>
-							</View>
-							<View style={styles.blankView} />
-							<View style={styles.rowView}>
-								<Text style={styles.timeInputText}>종료 시간 : </Text>
-								<View style={styles.timeInputView}>
-									<TextInput
-										// onFocus={focus}
-										style={[styles.timeInput, { color: Colors.black }]}
-										value={endTime}
-										onChangeText={(hour) => setEndTime((text) => hour)}
-										placeholder="22"
-										placeholderTextColor={Colors.grey600}
-									/>
-								</View>
-							</View>
-							<View style={styles.blankView} />
-							<View style={styles.buttonOverLine} />
-							<Button
-								buttonNumber={2}
-								buttonText={'이전'}
-								secondButtonText={'다음'}
-								onPressWithParam={() => onPressPrev('initial')}
-								secondOnPressWithParam={() => onPressNext('color')}
-								pressParam="initial"
-								secondParam="color"
-							/>
-						</>
-					)}
-					{mode === 'color' && (
-						<>
-							<Text style={styles.titleText}>모임 색상을 선택해 주세요 </Text>
-							<View
-								style={{
-									height: 200,
-									width: '80%',
-								}}
-							>
-								<ColorPicker
-									onColorSelected={(color) => alert(`Color selected: ${color}`)}
-									onColorChange={(color) => setColor(fromHsv(color))}
-									style={{ flex: 1 }}
-									hideSliders={true}
+								<View style={styles.blankView} />
+								<View style={styles.buttonOverLine} />
+								<Button
+									buttonNumber={2}
+									buttonText={'이전'}
+									secondButtonText={'다음'}
+									onPressWithParam={() => onPressPrev('initial')}
+									secondOnPressWithParam={() => onPressNext('color')}
+									pressParam="initial"
+									secondParam="color"
 								/>
-							</View>
-							<View style={styles.buttonOverLine} />
-							<Button
-								buttonNumber={2}
-								buttonText={'이전'}
-								secondButtonText={'다음'}
-								onPressWithParam={() => onPressPrev('time')}
-								secondOnPressWithParam={() => onPressNext('send')}
-								onPressFunction={() => modeChange()}
-								pressParam="time"
-								secondParam="send"
-							/>
-						</>
-					)}
-					{mode === 'loading' && (
-						<>
-							<View style={{ height: 30 }} />
-							<ActivityIndicator size="large" color={Colors.blue500} />
-							<View style={{ height: 30 }} />
-						</>
-					)}
-					{mode === 'joinSuccess' && (
-						<>
-							<Text style={[styles.titleText, { fontSize: 17 }]}>
-								🎉 모임에 참여가 완료 되었습니다 {'\n'} 가능한 시간을
-								입력해주세요
-							</Text>
-							<View style={styles.buttonOverLine} />
-							<Button
-								buttonNumber={1}
-								buttonText={'확인'}
-								onPressFunction={onPressClose}
-							/>
-						</>
-					)}
-					{mode === 'makeSuccess' && (
-						<>
-							<Text style={[styles.titleText, { fontSize: 17 }]}>
-								🎉 모임 생성 완료 되었습니다 {'\n'} 가능한 시간을 입력해주세요
-								{'\n'}
-							</Text>
-							<View style={styles.buttonOverLine} />
-							<Button
-								buttonNumber={1}
-								buttonText={'확인'}
-								onPressFunction={onPressClose}
-							/>
-						</>
-					)}
+							</>
+						)}
 
-					{/* <View style={styles.buttonRowView}>
-						<TouchableHighlight
-							activeOpacity={0.1}
-							underlayColor={Colors.grey200}
-							style={styles.closeButtonStyle}
-							onPress={() => {
-								joinTeamError
-									? onCloseError()
-									: mode === '3'
-									? onMoveTeamTime()
-									: onChangeInput();
-							}}
-						>
-							<Text style={styles.buttonText}>확인</Text>
-						</TouchableHighlight>
-					</View> */}
+						{mode === 'color' && (
+							<>
+								<Text style={styles.titleText}>모임 색상을 선택해 주세요 </Text>
+								<View
+									style={{
+										height: 300,
+										width: '80%',
+									}}
+								>
+									<ColorPicker
+										color={color}
+										swatchesOnly={false}
+										onColorChange={(color) => setColor(color)}
+										onColorChangeComplete={(color) => setColor(color)}
+										thumbSize={40}
+										sliderSize={40}
+										noSnap={false}
+										row={false}
+										swatchesLast={false}
+									/>
+								</View>
+								<View style={styles.buttonOverLine} />
+								<Button
+									buttonNumber={2}
+									buttonText={'이전'}
+									secondButtonText={'다음'}
+									onPressWithParam={() => onPressPrev('time')}
+									secondOnPressWithParam={() => onPressNext('send')}
+									onPressFunction={() => modeChange()}
+									pressParam="time"
+									secondParam="send"
+								/>
+							</>
+						)}
+						{mode === 'loading' && (
+							<>
+								<View style={{ height: 30 }} />
+								<ActivityIndicator size="large" color={Colors.blue500} />
+								<View style={{ height: 30 }} />
+							</>
+						)}
+						{mode === 'joinSuccess' && (
+							<>
+								<Text style={[styles.titleText, { fontSize: 17 }]}>
+									🎉 모임에 참여가 완료 되었습니다 {'\n'} 가능한 시간을
+									입력해주세요
+								</Text>
+								<View style={styles.buttonOverLine} />
+								<Button
+									buttonNumber={1}
+									buttonText={'확인'}
+									onPressFunction={onPressClose}
+								/>
+							</>
+						)}
+						{mode === 'makeSuccess' && (
+							<>
+								<Text style={[styles.titleText, { fontSize: 17 }]}>
+									🎉 모임 생성 완료 되었습니다 {'\n'} 가능한 시간을 입력해주세요
+									{'\n'}
+								</Text>
+								<View style={styles.buttonOverLine} />
+								<Button
+									buttonNumber={1}
+									buttonText={'확인'}
+									onPressFunction={onPressClose}
+								/>
+							</>
+						)}
+					</View>
 				</View>
-			</View>
+			</KeyboardAvoidingView>
+			{/* <View style={[{ marginBottom: Platform.select({ ios: 50 }) }]} /> */}
 		</Modal>
-		// </AutoFocusProvider>
 	);
 }
 
@@ -460,7 +458,7 @@ const styles = StyleSheet.create({
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
-		width: '90%',
+		width: screen.width * 0.9,
 	},
 	titleText: {
 		textAlign: 'center',
@@ -494,13 +492,16 @@ const styles = StyleSheet.create({
 	textInput: {
 		fontSize: 18,
 		fontFamily: 'NanumSquareR',
+		textAlign: 'center',
 	},
 	textInputView: {
 		paddingBottom: 2,
-		backgroundColor: Colors.white,
 		borderBottomWidth: 0.3,
-		width: '70%',
-		marginLeft: '15%',
+		width: '60%',
+		justifyContent: 'center',
+		textAlign: 'center',
+
+		// marginLeft: '15%',
 		padding: 10,
 		marginBottom: 15,
 	},
@@ -554,5 +555,11 @@ const styles = StyleSheet.create({
 		width: screen.width * 0.9,
 		marginTop: 20,
 		borderColor: Colors.black,
+	},
+	safeAreaView: {
+		flex: 1,
+		// marginTop: 50,
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
 });

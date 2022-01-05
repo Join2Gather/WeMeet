@@ -4,20 +4,25 @@ import { StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 // prettier-ignore
 import {SafeAreaView, View, 
-NavigationHeader,  Text} from '../theme';
+NavigationHeader,  Text, TouchHeaderIconView} from '../theme';
 import Icon from 'react-native-vector-icons/Fontisto';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
 	DayOfWeek,
 	ModalConfirm,
 	ModalDatePicker,
+	ModalInfo,
 	Spinner,
 } from '../components';
 import { Timetable } from '../components/Timetable';
 import { Colors } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
-import { makeInitialTimetable, setIsInTeamTime } from '../store/timetable';
+import {
+	makeInitialTimetable,
+	setIsInTeamTime,
+	toggleIsInitial,
+} from '../store/timetable';
 import { RootState } from '../store';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
@@ -35,6 +40,8 @@ import { setModalMode, shareUri } from '../store/team';
 import { ModalSetting } from '../components/ModalSetting';
 import { Sequence } from '../components/Sequence';
 import { TouchableHighlight } from 'react-native-gesture-handler';
+
+const iconSize = 22;
 
 export default function TeamTime({ route }: Props) {
 	const {
@@ -54,6 +61,9 @@ export default function TeamTime({ route }: Props) {
 		name,
 		isConfirmProve,
 		alarmTime,
+		isOverlap,
+		seeTips,
+		seeTimeTips,
 	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
 		uri: timetable.teamURI,
 		color: timetable.color,
@@ -74,6 +84,9 @@ export default function TeamTime({ route }: Props) {
 		name: timetable.teamName,
 		isConfirmProve: login.isConfirmProve,
 		alarmTime: login.alarmTime,
+		isOverlap: timetable.isOverlap,
+		seeTips: login.seeTips,
+		seeTimeTips: login.seeTimeTips,
 	}));
 	// navigation
 	const { id, user, token, modalMode } = route.params;
@@ -94,16 +107,34 @@ export default function TeamTime({ route }: Props) {
 	const [currentNumber, setCurrent] = useState(0);
 	const [sequence, setSequence] = useState([0, 1, 2]);
 	const [dateVisible, setDateVisible] = useState(false);
+	const [infoVisible, setInfoVisible] = useState(false);
 	// initial
 	useEffect(() => {
 		makeReady && dispatch(makeInitialTimetable());
 	}, [name, makeReady]);
 
 	useEffect(() => {
+		seeTimeTips;
+	}, [seeTimeTips]);
+
+	useEffect(() => {
 		if (joinTeamError || error !== '') {
 			navigation.navigate('TeamList');
 		}
 	}, [joinTeamError, loadingJoin, error]);
+
+	useEffect(() => {
+		seeTimeTips ? setInfoVisible(true) : setInfoVisible(false);
+	}, [seeTimeTips]);
+
+	useEffect(() => {
+		isOverlap &&
+			Alert.alert(
+				'경고',
+				`개인 일정과 중복된 시간이 존재 합니다.\n 개인 시간표에서 수정해 주세요`,
+				[{ text: '확인', onPress: () => {} }]
+			);
+	}, [isOverlap]);
 
 	// useCallback
 	const goConfirmPage = useCallback(() => {
@@ -113,6 +144,7 @@ export default function TeamTime({ route }: Props) {
 		navigation.goBack();
 		dispatch(setModalMode('normal'));
 		dispatch(setIsInTeamTime(false));
+		dispatch(toggleIsInitial(false));
 	}, []);
 	// 공유하기 버튼
 	const onShareURI = useCallback(() => {
@@ -124,6 +156,10 @@ export default function TeamTime({ route }: Props) {
 		setIsTimeMode(true);
 		setMode('startMode');
 	}, []);
+
+	const onPressGrInBtn = useCallback((groupMode) => {
+		setGroupMode(groupMode);
+	}, []);
 	return (
 		<>
 			<SafeAreaView style={{ backgroundColor: color }}>
@@ -133,54 +169,67 @@ export default function TeamTime({ route }: Props) {
 						title={modalMode === 'join' ? joinName : name}
 						titleStyle={{ paddingLeft: 0 }}
 						Left={() => (
-							<TouchableHighlight underlayColor={color} onPress={goLeft}>
+							<TouchHeaderIconView underlayColor={color} onPress={goLeft}>
 								<Icon
 									name="angle-left"
-									size={22}
+									size={iconSize - 2}
 									color={Colors.white}
 									// style={{ marginLeft: '3%' }}
 								/>
-							</TouchableHighlight>
+							</TouchHeaderIconView>
 						)}
 						Right={() =>
 							isGroup ? (
-								<TouchableHighlight
+								<TouchHeaderIconView
 									underlayColor={color}
 									onPress={goConfirmPage}
+									// style={{ backgroundColor: Colors.black }}
 								>
 									<MIcon
 										name="check-bold"
-										size={20}
+										size={iconSize + 3}
 										color={Colors.white}
 										style={{ paddingTop: 1 }}
 									/>
-								</TouchableHighlight>
+								</TouchHeaderIconView>
 							) : (
-								<TouchableHighlight
+								<TouchHeaderIconView
 									underlayColor={color}
 									onPress={onPressPlusBtn}
 								>
 									<FontAwesome5Icon
 										name="plus"
-										size={22}
+										size={iconSize + 1}
 										color={Colors.white}
 										style={{ paddingTop: 1 }}
 									/>
-								</TouchableHighlight>
+								</TouchHeaderIconView>
 							)
 						}
 						secondRight={() => (
-							<TouchableHighlight
+							<TouchHeaderIconView
 								underlayColor={color}
 								onPress={() => setSettingModalVisible(true)}
 							>
 								<MaterialIcon
 									name="settings"
-									size={24}
+									size={iconSize + 2}
+									color={Colors.white}
+								/>
+							</TouchHeaderIconView>
+						)}
+						thirdRight={() => (
+							<TouchHeaderIconView
+								underlayColor={color}
+								onPress={() => setInfoVisible(true)}
+							>
+								<FontAwesome5Icon
+									name="question-circle"
+									size={iconSize}
 									color={Colors.white}
 									style={{ paddingTop: 1 }}
 								/>
-							</TouchableHighlight>
+							</TouchHeaderIconView>
 						)}
 					/>
 
@@ -189,50 +238,63 @@ export default function TeamTime({ route }: Props) {
 							{/* <Spinner loading={loadingIndividual} /> */}
 							{mode === 'normal' && (
 								<View style={styles.boxOverView}>
-									<View
-										style={{
-											flexDirection: 'row',
-											justifyContent: 'space-evenly',
-											// marginTop: 25,
-											height: 25,
-										}}
-									>
-										<TouchableOpacity
-											style={styles.touchableBoxView}
-											onPress={() => setGroupMode(true)}
+									<>
+										<View
+											style={{
+												flexDirection: 'row',
+												justifyContent: 'center',
+												// marginTop: 25,
+												height: 25,
+											}}
 										>
-											<MIcon
-												name={
-													isGroup
-														? 'checkbox-marked-outline'
-														: 'checkbox-blank-outline'
-												}
-												size={24}
-												color={color !== '' ? color : Colors.blue500}
-											/>
-											<Text style={styles.iconText}>그룹</Text>
-										</TouchableOpacity>
-										<TouchableOpacity
-											style={[styles.touchableBoxView, { marginLeft: 70 }]}
-											onPress={() => setGroupMode(false)}
-										>
-											<MIcon
-												name={
-													isGroup
-														? 'checkbox-blank-outline'
-														: 'checkbox-marked-outline'
-												}
-												size={23}
-												color={color !== '' ? color : Colors.blue500}
-											/>
-											<Text style={styles.iconText}>개인</Text>
-										</TouchableOpacity>
-									</View>
+											<TouchableOpacity
+												style={styles.touchableBoxView}
+												onPress={() => onPressGrInBtn(true)}
+											>
+												<MIcon
+													name={
+														isGroup
+															? 'checkbox-marked-outline'
+															: 'checkbox-blank-outline'
+													}
+													size={24}
+													color={color !== '' ? color : Colors.blue500}
+												/>
+												<Text style={styles.iconText}>그룹</Text>
+											</TouchableOpacity>
+											<TouchableOpacity
+												style={[styles.touchableBoxView, { marginLeft: 70 }]}
+												onPress={() => onPressGrInBtn(false)}
+											>
+												<MIcon
+													name={
+														isGroup
+															? 'checkbox-blank-outline'
+															: 'checkbox-marked-outline'
+													}
+													size={23}
+													color={color !== '' ? color : Colors.blue500}
+												/>
+												<Text style={styles.iconText}>개인</Text>
+											</TouchableOpacity>
+										</View>
+									</>
 									<View style={styles.rowView}>
 										<View
 											style={[styles.boxView, { backgroundColor: color }]}
 										/>
 										<Text style={styles.infoText}>가능 일정</Text>
+										{isOverlap && (
+											<>
+												<View
+													style={[
+														styles.boxView,
+														{ backgroundColor: Colors.grey600 },
+													]}
+												/>
+												<Text style={styles.infoText}>중복 일정</Text>
+											</>
+										)}
 										<View
 											style={[
 												styles.boxView,
@@ -282,7 +344,7 @@ export default function TeamTime({ route }: Props) {
 							)}
 						</View>
 					</View>
-					<DayOfWeek />
+					<DayOfWeek isTeam={true} />
 					<ScrollView style={{ backgroundColor: Colors.white }}>
 						<Timetable
 							mode={mode}
@@ -323,6 +385,7 @@ export default function TeamTime({ route }: Props) {
 						<ModalDatePicker
 							dateVisible={dateVisible}
 							setDateVisible={setDateVisible}
+							setSettingModalVisible={setSettingModalVisible}
 							name={name}
 							alarmTime={alarmTime}
 							setSetting={setSetting}
@@ -335,8 +398,15 @@ export default function TeamTime({ route }: Props) {
 							name={name}
 							setConfirm={setConfirm}
 							uri={uri}
+							isOverlap={isOverlap}
 						/>
 					</ScrollView>
+					<ModalInfo
+						infoVisible={infoVisible}
+						setInfoVisible={setInfoVisible}
+						seeTips={seeTips}
+						color={color}
+					/>
 				</View>
 			</SafeAreaView>
 		</>

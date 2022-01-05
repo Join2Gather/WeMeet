@@ -49,6 +49,10 @@ export interface timetable {
 	startTimeText: string;
 	confirmCount: number;
 	alarmArray: alarm_time[];
+	isInitial: boolean;
+	isOverlap: boolean;
+	selectIdx: number;
+	loading: string;
 }
 
 export type weekIndex = Array<string>;
@@ -118,8 +122,8 @@ export interface timeProps {
 	color: string;
 	mode: string;
 	minute: number;
-	borderWidth: number;
 	borderColor?: string;
+	borderWidth?: number;
 	borderTop?: boolean;
 	borderBottom?: boolean;
 	people?: Array<string>;
@@ -135,6 +139,7 @@ export interface findTime {
 	endTime: timeType;
 	selectTime: number;
 	timeText?: string;
+	id?: number;
 }
 
 export interface timeType {

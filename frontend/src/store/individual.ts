@@ -10,6 +10,7 @@ import type {
 	make_days,
 	postEveryTimeAPI,
 	findTime,
+	homeTime,
 } from '../interface';
 import { Colors } from 'react-native-paper';
 import { useMakeTimeTableWith60 } from '../hooks';
@@ -72,6 +73,13 @@ const initialState: individual = {
 	postHomePrepare: false,
 	postHomeSuccess: false,
 	setTime: 0,
+	todayDate: 0,
+	individualCount: 0,
+	groupCount: 0,
+	homeTime: {
+		start: 0,
+		end: 24,
+	},
 };
 
 export const individualSlice = createSlice({
@@ -89,7 +97,6 @@ export const individualSlice = createSlice({
 				confirmClubs: Array<string>;
 			}>
 		) => {
-			// state.individualDates = defaultDatesWith60;
 			const { confirmClubs, confirmDatesTimetable } = action.payload;
 			state.confirmClubs = confirmClubs;
 			state.confirmDatesTimetable = confirmDatesTimetable;
@@ -99,30 +106,54 @@ export const individualSlice = createSlice({
 						date[day].map((d: any) => {
 							const startingMinute = Math.round(d.starting_minutes / 10);
 							const endMinute = Math.round(d.end_minutes / 10);
+							if (state.todayDate === idx) {
+								if (date.club === null) {
+									state.individualCount = date[day].length;
+								} else {
+									state.groupCount = date[day].length;
+								}
+							}
 							for (let i = d.starting_hours; i <= d.end_hours; i++) {
-								if (i === d.starting_hours) {
-									for (let j = startingMinute; j <= 6; j++) {
-										makeTime(
-											state.individualDates[idx].times[i][j],
-											date.color ? 'team' : 'everyTime',
-											date.color ? date.color : Colors.grey400
-										);
-									}
-								} else if (i === d.end_hours) {
-									for (let j = 0; j < endMinute; j++) {
-										makeTime(
-											state.individualDates[idx].times[i][j],
-											date.color ? 'team' : 'everyTime',
-											date.color ? date.color : Colors.grey400
-										);
+								if (d.starting_hours === d.end_hours) {
+									for (let j = startingMinute; j < endMinute; j++) {
+										if (state.individualDates[idx].times[i])
+											makeTime(
+												state.individualDates[idx].times[i][j],
+												date.color ? 'team' : 'everyTime',
+												date.color ? date.color : Colors.grey400
+											);
 									}
 								} else {
-									for (let j = 0; j <= 6; j++) {
-										makeTime(
-											state.individualDates[idx].times[i][j],
-											date.color ? 'team' : 'everyTime',
-											date.color ? date.color : Colors.grey400
-										);
+									if (i === d.starting_hours) {
+										for (let j = startingMinute; j <= 5; j++) {
+											if (state.individualDates[idx].times[i]) {
+												makeTime(
+													state.individualDates[idx].times[i][j],
+													date.color ? 'team' : 'everyTime',
+													date.color ? date.color : Colors.grey400
+												);
+											}
+										}
+									} else if (i === d.end_hours) {
+										for (let j = 0; j < endMinute; j++) {
+											if (state.individualDates[idx].times[i]) {
+												makeTime(
+													state.individualDates[idx].times[i][j],
+													date.color ? 'team' : 'everyTime',
+													date.color ? date.color : Colors.grey400
+												);
+											}
+										}
+									} else {
+										for (let j = 0; j <= 5; j++) {
+											if (state.individualDates[idx].times[i]) {
+												makeTime(
+													state.individualDates[idx].times[i][j],
+													date.color ? 'team' : 'everyTime',
+													date.color ? date.color : Colors.grey400
+												);
+											}
+										}
 									}
 								}
 							}
@@ -131,9 +162,29 @@ export const individualSlice = createSlice({
 				});
 		},
 		initialIndividualTimetable: (state) => {
+			const { defaultDatesWith60, timesText } = useMakeTimeTableWith60(
+				state.homeTime.start,
+				state.homeTime.end
+			);
+
 			state.individualDates = defaultDatesWith60;
+			state.individualTimesText = timesText;
+		},
+		makeHomeTime: (state) => {
 			makeHomeTimetable(state);
 			state.postHomeSuccess = false;
+		},
+
+		cloneHomeDate: (state, action: PayloadAction<homeTime>) => {
+			const { start, end } = action.payload;
+			state.homeTime.start = start;
+			state.homeTime.end = end;
+			const { defaultDatesWith60, timesText } = useMakeTimeTableWith60(
+				start,
+				end
+			);
+			state.individualDates = defaultDatesWith60;
+			state.individualTimesText = timesText;
 		},
 		kakaoLogin: (state, action: PayloadAction<any>) => {
 			if (state.cloneDateSuccess) {
@@ -165,29 +216,43 @@ export const individualSlice = createSlice({
 						const endMinute = Math.round(d.end_minutes / 10);
 
 						for (let i = d.starting_hours; i <= d.end_hours; i++) {
-							if (i === d.starting_hours) {
-								for (let j = startingMinute; j <= 6; j++) {
-									makeTime(
-										state.individualDates[idx].times[i][j],
-										'team',
-										Colors.grey400
-									);
-								}
-							} else if (i === d.end_hours) {
-								for (let j = 0; j < endMinute; j++) {
-									makeTime(
-										state.individualDates[idx].times[i][j],
-										'team',
-										Colors.grey400
-									);
+							if (d.starting_hours === d.end_hours) {
+								for (let j = startingMinute; j < endMinute; j++) {
+									if (state.individualDates[idx].times[i])
+										makeTime(
+											state.individualDates[idx].times[i][j],
+											'team',
+											Colors.grey400
+										);
 								}
 							} else {
-								for (let j = 0; j <= 6; j++) {
-									makeTime(
-										state.individualDates[idx].times[i][j],
-										'team',
-										Colors.grey400
-									);
+								if (i === d.starting_hours) {
+									for (let j = startingMinute; j <= 5; j++) {
+										if (state.individualDates[idx].times[i])
+											makeTime(
+												state.individualDates[idx].times[i][j],
+												'team',
+												Colors.grey400
+											);
+									}
+								} else if (i === d.end_hours) {
+									for (let j = 0; j < endMinute; j++) {
+										if (state.individualDates[idx].times[i])
+											makeTime(
+												state.individualDates[idx].times[i][j],
+												'team',
+												Colors.grey400
+											);
+									}
+								} else {
+									for (let j = 0; j <= 5; j++) {
+										if (state.individualDates[idx].times[i])
+											makeTime(
+												state.individualDates[idx].times[i][j],
+												'team',
+												Colors.grey400
+											);
+									}
 								}
 							}
 						}
@@ -195,7 +260,7 @@ export const individualSlice = createSlice({
 			);
 		},
 		LOGIN_EVERYTIME_FAILURE: (state, action: PayloadAction<any>) => {
-			state.error = action.payload;
+			state.error = 'everyTime';
 		},
 		cloneIndividualDates: (state, action: PayloadAction<make_days[]>) => {
 			state.cloneDateSuccess = true;
@@ -270,7 +335,6 @@ export const individualSlice = createSlice({
 				}
 			});
 			// state.inTimeMode = modeSelect[0].content;
-			console.log(state.inTimeMode);
 		},
 		makePostHomeDates: (state) => {
 			const data = {
@@ -309,13 +373,18 @@ export const individualSlice = createSlice({
 		deleteHomeTime: (state, action: PayloadAction<findTime[]>) => {
 			const findTime = action.payload;
 			const startHour = findTime[0].startTime.hour;
-			console.log(startHour);
-			console.log(state.everyTime);
+
 			state.everyTime[state.dayString] = state.everyTime[
 				state.dayString
 			].filter((time) => time.starting_hours !== startHour);
 
 			state.postHomePrepare = true;
+		},
+		setTodayDate: (state, action: PayloadAction<number>) => {
+			state.todayDate = action.payload;
+		},
+		initialIndividualError: (state) => {
+			state.error = '';
 		},
 	},
 	extraReducers: {},
@@ -334,6 +403,10 @@ export const {
 	initialTimeMode,
 	checkHomeIstBlank,
 	deleteHomeTime,
+	setTodayDate,
+	cloneHomeDate,
+	makeHomeTime,
+	initialIndividualError,
 } = individualSlice.actions;
 
 export default individualSlice.reducer;

@@ -1,5 +1,6 @@
 import type { make60 } from './timetable';
 import type { confirmDates } from './login';
+import type { homeTime } from '.';
 export interface individual {
 	individualDates: make60[];
 	error: string;
@@ -25,6 +26,10 @@ export interface individual {
 	postHomePrepare: boolean;
 	postHomeSuccess: boolean;
 	setTime: number;
+	todayDate: number;
+	individualCount: number;
+	groupCount: number;
+	homeTime: homeTime;
 }
 
 export interface postImageAPI {

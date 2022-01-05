@@ -17,14 +17,19 @@ import FontIcon from 'react-native-vector-icons/FontAwesome';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { hexToRGB } from '../lib/util/hexToRGB';
-import { ColorPicker, fromHsv } from 'react-native-color-picker';
+// import { ColorPicker, fromHsv } from 'react-native-color-picker';
+import ColorPicker from 'react-native-wheel-color-picker';
 import { changeColor, leaveTeam, setModalMode } from '../store/team';
 import { Button } from '../lib/util/Button';
-import { changeTimetableColor, getSnapShot } from '../store/timetable';
+import {
+	changeTimetableColor,
+	deleteAllIndividual,
+	getSnapShot,
+} from '../store/timetable';
 import { getUserMe, makeGroupColor, setAlarmTime } from '../store/login';
 import { useNavigation } from '@react-navigation/core';
-import MakeAlarm from '../lib/util/MakeAlarm';
-import { ModalDatePicker } from './ModalDatePicker';
+import { CloseButton } from '../theme';
+import { initialIndividualTimetable } from '../store/individual';
 
 const screen = Dimensions.get('screen');
 
@@ -97,7 +102,7 @@ export function ModalSetting({
 			setTimeout(() => {
 				setSetting('successLeave');
 			}, 500);
-			dispatch(getUserMe({ id, token, user }));
+			dispatch(getUserMe({ token }));
 		}
 	}, [settingMode]);
 
@@ -117,7 +122,7 @@ export function ModalSetting({
 	// 팀 색 변경
 	const onPressChangeColor = useCallback(() => {
 		uri && dispatch(changeColor({ color: pickColor, id, token, user, uri }));
-		dispatch(getUserMe({ id, token, user }));
+		dispatch(getUserMe({ token }));
 		dispatch(makeGroupColor(pickColor));
 
 		setSetting('loading');
@@ -127,11 +132,15 @@ export function ModalSetting({
 		setSetting('loadingSave');
 	}, []);
 	const onFinishChangeColor = useCallback(() => {
-		dispatch(changeTimetableColor(pickColor));
-		setPickColor(Colors.red500);
+		if (subMode === 'loading') {
+			setSubMode('initial');
+		} else {
+			dispatch(changeTimetableColor(pickColor));
+			setPickColor(Colors.red500);
+		}
 		setSettingModalVisible(false);
 		setSetting('initial');
-	}, [pickColor]);
+	}, [pickColor, subMode]);
 
 	const goSnapShotPage = useCallback(() => {
 		setSettingModalVisible(false);
@@ -140,6 +149,8 @@ export function ModalSetting({
 	}, [color]);
 	const onPressLeaveTeam = useCallback(() => {
 		uri && dispatch(leaveTeam({ id, token, uri, user }));
+		dispatch(initialIndividualTimetable());
+		dispatch(getUserMe({ token }));
 		setSetting('loadingLeave');
 	}, []);
 	const onCloseLeaveTeam = useCallback(() => {
@@ -164,7 +175,14 @@ export function ModalSetting({
 	const onPressAlarmPrevious = useCallback(() => {
 		setSubMode('initial');
 	}, []);
-
+	const onPressDeleteAll = useCallback(() => {
+		dispatch(deleteAllIndividual());
+		setSetting('loading');
+		setSubMode('loading');
+	}, []);
+	const onPressLeaveTeamFirst = useCallback(() => {
+		setSetting('questionOut');
+	}, []);
 	return (
 		<Modal
 			animationType="fade"
@@ -176,28 +194,7 @@ export function ModalSetting({
 		>
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
-					<View
-						style={
-							(styles.textView,
-							[
-								{
-									marginBottom: 10,
-								},
-							])
-						}
-					>
-						<TouchableHighlight
-							activeOpacity={1}
-							underlayColor={Colors.white}
-							style={{
-								marginLeft: '90%',
-								width: '9%',
-							}}
-							onPress={onPressCloseButton}
-						>
-							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
-						</TouchableHighlight>
-					</View>
+					<CloseButton closeBtn={onPressCloseButton} />
 					{settingMode === 'initial' && (
 						<>
 							<View style={styles.blankView} />
@@ -247,7 +244,10 @@ export function ModalSetting({
 												name="user-plus"
 												size={20}
 												color={color}
-												style={[styles.iconStyle, { marginTop: 10 }]}
+												style={[
+													styles.iconStyle,
+													{ marginTop: 10, marginLeft: 13 },
+												]}
 											/>
 											<Text style={styles.touchText}>팀원 초대</Text>
 											<View style={styles.iconView}>
@@ -322,7 +322,33 @@ export function ModalSetting({
 									<TouchableHighlight
 										activeOpacity={1}
 										underlayColor={Colors.grey300}
-										onPress={onPressLeaveTeam}
+										onPress={() => setSetting('question')}
+										style={[styles.touchButtonStyle, { borderRadius: 0 }]}
+									>
+										<View style={styles.rowView}>
+											<Font5Icon
+												name="trash"
+												size={23}
+												color={color}
+												style={styles.iconStyle}
+											/>
+											<Text style={[styles.touchText, { fontSize: 15 }]}>
+												모든 일정 삭제하기
+											</Text>
+											<View style={styles.iconView}>
+												<Font5Icon
+													name="angle-right"
+													size={19}
+													color={Colors.black}
+													style={styles.rightIconStyle}
+												/>
+											</View>
+										</View>
+									</TouchableHighlight>
+									<TouchableHighlight
+										activeOpacity={1}
+										underlayColor={Colors.grey300}
+										onPress={onPressLeaveTeamFirst}
 										style={[
 											styles.touchButtonStyle,
 											{ borderTopLeftRadius: 0, borderTopRightRadius: 0 },
@@ -361,21 +387,26 @@ export function ModalSetting({
 									{ color: Colors.red500, fontSize: 13, marginTop: 0 },
 								]}
 							>
-								주의 사항 : 팀원 전체의 모임 색이 변경되게 됩니다
+								주의 사항 : 팀원 전체의 모임 색상이 변경되게 됩니다
 							</Text>
 							<View style={styles.blankView} />
 							<View style={styles.blankView} />
 							<View
 								style={{
-									height: 200,
+									height: 300,
 									width: '80%',
 								}}
 							>
 								<ColorPicker
-									onColorSelected={(color) => alert(`Color selected: ${color}`)}
-									onColorChange={(color) => setPickColor(fromHsv(color))}
-									style={{ flex: 1 }}
-									hideSliders={true}
+									color={color}
+									swatchesOnly={false}
+									onColorChange={(color) => setPickColor(color)}
+									onColorChangeComplete={(color) => setPickColor(color)}
+									thumbSize={40}
+									sliderSize={40}
+									noSnap={false}
+									row={false}
+									swatchesLast={false}
 								/>
 							</View>
 							<View style={styles.buttonOverLine} />
@@ -650,6 +681,46 @@ export function ModalSetting({
 								buttonNumber={1}
 								buttonText="확인"
 								onPressFunction={onCloseLeaveTeam}
+							/>
+						</>
+					)}
+					{settingMode === 'questionOut' && (
+						<>
+							<View style={styles.blankView} />
+							<View style={[styles.rowView, { justifyContent: 'center' }]}>
+								<Text style={styles.touchText}>
+									{' '}
+									정말로 모임에서 나가시겠어요?
+								</Text>
+							</View>
+							<View style={styles.blankView} />
+							<View style={styles.buttonOverLine} />
+							<Button
+								buttonNumber={2}
+								buttonText="취소"
+								secondButtonText="네"
+								onPressFunction={onPressCloseButton}
+								secondOnPressFunction={onPressLeaveTeam}
+							/>
+						</>
+					)}
+					{settingMode === 'question' && (
+						<>
+							<View style={styles.blankView} />
+							<View style={[styles.rowView, { justifyContent: 'center' }]}>
+								<Text style={styles.touchText}>
+									{' '}
+									정말로 모든 일정을 삭제 하시겠어요?
+								</Text>
+							</View>
+							<View style={styles.blankView} />
+							<View style={styles.buttonOverLine} />
+							<Button
+								buttonNumber={2}
+								buttonText="취소"
+								secondButtonText="네"
+								onPressFunction={onPressCloseButton}
+								secondOnPressFunction={onPressDeleteAll}
 							/>
 						</>
 					)}

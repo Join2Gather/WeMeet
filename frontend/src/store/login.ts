@@ -4,6 +4,7 @@ import * as api from '../lib/api/login';
 import { takeLatest } from 'redux-saga/effects';
 import { createAction } from 'redux-actions';
 import type {
+	homeTime,
 	kakaoLoginAPI,
 	Login,
 	nicknameAPI,
@@ -46,6 +47,13 @@ const initialState: Login = {
 	appleUser: null,
 	isConfirmProve: false,
 	alarmTime: 1,
+	homeTime: {
+		start: 0,
+		end: 25,
+	},
+	loading: '',
+	seeTips: true,
+	seeTimeTips: true,
 };
 
 const USER_ME = 'login/USER_ME';
@@ -96,10 +104,11 @@ export const loginSlice = createSlice({
 			} else if (action.payload.uri) {
 				data = state.clubs.find((club) => club.uri === action.payload.uri);
 			} else if (action.payload.id) {
-				data = state.clubs.find((club) => club.id === action.payload.id);
-				dateInfo = state.dates.find(
-					(date: any) => date.club.id === action.payload.id
+				data = state.clubs.find((club) => club?.id == action.payload.id);
+				dateInfo = state.confirmDatesTimetable.find(
+					(date: any) => date?.club?.id === action.payload.id
 				);
+				if (dateInfo) console.log(dateInfo, 'hihi');
 			}
 			if (data && dateInfo) {
 				state.name = data.name;
@@ -108,7 +117,7 @@ export const loginSlice = createSlice({
 				state.peopleCount = data.people_count;
 				state.startHour = data.starting_hours;
 				state.endHour = data.end_hours;
-				state.isConfirmProve = !dateInfo.is_temporary_reserved;
+				state.isConfirmProve = true;
 			} else {
 				state.name = data.name;
 				state.uri = data.uri;
@@ -118,6 +127,9 @@ export const loginSlice = createSlice({
 				state.endHour = data.end_hours;
 				state.isConfirmProve = false;
 			}
+		},
+		confirmProve: (state) => {
+			state.isConfirmProve = true;
 		},
 		findHomeTime: (
 			state,
@@ -133,6 +145,7 @@ export const loginSlice = createSlice({
 						color: d.color,
 						name: decodeURIComponent(d.name),
 						selectTime: time,
+						id: d.id,
 					};
 					state.findIndividual = [...state.findIndividual, data];
 				}
@@ -149,10 +162,15 @@ export const loginSlice = createSlice({
 				fri: [],
 				sat: [],
 			};
-			const { clubs, dates, nickname } = action.payload;
+			const { clubs, dates, nickname, id, name, user } = action.payload;
+			state.id = id;
+			state.name = name;
 			state.dates = dates;
+			state.user = user;
 			state.joinClubNum = clubs.length;
 			state.nickname = nickname;
+			state.clubs = clubs;
+			state.dates = dates;
 			state.confirmDatesTimetable = dates.filter(
 				(da: any) => !da.is_temporary_reserved
 			);
@@ -182,6 +200,7 @@ export const loginSlice = createSlice({
 								},
 								color: day.color,
 								name: day.club === null ? '개인 시간표' : day.club.name,
+								id: day.club?.id,
 							};
 							state.inDates[dayString] = [...state.inDates[dayString], data];
 						});
@@ -193,9 +212,10 @@ export const loginSlice = createSlice({
 				club.name = decodeURIComponent(club.name);
 			});
 			state.userMeSuccess = true;
+			state.error = '';
 		},
 		USER_ME_FAILURE: (state, action: PayloadAction<any>) => {
-			state.error = action.payload;
+			state.error = 'error';
 			state.userMeSuccess = false;
 		},
 		CHANGE_NICKNAME_SUCCESS: (state, action: PayloadAction<any>) => {
@@ -213,6 +233,25 @@ export const loginSlice = createSlice({
 		setAlarmTime: (state, action: PayloadAction<number>) => {
 			state.alarmTime = action.payload;
 		},
+		setAppleToken: (state, action: PayloadAction<string>) => {
+			state.token = action.payload;
+		},
+		setHomeTime: (state, action: PayloadAction<homeTime>) => {
+			state.homeTime.start = action.payload.start;
+			state.homeTime.end = action.payload.end;
+		},
+		setAppLoading: (state, action: PayloadAction<string>) => {
+			state.loading = action.payload;
+		},
+		setTipMode: (state, action: PayloadAction<boolean>) => {
+			state.seeTips = action.payload;
+		},
+		setTimeTipMode: (state, action: PayloadAction<boolean>) => {
+			state.seeTimeTips = action.payload;
+		},
+		toggleUserMeSuccess: (state) => {
+			state.userMeSuccess = false;
+		},
 	},
 	extraReducers: {},
 });
@@ -224,6 +263,13 @@ export const {
 	changeTeamColor,
 	findHomeTime,
 	setAlarmTime,
+	setAppleToken,
+	confirmProve,
+	setHomeTime,
+	setAppLoading,
+	setTipMode,
+	setTimeTipMode,
+	toggleUserMeSuccess,
 } = loginSlice.actions;
 
 export default loginSlice.reducer;

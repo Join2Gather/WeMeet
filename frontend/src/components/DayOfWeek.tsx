@@ -8,8 +8,18 @@ import { View, Text } from '../theme';
 const dayOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const screen = Dimensions.get('screen');
 
-export function DayOfWeek() {
-	const {} = useSelector(({ timetable }: RootState) => ({}));
+interface props {
+	isTeam: boolean;
+}
+
+export function DayOfWeek({ isTeam }: props) {
+	const { todayDate, inColor, teamColor } = useSelector(
+		({ individual, login, timetable }: RootState) => ({
+			todayDate: individual.todayDate,
+			inColor: login.individualColor,
+			teamColor: timetable.color,
+		})
+	);
 	return (
 		<View style={styles.rowDayOfWeekView}>
 			<View style={styles.timeView}>
@@ -17,13 +27,28 @@ export function DayOfWeek() {
 			</View>
 			<View style={styles.contentView}>
 				{dayOfWeek.map((dayText, idx) => (
-					<View style={styles.dayOfWeekView} key={idx}>
+					<View
+						style={[
+							styles.dayOfWeekView,
+							{
+								backgroundColor:
+									todayDate === idx
+										? isTeam
+											? teamColor
+											: inColor
+										: Colors.white,
+							},
+						]}
+						key={idx}
+					>
 						<Text
 							style={[
 								styles.dayOfText,
 								{
 									color:
-										idx === 0
+										todayDate === idx
+											? Colors.white
+											: idx === 0
 											? Colors.red500
 											: idx === 6
 											? Colors.blue700
@@ -50,6 +75,11 @@ const styles = StyleSheet.create({
 	},
 	dayOfWeekView: {
 		width: screen.width / 9,
+		height: screen.width / 12,
+		alignSelf: 'center',
+		alignContent: 'center',
+		alignItems: 'center',
+		justifyContent: 'center',
 	},
 	contentView: {
 		flexDirection: 'row',
@@ -59,5 +89,6 @@ const styles = StyleSheet.create({
 	dayOfText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
+		textAlignVertical: 'center',
 	},
 });

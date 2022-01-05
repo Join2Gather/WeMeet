@@ -1,5 +1,17 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, Dimensions } from 'react-native';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import {
+	StyleSheet,
+	View,
+	Text,
+	FlatList,
+	Dimensions,
+	Animated,
+	PanResponder,
+	Platform,
+	GestureResponderEvent,
+	PanResponderGestureState,
+	Easing,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import {
@@ -14,18 +26,38 @@ import { RootState } from '../store';
 import { initialError, setModalMode } from '../store/team';
 import { ModalInput, Spinner } from '../components';
 import { NavigationHeader } from '../theme';
-import FontAweSome from 'react-native-vector-icons/FontAwesome5';
-import Material from 'react-native-vector-icons/MaterialCommunityIcons';
 import { findTeam, getUserMe } from '../store/login';
 import { Colors } from 'react-native-paper';
-import { makeTeamTime, setIsInTeamTime, setTeamName } from '../store/timetable';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import {
+	makeInitialOverlap,
+	makeTeamTime,
+	setIsInTeamTime,
+	setTeamName,
+	toggleIsInitial,
+} from '../store/timetable';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import { hexToRGB } from '../lib/util/hexToRGB';
-import { TouchableHighlight } from 'react-native-gesture-handler';
+import { TouchableHighlight } from 'react-native';
+import { TouchHeaderIconView } from '../theme';
+import {
+	useAnimatedValue,
+	useAnimatedValueXY,
+	useNavigationHorizontalInterpolator,
+	usePanResponder,
+} from '../hooks';
+import { transform } from 'lodash';
+import { initialTimeMode } from '../store/individual';
+import { interpolate } from '../lib/util/interpolate';
+import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
+
+type Event = GestureResponderEvent;
+type State = PanResponderGestureState;
+
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
 const circleWidth = 14;
+
+const iconSize = 22;
 
 interface goTeam {
 	id?: string;
@@ -97,26 +129,67 @@ export default function TeamList() {
 	const [mode, setMode] = useState('initial');
 	const [makeName, setMake] = useState('');
 	const navigation = useNavigation();
+	const [buttonShown, setButtonShown] = useState(true);
+	const [scrollEnabled, setScrollEnabled] = useScrollEnabled();
+	const animValueXY = useAnimatedValueXY();
 	const [RGBColor, setRGBColor] = useState({
 		r: 0,
 		g: 0,
 		b: 0,
 	});
+
+	const ios = Platform.OS === 'ios';
+
+	const scrolling = useAnimatedValue(0);
+
+	const panResponser = usePanResponder({
+		onPanResponderGrant() {
+			ios && setScrollEnabled(false);
+		},
+		onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
+			return gestureState.dx != 0 && gestureState.dy != 0;
+		},
+		onPanResponderMove(e: Event, s: State) {
+			const { dx, dy } = s;
+			animValueXY.setValue({ x: dx, y: dy });
+			if (dy > 5) {
+				Animated.timing(scrolling, {
+					useNativeDriver: true, // -1-
+					toValue: 0, // -2-
+					duration: 500, // -3-
+					easing: Easing.ease, // -4-
+				}).start();
+			} else if (dy < -5) {
+				Animated.timing(scrolling, {
+					useNativeDriver: true, // -1-
+					toValue: 100, // -2-
+					duration: 500, // -3-
+					easing: Easing.ease, // -4-
+				}).start();
+			}
+			console.log(dx, dy);
+		},
+		onPanResponderRelease() {
+			animValueXY.extractOffset();
+			ios && setScrollEnabled(true);
+		},
+	});
+
+	const [loading, setLoading] = useState('');
+
+	const animValue = useAnimatedValue(0);
+	const AnimatedTouchable =
+		Animated.createAnimatedComponent(TouchableHighlight);
 	const dispatch = useDispatch();
 
 	// useEffect
 	useEffect(() => {
-		dispatch(getUserMe({ id, token, user }));
+		dispatch(getUserMe({ token }));
 	}, [joinTeam]);
 	useEffect(() => {
 		const result = hexToRGB(individualColor);
 		result && setRGBColor(result);
 	}, [individualColor]);
-	useEffect(() => {
-		dispatch(setModalMode('normal'));
-	}, [joinTeamError]);
-	// useCallback
-	// Navigation 이동
 	useEffect(() => {
 		if (mode === 'next') {
 			if (modalMode === 'make') {
@@ -128,7 +201,7 @@ export default function TeamList() {
 						endHour: makeEndHour,
 					})
 				);
-				dispatch(setTeamName({ name: teamName, uri: teamUri }));
+				dispatch(setTeamName({ name: makeName, uri: teamUri }));
 
 				setTimeout(() => {
 					navigation.navigate('TeamTime', {
@@ -170,10 +243,19 @@ export default function TeamList() {
 				});
 			}, 50);
 			setMode('normal');
-
+			dispatch(toggleIsInitial(true));
 			dispatch(setIsInTeamTime(true));
 		}
-	}, [modalMode, mode, teamMakeColor, makeStartHour, makeEndHour]);
+	}, [
+		modalMode,
+		mode,
+		teamMakeColor,
+		makeStartHour,
+		makeEndHour,
+		makeName,
+		loginURI,
+		loginName,
+	]);
 	const goTeamTime = useCallback(
 		({ id, name, uri }: goTeam) => {
 			if (modalMode === 'join') {
@@ -184,6 +266,7 @@ export default function TeamList() {
 				setMode('next');
 			} else if (modalMode === 'make') {
 				name && setMake(name);
+				// dispatch(findTeam({ name }));
 				setMode('next');
 			}
 
@@ -199,167 +282,212 @@ export default function TeamList() {
 	}, [sequence]);
 	const onJoinTeamTime = useCallback(() => {
 		setSequence((sequence) => sequence.filter((idx) => idx !== 3));
+		setMode('initial');
 		dispatch(setModalMode('join'));
+
 		setModalVisible(true);
 	}, [sequence]);
 	const onReload = useCallback(() => {
-		dispatch(getUserMe({ id, user, token }));
+		dispatch(getUserMe({ token }));
+		setLoading('loading');
+		setTimeout(() => {
+			setLoading('');
+		}, 500);
+	}, []);
+	const onPressGoTeamTime = useCallback((item) => {
+		dispatch(toggleIsInitial(true));
+		dispatch(makeInitialOverlap());
+		goTeamTime({ id: item.id });
 	}, []);
 	return (
 		<SafeAreaView
 			style={{ backgroundColor: modalVisible ? Colors.white : individualColor }}
 		>
-			<View
-				style={[
-					styles.view,
-					{ opacity: modalVisible ? 0.2 : 1, backgroundColor: Colors.white },
-				]}
-			>
-				<NavigationHeader
-					title="모임 목록"
-					headerColor={individualColor}
-					Left={() => (
-						<TouchableHighlight
-							underlayColor={individualColor}
-							onPress={onReload}
-						>
-							<FontAwesome5Icon
-								name="redo-alt"
-								size={22}
-								color={Colors.white}
-								style={{ paddingTop: 1 }}
-							/>
-						</TouchableHighlight>
-					)}
-					Right={() => (
-						<TouchableHighlight
-							underlayColor={individualColor}
-							onPress={onMakeTeamTime}
-						>
-							<FontAwesome5Icon
-								name="plus"
-								size={22}
-								color={Colors.white}
-								style={{ paddingTop: 1 }}
-							/>
-						</TouchableHighlight>
-					)}
-				/>
-				{/* <Spinner loading={userLoading} /> */}
-				<Text style={[styles.headerUnderText]}>Plan list</Text>
-
-				{!clubs.length && (
-					<TouchableView
-						style={[
-							styles.teamListTouchableView,
-							{ width: '100%', justifyContent: 'space-between' },
-						]}
-					>
-						<View style={styles.rowCircle} />
-						<Text style={styles.teamTitle}>아직 아무런 모임이 없네요 😭</Text>
-					</TouchableView>
-				)}
-				{/* <Spinner loading={loadingUserMe} /> */}
-				<FlatList
-					style={styles.FlatView}
-					data={clubs}
-					renderItem={({ item }) => (
-						<View>
-							<TouchableHighlight
-								onPress={() => goTeamTime({ id: item.id })}
-								activeOpacity={0.1}
-								underlayColor={Colors.grey300}
-								style={[
-									styles.teamListTouchableView,
-									{
-										opacity: 1,
-									},
-								]}
-							>
-								<View style={styles.teamView}>
-									<View
-										style={[styles.rowCircle, { backgroundColor: item.color }]}
-									/>
-									<Text
-										numberOfLines={1}
-										ellipsizeMode="tail"
-										style={styles.teamTitle}
-									>
-										{item.name}
-									</Text>
-									<Icons size={15} name="right" style={styles.iconStyle} />
-								</View>
-							</TouchableHighlight>
-						</View>
-					)}
-					keyExtractor={(item, index) => String(item.id)}
-				/>
-				{/* <View
-					style={[
-						styles.blurView,
-						{
-							padding: dimensions.screen.width,
-							backgroundColor: Colors.grey200,
-							bottom: -10,
-						},
-					]}
-				></View>
+			<ScrollEnabledProvider>
 				<View
 					style={[
-						styles.blurView,
-						{
-							padding: dimensions.screen.width,
-							backgroundColor: Colors.grey300,
-							bottom: 0,
-						},
+						styles.view,
+						{ opacity: modalVisible ? 0.2 : 1, backgroundColor: Colors.white },
 					]}
-				></View> */}
-				{/* <View
-					style={[styles.blurView, { padding: dimensions.screen.width }]}
-				></View> */}
-				<ModalInput
-					modalVisible={modalVisible}
-					setModalVisible={setModalVisible}
-					user={user}
-					id={id}
-					token={token}
-					goTeamTime={goTeamTime}
-					modalMode={modalMode}
-					loadingJoin={loadingJoin}
-					postTeamError={postTeamError}
-					joinTeamError={joinTeamError}
-					joinUri={joinUri}
-					loadingChangeColor={loadingChangeColor}
-					joinName={joinName}
-					makeReady={makeReady}
-					individualColor={individualColor}
-					sequence={sequence}
-				/>
-				<TouchableView
-					style={[
-						styles.touchableView,
-						{
-							backgroundColor: `rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 2)`,
-						},
-					]}
-					onPress={onJoinTeamTime}
 				>
-					<Text style={styles.loginText}>모임 참여</Text>
-				</TouchableView>
-			</View>
+					<NavigationHeader
+						title="모임 목록"
+						headerColor={individualColor}
+						Left={() => (
+							<TouchHeaderIconView
+								underlayColor={individualColor}
+								onPress={onReload}
+							>
+								<FontAwesome5Icon
+									name="redo-alt"
+									size={iconSize}
+									color={Colors.white}
+									style={{ paddingTop: 1 }}
+								/>
+							</TouchHeaderIconView>
+						)}
+						Right={() => (
+							<TouchHeaderIconView
+								underlayColor={individualColor}
+								onPress={onMakeTeamTime}
+							>
+								<FontAwesome5Icon
+									name="plus"
+									size={iconSize}
+									color={Colors.white}
+									style={{ paddingTop: 1 }}
+								/>
+							</TouchHeaderIconView>
+						)}
+					/>
+					{/* <Spinner loading={userLoading} /> */}
+					{clubs.length !== 0 && (
+						<Text style={[styles.headerUnderText]}>Plan list</Text>
+					)}
+
+					{!clubs.length && (
+						<View
+							style={{
+								flexDirection: 'column',
+								marginLeft: '16%',
+								marginTop: 20,
+								flex: 0.3,
+							}}
+						>
+							<Text style={styles.noListText}>
+								아직 아무런 모임이 없네요 😭
+							</Text>
+							<Text style={styles.noListText}>
+								1. 상단의 "+" 버튼을 눌러 모임을 생성 하거나
+							</Text>
+							<Text style={styles.noListText}>
+								2. 하단의 "모임 참여"를 눌러 모임에 참여해 보세요
+							</Text>
+						</View>
+					)}
+					<Animated.View style={{ flex: 2 }}>
+						<Animated.FlatList
+							{...panResponser.panHandlers}
+							style={[styles.FlatView]}
+							data={clubs}
+							scrollEnabled={scrollEnabled}
+							onScroll={Animated.event(
+								[
+									{
+										nativeEvent: {
+											contentOffset: {
+												y: animValue,
+											},
+										},
+									},
+								],
+								{ useNativeDriver: false }
+							)}
+							renderItem={({ item }) => (
+								<View
+									style={{
+										backgroundColor: Colors.black,
+									}}
+								>
+									<AnimatedTouchable
+										onPress={() => onPressGoTeamTime(item)}
+										activeOpacity={0.1}
+										underlayColor={Colors.grey300}
+										style={[
+											styles.teamListTouchableView,
+											{
+												opacity:
+													item.id === 0
+														? interpolate(animValue, [1, 0.9], [item.id, 18])
+														: 1,
+
+												// backgroundColor:
+												// 	item.id === 1
+												// 		? interpolate(
+												// 				animValue,
+												// 				[Colors.grey800, Colors.white],
+												// 				[-30, 0]
+												// 		  )
+												// 		: Colors.white,
+											},
+										]}
+									>
+										<View style={styles.teamView}>
+											<View
+												style={[
+													styles.rowCircle,
+													{ backgroundColor: item.color },
+												]}
+											/>
+											<Text
+												numberOfLines={1}
+												ellipsizeMode="tail"
+												style={styles.teamTitle}
+											>
+												{item.name}
+											</Text>
+											<Icons size={15} name="right" style={styles.iconStyle} />
+										</View>
+									</AnimatedTouchable>
+								</View>
+							)}
+							keyExtractor={(item, index) => String(item.id)}
+						/>
+					</Animated.View>
+					<Spinner loading={loading} />
+					<ModalInput
+						modalVisible={modalVisible}
+						setModalVisible={setModalVisible}
+						user={user}
+						id={id}
+						token={token}
+						goTeamTime={goTeamTime}
+						modalMode={modalMode}
+						loadingJoin={loadingJoin}
+						postTeamError={postTeamError}
+						joinTeamError={joinTeamError}
+						joinUri={joinUri}
+						loadingChangeColor={loadingChangeColor}
+						joinName={joinName}
+						makeReady={makeReady}
+						individualColor={individualColor}
+						sequence={sequence}
+					/>
+
+					<Animated.View
+						style={{
+							// position: 'absolute',
+							// bottom: '20%',
+							transform: [{ translateY: scrolling }],
+						}}
+					>
+						<TouchableView
+							style={[
+								styles.touchableView,
+								{
+									backgroundColor: individualColor,
+								},
+							]}
+							onPress={onJoinTeamTime}
+						>
+							<Text style={styles.loginText}>모임 참여</Text>
+						</TouchableView>
+					</Animated.View>
+				</View>
+			</ScrollEnabledProvider>
 		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
-	view: { justifyContent: 'center', backgroundColor: Colors.white },
+	view: { justifyContent: 'center', backgroundColor: Colors.white, flex: 1 },
 	headerUnderText: {
 		fontFamily: 'NanumSquareR',
 		fontSize: 16,
 		marginTop: 15,
 		marginBottom: 20,
 		letterSpacing: -0.3,
-
+		flex: 0.08,
 		textAlign: 'center',
 	},
 
@@ -394,7 +522,7 @@ const styles = StyleSheet.create({
 		height: circleWidth,
 		borderRadius: circleWidth / 2,
 		// position: 'absolute',
-		marginLeft: '10%',
+		marginLeft: '11%',
 		// top: -7,
 	},
 	teamTitle: {
@@ -403,13 +531,22 @@ const styles = StyleSheet.create({
 		color: '#000',
 		position: 'absolute',
 		letterSpacing: -0.5,
-		left: '18%',
+		left: '21%',
 		overflow: 'hidden',
 		textAlign: 'center',
 	},
+	noListText: {
+		fontSize: 13,
+		fontFamily: 'SCDream4',
+		letterSpacing: -0.5,
+		overflow: 'hidden',
+		textAlign: 'left',
+		marginBottom: 30,
+		// textAlign: 'center',
+	},
 	iconStyle: {
 		position: 'absolute',
-		right: '10%',
+		right: '11%',
 		alignItems: 'center',
 		alignContent: 'center',
 		alignSelf: 'center',
@@ -420,9 +557,11 @@ const styles = StyleSheet.create({
 	touchableView: {
 		flexDirection: 'row',
 		height: 50,
-		marginBottom: 50,
+		bottom: 30,
 		borderRadius: 10,
+		position: 'absolute',
 		width: '65%',
+		// left: '60%',
 		justifyContent: 'center',
 		alignItems: 'center',
 		shadowColor: 'black',
@@ -431,13 +570,13 @@ const styles = StyleSheet.create({
 			width: 1,
 			height: 1,
 		},
+
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
-		marginTop: 50,
 	},
 	teamListTouchableView: {
 		flexDirection: 'row',
-		height: 40,
+
 		// borderRadius: 10,
 		width: '100%',
 		justifyContent: 'center',
@@ -448,6 +587,8 @@ const styles = StyleSheet.create({
 			width: 1,
 			height: 1,
 		},
+		paddingTop: 13,
+		paddingBottom: 13,
 	},
 	blurView: {
 		paddingTop: 5,
@@ -459,7 +600,7 @@ const styles = StyleSheet.create({
 		height: 30,
 	},
 	FlatView: {
-		height: '70%',
+		height: '100%',
 		flexGrow: 0,
 	},
 	teamView: {

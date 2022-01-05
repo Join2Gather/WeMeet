@@ -12,13 +12,24 @@ import {
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { hexToRGB } from '../lib/util/hexToRGB';
 import type { findTime } from '../interface/timetable';
-import { deletePostTime, setTimeModalMode } from '../store/timetable';
+import {
+	makeTeamTime,
+	setTeamName,
+	setTimeModalMode,
+	toggleIsInitial,
+} from '../store/timetable';
 import { Button } from '../lib/util/Button';
-import { deleteHomeTime, initialTimeMode } from '../store/individual';
+import {
+	deleteHomeTime,
+	initialIndividualTimetable,
+	initialTimeMode,
+} from '../store/individual';
 import { RootState } from '../store';
 import { Spinner } from '.';
+import { findTeam } from '../store/login';
+import { useNavigation } from '@react-navigation/native';
+import { CloseButton } from '../theme';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -36,9 +47,38 @@ export function ModalIndividualTime({
 	findIndividual,
 	inTimeMode,
 }: props) {
+	const {
+		user,
+		id,
+		token,
+		loginName,
+		loginURI,
+		color,
+		peopleCount,
+		startHour,
+		endHour,
+	} = useSelector(({ login }: RootState) => ({
+		user: login.user,
+		id: login.id,
+		token: login.token,
+		loginURI: login.uri,
+		loginName: login.name,
+		color: login.color,
+		peopleCount: login.peopleCount,
+		startHour: login.startHour,
+		endHour: login.endHour,
+	}));
 	const dispatch = useDispatch();
+	const navigation = useNavigation();
 	const [mode, setMode] = useState('normal');
-	console.log(inTimeMode);
+	const [teamId, setId] = useState('');
+
+	useEffect(() => {
+		if (findIndividual && findIndividual[0]?.id && inModalVisible) {
+			const id = String(findIndividual[0].id);
+			dispatch(findTeam({ id: id }));
+		}
+	}, [findIndividual, teamId, inModalVisible]);
 
 	const onPressCloseBtn = useCallback(() => {
 		setInModalVisible && setInModalVisible(false);
@@ -49,11 +89,41 @@ export function ModalIndividualTime({
 		dispatch(deleteHomeTime(findIndividual));
 		dispatch(initialTimeMode());
 		setMode('loading');
+		dispatch(initialIndividualTimetable());
 		setTimeout(() => {
 			setMode('normal');
 			setInModalVisible && setInModalVisible(false);
 		}, 1000);
 	}, [findIndividual]);
+	const onPressMove = useCallback(() => {
+		console.log(teamId);
+
+		dispatch(toggleIsInitial(true));
+		setTimeout(() => {
+			dispatch(
+				makeTeamTime({
+					color,
+					peopleCount,
+					startHour,
+					endHour,
+				})
+			);
+			dispatch(setTeamName({ name: loginName, uri: loginURI }));
+		}, 100);
+		setTimeout(() => {
+			navigation.navigate('HomeNavigator');
+		}, 200);
+		setTimeout(() => {
+			navigation.navigate('TeamTime', {
+				user,
+				id,
+				token,
+				modalMode: 'normal',
+			});
+		}, 300);
+		setInModalVisible && setInModalVisible(false);
+		dispatch(initialTimeMode());
+	}, [teamId, findIndividual, color, loginName, loginURI]);
 	return (
 		<Modal
 			animationType="fade"
@@ -66,34 +136,13 @@ export function ModalIndividualTime({
 			<Spinner loading={mode} />
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
-					<View
-						style={
-							(styles.textView,
-							[
-								{
-									marginBottom: 10,
-								},
-							])
-						}
-					>
-						<TouchableHighlight
-							activeOpacity={1}
-							underlayColor={Colors.white}
-							style={{
-								marginLeft: '90%',
-								width: '9%',
-							}}
-							onPress={onPressCloseBtn}
-						>
-							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
-						</TouchableHighlight>
-					</View>
+					<CloseButton closeBtn={onPressCloseBtn} />
 
 					<ScrollView>
 						{findIndividual && findIndividual[0] && (
 							<>
 								<View style={styles.blankView} />
-								<Text style={styles.titleText}>모임명</Text>
+								<Text style={[styles.titleText]}>모임명</Text>
 								<View style={styles.blankView} />
 
 								<View
@@ -108,7 +157,12 @@ export function ModalIndividualTime({
 								>
 									<View style={styles.columnView}>
 										<View style={styles.rowView}>
-											<Text style={(styles.touchText, { color: Colors.white })}>
+											<Text
+												style={
+													(styles.touchText,
+													{ color: Colors.white, fontSize: 15 })
+												}
+											>
 												{findIndividual[0].name}
 											</Text>
 										</View>
@@ -170,6 +224,19 @@ export function ModalIndividualTime({
 							))}
 						<View style={styles.blankView} />
 					</ScrollView>
+					{inTimeMode.includes('team') && (
+						<>
+							<View style={styles.blankView} />
+							<View style={styles.rowLine} />
+							<Button
+								buttonNumber={2}
+								buttonText="취소"
+								secondButtonText="이동"
+								onPressFunction={onPressCloseBtn}
+								secondOnPressFunction={onPressMove}
+							/>
+						</>
+					)}
 					{inTimeMode.includes('everyTime') && (
 						<>
 							<View style={styles.blankView} />
@@ -235,6 +302,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
 		width: screen.width * 0.9,
+		maxHeight: screen.height * 0.7,
 	},
 	touchText: {
 		fontSize: 14,
@@ -250,6 +318,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
+		marginLeft: '1%',
 	},
 	blankView: {
 		height: 10,

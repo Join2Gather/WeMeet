@@ -28,14 +28,21 @@ import { postImage } from '../store/individual';
 const screen = Dimensions.get('screen');
 
 const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
-	const { individualColor, myNickName, joinClubNum, confirmClubNum, token } =
-		useSelector(({ login }: RootState) => ({
-			individualColor: login.individualColor,
-			myNickName: login.nickname,
-			joinClubNum: login.joinClubNum,
-			confirmClubNum: login.confirmClubNum,
-			token: login.token,
-		}));
+	const {
+		individualColor,
+		myNickName,
+		joinClubNum,
+		confirmClubNum,
+		token,
+		color,
+	} = useSelector(({ login }: RootState) => ({
+		individualColor: login.individualColor,
+		myNickName: login.nickname,
+		joinClubNum: login.joinClubNum,
+		confirmClubNum: login.confirmClubNum,
+		token: login.token,
+		color: login.individualColor,
+	}));
 	const { navigation } = props;
 	const close = useCallback(
 		() => navigation.dispatch(DrawerActions.closeDrawer()),
@@ -89,7 +96,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 				<NavigationHeader
 					headerColor={individualColor}
 					Right={() => (
-						<Icon color={Colors.white} name="close" size={24} onPress={close} />
+						<Icon color={Colors.white} name="close" size={31} onPress={close} />
 					)}
 				/>
 				<View style={[styles.content]}>
@@ -182,7 +189,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 										</View>
 									</View>
 								</TouchableHighlight>
-								<TouchableHighlight
+								{/* <TouchableHighlight
 									activeOpacity={0.5}
 									style={styles.touchButtonStyle}
 									onPress={onPressGallery}
@@ -205,12 +212,13 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 											/>
 										</View>
 									</View>
-								</TouchableHighlight>
+								</TouchableHighlight> */}
 								<ModalSelect
 									selectModalVisible={selectModalVisible}
 									setSelectModalVisible={setSelectModalVisible}
 									mode={mode}
 									setMode={setMode}
+									color={color}
 								/>
 							</View>
 						</View>

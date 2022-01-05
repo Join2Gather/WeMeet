@@ -6,18 +6,22 @@ import {
 	Platform,
 	Image,
 	ScrollView,
+	Animated,
 } from 'react-native';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 import Constants from 'expo-constants';
 // prettier-ignore
 import {SafeAreaView, View, UnderlineText,TopBar,
-NavigationHeader, MaterialCommunityIcon as Icon, Text} from '../theme';
+NavigationHeader, MaterialCommunityIcon as Icon, Text, TouchHeaderIconView} from '../theme';
 import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
 import {
 	LeftRightNavigation,
 	Spinner,
 	ModalSelect,
 	DayOfWeek,
+	ModalHomeTimePicker,
+	ModalInfo,
+	ModalHomeInfo,
 } from '../components';
 import { Timetable } from '../components/Timetable';
 import type { LeftRightNavigationMethods } from '../components';
@@ -31,7 +35,7 @@ import {
 	postImage,
 } from '../store/individual';
 import * as FileSystem from 'expo-file-system';
-import { useMakeTimetable } from '../hooks';
+import { useAnimatedValue, useMakeTimetable } from '../hooks';
 import { getUserMe } from '../store/login';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
@@ -43,6 +47,8 @@ import Ionic from 'react-native-vector-icons/Ionicons';
 import { StatusBar } from 'expo-status-bar';
 
 import * as Notifications from 'expo-notifications';
+
+const iconSize = 22;
 
 export async function allowsNotificationsAsync() {
 	const settings = await Notifications.getPermissionsAsync();
@@ -86,8 +92,7 @@ export default function Home() {
 	const {
 		token,
 		individualDates,
-		loginEveryTime,
-		postEveryTime,
+
 		id,
 		user,
 		userMeSuccess,
@@ -95,24 +100,29 @@ export default function Home() {
 		confirmDatesTimetable,
 		individualTimesText,
 		individualColor,
-		myNickName,
-		joinClubNum,
-		confirmClubNum,
+		userMeError,
+		individualCount,
+		groupCount,
+		endHour,
+		appLoading,
+		seeTips,
 	} = useSelector(({ login, individual, loading }: RootState) => ({
 		token: login.token,
 		id: login.id,
 		user: login.user,
 		individualDates: individual.individualDates,
-		loginEveryTime: loading['individual/LOGIN_EVERYTIME'],
-		postEveryTime: loading['individual/POST_EVERYTIME'],
+
 		userMeSuccess: login.userMeSuccess,
 		confirmClubs: login.confirmClubs,
 		confirmDatesTimetable: login.confirmDatesTimetable,
 		individualTimesText: individual.individualTimesText,
 		individualColor: login.individualColor,
-		myNickName: login.nickname,
-		joinClubNum: login.joinClubNum,
-		confirmClubNum: login.confirmClubNum,
+		userMeError: individual.error,
+		individualCount: individual.individualCount,
+		groupCount: individual.groupCount,
+		endHour: login.homeTime.end,
+		appLoading: login.loading,
+		seeTips: login.seeTips,
 	}));
 
 	// useEffect(() => {
@@ -133,7 +143,6 @@ export default function Home() {
 	const navigation = useNavigation();
 	useEffect(() => {
 		const isFocus = navigation.getState().routes;
-		console.log(isFocus);
 	}, [navigation]);
 	useEffect(() => {
 		if (!individualDates.length) {
@@ -141,7 +150,7 @@ export default function Home() {
 		dispatch(cloneIndividualDates(defaultDates));
 	}, []);
 	useEffect(() => {
-		dispatch(getUserMe({ id, token, user }));
+		dispatch(getUserMe({ token }));
 	}, []);
 	useEffect(() => {
 		dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
@@ -153,27 +162,47 @@ export default function Home() {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [selectModalVisible, setSelectModalVisible] = useState(false);
 	const [settingModalVisible, setSettingModalVisible] = useState(false);
+	const [infoVisible, setInfoVisible] = useState(false);
 	const flatListRef = useRef<FlatList | null>(null);
 
+	useEffect(() => {
+		seeTips ? setInfoVisible(true) : setInfoVisible(false);
+	}, [seeTips]);
 	// image pic1er
 
 	const [mode, setMode] = useState('normal');
 	const [isTimeMode, setIsTimeMode] = useState(false);
 	const [currentNumber, setCurrent] = useState(0);
 	const [sequence, setSequence] = useState([0, 1, 2]);
+	const [homeVisible, setHomeVisible] = useState(false);
 	const onPressPlus = useCallback(() => {
 		setIsTimeMode(true);
 		setMode('startMode');
 	}, []);
+	const [headerShown, setHeaderShown] = useState(true);
+	const animValue = useAnimatedValue(115);
 
 	useEffect(() => {
-		!userMeSuccess && setSettingModalVisible(true);
-	}, [userMeSuccess]);
+		Animated.timing(animValue, {
+			toValue: headerShown ? 0 : -115,
+			duration: 250,
+			useNativeDriver: true,
+		}).start();
+	}, [headerShown]);
+
+	useEffect(() => {
+		userMeError && setSettingModalVisible(true);
+	}, [userMeError]);
 
 	// modal
 
 	const open = useCallback(() => {
 		navigation.dispatch(DrawerActions.openDrawer());
+	}, []);
+
+	const onPressChangeTime = useCallback(() => {
+		setSettingModalVisible(false);
+		setHomeVisible(true);
 	}, []);
 	return (
 		<SafeAreaView style={{ backgroundColor: individualColor }}>
@@ -183,47 +212,84 @@ export default function Home() {
 					title="내 일정 등록하기"
 					headerColor={individualColor}
 					Left={() => (
-						<TouchableHighlight underlayColor={individualColor} onPress={open}>
+						<TouchHeaderIconView underlayColor={individualColor} onPress={open}>
 							<Ionic
 								name="menu"
-								size={33}
+								size={iconSize + 11}
 								color={Colors.white}
 								// style={{ paddingTop: 1 }}
 							/>
-						</TouchableHighlight>
+						</TouchHeaderIconView>
 					)}
 					Right={() => (
-						<TouchableHighlight
+						<TouchHeaderIconView
 							underlayColor={individualColor}
 							onPress={onPressPlus}
 						>
 							<FontAwesome5Icon
 								name="plus"
-								size={22}
+								size={iconSize}
 								color={Colors.white}
-								style={{ paddingTop: 2 }}
+								style={{}}
 							/>
-						</TouchableHighlight>
+						</TouchHeaderIconView>
 					)}
 					secondRight={() => (
-						<TouchableHighlight
+						<TouchHeaderIconView
 							underlayColor={individualColor}
 							onPress={() => setSettingModalVisible(true)}
 						>
 							<MaterialIcon
 								name="settings"
-								size={24}
+								size={iconSize + 2}
+								color={Colors.white}
+							/>
+						</TouchHeaderIconView>
+					)}
+					thirdRight={() => (
+						<TouchHeaderIconView
+							underlayColor={individualColor}
+							onPress={() => setInfoVisible(true)}
+						>
+							<FontAwesome5Icon
+								name="question-circle"
+								size={iconSize}
 								color={Colors.white}
 								style={{ paddingTop: 1 }}
 							/>
-						</TouchableHighlight>
+						</TouchHeaderIconView>
 					)}
 				/>
 
 				<View style={styles.viewHeight}>
 					{mode === 'normal' && (
 						<View style={{ flexDirection: 'column' }}>
-							<Text style={styles.titleText}>안녕하세요 {myNickName}님</Text>
+							{/* <Text style={styles.titleText}>안녕하세요 {myNickName}님</Text> */}
+							{groupCount !== 0 && individualCount !== 0 && (
+								<>
+									<Text style={styles.titleText}>
+										오늘은 {individualCount}개의 개인 일정과
+									</Text>
+									<Text style={styles.titleText}>
+										오늘은 {individualCount}개의 팀 일정이 있어요
+									</Text>
+								</>
+							)}
+							{groupCount !== 0 && individualCount === 0 && (
+								<Text style={styles.titleText}>
+									오늘은 {groupCount}개의 팀 일정이 있어요
+								</Text>
+							)}
+							{!groupCount && individualCount !== 0 && (
+								<Text style={styles.titleText}>
+									오늘은 {individualCount}개의 개인 일정이 있어요
+								</Text>
+							)}
+							{!groupCount && individualCount === 0 && (
+								<Text style={styles.titleText}>
+									오늘은 아무런 일정이 없네요
+								</Text>
+							)}
 							<View style={styles.rowView}>
 								<>
 									<View style={[styles.boxView]}>
@@ -257,7 +323,7 @@ export default function Home() {
 							</View>
 						</View>
 					)}
-					<Spinner loading={postEveryTime} />
+					<Spinner loading={appLoading} />
 					{isTimeMode && (
 						<View style={{ flexDirection: 'column' }}>
 							<View style={{ height: 30 }} />
@@ -287,7 +353,7 @@ export default function Home() {
 						</View>
 					)}
 				</View>
-				<DayOfWeek />
+				<DayOfWeek isTeam={false} />
 				<ScrollView style={{ backgroundColor: Colors.white }}>
 					<Timetable
 						modalVisible={modalVisible}
@@ -298,26 +364,30 @@ export default function Home() {
 						individualDates={individualDates}
 						isGroup={false}
 						individualTimesText={individualTimesText}
-						endIdx={25}
+						endIdx={endHour}
 						color={individualColor}
 						isHomeTime={true}
 						setCurrent={setCurrent}
 					/>
-					{/* <ModalSelect
-						selectModalVisible={selectModalVisible}
-						setSelectModalVisible={setSelectModalVisible}
-					/> */}
+					<ModalHomeTimePicker
+						homeVisible={homeVisible}
+						setHomeVisible={setHomeVisible}
+						setSettingModalVisible={setSettingModalVisible}
+					/>
 					<HomeSetting
-						userMeSuccess={userMeSuccess}
+						userMeError={userMeError}
 						setSettingModalVisible={setSettingModalVisible}
 						settingModalVisible={settingModalVisible}
 						user={user}
 						id={id}
 						token={token}
 						color={individualColor}
-						myNickName={myNickName}
-						joinClubNum={joinClubNum}
-						confirmClubNum={confirmClubNum}
+						onPressChangeTime={onPressChangeTime}
+					/>
+					<ModalHomeInfo
+						infoVisible={infoVisible}
+						setInfoVisible={setInfoVisible}
+						seeTips={seeTips}
 					/>
 				</ScrollView>
 			</View>

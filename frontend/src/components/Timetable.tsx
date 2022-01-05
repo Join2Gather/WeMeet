@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { StyleSheet, Dimensions, View } from 'react-native';
+import { StyleSheet, Dimensions, View, Alert } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -12,19 +12,24 @@ import {
 	getGroupDates,
 	getIndividualDates,
 	getOtherConfirmDates,
+	makeInitialIndividual,
+	makeTeamTime,
 	setDay,
 	setStartHour,
 	setTimeModalMode,
 	toggleTimePick,
 } from '../store/timetable';
 import type { make60, timeType } from '../interface';
-import { Text, TouchableView } from '../theme';
+import { Text } from '../theme';
 import { RootState } from '../store';
 import { checkInMode, initialTimeMode, kakaoLogin } from '../store/individual';
 import { ModalTime } from './';
 import { ModalTimePicker } from './ModalTimePicker';
 import { findHomeTime } from '../store/login';
 import { ModalIndividualTime } from './ModalIndividualTime';
+import { TouchableOpacity } from 'react-native';
+import { Spinner } from './Spinner';
+import { Platform } from 'react-native';
 
 const boxHeight = 28.0;
 const inBoxHeight = 7.0;
@@ -104,6 +109,9 @@ export function Timetable({
 		selectTimeMode,
 		modalMode,
 		inTimeMode,
+		isInitial,
+		isOverlap,
+		todayDate,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
@@ -131,6 +139,9 @@ export function Timetable({
 			selectTimeMode: timetable.selectTimeMode,
 			modalMode: timetable.modalMode,
 			inTimeMode: individual.inTimeMode,
+			isInitial: timetable.isInitial,
+			isOverlap: timetable.isOverlap,
+			todayDate: individual.todayDate,
 		})
 	);
 	const dispatch = useDispatch();
@@ -145,8 +156,11 @@ export function Timetable({
 		day: '',
 	});
 	const [count, setCount] = useState(1);
+	const [loading, setLoading] = useState('');
 	// useEffect
-
+	useEffect(() => {
+		console.log(isGroup, 'isGroup');
+	}, [isGroup]);
 	useEffect(() => {
 		date.setMinutes(0);
 	}, [date]);
@@ -158,57 +172,55 @@ export function Timetable({
 	useEffect(() => {
 		endIdx ? setEndHour(endIdx) : setEndHour(endHourTimetable);
 	}, [endIdx, endHourTimetable]);
+
 	// 최초 렌더링 개인 페이지 정보 받아오기
 	useEffect(() => {
-		if (!loadingJoin && !joinTeamError) {
-			if (uri && isGroup) {
+		if (isInitial) {
+			if (uri) {
+				dispatch(makeInitialIndividual());
+
 				if (timeMode === 'make')
 					dispatch(getGroupDates({ id, user, token, uri: joinUri }));
 				else dispatch(getGroupDates({ id, user, token, uri }));
 
-				dispatch(
-					getOtherConfirmDates({
-						confirmClubs,
-						confirmDatesTimetable,
-						isGroup,
-					})
-				);
-			} else if (uri && !isGroup) {
+				setTimeout(() => {
+					dispatch(
+						getOtherConfirmDates({
+							confirmClubs,
+							confirmDatesTimetable,
+							isGroup: true,
+						})
+					);
+				}, 200);
+
 				if (timeMode == 'make')
 					dispatch(getIndividualDates({ id, user, token, uri: joinUri }));
 				else {
 					dispatch(getIndividualDates({ id, user, token, uri }));
 				}
-				dispatch(
-					getOtherConfirmDates({
-						confirmClubs,
-						confirmDatesTimetable,
-						isGroup: false,
-					})
-				);
+				setTimeout(() => {
+					dispatch(
+						getOtherConfirmDates({
+							confirmClubs,
+							confirmDatesTimetable,
+							isGroup: false,
+						})
+					);
+				}, 100);
 			}
+			setLoading('loading');
+			setTimeout(() => {
+				setLoading('');
+			}, 500);
 		}
-	}, [
-		uri,
-		id,
-		user,
-		token,
-		isGroup,
-		loadingJoin,
-		joinTeamError,
-		joinUri,
-		timeMode,
-		reload,
-		color,
-		confirmDatesPrepare,
-	]);
+	}, [uri, isGroup, isInitial]);
 
-	useEffect(() => {
-		if (cloneDateSuccess) {
-			dispatch(kakaoLogin(kakaoDates));
-			dispatch(cloneEveryTime(kakaoDates));
-		}
-	}, [cloneDateSuccess, kakaoDates]);
+	// useEffect(() => {
+	// 	if (cloneDateSuccess) {
+	// 		dispatch(kakaoLogin(kakaoDates));
+	// 		dispatch(cloneEveryTime(kakaoDates));
+	// 	}
+	// }, [cloneDateSuccess, kakaoDates]);
 	useEffect(() => {
 		// 시간 누르기 로직
 		if (!isHomeTime) {
@@ -261,10 +273,14 @@ export function Timetable({
 	}, [isTimePicked, mode]);
 	useEffect(() => {
 		if (isHomeTime) {
-			if (inTimeMode.includes('team') || inTimeMode.includes('everyTime')) {
+			console.log(inTimeMode);
+			if (
+				inTimeMode.includes('home') ||
+				inTimeMode.includes('team') ||
+				inTimeMode.includes('everyTime')
+			) {
 				// 빈 칸 아닐 경우
 				dispatch(findHomeTime({ day: select.day, time: select.time }));
-
 				setTimeout(() => {
 					setInModalVisible(true);
 				}, 100);
@@ -323,6 +339,9 @@ export function Timetable({
 		setTimeModalVisible(false);
 	}, [select]);
 
+	useEffect(() => {
+		console.log('mode', mode);
+	}, [mode]);
 	const onSetStartHour = useCallback(
 		(idx: number, time: number, day: string) => {
 			dispatch(toggleTimePick());
@@ -340,7 +359,7 @@ export function Timetable({
 			}, 100);
 			setTimeout(() => {
 				setMode && setMode('startMinute');
-			}, 500);
+			}, 100);
 		},
 		[isGroup, date, isConfirm, mode]
 	);
@@ -380,13 +399,15 @@ export function Timetable({
 								</View>
 						  ))}
 				</View>
+				{/* <Spinner loading={loading} /> */}
 				<View style={styles.contentView}>
 					{isGroup ? (
 						<>
 							{teamDatesWith60.map((day, idx) => (
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
-										<TouchableView
+										<TouchableOpacity
+											accessibilityRole="button"
 											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
@@ -410,7 +431,7 @@ export function Timetable({
 																	? borderWidth
 																	: 0,
 															borderBottomWidth:
-																Number(time) === endHour - 1 && tIdx === 6
+																Number(time) === endHour - 1 && tIdx === 5
 																	? borderWidth
 																	: 0,
 															borderLeftWidth:
@@ -421,7 +442,7 @@ export function Timetable({
 													]}
 												/>
 											))}
-										</TouchableView>
+										</TouchableOpacity>
 									))}
 								</View>
 							))}
@@ -431,7 +452,7 @@ export function Timetable({
 							{individualDates.map((day, idx) => (
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
-										<TouchableView
+										<TouchableOpacity
 											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
@@ -452,7 +473,7 @@ export function Timetable({
 																	? borderWidth
 																	: 0,
 															borderBottomWidth:
-																Number(time) === endHour - 1 && tIdx === 6
+																Number(time) === endHour - 1 && tIdx === 5
 																	? borderWidth
 																	: 0,
 															borderLeftWidth:
@@ -463,7 +484,7 @@ export function Timetable({
 													]}
 												/>
 											))}
-										</TouchableView>
+										</TouchableOpacity>
 									))}
 								</View>
 							))}
@@ -473,7 +494,7 @@ export function Timetable({
 							{snapShotDate.map((day, idx) => (
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
-										<TouchableView
+										<TouchableOpacity
 											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
@@ -494,7 +515,7 @@ export function Timetable({
 																	? borderWidth
 																	: 0,
 															borderBottomWidth:
-																Number(time) === endHour - 1 && tIdx === 6
+																Number(time) === endHour - 1 && tIdx === 5
 																	? borderWidth
 																	: 0,
 															borderLeftWidth:
@@ -505,7 +526,7 @@ export function Timetable({
 													]}
 												/>
 											))}
-										</TouchableView>
+										</TouchableOpacity>
 									))}
 								</View>
 							))}
@@ -515,7 +536,7 @@ export function Timetable({
 							{teamConfirmDate.map((day, idx) => (
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
-										<TouchableView
+										<TouchableOpacity
 											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
@@ -529,29 +550,33 @@ export function Timetable({
 														styles.timeSmallView,
 														{
 															backgroundColor: t.color,
-
 															borderTopWidth:
 																Number(time) === endHour
-																	? t.borderWidth
+																	? borderWidth
 																	: t.borderTop
 																	? t.borderWidth
 																	: 0,
+
 															borderBottomWidth:
-																Number(time) === endHour - 1 && tIdx === 6
-																	? t.borderWidth
+																Number(time) === endHour - 1 && tIdx === 5
+																	? borderWidth
 																	: t.borderBottom
 																	? t.borderWidth
 																	: 0,
-
 															borderLeftWidth:
-																Number(time) === endHour ? 0 : t.borderWidth,
+																Number(time) === endHour
+																	? t.borderWidth
+																	: t.borderWidth,
+
 															borderRightWidth:
-																Number(time) === endHour ? 0 : t.borderWidth,
+																Number(time) === endHour
+																	? t.borderWidth
+																	: t.borderWidth,
 														},
 													]}
 												/>
 											))}
-										</TouchableView>
+										</TouchableOpacity>
 									))}
 								</View>
 							))}
@@ -561,17 +586,12 @@ export function Timetable({
 							{dates.map((day, idx) => (
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
-										<TouchableView
+										<TouchableOpacity
 											style={[styles.boxView]}
 											key={time}
 											onPress={() => {
 												mode === 'normal' &&
-													onPressIndividualTime(
-														Number(time),
-														day.day,
-
-														idx
-													);
+													onPressIndividualTime(Number(time), day.day, idx);
 												mode === 'startMode' &&
 													onSetStartHour(idx, Number(time), day.day);
 											}}
@@ -590,7 +610,7 @@ export function Timetable({
 																	? borderWidth
 																	: 0,
 															borderBottomWidth:
-																Number(time) === endHour - 1 && tIdx === 6
+																Number(time) === endHour - 1 && tIdx === 5
 																	? borderWidth
 																	: 0,
 															borderLeftWidth:
@@ -601,7 +621,7 @@ export function Timetable({
 													]}
 												/>
 											))}
-										</TouchableView>
+										</TouchableOpacity>
 									))}
 								</View>
 							))}
@@ -679,19 +699,25 @@ const styles = StyleSheet.create({
 	rowView: {
 		flexDirection: 'row',
 	},
-	boxView: {
-		height: 28,
-		width: screen.width / 9,
-	},
+
 	timeEachView: {
-		height: 56,
+		height: Platform.OS === 'android' ? 59.7 : 60,
 		borderTopWidth: 2,
-		borderColor: Colors.blue500,
+
 		width: screen.width / 3,
 		alignSelf: 'flex-end',
 	},
+	boxView: {
+		height: 30,
+		borderColor: Colors.black,
+
+		width: screen.width / 9,
+		marginBottom: Platform.OS === 'android' ? -0.14 : 0,
+	},
 	timeSmallView: {
-		flex: 1,
-		marginBottom: -0.01,
+		// flex: 1,
+		height: 5,
+		marginBottom: Platform.OS === 'android' ? -0.008 : 0,
+		marginTop: Platform.OS === 'android' ? -0.01 : 0,
 	},
 });

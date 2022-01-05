@@ -7,11 +7,11 @@ platform :ios, '12.0'
 require 'json'
 podfile_properties = JSON.parse(File.read('./Podfile.properties.json')) rescue {}
 
-target 'Join2Gather' do
+target 'WeMeet' do
   use_expo_modules!
   config = use_native_modules!
 
-  pod 'expo-dev-launcher', path: '../node_modules/expo-dev-launcher', :configurations => :debug
+  pod 'expo-dev-launcher', path: '../node_modules/expo-dev-client/node_modules/expo-dev-launcher', :configurations => :debug
   pod 'expo-dev-menu', path: '../node_modules/expo-dev-menu', :configurations => :debug
   use_react_native!(
     :path => config[:reactNativePath],

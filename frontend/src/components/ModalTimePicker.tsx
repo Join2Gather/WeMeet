@@ -1,6 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { Alert, Platform, StyleSheet } from 'react-native';
-// import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { Alert, Platform } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import {
 	changeConfirmTime,
@@ -14,15 +13,18 @@ import {
 	checkIsExist,
 	checkIsBlank,
 	makeInitialTimePicked,
+	toggleIsInitial,
+	setSelectIdx,
 } from '../store/timetable';
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
-import { getUserMe } from '../store/login';
+import { getUserMe, toggleUserMeSuccess } from '../store/login';
 import individual, {
 	checkHomeIstBlank,
 	cloneINDates,
 	initialIndividualTimetable,
 	initialTimeMode,
+	makeHomeTime,
 	makePostHomeDates,
 	postEveryTime,
 	setInEndTime,
@@ -97,6 +99,8 @@ export function ModalTimePicker({
 		startHour,
 		endHour,
 		confirmCount,
+		selectIdx,
+		userMeSuccess,
 	} = useSelector(({ timetable, login, individual }: RootState) => ({
 		postConfirmSuccess: timetable.postConfirmSuccess,
 		confirmClubs: login.confirmClubs,
@@ -111,6 +115,8 @@ export function ModalTimePicker({
 		startHour: timetable.startHour,
 		endHour: timetable.endHour,
 		confirmCount: timetable.confirmCount,
+		selectIdx: timetable.selectIdx,
+		userMeSuccess: login.userMeSuccess,
 	}));
 	const dispatch = useDispatch();
 	// const [minute, setMinute] = useState(0);
@@ -185,10 +191,14 @@ export function ModalTimePicker({
 				dispatch(setStartHour(timeHour));
 				dispatch(setStartMin(timeMinute));
 			}
-			console.log(checkTime);
 			if (timeHour < checkTime.start) {
 				initialWithError();
 				Alert.alert('경고', '모임 시간 이전 시간으로 선택하실 수 없습니다', [
+					{ text: '확인', onPress: () => {} },
+				]);
+			} else if (timeHour >= checkTime.end) {
+				initialWithError();
+				Alert.alert('경고', '모임 시간 이후 시간으로 선택하실 수 없습니다', [
 					{ text: '확인', onPress: () => {} },
 				]);
 			} else {
@@ -209,6 +219,7 @@ export function ModalTimePicker({
 			setCurrent && setCurrent(0);
 			const timeHour = date.getHours();
 			const timeMinute = date.getMinutes();
+			dispatch(setSelectIdx(0));
 			if (isHomeTime)
 				dispatch(setInEndTime({ hour: timeHour, min: timeMinute }));
 			else {
@@ -220,7 +231,7 @@ export function ModalTimePicker({
 				Alert.alert('경고', '모임 시간 이후 시간으로 선택하실 수 없습니다', [
 					{ text: '확인', onPress: () => {} },
 				]);
-			} else if (startTime.hour >= timeHour) {
+			} else if (startTime.hour > timeHour) {
 				initialWithError();
 				Alert.alert('경고', '시작시간 전으로 시간 설정이 불가능 합니다', [
 					{ text: '확인', onPress: () => {} },
@@ -258,6 +269,7 @@ export function ModalTimePicker({
 		setIsTimeMode && setIsTimeMode(false);
 		setCurrent && setCurrent(0);
 		setMode && setMode('normal');
+		dispatch(setSelectIdx(0));
 		if (isHomeTime) {
 			dispatch(initialTimeMode());
 			initialWithError();
@@ -298,13 +310,23 @@ export function ModalTimePicker({
 	}, [postDatesPrepare, uri, joinUri]);
 	useEffect(() => {
 		if (postConfirmSuccess || postHomeSuccess) {
-			dispatch(getUserMe({ id, user, token }));
+			dispatch(getUserMe({ token }));
 			dispatch(initialIndividualTimetable());
 		}
 	}, [postConfirmSuccess, postHomeSuccess]);
+
 	useEffect(() => {
-		dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
-	}, [confirmClubs, confirmDatesTimetable]);
+		if (userMeSuccess) {
+			dispatch(makeHomeTime());
+			dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
+		}
+		setTimeout(() => {
+			dispatch(toggleUserMeSuccess());
+		}, 300);
+	}, [userMeSuccess]);
+	// useEffect(() => {
+	// 	dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
+	// }, []);
 	return (
 		<>
 			<Spinner loading={mode} />
@@ -331,7 +353,7 @@ export function ModalTimePicker({
 				title={
 					isConfirm
 						? findTime && findTime.length !== 0
-							? `시작시간 설정\n 가능 시간 : [ ${findTime[0].timeText} ]`
+							? `시작시간 설정\n 가능 시간 : [ ${findTime[selectIdx].timeText} ]`
 							: ``
 						: '시작시간 설정'
 				}
@@ -361,7 +383,7 @@ export function ModalTimePicker({
 				title={
 					isConfirm
 						? findTime && findTime.length !== 0
-							? `종료시간 설정\n${findTime[0].timeText}`
+							? `종료시간 설정\n${findTime[selectIdx].timeText}`
 							: ''
 						: `시작 시간 : ${
 								startTime.hour > 12 ? startTime.hour - 12 : startTime.hour
@@ -373,109 +395,3 @@ export function ModalTimePicker({
 		</>
 	);
 }
-
-const styles = StyleSheet.create({
-	centeredView: {
-		flex: 3,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginTop: 50,
-	},
-	modalView: {
-		margin: 10,
-		paddingBottom: 60,
-		marginBottom: 60,
-		backgroundColor: 'white',
-		borderRadius: 13,
-		padding: 15,
-		alignItems: 'center',
-		elevation: 10,
-		shadowColor: 'black',
-		shadowOffset: {
-			width: 1,
-			height: 0.3,
-		},
-		shadowOpacity: 0.21,
-		shadowRadius: 1.0,
-
-		width: '94%',
-	},
-	titleText: {
-		textAlign: 'center',
-		fontFamily: 'NanumSquareBold',
-		fontSize: 21,
-		marginBottom: 18,
-	},
-	startTimeText: {
-		textAlign: 'center',
-		fontFamily: 'NanumSquareR',
-		fontSize: 17,
-		marginBottom: 18,
-	},
-	textView: {
-		width: '100%',
-		//
-	},
-	hourText: {
-		fontSize: 20,
-		fontFamily: 'NanumSquareR',
-		marginTop: 4,
-	},
-	textInput: {
-		fontSize: 22,
-		flex: 0.6,
-		fontFamily: 'NanumSquareR',
-
-		alignSelf: 'center',
-		borderWidth: 0.3,
-		padding: 2,
-		textAlign: 'center',
-
-		borderColor: Colors.blue300,
-		borderRadius: 8,
-	},
-	textInputView: {
-		flexDirection: 'row',
-		alignContent: 'center',
-		justifyContent: 'center',
-		alignSelf: 'center',
-	},
-	buttonText: {
-		textAlign: 'center',
-		fontFamily: 'NanumSquareR',
-	},
-	buttonRowView: {
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignContent: 'center',
-		alignSelf: 'center',
-		marginTop: 10,
-		marginBottom: 0,
-	},
-	textStyle: {
-		color: 'white',
-		fontWeight: 'bold',
-		textAlign: 'center',
-	},
-	closeButtonStyle: {
-		borderRadius: 8,
-
-		padding: 12,
-		flex: 1,
-	},
-	acceptButtonStyle: {
-		padding: 15,
-
-		borderRadius: 10,
-	},
-	modalText: {
-		textAlign: 'center',
-	},
-	verticalLine: {
-		borderLeftWidth: 0.16,
-		width: 1,
-	},
-	viewFlex1: {
-		flex: 0.1,
-	},
-});

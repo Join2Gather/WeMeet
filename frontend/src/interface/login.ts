@@ -29,6 +29,15 @@ export interface Login {
 	appleUser: string | null;
 	isConfirmProve: boolean;
 	alarmTime: number;
+	homeTime: homeTime;
+	loading: string;
+	seeTips: boolean;
+	seeTimeTips: boolean;
+}
+
+export interface homeTime {
+	start: number;
+	end: number;
 }
 
 export interface kakaoLoginAPI {
@@ -68,11 +77,10 @@ export interface date {
 	end: timeType;
 	color: string;
 	name: string;
+	id: number;
 }
 
 export interface userMeAPI {
-	user: number;
-	id: number;
 	token: string;
 }
 

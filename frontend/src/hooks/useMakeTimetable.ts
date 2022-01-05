@@ -5,27 +5,29 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 	const times: timeWith60 = {};
 	const timesText: Array<string> = [];
 
-	for (let i = startHour; i < endHour; i++) {
-		times[i] = [];
-		for (let j = 0; j <= 60; j += 10) {
-			if (j === 0) {
-				times[i].push({
-					color: Colors.white,
-					mode: 'normal',
-					minute: j,
-					borderWidth: 0.3,
-					borderBottom: false,
-					borderTop: true,
-				});
-			} else {
-				times[i].push({
-					color: Colors.white,
-					mode: 'normal',
-					minute: j,
-					borderWidth: 0.3,
-					borderBottom: false,
-					borderTop: false,
-				});
+	for (let i = startHour; i <= endHour; i++) {
+		if (i < endHour) {
+			times[i] = [];
+			for (let j = 0; j <= 50; j += 10) {
+				if (j === 0) {
+					times[i].push({
+						color: Colors.white,
+						mode: 'normal',
+						minute: j,
+						borderBottom: false,
+						borderTop: true,
+						borderWidth: 0.3,
+					});
+				} else {
+					times[i].push({
+						color: Colors.white,
+						mode: 'normal',
+						minute: j,
+						borderBottom: false,
+						borderTop: false,
+						borderWidth: 0.3,
+					});
+				}
 			}
 		}
 

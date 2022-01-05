@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { StyleSheet, ScrollView, Alert } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 // prettier-ignore
 import {SafeAreaView, View,
@@ -34,6 +34,7 @@ import {
 	makeInitialConfirmTime,
 	makeTeamTime,
 	postConfirm,
+	postRevert,
 	postSnapShot,
 } from '../store/timetable';
 import { initialIndividualTimetable } from '../store/individual';
@@ -41,6 +42,7 @@ import team from '../store/team';
 import { ModalLoading } from '../components/ModalLoading';
 import { Sequence } from '../components/Sequence';
 import { DayOfWeek } from '../components';
+import { confirmProve } from '../store/login';
 
 export default function SnapShot({ route }: Props) {
 	const {
@@ -58,6 +60,7 @@ export default function SnapShot({ route }: Props) {
 		confirmClubs,
 		confirmDatesTimetable,
 		createdDate,
+		uri,
 	} = useSelector(({ timetable, login, team }: RootState) => ({
 		snapShotDate: timetable.snapShotDate,
 		teamConfirmDate: timetable.teamConfirmDate,
@@ -73,6 +76,7 @@ export default function SnapShot({ route }: Props) {
 		confirmClubs: login.confirmClubs,
 		confirmDatesTimetable: login.confirmDatesTimetable,
 		createdDate: timetable.createdDate,
+		uri: timetable.teamURI,
 	}));
 	// useState
 	const [mode, setMode] = useState('initial');
@@ -82,7 +86,7 @@ export default function SnapShot({ route }: Props) {
 	const [sequence] = useState([0, 1, 2, 3]);
 	const [currentNumber, setCurrent] = useState(0);
 	// navigation
-	const { name, color, timetableMode, isConfirm, uri } = route.params;
+	const { name, color, timetableMode, isConfirm } = route.params;
 	const navigation = useNavigation();
 	const dispatch = useDispatch();
 
@@ -137,9 +141,17 @@ export default function SnapShot({ route }: Props) {
 			dispatch(postSnapShot({ uri, id, token, user }));
 		}
 		dispatch(makeTeamTime({ color, endHour, startHour, peopleCount }));
+		dispatch(confirmProve());
 		setLoading('loading');
 	}, [confirmDates, timeMode, joinUri]);
-	const onPressRevert = useCallback(() => {}, []);
+	const onPressRevert = useCallback(() => {
+		setLoading('revert');
+		setLoadingVisible(true);
+	}, []);
+	const onPressRevertOk = useCallback(() => {
+		dispatch(postRevert({ id, uri, user, token }));
+		setLoading('loading');
+	}, []);
 	return (
 		<SafeAreaView style={{ backgroundColor: color }}>
 			<View style={[styles.view]}>
@@ -245,7 +257,7 @@ export default function SnapShot({ route }: Props) {
 						</>
 					)}
 				</View>
-				<DayOfWeek />
+				<DayOfWeek isTeam={true} />
 				<ScrollView style={{ backgroundColor: Colors.white }}>
 					{timetableMode === 'confirm' ? (
 						<Timetable
@@ -273,6 +285,7 @@ export default function SnapShot({ route }: Props) {
 						loadingMode={loadingMode}
 						setLoading={setLoading}
 						onPressOk={onPressOk}
+						onPressRevertOk={onPressRevertOk}
 						goLeft={goLeft}
 					/>
 				</ScrollView>

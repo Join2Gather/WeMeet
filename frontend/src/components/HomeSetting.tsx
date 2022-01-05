@@ -14,18 +14,12 @@ import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionic from 'react-native-vector-icons/Ionicons';
 import { hexToRGB } from '../lib/util/hexToRGB';
-import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import { Button } from '../lib/util/Button';
 import Material from 'react-native-vector-icons/MaterialIcons';
-import {
-	changeNickname,
-	changeTeamColor,
-	getUserMe,
-	makeGroupColor,
-} from '../store/login';
-import { useNavigation } from '@react-navigation/core';
-
+import { changeNickname, changeTeamColor } from '../store/login';
+import ColorPicker from 'react-native-wheel-color-picker';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -35,10 +29,8 @@ interface props {
 	id: number;
 	token: string;
 	color: string;
-	myNickName: string;
-	joinClubNum: number;
-	confirmClubNum: number;
-	userMeSuccess: boolean;
+	userMeError: string;
+	onPressChangeTime: () => void;
 }
 
 export function HomeSetting({
@@ -48,10 +40,8 @@ export function HomeSetting({
 	id,
 	token,
 	color,
-	myNickName,
-	joinClubNum,
-	confirmClubNum,
-	userMeSuccess,
+	userMeError,
+	onPressChangeTime,
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
@@ -64,8 +54,8 @@ export function HomeSetting({
 		b: 0,
 	});
 	useEffect(() => {
-		!userMeSuccess && setMode('error');
-	}, [userMeSuccess, mode]);
+		userMeError && setMode('error');
+	}, [userMeError, mode]);
 	useEffect(() => {
 		if (mode === 'loading') {
 			setTimeout(() => {
@@ -100,6 +90,7 @@ export function HomeSetting({
 		setSettingModalVisible(false);
 		setPickColor(Colors.red500);
 	}, []);
+
 	return (
 		<Modal
 			animationType="fade"
@@ -133,6 +124,7 @@ export function HomeSetting({
 							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
 						</TouchableHighlight>
 					</View>
+
 					{mode === 'initial' && (
 						<>
 							<>
@@ -170,7 +162,35 @@ export function HomeSetting({
 												</View>
 											</View>
 										</TouchableHighlight>
-
+										<TouchableHighlight
+											activeOpacity={1}
+											underlayColor={Colors.grey300}
+											onPress={onPressChangeTime}
+											style={[
+												styles.touchButtonStyle,
+												{
+													borderRadius: 0,
+												},
+											]}
+										>
+											<View style={styles.rowView}>
+												<Ionic
+													name="time"
+													size={25}
+													color={color}
+													style={[styles.iconStyle, { marginLeft: 8 }]}
+												/>
+												<Text style={styles.touchText}> 홈 시간 설정</Text>
+												<View style={styles.iconView}>
+													<Font5Icon
+														name="angle-right"
+														size={19}
+														color={Colors.black}
+														style={styles.rightIconStyle}
+													/>
+												</View>
+											</View>
+										</TouchableHighlight>
 										<TouchableHighlight
 											activeOpacity={1}
 											underlayColor={Colors.grey300}
@@ -215,15 +235,20 @@ export function HomeSetting({
 							<View style={styles.blankView} />
 							<View
 								style={{
-									height: 200,
+									height: 300,
 									width: '80%',
 								}}
 							>
 								<ColorPicker
-									onColorSelected={(color) => alert(`Color selected: ${color}`)}
-									onColorChange={(color) => setPickColor(fromHsv(color))}
-									style={{ flex: 1 }}
-									hideSliders={true}
+									color={color}
+									swatchesOnly={false}
+									onColorChange={(color) => setPickColor(color)}
+									onColorChangeComplete={(color) => setPickColor(color)}
+									thumbSize={40}
+									sliderSize={40}
+									noSnap={false}
+									row={false}
+									swatchesLast={false}
 								/>
 							</View>
 							<View style={styles.buttonOverLine} />
@@ -310,6 +335,7 @@ export function HomeSetting({
 								<Text style={styles.errorText}> 서버 오류</Text>
 							</View>
 							<View style={styles.blankView} />
+							<View style={styles.buttonOverLine} />
 							<Button
 								buttonNumber={1}
 								buttonText="확인"
@@ -318,7 +344,6 @@ export function HomeSetting({
 									setMode('error');
 								}}
 							/>
-							<View style={styles.blankView} />
 						</>
 					)}
 				</View>
