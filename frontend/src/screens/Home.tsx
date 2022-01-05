@@ -100,7 +100,7 @@ export default function Home() {
 		confirmDatesTimetable,
 		individualTimesText,
 		individualColor,
-
+		userMeError,
 		individualCount,
 		groupCount,
 		endHour,
@@ -117,7 +117,7 @@ export default function Home() {
 		confirmDatesTimetable: login.confirmDatesTimetable,
 		individualTimesText: individual.individualTimesText,
 		individualColor: login.individualColor,
-
+		userMeError: individual.error,
 		individualCount: individual.individualCount,
 		groupCount: individual.groupCount,
 		endHour: login.homeTime.end,
@@ -162,11 +162,11 @@ export default function Home() {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [selectModalVisible, setSelectModalVisible] = useState(false);
 	const [settingModalVisible, setSettingModalVisible] = useState(false);
-	const [infoVisible, setInfoVisible] = useState(true);
+	const [infoVisible, setInfoVisible] = useState(false);
 	const flatListRef = useRef<FlatList | null>(null);
 
 	useEffect(() => {
-		!seeTips && setInfoVisible(false);
+		seeTips ? setInfoVisible(true) : setInfoVisible(false);
 	}, [seeTips]);
 	// image pic1er
 
@@ -191,8 +191,8 @@ export default function Home() {
 	}, [headerShown]);
 
 	useEffect(() => {
-		!userMeSuccess && setSettingModalVisible(true);
-	}, [userMeSuccess]);
+		userMeError && setSettingModalVisible(true);
+	}, [userMeError]);
 
 	// modal
 
@@ -375,7 +375,7 @@ export default function Home() {
 						setSettingModalVisible={setSettingModalVisible}
 					/>
 					<HomeSetting
-						userMeSuccess={userMeSuccess}
+						userMeError={userMeError}
 						setSettingModalVisible={setSettingModalVisible}
 						settingModalVisible={settingModalVisible}
 						user={user}
