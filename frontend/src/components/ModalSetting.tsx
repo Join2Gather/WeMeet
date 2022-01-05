@@ -17,7 +17,8 @@ import FontIcon from 'react-native-vector-icons/FontAwesome';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { hexToRGB } from '../lib/util/hexToRGB';
-import { ColorPicker, fromHsv } from 'react-native-color-picker';
+// import { ColorPicker, fromHsv } from 'react-native-color-picker';
+import ColorPicker from 'react-native-wheel-color-picker';
 import { changeColor, leaveTeam, setModalMode } from '../store/team';
 import { Button } from '../lib/util/Button';
 import {
@@ -27,6 +28,7 @@ import {
 } from '../store/timetable';
 import { getUserMe, makeGroupColor, setAlarmTime } from '../store/login';
 import { useNavigation } from '@react-navigation/core';
+import { CloseButton } from '../theme';
 
 const screen = Dimensions.get('screen');
 
@@ -186,28 +188,7 @@ export function ModalSetting({
 		>
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
-					<View
-						style={
-							(styles.textView,
-							[
-								{
-									marginBottom: 10,
-								},
-							])
-						}
-					>
-						<TouchableHighlight
-							activeOpacity={1}
-							underlayColor={Colors.white}
-							style={{
-								marginLeft: '90%',
-								width: '9%',
-							}}
-							onPress={onPressCloseButton}
-						>
-							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
-						</TouchableHighlight>
-					</View>
+					<CloseButton closeBtn={onPressCloseButton} />
 					{settingMode === 'initial' && (
 						<>
 							<View style={styles.blankView} />
@@ -400,21 +381,26 @@ export function ModalSetting({
 									{ color: Colors.red500, fontSize: 13, marginTop: 0 },
 								]}
 							>
-								주의 사항 : 팀원 전체의 모임 색이 변경되게 됩니다
+								주의 사항 : 팀원 전체의 모임 색상이 변경되게 됩니다
 							</Text>
 							<View style={styles.blankView} />
 							<View style={styles.blankView} />
 							<View
 								style={{
-									height: 200,
+									height: 300,
 									width: '80%',
 								}}
 							>
 								<ColorPicker
-									onColorSelected={(color) => alert(`Color selected: ${color}`)}
-									onColorChange={(color) => setPickColor(fromHsv(color))}
-									style={{ flex: 1 }}
-									hideSliders={true}
+									color={color}
+									swatchesOnly={false}
+									onColorChange={(color) => setPickColor(color)}
+									onColorChangeComplete={(color) => setPickColor(color)}
+									thumbSize={40}
+									sliderSize={40}
+									noSnap={false}
+									row={false}
+									swatchesLast={false}
 								/>
 							</View>
 							<View style={styles.buttonOverLine} />

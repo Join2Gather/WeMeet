@@ -1,5 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, Dimensions } from 'react-native';
+import {
+	StyleSheet,
+	View,
+	Text,
+	FlatList,
+	Dimensions,
+	Animated,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import {
@@ -25,10 +32,20 @@ import {
 } from '../store/timetable';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import { hexToRGB } from '../lib/util/hexToRGB';
-import { TouchableHighlight } from 'react-native-gesture-handler';
+import { TouchableHighlight } from 'react-native';
+import { TouchHeaderIconView } from '../theme';
+import {
+	useAnimatedValue,
+	useNavigationHorizontalInterpolator,
+} from '../hooks';
+import { transform } from 'lodash';
+import { initialTimeMode } from '../store/individual';
+import { interpolate } from '../lib/util/interpolate';
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
 const circleWidth = 14;
+
+const iconSize = 22;
 
 interface goTeam {
 	id?: string;
@@ -100,12 +117,25 @@ export default function TeamList() {
 	const [mode, setMode] = useState('initial');
 	const [makeName, setMake] = useState('');
 	const navigation = useNavigation();
+	const [buttonShown, setButtonShown] = useState(true);
 	const [RGBColor, setRGBColor] = useState({
 		r: 0,
 		g: 0,
 		b: 0,
 	});
 	const [loading, setLoading] = useState('');
+
+	const animValue = useAnimatedValue(0);
+	const AnimatedTouchable =
+		Animated.createAnimatedComponent(TouchableHighlight);
+	const anim = interpolate(animValue, [Colors.black, Colors.white]);
+	// useEffect(() => {
+	// 	Animated.timing(animValue, {
+	// 		toValue: buttonShown ? 0 : 100,
+	// 		duration: 250,
+	// 		useNativeDriver: true,
+	// 	}).start();
+	// }, [buttonShown]);
 
 	const dispatch = useDispatch();
 
@@ -175,7 +205,7 @@ export default function TeamList() {
 				});
 			}, 50);
 			setMode('normal');
-
+			dispatch(toggleIsInitial(true));
 			dispatch(setIsInTeamTime(true));
 		}
 	}, [
@@ -245,32 +275,30 @@ export default function TeamList() {
 					title="모임 목록"
 					headerColor={individualColor}
 					Left={() => (
-						<TouchableHighlight
+						<TouchHeaderIconView
 							underlayColor={individualColor}
 							onPress={onReload}
-							style={{ padding: 5 }}
 						>
 							<FontAwesome5Icon
 								name="redo-alt"
-								size={25}
+								size={iconSize}
 								color={Colors.white}
 								style={{ paddingTop: 1 }}
 							/>
-						</TouchableHighlight>
+						</TouchHeaderIconView>
 					)}
 					Right={() => (
-						<TouchableHighlight
+						<TouchHeaderIconView
 							underlayColor={individualColor}
 							onPress={onMakeTeamTime}
-							style={{ padding: 5 }}
 						>
 							<FontAwesome5Icon
 								name="plus"
-								size={25}
+								size={iconSize}
 								color={Colors.white}
 								style={{ paddingTop: 1 }}
 							/>
-						</TouchableHighlight>
+						</TouchHeaderIconView>
 					)}
 				/>
 				{/* <Spinner loading={userLoading} /> */}
@@ -297,20 +325,74 @@ export default function TeamList() {
 					</View>
 				)}
 				{/* <Spinner loading={loadingUserMe} /> */}
-				<View style={{ flex: 1 }}>
-					<FlatList
-						style={styles.FlatView}
+				{/* <Animated.View
+					style={{
+						height: animValue.interpolate({
+							inputRange: [-100, 0],
+							outputRange: [5, 5],
+							extrapolate: 'extend',
+						}),
+						backgroundColor: animValue.interpolate({
+							inputRange: [-100, 0],
+							outputRange: [Colors.grey700, Colors.white],
+						}),
+					}}
+				/>
+				<Animated.View
+					style={{
+						height: animValue.interpolate({
+							inputRange: [-100, 0],
+							outputRange: [5, 5],
+							extrapolate: 'extend',
+						}),
+						backgroundColor: animValue.interpolate({
+							inputRange: [-100, 0],
+							outputRange: [Colors.grey500, Colors.white],
+						}),
+					}}
+				/> */}
+				<View style={{ flex: 2 }}>
+					<Animated.FlatList
+						style={[styles.FlatView]}
 						data={clubs}
+						onScroll={Animated.event(
+							[
+								{
+									nativeEvent: {
+										contentOffset: {
+											y: animValue,
+										},
+									},
+								},
+							],
+							{ useNativeDriver: false }
+						)}
 						renderItem={({ item }) => (
-							<View>
-								<TouchableHighlight
+							<View
+								style={{
+									backgroundColor: Colors.black,
+								}}
+							>
+								<AnimatedTouchable
 									onPress={() => onPressGoTeamTime(item)}
 									activeOpacity={0.1}
 									underlayColor={Colors.grey300}
 									style={[
 										styles.teamListTouchableView,
 										{
-											opacity: 1,
+											opacity:
+												item.id === 0
+													? interpolate(animValue, [1, 0.9], [item.id, 18])
+													: 1,
+
+											// backgroundColor:
+											// 	item.id === 1
+											// 		? interpolate(
+											// 				animValue,
+											// 				[Colors.grey800, Colors.white],
+											// 				[-30, 0]
+											// 		  )
+											// 		: Colors.white,
 										},
 									]}
 								>
@@ -330,7 +412,7 @@ export default function TeamList() {
 										</Text>
 										<Icons size={15} name="right" style={styles.iconStyle} />
 									</View>
-								</TouchableHighlight>
+								</AnimatedTouchable>
 							</View>
 						)}
 						keyExtractor={(item, index) => String(item.id)}
@@ -379,19 +461,25 @@ export default function TeamList() {
 					sequence={sequence}
 				/>
 
-				<View style={{ flex: 0.3 }}>
+				<Animated.View
+					style={{
+						// position: 'absolute',
+						// bottom: '20%',
+						transform: [{ translateY: animValue }],
+					}}
+				>
 					<TouchableView
 						style={[
 							styles.touchableView,
 							{
-								backgroundColor: `rgba(${RGBColor.r}, ${RGBColor.g}, ${RGBColor.b}, 2)`,
+								backgroundColor: individualColor,
 							},
 						]}
 						onPress={onJoinTeamTime}
 					>
 						<Text style={styles.loginText}>모임 참여</Text>
 					</TouchableView>
-				</View>
+				</Animated.View>
 			</View>
 		</SafeAreaView>
 	);
@@ -405,7 +493,7 @@ const styles = StyleSheet.create({
 		marginTop: 15,
 		marginBottom: 20,
 		letterSpacing: -0.3,
-		flex: 0.03,
+		flex: 0.08,
 		textAlign: 'center',
 	},
 
@@ -475,9 +563,11 @@ const styles = StyleSheet.create({
 	touchableView: {
 		flexDirection: 'row',
 		height: 50,
-		marginBottom: 50,
+		bottom: 30,
 		borderRadius: 10,
+		position: 'absolute',
 		width: '65%',
+		// left: '60%',
 		justifyContent: 'center',
 		alignItems: 'center',
 		shadowColor: 'black',
@@ -489,7 +579,6 @@ const styles = StyleSheet.create({
 
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
-		marginTop: 50,
 	},
 	teamListTouchableView: {
 		flexDirection: 'row',
@@ -517,7 +606,7 @@ const styles = StyleSheet.create({
 		height: 30,
 	},
 	FlatView: {
-		height: '65%',
+		height: '100%',
 		flexGrow: 0,
 	},
 	teamView: {

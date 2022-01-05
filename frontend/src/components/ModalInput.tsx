@@ -24,14 +24,17 @@ import {
 } from '../store/team';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ColorPicker, fromHsv } from 'react-native-color-picker';
+// import { ColorPicker, fromHsv } from 'react-native-color-picker';
+// import { CromaColorPicker as ColorPicker } from 'croma-color-picker';
+
 import Material from 'react-native-vector-icons/MaterialIcons';
 import { getUserMe } from '../store/login';
-import { makeTeamTime, setTimeMode } from '../store/timetable';
+import { setTimeMode } from '../store/timetable';
 import { Button } from '../lib/util/Button';
 import { Sequence } from './Sequence';
 import { current } from '@reduxjs/toolkit';
-import { useAutoFocus } from '../contexts';
+import ColorPicker from 'react-native-wheel-color-picker';
+import { CloseButton } from '../theme';
 const screen = Dimensions.get('screen');
 interface props {
 	modalVisible: boolean;
@@ -76,9 +79,30 @@ export function ModalInput({
 	const [code, setCode] = useState('');
 	const [mode, setMode] = useState('initial');
 	const [color, setColor] = useState(Colors.red500);
+	const [hsvColor, setHSV] = useState({
+		hue: 0,
+		sat: 0,
+		val: 0,
+	});
 	const [startTime, setStartTime] = useState('9');
+
 	const [endTime, setEndTime] = useState('22');
 	const [currentNumber, setCurrent] = useState(0);
+
+	const onSatValPickerChange = useCallback(({ sat, val }) => {
+		setHSV((prevState) => ({
+			...prevState,
+			sat: sat,
+			val: val,
+		}));
+	}, []);
+
+	const onHuePickerChange = useCallback((hue) => {
+		setHSV((prevState) => ({
+			...prevState,
+			hue: hue,
+		}));
+	}, []);
 
 	// useEffect
 	useEffect(() => {
@@ -187,37 +211,7 @@ export function ModalInput({
 					<View style={styles.modalView}>
 						{!loadingJoin && (
 							<>
-								<View
-									style={[
-										styles.textView,
-										{
-											marginBottom: 10,
-										},
-									]}
-								>
-									<TouchableHighlight
-										activeOpacity={1}
-										underlayColor={Colors.white}
-										style={{
-											marginLeft: '90%',
-											width: '9%',
-										}}
-										onPress={onPressCloseButton}
-									>
-										<Icon
-											style={{ alignSelf: 'flex-end' }}
-											name="close"
-											size={25}
-										/>
-									</TouchableHighlight>
-									<View style={styles.blankView} />
-									<Sequence
-										color={individualColor}
-										currentNumber={currentNumber}
-										mode={sequence}
-									/>
-									<View style={styles.blankView} />
-								</View>
+								<CloseButton closeBtn={onPressCloseButton} />
 								<>
 									{!loadingJoin && mode === 'makeError' && (
 										<>
@@ -230,6 +224,8 @@ export function ModalInput({
 												/>
 												<Text style={styles.errorText}> 서버 오류</Text>
 											</View>
+											<View style={styles.blankView} />
+											<View style={styles.buttonOverLine} />
 											<Button
 												buttonNumber={1}
 												buttonText="확인"
@@ -363,17 +359,20 @@ export function ModalInput({
 								<Text style={styles.titleText}>모임 색상을 선택해 주세요 </Text>
 								<View
 									style={{
-										height: 200,
+										height: 300,
 										width: '80%',
 									}}
 								>
 									<ColorPicker
-										onColorSelected={(color) =>
-											alert(`Color selected: ${color}`)
-										}
-										onColorChange={(color) => setColor(fromHsv(color))}
-										style={{ flex: 1 }}
-										hideSliders={true}
+										color={color}
+										swatchesOnly={false}
+										onColorChange={(color) => setColor(color)}
+										onColorChangeComplete={(color) => setColor(color)}
+										thumbSize={40}
+										sliderSize={40}
+										noSnap={false}
+										row={false}
+										swatchesLast={false}
 									/>
 								</View>
 								<View style={styles.buttonOverLine} />

@@ -16,11 +16,10 @@ import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionic from 'react-native-vector-icons/Ionicons';
 import { hexToRGB } from '../lib/util/hexToRGB';
-import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import { Button } from '../lib/util/Button';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import { changeNickname, changeTeamColor } from '../store/login';
-
+import ColorPicker from 'react-native-wheel-color-picker';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -236,15 +235,20 @@ export function HomeSetting({
 							<View style={styles.blankView} />
 							<View
 								style={{
-									height: 200,
+									height: 300,
 									width: '80%',
 								}}
 							>
 								<ColorPicker
-									onColorSelected={(color) => alert(`Color selected: ${color}`)}
-									onColorChange={(color) => setPickColor(fromHsv(color))}
-									style={{ flex: 1 }}
-									hideSliders={true}
+									color={color}
+									swatchesOnly={false}
+									onColorChange={(color) => setPickColor(color)}
+									onColorChangeComplete={(color) => setPickColor(color)}
+									thumbSize={40}
+									sliderSize={40}
+									noSnap={false}
+									row={false}
+									swatchesLast={false}
 								/>
 							</View>
 							<View style={styles.buttonOverLine} />

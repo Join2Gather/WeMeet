@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 // prettier-ignore
 import {SafeAreaView, View, 
-NavigationHeader,  Text} from '../theme';
+NavigationHeader,  Text, TouchHeaderIconView} from '../theme';
 import Icon from 'react-native-vector-icons/Fontisto';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
@@ -40,6 +40,8 @@ import { setModalMode, shareUri } from '../store/team';
 import { ModalSetting } from '../components/ModalSetting';
 import { Sequence } from '../components/Sequence';
 import { TouchableHighlight } from 'react-native-gesture-handler';
+
+const iconSize = 22;
 
 export default function TeamTime({ route }: Props) {
 	const {
@@ -167,65 +169,67 @@ export default function TeamTime({ route }: Props) {
 						title={modalMode === 'join' ? joinName : name}
 						titleStyle={{ paddingLeft: 0 }}
 						Left={() => (
-							<TouchableHighlight underlayColor={color} onPress={goLeft}>
+							<TouchHeaderIconView underlayColor={color} onPress={goLeft}>
 								<Icon
 									name="angle-left"
-									size={23}
+									size={iconSize - 2}
 									color={Colors.white}
 									// style={{ marginLeft: '3%' }}
 								/>
-							</TouchableHighlight>
+							</TouchHeaderIconView>
 						)}
 						Right={() =>
 							isGroup ? (
-								<TouchableHighlight
+								<TouchHeaderIconView
 									underlayColor={color}
 									onPress={goConfirmPage}
-									style={{ padding: 5 }}
+									// style={{ backgroundColor: Colors.black }}
 								>
 									<MIcon
 										name="check-bold"
-										size={23}
+										size={iconSize + 3}
 										color={Colors.white}
 										style={{ paddingTop: 1 }}
 									/>
-								</TouchableHighlight>
+								</TouchHeaderIconView>
 							) : (
-								<TouchableHighlight
+								<TouchHeaderIconView
 									underlayColor={color}
 									onPress={onPressPlusBtn}
-									style={{ padding: 5 }}
 								>
 									<FontAwesome5Icon
 										name="plus"
-										size={25}
+										size={iconSize + 1}
 										color={Colors.white}
+										style={{ paddingTop: 1 }}
 									/>
-								</TouchableHighlight>
+								</TouchHeaderIconView>
 							)
 						}
 						secondRight={() => (
-							<TouchableHighlight
+							<TouchHeaderIconView
 								underlayColor={color}
 								onPress={() => setSettingModalVisible(true)}
-								style={{ padding: 5 }}
 							>
-								<MaterialIcon name="settings" size={27} color={Colors.white} />
-							</TouchableHighlight>
+								<MaterialIcon
+									name="settings"
+									size={iconSize + 2}
+									color={Colors.white}
+								/>
+							</TouchHeaderIconView>
 						)}
 						thirdRight={() => (
-							<TouchableHighlight
+							<TouchHeaderIconView
 								underlayColor={color}
 								onPress={() => setInfoVisible(true)}
-								style={{ padding: 5 }}
 							>
 								<FontAwesome5Icon
 									name="question-circle"
-									size={25}
+									size={iconSize}
 									color={Colors.white}
 									style={{ paddingTop: 1 }}
 								/>
-							</TouchableHighlight>
+							</TouchHeaderIconView>
 						)}
 					/>
 

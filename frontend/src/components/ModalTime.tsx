@@ -25,6 +25,7 @@ import {
 	toggleIsInitial,
 } from '../store/timetable';
 import { RootState } from '../store';
+import { CloseButton } from '../theme';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -102,28 +103,7 @@ export function ModalTime({
 		>
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
-					<View
-						style={
-							(styles.textView,
-							[
-								{
-									marginBottom: 10,
-								},
-							])
-						}
-					>
-						<TouchableHighlight
-							activeOpacity={1}
-							underlayColor={Colors.white}
-							style={{
-								marginLeft: '90%',
-								width: '9%',
-							}}
-							onPress={onPressCloseBtn}
-						>
-							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
-						</TouchableHighlight>
-					</View>
+					<CloseButton closeBtn={onPressCloseBtn} />
 					<ScrollView>
 						{mode === 'initial' && (
 							<>

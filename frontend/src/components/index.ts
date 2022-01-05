@@ -17,3 +17,4 @@ export * from './ModalDatePicker';
 export * from './DayOfWeek';
 export * from './ModalHomeTimePicker';
 export * from './ModalInfo';
+export * from './ModalHomeInfo';

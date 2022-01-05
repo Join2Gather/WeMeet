@@ -6,12 +6,13 @@ import {
 	Platform,
 	Image,
 	ScrollView,
+	Animated,
 } from 'react-native';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 import Constants from 'expo-constants';
 // prettier-ignore
 import {SafeAreaView, View, UnderlineText,TopBar,
-NavigationHeader, MaterialCommunityIcon as Icon, Text} from '../theme';
+NavigationHeader, MaterialCommunityIcon as Icon, Text, TouchHeaderIconView} from '../theme';
 import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
 import {
 	LeftRightNavigation,
@@ -20,6 +21,7 @@ import {
 	DayOfWeek,
 	ModalHomeTimePicker,
 	ModalInfo,
+	ModalHomeInfo,
 } from '../components';
 import { Timetable } from '../components/Timetable';
 import type { LeftRightNavigationMethods } from '../components';
@@ -33,7 +35,7 @@ import {
 	postImage,
 } from '../store/individual';
 import * as FileSystem from 'expo-file-system';
-import { useMakeTimetable } from '../hooks';
+import { useAnimatedValue, useMakeTimetable } from '../hooks';
 import { getUserMe } from '../store/login';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
@@ -45,6 +47,8 @@ import Ionic from 'react-native-vector-icons/Ionicons';
 import { StatusBar } from 'expo-status-bar';
 
 import * as Notifications from 'expo-notifications';
+
+const iconSize = 22;
 
 export async function allowsNotificationsAsync() {
 	const settings = await Notifications.getPermissionsAsync();
@@ -175,6 +179,16 @@ export default function Home() {
 		setIsTimeMode(true);
 		setMode('startMode');
 	}, []);
+	const [headerShown, setHeaderShown] = useState(true);
+	const animValue = useAnimatedValue(115);
+
+	useEffect(() => {
+		Animated.timing(animValue, {
+			toValue: headerShown ? 0 : -115,
+			duration: 250,
+			useNativeDriver: true,
+		}).start();
+	}, [headerShown]);
 
 	useEffect(() => {
 		!userMeSuccess && setSettingModalVisible(true);
@@ -198,55 +212,52 @@ export default function Home() {
 					title="내 일정 등록하기"
 					headerColor={individualColor}
 					Left={() => (
-						<TouchableHighlight
-							underlayColor={individualColor}
-							onPress={open}
-							style={{ padding: 0 }}
-						>
+						<TouchHeaderIconView underlayColor={individualColor} onPress={open}>
 							<Ionic
 								name="menu"
-								size={36}
+								size={iconSize + 11}
 								color={Colors.white}
 								// style={{ paddingTop: 1 }}
 							/>
-						</TouchableHighlight>
+						</TouchHeaderIconView>
 					)}
 					Right={() => (
-						<TouchableHighlight
+						<TouchHeaderIconView
 							underlayColor={individualColor}
 							onPress={onPressPlus}
-							style={{ padding: 5 }}
 						>
 							<FontAwesome5Icon
 								name="plus"
-								size={25}
+								size={iconSize}
 								color={Colors.white}
 								style={{}}
 							/>
-						</TouchableHighlight>
+						</TouchHeaderIconView>
 					)}
 					secondRight={() => (
-						<TouchableHighlight
+						<TouchHeaderIconView
 							underlayColor={individualColor}
 							onPress={() => setSettingModalVisible(true)}
-							style={{ padding: 5 }}
 						>
-							<MaterialIcon name="settings" size={27} color={Colors.white} />
-						</TouchableHighlight>
+							<MaterialIcon
+								name="settings"
+								size={iconSize + 2}
+								color={Colors.white}
+							/>
+						</TouchHeaderIconView>
 					)}
 					thirdRight={() => (
-						<TouchableHighlight
+						<TouchHeaderIconView
 							underlayColor={individualColor}
 							onPress={() => setInfoVisible(true)}
-							style={{ padding: 5 }}
 						>
 							<FontAwesome5Icon
 								name="question-circle"
-								size={25}
+								size={iconSize}
 								color={Colors.white}
 								style={{ paddingTop: 1 }}
 							/>
-						</TouchableHighlight>
+						</TouchHeaderIconView>
 					)}
 				/>
 
@@ -373,7 +384,7 @@ export default function Home() {
 						color={individualColor}
 						onPressChangeTime={onPressChangeTime}
 					/>
-					<ModalInfo
+					<ModalHomeInfo
 						infoVisible={infoVisible}
 						setInfoVisible={setInfoVisible}
 						seeTips={seeTips}
