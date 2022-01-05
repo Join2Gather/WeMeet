@@ -52,6 +52,7 @@ export interface timetable {
 	isInitial: boolean;
 	isOverlap: boolean;
 	selectIdx: number;
+	loading: string;
 }
 
 export type weekIndex = Array<string>;
