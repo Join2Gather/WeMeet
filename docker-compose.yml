@@ -4,6 +4,8 @@ services:
   django_app:
     build:
       context: ./backend
+    ports:
+      - "8000:8000"
     restart: always
     volumes:
       - ./db:/db
@@ -16,6 +18,8 @@ services:
   everytime_parser:
     build:
       context: ./everytime-parse-api
+    ports:
+      - "8009:8009"
     restart: always
     # environment:
     #   - VIRTUAL_HOST=everytime.dps0340.xyz
