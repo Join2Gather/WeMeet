@@ -6,7 +6,7 @@ import type { StyleProp, ViewStyle, TextStyle } from 'react-native';
 import { Colors } from 'react-native-paper';
 
 export type NavigationHeaderProps = {
-	title?: string;
+	title: string;
 	Left?: () => ReactNode;
 	Right?: () => ReactNode;
 	secondRight?: () => ReactNode;
@@ -39,10 +39,11 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 			<View style={[styles.flex]}>
 				<Text
 					style={[styles.title, titleStyle]}
-					numberOfLines={title && title.length > 7 ? 3 : 0}
+					numberOfLines={title && title?.length > 7 ? 3 : 2}
 					ellipsizeMode="tail"
 				>
 					{title}
+					{console.log('len', title?.length)}
 				</Text>
 			</View>
 			<View
@@ -64,7 +65,7 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 
 const styles = StyleSheet.create({
 	flex: {
-		flex: 1,
+		flex: 0.6,
 		backgroundColor: 'transparent',
 	},
 	halfFlex: {

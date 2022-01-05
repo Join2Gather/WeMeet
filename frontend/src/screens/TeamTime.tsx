@@ -107,14 +107,14 @@ export default function TeamTime({ route }: Props) {
 	const [currentNumber, setCurrent] = useState(0);
 	const [sequence, setSequence] = useState([0, 1, 2]);
 	const [dateVisible, setDateVisible] = useState(false);
-	const [infoVisible, setInfoVisible] = useState(true);
+	const [infoVisible, setInfoVisible] = useState(false);
 	// initial
 	useEffect(() => {
 		makeReady && dispatch(makeInitialTimetable());
 	}, [name, makeReady]);
 
 	useEffect(() => {
-		!seeTimeTips && setInfoVisible(false);
+		seeTimeTips;
 	}, [seeTimeTips]);
 
 	useEffect(() => {
@@ -124,14 +124,14 @@ export default function TeamTime({ route }: Props) {
 	}, [joinTeamError, loadingJoin, error]);
 
 	useEffect(() => {
-		!seeTimeTips && setInfoVisible(false);
+		seeTimeTips ? setInfoVisible(true) : setInfoVisible(false);
 	}, [seeTimeTips]);
 
 	useEffect(() => {
 		isOverlap &&
 			Alert.alert(
 				'경고',
-				`개인 일정과 겹치는 시간이 존재 합니다.\n 개인 시간표에서 수정해 주세요`,
+				`개인 일정과 중복된 시간이 존재 합니다.\n 개인 시간표에서 수정해 주세요`,
 				[{ text: '확인', onPress: () => {} }]
 			);
 	}, [isOverlap]);
@@ -292,7 +292,7 @@ export default function TeamTime({ route }: Props) {
 														{ backgroundColor: Colors.grey600 },
 													]}
 												/>
-												<Text style={styles.infoText}>겹쳐진 일정</Text>
+												<Text style={styles.infoText}>중복 일정</Text>
 											</>
 										)}
 										<View

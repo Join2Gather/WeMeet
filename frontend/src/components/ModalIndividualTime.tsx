@@ -20,7 +20,11 @@ import {
 	toggleIsInitial,
 } from '../store/timetable';
 import { Button } from '../lib/util/Button';
-import { deleteHomeTime, initialTimeMode } from '../store/individual';
+import {
+	deleteHomeTime,
+	initialIndividualTimetable,
+	initialTimeMode,
+} from '../store/individual';
 import { RootState } from '../store';
 import { Spinner } from '.';
 import { findTeam } from '../store/login';
@@ -85,6 +89,7 @@ export function ModalIndividualTime({
 		dispatch(deleteHomeTime(findIndividual));
 		dispatch(initialTimeMode());
 		setMode('loading');
+		dispatch(initialIndividualTimetable());
 		setTimeout(() => {
 			setMode('normal');
 			setInModalVisible && setInModalVisible(false);
@@ -128,7 +133,7 @@ export function ModalIndividualTime({
 				Alert.alert('Modal has been closed.');
 			}}
 		>
-			{/* <Spinner loading={mode} /> */}
+			<Spinner loading={mode} />
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
 					<CloseButton closeBtn={onPressCloseBtn} />

@@ -87,13 +87,6 @@ export default function Login() {
 			}),
 		[layout.height]
 	);
-
-	// const goHomeNavigator = useCallback(
-	//   () => navigation.navigate('HomeNavigator'),
-	//   []
-	// )
-	// prettier-ignore
-	const goTabNavigator = useCallback(() => navigation.navigate('TabNavigator'), []);
 	useEffect(() => {
 		if (token) {
 			dispatch(getUserMe({ token }));

@@ -114,7 +114,13 @@ export function ModalSelect({
 									},
 								]}
 							>
-								<View style={[styles.textInputView]}>
+								<View
+									style={[
+										styles.textInputView,
+										,
+										{ borderColor: individualColor },
+									]}
+								>
 									<Icon
 										name="account"
 										size={25}
@@ -125,7 +131,7 @@ export function ModalSelect({
 										}}
 									/>
 									<TextInput
-										style={[styles.textInput, { borderColor: color }]}
+										style={[styles.textInput]}
 										value={loginID}
 										onChangeText={(loginID) => setID((text) => loginID)}
 										autoCapitalize="none"
@@ -136,7 +142,13 @@ export function ModalSelect({
 							</View>
 							<View style={{ marginBottom: 15 }} />
 							<View style={[styles.textView]}>
-								<View style={[styles.textInputView]}>
+								<View
+									style={[
+										styles.textInputView,
+										,
+										{ borderColor: individualColor },
+									]}
+								>
 									<Icon
 										name="lock"
 										size={25}
@@ -150,7 +162,7 @@ export function ModalSelect({
 										autoCapitalize="none"
 										autoCompleteType="password"
 										// secureTextEntry={true}
-										style={[styles.textInput, { borderColor: color }]}
+										style={[styles.textInput]}
 										value={password}
 										onChangeText={(userPw) => setPassword((text) => userPw)}
 										placeholder="PASSWORD"
@@ -297,7 +309,6 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 2,
 		padding: 3,
 
-		borderColor: Colors.blue200,
 		width: '70%',
 		marginLeft: '20%',
 	},

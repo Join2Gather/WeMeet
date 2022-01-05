@@ -72,9 +72,7 @@ export function ModalTime({
 
 	const onPressDelete = useCallback(() => {
 		dispatch(deletePostTime());
-		setMode('initial');
-		setTimeModalVisible && setTimeModalVisible(false);
-		dispatch(toggleIsInitial(true));
+		setMode('loading');
 		dispatch(setTimeModalMode(false));
 		setTimeout(() => {
 			color &&
@@ -271,7 +269,7 @@ export function ModalTime({
 						)}
 						<View style={styles.blankView} />
 					</ScrollView>
-					{!isGroup && !isConfirmMode && (
+					{!isGroup && !isConfirmMode && mode === 'initial' && (
 						<>
 							<View style={styles.blankView} />
 							<View style={styles.rowLine} />
@@ -310,13 +308,13 @@ export function ModalTime({
 					{mode === 'success' && (
 						<>
 							<View style={styles.blankView} />
-							<View style={styles.rowView}>
+							<View style={[styles.rowView, { justifyContent: 'center' }]}>
 								<Font5Icon
 									name="check-circle"
 									size={19}
 									color={Colors.green500}
 								/>
-								<Text style={styles.touchText}>
+								<Text style={[styles.touchText, { marginLeft: 10 }]}>
 									{' '}
 									변경 사항이 저장 되었습니다
 								</Text>

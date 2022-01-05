@@ -18,7 +18,7 @@ import {
 } from '../store/timetable';
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
-import { getUserMe } from '../store/login';
+import { getUserMe, toggleUserMeSuccess } from '../store/login';
 import individual, {
 	checkHomeIstBlank,
 	cloneINDates,
@@ -100,6 +100,7 @@ export function ModalTimePicker({
 		endHour,
 		confirmCount,
 		selectIdx,
+		userMeSuccess,
 	} = useSelector(({ timetable, login, individual }: RootState) => ({
 		postConfirmSuccess: timetable.postConfirmSuccess,
 		confirmClubs: login.confirmClubs,
@@ -115,6 +116,7 @@ export function ModalTimePicker({
 		endHour: timetable.endHour,
 		confirmCount: timetable.confirmCount,
 		selectIdx: timetable.selectIdx,
+		userMeSuccess: login.userMeSuccess,
 	}));
 	const dispatch = useDispatch();
 	// const [minute, setMinute] = useState(0);
@@ -310,12 +312,18 @@ export function ModalTimePicker({
 		if (postConfirmSuccess || postHomeSuccess) {
 			dispatch(getUserMe({ token }));
 			dispatch(initialIndividualTimetable());
-			setTimeout(() => {
-				dispatch(makeHomeTime());
-				dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
-			}, 100);
 		}
 	}, [postConfirmSuccess, postHomeSuccess]);
+
+	useEffect(() => {
+		if (userMeSuccess) {
+			dispatch(makeHomeTime());
+			dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
+		}
+		setTimeout(() => {
+			dispatch(toggleUserMeSuccess());
+		}, 300);
+	}, [userMeSuccess]);
 	// useEffect(() => {
 	// 	dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
 	// }, []);

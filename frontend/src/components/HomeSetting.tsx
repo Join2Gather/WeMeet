@@ -29,7 +29,7 @@ interface props {
 	id: number;
 	token: string;
 	color: string;
-	userMeSuccess: boolean;
+	userMeError: string;
 	onPressChangeTime: () => void;
 }
 
@@ -40,7 +40,7 @@ export function HomeSetting({
 	id,
 	token,
 	color,
-	userMeSuccess,
+	userMeError,
 	onPressChangeTime,
 }: props) {
 	const dispatch = useDispatch();
@@ -54,8 +54,8 @@ export function HomeSetting({
 		b: 0,
 	});
 	useEffect(() => {
-		!userMeSuccess && setMode('error');
-	}, [userMeSuccess, mode]);
+		userMeError && setMode('error');
+	}, [userMeError, mode]);
 	useEffect(() => {
 		if (mode === 'loading') {
 			setTimeout(() => {
