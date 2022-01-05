@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
 	StyleSheet,
 	View,
@@ -6,6 +6,11 @@ import {
 	FlatList,
 	Dimensions,
 	Animated,
+	PanResponder,
+	Platform,
+	GestureResponderEvent,
+	PanResponderGestureState,
+	Easing,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -36,11 +41,18 @@ import { TouchableHighlight } from 'react-native';
 import { TouchHeaderIconView } from '../theme';
 import {
 	useAnimatedValue,
+	useAnimatedValueXY,
 	useNavigationHorizontalInterpolator,
+	usePanResponder,
 } from '../hooks';
 import { transform } from 'lodash';
 import { initialTimeMode } from '../store/individual';
 import { interpolate } from '../lib/util/interpolate';
+import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
+
+type Event = GestureResponderEvent;
+type State = PanResponderGestureState;
+
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
 const circleWidth = 14;
@@ -118,25 +130,56 @@ export default function TeamList() {
 	const [makeName, setMake] = useState('');
 	const navigation = useNavigation();
 	const [buttonShown, setButtonShown] = useState(true);
+	const [scrollEnabled, setScrollEnabled] = useScrollEnabled();
+	const animValueXY = useAnimatedValueXY();
 	const [RGBColor, setRGBColor] = useState({
 		r: 0,
 		g: 0,
 		b: 0,
 	});
+
+	const ios = Platform.OS === 'ios';
+
+	const scrolling = useAnimatedValue(0);
+
+	const panResponser = usePanResponder({
+		onPanResponderGrant() {
+			ios && setScrollEnabled(false);
+		},
+		onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
+			return gestureState.dx != 0 && gestureState.dy != 0;
+		},
+		onPanResponderMove(e: Event, s: State) {
+			const { dx, dy } = s;
+			animValueXY.setValue({ x: dx, y: dy });
+			if (dy > 5) {
+				Animated.timing(scrolling, {
+					useNativeDriver: true, // -1-
+					toValue: 0, // -2-
+					duration: 500, // -3-
+					easing: Easing.ease, // -4-
+				}).start();
+			} else if (dy < -5) {
+				Animated.timing(scrolling, {
+					useNativeDriver: true, // -1-
+					toValue: 100, // -2-
+					duration: 500, // -3-
+					easing: Easing.ease, // -4-
+				}).start();
+			}
+			console.log(dx, dy);
+		},
+		onPanResponderRelease() {
+			animValueXY.extractOffset();
+			ios && setScrollEnabled(true);
+		},
+	});
+
 	const [loading, setLoading] = useState('');
 
 	const animValue = useAnimatedValue(0);
 	const AnimatedTouchable =
 		Animated.createAnimatedComponent(TouchableHighlight);
-	const anim = interpolate(animValue, [Colors.black, Colors.white]);
-	// useEffect(() => {
-	// 	Animated.timing(animValue, {
-	// 		toValue: buttonShown ? 0 : 100,
-	// 		duration: 250,
-	// 		useNativeDriver: true,
-	// 	}).start();
-	// }, [buttonShown]);
-
 	const dispatch = useDispatch();
 
 	// useEffect
@@ -147,11 +190,6 @@ export default function TeamList() {
 		const result = hexToRGB(individualColor);
 		result && setRGBColor(result);
 	}, [individualColor]);
-	// useEffect(() => {
-	// 	dispatch(setModalMode('normal'));
-	// }, [joinTeamError]);
-	// useCallback
-	// Navigation 이동
 	useEffect(() => {
 		if (mode === 'next') {
 			if (modalMode === 'make') {
@@ -265,222 +303,178 @@ export default function TeamList() {
 		<SafeAreaView
 			style={{ backgroundColor: modalVisible ? Colors.white : individualColor }}
 		>
-			<View
-				style={[
-					styles.view,
-					{ opacity: modalVisible ? 0.2 : 1, backgroundColor: Colors.white },
-				]}
-			>
-				<NavigationHeader
-					title="모임 목록"
-					headerColor={individualColor}
-					Left={() => (
-						<TouchHeaderIconView
-							underlayColor={individualColor}
-							onPress={onReload}
-						>
-							<FontAwesome5Icon
-								name="redo-alt"
-								size={iconSize}
-								color={Colors.white}
-								style={{ paddingTop: 1 }}
-							/>
-						</TouchHeaderIconView>
-					)}
-					Right={() => (
-						<TouchHeaderIconView
-							underlayColor={individualColor}
-							onPress={onMakeTeamTime}
-						>
-							<FontAwesome5Icon
-								name="plus"
-								size={iconSize}
-								color={Colors.white}
-								style={{ paddingTop: 1 }}
-							/>
-						</TouchHeaderIconView>
-					)}
-				/>
-				{/* <Spinner loading={userLoading} /> */}
-				{clubs.length !== 0 && (
-					<Text style={[styles.headerUnderText]}>Plan list</Text>
-				)}
-
-				{!clubs.length && (
-					<View
-						style={{
-							flexDirection: 'column',
-							marginLeft: '16%',
-							marginTop: 20,
-							flex: 0.3,
-						}}
-					>
-						<Text style={styles.noListText}>아직 아무런 모임이 없네요 😭</Text>
-						<Text style={styles.noListText}>
-							1. 상단의 "+" 버튼을 눌러 모임을 생성 하거나
-						</Text>
-						<Text style={styles.noListText}>
-							2. 하단의 "모임 참여"를 눌러 모임에 참여해 보세요
-						</Text>
-					</View>
-				)}
-				{/* <Spinner loading={loadingUserMe} /> */}
-				{/* <Animated.View
-					style={{
-						height: animValue.interpolate({
-							inputRange: [-100, 0],
-							outputRange: [5, 5],
-							extrapolate: 'extend',
-						}),
-						backgroundColor: animValue.interpolate({
-							inputRange: [-100, 0],
-							outputRange: [Colors.grey700, Colors.white],
-						}),
-					}}
-				/>
-				<Animated.View
-					style={{
-						height: animValue.interpolate({
-							inputRange: [-100, 0],
-							outputRange: [5, 5],
-							extrapolate: 'extend',
-						}),
-						backgroundColor: animValue.interpolate({
-							inputRange: [-100, 0],
-							outputRange: [Colors.grey500, Colors.white],
-						}),
-					}}
-				/> */}
-				<View style={{ flex: 2 }}>
-					<Animated.FlatList
-						style={[styles.FlatView]}
-						data={clubs}
-						onScroll={Animated.event(
-							[
-								{
-									nativeEvent: {
-										contentOffset: {
-											y: animValue,
-										},
-									},
-								},
-							],
-							{ useNativeDriver: false }
-						)}
-						renderItem={({ item }) => (
-							<View
-								style={{
-									backgroundColor: Colors.black,
-								}}
-							>
-								<AnimatedTouchable
-									onPress={() => onPressGoTeamTime(item)}
-									activeOpacity={0.1}
-									underlayColor={Colors.grey300}
-									style={[
-										styles.teamListTouchableView,
-										{
-											opacity:
-												item.id === 0
-													? interpolate(animValue, [1, 0.9], [item.id, 18])
-													: 1,
-
-											// backgroundColor:
-											// 	item.id === 1
-											// 		? interpolate(
-											// 				animValue,
-											// 				[Colors.grey800, Colors.white],
-											// 				[-30, 0]
-											// 		  )
-											// 		: Colors.white,
-										},
-									]}
-								>
-									<View style={styles.teamView}>
-										<View
-											style={[
-												styles.rowCircle,
-												{ backgroundColor: item.color },
-											]}
-										/>
-										<Text
-											numberOfLines={1}
-											ellipsizeMode="tail"
-											style={styles.teamTitle}
-										>
-											{item.name}
-										</Text>
-										<Icons size={15} name="right" style={styles.iconStyle} />
-									</View>
-								</AnimatedTouchable>
-							</View>
-						)}
-						keyExtractor={(item, index) => String(item.id)}
-					/>
-				</View>
-				{/* <View
-					style={[
-						styles.blurView,
-						{
-							padding: dimensions.screen.width,
-							backgroundColor: Colors.grey200,
-							bottom: -10,
-						},
-					]}
-				></View>
+			<ScrollEnabledProvider>
 				<View
 					style={[
-						styles.blurView,
-						{
-							padding: dimensions.screen.width,
-							backgroundColor: Colors.grey300,
-							bottom: 0,
-						},
+						styles.view,
+						{ opacity: modalVisible ? 0.2 : 1, backgroundColor: Colors.white },
 					]}
-				></View> */}
-				{/* <View
-					style={[styles.blurView, { padding: dimensions.screen.width }]}
-				></View> */}
-				<Spinner loading={loading} />
-				<ModalInput
-					modalVisible={modalVisible}
-					setModalVisible={setModalVisible}
-					user={user}
-					id={id}
-					token={token}
-					goTeamTime={goTeamTime}
-					modalMode={modalMode}
-					loadingJoin={loadingJoin}
-					postTeamError={postTeamError}
-					joinTeamError={joinTeamError}
-					joinUri={joinUri}
-					loadingChangeColor={loadingChangeColor}
-					joinName={joinName}
-					makeReady={makeReady}
-					individualColor={individualColor}
-					sequence={sequence}
-				/>
-
-				<Animated.View
-					style={{
-						// position: 'absolute',
-						// bottom: '20%',
-						transform: [{ translateY: animValue }],
-					}}
 				>
-					<TouchableView
-						style={[
-							styles.touchableView,
-							{
-								backgroundColor: individualColor,
-							},
-						]}
-						onPress={onJoinTeamTime}
+					<NavigationHeader
+						title="모임 목록"
+						headerColor={individualColor}
+						Left={() => (
+							<TouchHeaderIconView
+								underlayColor={individualColor}
+								onPress={onReload}
+							>
+								<FontAwesome5Icon
+									name="redo-alt"
+									size={iconSize}
+									color={Colors.white}
+									style={{ paddingTop: 1 }}
+								/>
+							</TouchHeaderIconView>
+						)}
+						Right={() => (
+							<TouchHeaderIconView
+								underlayColor={individualColor}
+								onPress={onMakeTeamTime}
+							>
+								<FontAwesome5Icon
+									name="plus"
+									size={iconSize}
+									color={Colors.white}
+									style={{ paddingTop: 1 }}
+								/>
+							</TouchHeaderIconView>
+						)}
+					/>
+					{/* <Spinner loading={userLoading} /> */}
+					{clubs.length !== 0 && (
+						<Text style={[styles.headerUnderText]}>Plan list</Text>
+					)}
+
+					{!clubs.length && (
+						<View
+							style={{
+								flexDirection: 'column',
+								marginLeft: '16%',
+								marginTop: 20,
+								flex: 0.3,
+							}}
+						>
+							<Text style={styles.noListText}>
+								아직 아무런 모임이 없네요 😭
+							</Text>
+							<Text style={styles.noListText}>
+								1. 상단의 "+" 버튼을 눌러 모임을 생성 하거나
+							</Text>
+							<Text style={styles.noListText}>
+								2. 하단의 "모임 참여"를 눌러 모임에 참여해 보세요
+							</Text>
+						</View>
+					)}
+					<Animated.View style={{ flex: 2 }}>
+						<Animated.FlatList
+							{...panResponser.panHandlers}
+							style={[styles.FlatView]}
+							data={clubs}
+							scrollEnabled={scrollEnabled}
+							onScroll={Animated.event(
+								[
+									{
+										nativeEvent: {
+											contentOffset: {
+												y: animValue,
+											},
+										},
+									},
+								],
+								{ useNativeDriver: false }
+							)}
+							renderItem={({ item }) => (
+								<View
+									style={{
+										backgroundColor: Colors.black,
+									}}
+								>
+									<AnimatedTouchable
+										onPress={() => onPressGoTeamTime(item)}
+										activeOpacity={0.1}
+										underlayColor={Colors.grey300}
+										style={[
+											styles.teamListTouchableView,
+											{
+												opacity:
+													item.id === 0
+														? interpolate(animValue, [1, 0.9], [item.id, 18])
+														: 1,
+
+												// backgroundColor:
+												// 	item.id === 1
+												// 		? interpolate(
+												// 				animValue,
+												// 				[Colors.grey800, Colors.white],
+												// 				[-30, 0]
+												// 		  )
+												// 		: Colors.white,
+											},
+										]}
+									>
+										<View style={styles.teamView}>
+											<View
+												style={[
+													styles.rowCircle,
+													{ backgroundColor: item.color },
+												]}
+											/>
+											<Text
+												numberOfLines={1}
+												ellipsizeMode="tail"
+												style={styles.teamTitle}
+											>
+												{item.name}
+											</Text>
+											<Icons size={15} name="right" style={styles.iconStyle} />
+										</View>
+									</AnimatedTouchable>
+								</View>
+							)}
+							keyExtractor={(item, index) => String(item.id)}
+						/>
+					</Animated.View>
+					<Spinner loading={loading} />
+					<ModalInput
+						modalVisible={modalVisible}
+						setModalVisible={setModalVisible}
+						user={user}
+						id={id}
+						token={token}
+						goTeamTime={goTeamTime}
+						modalMode={modalMode}
+						loadingJoin={loadingJoin}
+						postTeamError={postTeamError}
+						joinTeamError={joinTeamError}
+						joinUri={joinUri}
+						loadingChangeColor={loadingChangeColor}
+						joinName={joinName}
+						makeReady={makeReady}
+						individualColor={individualColor}
+						sequence={sequence}
+					/>
+
+					<Animated.View
+						style={{
+							// position: 'absolute',
+							// bottom: '20%',
+							transform: [{ translateY: scrolling }],
+						}}
 					>
-						<Text style={styles.loginText}>모임 참여</Text>
-					</TouchableView>
-				</Animated.View>
-			</View>
+						<TouchableView
+							style={[
+								styles.touchableView,
+								{
+									backgroundColor: individualColor,
+								},
+							]}
+							onPress={onJoinTeamTime}
+						>
+							<Text style={styles.loginText}>모임 참여</Text>
+						</TouchableView>
+					</Animated.View>
+				</View>
+			</ScrollEnabledProvider>
 		</SafeAreaView>
 	);
 }
