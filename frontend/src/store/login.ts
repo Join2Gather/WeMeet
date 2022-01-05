@@ -212,9 +212,10 @@ export const loginSlice = createSlice({
 				club.name = decodeURIComponent(club.name);
 			});
 			state.userMeSuccess = true;
+			state.error = '';
 		},
 		USER_ME_FAILURE: (state, action: PayloadAction<any>) => {
-			state.error = action.payload;
+			state.error = 'error';
 			state.userMeSuccess = false;
 		},
 		CHANGE_NICKNAME_SUCCESS: (state, action: PayloadAction<any>) => {
@@ -248,6 +249,9 @@ export const loginSlice = createSlice({
 		setTimeTipMode: (state, action: PayloadAction<boolean>) => {
 			state.seeTimeTips = action.payload;
 		},
+		toggleUserMeSuccess: (state) => {
+			state.userMeSuccess = false;
+		},
 	},
 	extraReducers: {},
 });
@@ -265,6 +269,7 @@ export const {
 	setAppLoading,
 	setTipMode,
 	setTimeTipMode,
+	toggleUserMeSuccess,
 } = loginSlice.actions;
 
 export default loginSlice.reducer;
