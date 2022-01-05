@@ -93,7 +93,12 @@ export default function Login() {
 	//   []
 	// )
 	// prettier-ignore
-	const goTabNavigator = useCallback(() => navigation.navigate('TabNavigator'), []);
+
+	console.log('token', token)
+	const goTabNavigator = useCallback(
+		() => navigation.navigate('TabNavigator'),
+		[]
+	);
 	useEffect(() => {
 		if (token) {
 			dispatch(getUserMe({ token }));
