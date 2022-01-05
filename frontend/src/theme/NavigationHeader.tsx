@@ -34,12 +34,12 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 				{ backgroundColor: headerColor ? headerColor : '#33aafc' },
 			]}
 		>
-			<View style={{ flex: 0.05, backgroundColor: 'transparent' }}></View>
+			{/* <View style={{ flex: 0.01, backgroundColor: 'transparent' }}></View> */}
 			<View style={styles.halfFlex}>{Left && Left()}</View>
 			<View style={[styles.flex]}>
 				<Text
 					style={[styles.title, titleStyle]}
-					numberOfLines={title && title?.length > 7 ? 0 : 0}
+					numberOfLines={title && title.length > 7 ? 3 : 0}
 					ellipsizeMode="tail"
 				>
 					{title}
@@ -57,7 +57,7 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 				<View style={{ flex: 0.3, backgroundColor: 'transparent' }}></View>
 				{Right && Right()}
 			</View>
-			<View style={{ flex: 0.05, backgroundColor: 'transparent' }}></View>
+			{/* <View style={{ flex: 0.01, backgroundColor: 'transparent' }}></View> */}
 		</View>
 	);
 };
@@ -80,11 +80,10 @@ const styles = StyleSheet.create({
 		backgroundColor: '#33aafc',
 		borderBottomEndRadius: 15,
 		borderBottomLeftRadius: 15,
-		height: 60,
+		height: 55,
 	},
 	title: {
-		marginTop: 3,
-		fontSize: 21,
+		fontSize: 18,
 		fontWeight: '300',
 		textAlign: 'center',
 
