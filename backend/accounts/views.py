@@ -1,4 +1,5 @@
 import base64
+from binascii import Error
 from rest_framework.request import Request
 from config.settings import DEBUG
 from typing import Optional
@@ -142,7 +143,32 @@ class KakaoLoginToDjango(SocialLoginView):
 
 
 class AppleCallbackView(APIView):
-    def generate_client_secret(self, key, team_key, cert, client_id):
+    @staticmethod
+    def check_user_signed_in(email):
+        """
+            Signup or Signin Request
+        """
+        is_sign_in = False
+        try:
+            user: User = User.objects.get(email=email)
+            # 기존에 가입된 유저의 Provider가 kakao가 아니면 에러 발생, 맞으면 로그인
+            # 다른 SNS로 가입된 유저
+            social_user: Optional[SocialAccount] = SocialAccount.objects.get(
+                user=user)
+            if social_user is None:
+                raise Exception({'data': {
+                                'err_msg': 'email exists but not social user'}, 'status': status.HTTP_400_BAD_REQUEST})
+            if social_user.provider != 'apple':
+                raise Exception({'data': {
+                    'err_msg': 'no matching social type'}, 'status': status.HTTP_400_BAD_REQUEST})
+            is_sign_in = True
+        except User.DoesNotExist:
+            is_sign_in = False
+
+        return is_sign_in
+
+    @ staticmethod
+    def generate_client_secret(key, team_key, cert, client_id):
         """Create a JWT signed with an apple provided private key"""
         now = datetime.datetime.utcnow()
         claims = {
@@ -158,44 +184,15 @@ class AppleCallbackView(APIView):
         )
         return client_secret
 
-    @swagger_auto_schema(operation_id="애플 로그인 콜백")
-    def post(self, request: Request):
-
-        keys = ['state', 'code', 'id_token']
-
-        state, code, id_token = map(
-            lambda key: request.data.get(key, None), keys)
-
-        client_id = get_secret('CLIENT_ID')
-        APPLE_CALLBACK_URI = Constants.APPLE_CALLBACK_URI
-
-        decoded_token = jwt.decode(id_token, audience=client_id, options={
-                                   "verify_signature": False})
-
-        email = decoded_token.get('email')
-        """
-            Signup or Signin Request
-        """
-        is_sign_in = False
-        try:
-            user: User = User.objects.get(email=email)
-            # 기존에 가입된 유저의 Provider가 kakao가 아니면 에러 발생, 맞으면 로그인
-            # 다른 SNS로 가입된 유저
-            social_user: Optional[SocialAccount] = SocialAccount.objects.get(
-                user=user)
-            if social_user is None:
-                return JsonResponse({'err_msg': 'email exists but not social user'}, status=status.HTTP_400_BAD_REQUEST)
-            if social_user.provider != 'apple':
-                return JsonResponse({'err_msg': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
-            is_sign_in = True
-        except User.DoesNotExist:
-            is_sign_in = False
-
+    @ staticmethod
+    def manage_token_information(code, decoded_token, is_sign_in):
         key = get_secret('APPLE_KEY_ID')
         team_key = get_secret('APPLE_KEY')
         cert = base64.b64decode(get_secret('APPLE_CERTIFICATE_KEY_BASE64'))
+        client_id = get_secret('CLIENT_ID')
+        APPLE_CALLBACK_URI = Constants.APPLE_CALLBACK_URI
 
-        client_secret = self.generate_client_secret(
+        client_secret = AppleCallbackView.generate_client_secret(
             key, team_key, cert, client_id)
 
         # 로그인 / 가입 로직
@@ -209,7 +206,8 @@ class AppleCallbackView(APIView):
         accept_status = token_response.status_code
         sign_type = 'signin' if is_sign_in else 'signup'
         if accept_status != 200:
-            return JsonResponse({'err_msg': f'failed to {sign_type}'}, status=accept_status)
+            raise Exception(
+                {'data': {'err_msg': f'failed to {sign_type}'}, 'status': accept_status})
 
         token_json = token_response.json()
         refresh_token = token_json.get('refresh_token')
@@ -230,6 +228,10 @@ class AppleCallbackView(APIView):
             token_object: Token = Token.objects.get_or_create(
                 key=refresh_token, user=user)[0]
 
+        return token_object, user, username
+
+    @ staticmethod
+    def get_or_create_profiles(user, username):
         profiles = Profiles.objects.filter(user=user)
 
         if not profiles.exists():
@@ -237,5 +239,47 @@ class AppleCallbackView(APIView):
             Profiles.objects.create(name=nickname, user=user)
             profiles = Profiles.objects.filter(user=user)
 
+    @ staticmethod
+    def generate_return_json(token_object, profiles):
         profiles = [ProfilesSerializer(profile).data for profile in profiles]
-        return JsonResponse({'access_token': token_object.key, 'profiles': profiles})
+        return {'access_token': token_object.key, 'profiles': profiles}
+
+    @ staticmethod
+    def get_decoded_token(id_token):
+        client_id = get_secret('CLIENT_ID')
+
+        return jwt.decode(id_token, audience=client_id, options={
+            "verify_signature": False})
+
+    @staticmethod
+    def request_callback_process(code, id_token):
+        self = AppleCallbackView
+
+        decoded_token = self.get_decoded_token(id_token)
+
+        email = decoded_token.get('email')
+        try:
+            is_sign_in = self.check_user_signed_in(email)
+        except Exception as e:
+            return JsonResponse(**e.args)
+
+        try:
+            token_object, user, username = self.manage_token_information(
+                code, decoded_token, is_sign_in)
+        except Exception as e:
+            return JsonResponse(**e.args)
+
+        profiles = self.get_or_create_profiles(user, username)
+        payload = self.generate_return_json(token_object, profiles)
+
+        return JsonResponse(payload, status=status.HTTP_200_OK)
+
+    @ swagger_auto_schema(operation_id="애플 로그인 콜백")
+    def post(self, request: Request):
+
+        keys = ['code', 'id_token']
+
+        code, id_token = map(
+            lambda key: request.data.get(key, None), keys)
+
+        return self.request_callback_process(code, id_token)
