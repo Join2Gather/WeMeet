@@ -189,7 +189,7 @@ class AppleCallbackView(APIView):
 
     @ staticmethod
     def manage_token_information(code, email, is_sign_in):
-        key = get_secret('APPLE_SECRET')
+        key = get_secret('APPLE_KEY_ID')
         team_key = get_secret('APPLE_KEY')
         cert = base64.b64decode(get_secret('APPLE_CERTIFICATE_KEY_BASE64'))
         client_id = get_secret('CLIENT_ID')
