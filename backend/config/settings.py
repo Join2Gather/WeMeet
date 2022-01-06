@@ -65,7 +65,7 @@ INSTALLED_APPS = [
     'drf_yasg'
 ]
 
-SITE_ID = 1  # Admin 페이지를 위해 추가
+SITE_ID = 2  # Admin 페이지를 위해 추가
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
