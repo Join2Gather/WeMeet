@@ -1,5 +1,5 @@
 import base64
-from binascii import Error
+from drf_yasg import openapi
 from rest_framework.request import Request
 from config.settings import DEBUG
 from typing import Optional
@@ -7,7 +7,6 @@ from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.kakao import views as kakao_view
-from allauth.socialaccount.providers.apple import views as apple_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_framework.views import APIView
 from django.http import JsonResponse
@@ -17,7 +16,7 @@ from django.shortcuts import redirect
 from rest_framework.authtoken.models import Token
 from config.environment import get_secret
 from config.models import Profiles
-from config.serializers import ProfilesSerializer
+from config.serializers import AuthSerializer, ErrorSerializer, ProfilesSerializer
 from drf_yasg.utils import swagger_auto_schema
 import jwt
 import uuid
@@ -94,9 +93,9 @@ class KakaoCallbackView(APIView):
             social_user: Optional[SocialAccount] = SocialAccount.objects.get(
                 user=user)
             if social_user is None:
-                return JsonResponse({'err_msg': 'email exists but not social user'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'error': 'email exists but not social user'}, status=status.HTTP_400_BAD_REQUEST)
             if social_user.provider != 'kakao':
-                return JsonResponse({'err_msg': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'error': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
             is_sign_in = True
         except User.DoesNotExist:
             is_sign_in = False
@@ -107,7 +106,7 @@ class KakaoCallbackView(APIView):
         accept_status = accept.status_code
         sign_type = 'signin' if is_sign_in else 'signup'
         if accept_status != 200:
-            return JsonResponse({'err_msg': f'failed to {sign_type}'}, status=accept_status)
+            return JsonResponse({'error': f'failed to {sign_type}'}, status=accept_status)
 
         # accept의 Response body는 DRF 미들웨어 authtoken 값을 담고 있다.
         # DB에 자동으로 저장되는 변수이고, Request에서 Authorization 헤더에 Token으로 보내면 되는 값임.
@@ -142,6 +141,10 @@ class KakaoLoginToDjango(SocialLoginView):
     callback_url = Constants.KAKAO_CALLBACK_URI
 
 
+class BadRequestError(Exception):
+    pass
+
+
 class AppleCallbackView(APIView):
     @staticmethod
     def check_user_signed_in(email):
@@ -156,10 +159,10 @@ class AppleCallbackView(APIView):
             social_user: Optional[SocialAccount] = SocialAccount.objects.get(
                 user=user)
             if social_user is None:
-                raise Exception({'data': {
-                                'err_msg': 'email exists but not social user'}, 'status': status.HTTP_400_BAD_REQUEST})
+                raise BadRequestError({'data': {
+                    'err_msg': 'email exists but not social user'}, 'status': status.HTTP_400_BAD_REQUEST})
             if social_user.provider != 'apple':
-                raise Exception({'data': {
+                raise BadRequestError({'data': {
                     'err_msg': 'no matching social type'}, 'status': status.HTTP_400_BAD_REQUEST})
             is_sign_in = True
         except User.DoesNotExist:
@@ -185,8 +188,8 @@ class AppleCallbackView(APIView):
         return client_secret
 
     @ staticmethod
-    def manage_token_information(code, decoded_token, is_sign_in):
-        key = get_secret('APPLE_KEY_ID')
+    def manage_token_information(code, email, is_sign_in):
+        key = get_secret('APPLE_SECRET')
         team_key = get_secret('APPLE_KEY')
         cert = base64.b64decode(get_secret('APPLE_CERTIFICATE_KEY_BASE64'))
         client_id = get_secret('CLIENT_ID')
@@ -206,13 +209,12 @@ class AppleCallbackView(APIView):
         accept_status = token_response.status_code
         sign_type = 'signin' if is_sign_in else 'signup'
         if accept_status != 200:
-            raise Exception(
-                {'data': {'err_msg': f'failed to {sign_type}'}, 'status': accept_status})
+            raise BadRequestError(
+                {'data': {'error': f'failed to {sign_type}'}, 'status': accept_status})
 
         token_json = token_response.json()
         refresh_token = token_json.get('refresh_token')
 
-        email = decoded_token.get('email', '')
         # name scope를 주어도 id_token에서 이름이 발급되지 않아 임시로 이메일로 대체함.
         username = email
 
@@ -252,29 +254,46 @@ class AppleCallbackView(APIView):
             "verify_signature": False})
 
     @staticmethod
-    def request_callback_process(code, id_token):
+    def request_callback_process(code, id_token=None, email=None):
         self = AppleCallbackView
 
-        decoded_token = self.get_decoded_token(id_token)
+        if id_token:
+            decoded_token = self.get_decoded_token(id_token)
 
-        email = decoded_token.get('email')
+            email = decoded_token.get('email')
+        elif not email:
+            raise ValueError('email not given')
+
         try:
             is_sign_in = self.check_user_signed_in(email)
-        except Exception as e:
-            return JsonResponse(**e.args)
+        except BadRequestError as e:
+            return JsonResponse(**e.args[0])
 
         try:
             token_object, user, username = self.manage_token_information(
-                code, decoded_token, is_sign_in)
-        except Exception as e:
-            return JsonResponse(**e.args)
+                code, email, is_sign_in)
+        except BadRequestError as e:
+            return JsonResponse(**e.args[0])
 
         profiles = self.get_or_create_profiles(user, username)
         payload = self.generate_return_json(token_object, profiles)
 
         return JsonResponse(payload, status=status.HTTP_200_OK)
 
-    @ swagger_auto_schema(operation_id="애플 로그인 콜백")
+    @ swagger_auto_schema(
+        operation_id="애플 로그인 콜백",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'code': openapi.Schema(type=openapi.TYPE_STRING),
+                'id_token': openapi.Schema(type=openapi.TYPE_STRING),
+            }
+        ),
+        responses={
+            status.HTTP_200_OK: AuthSerializer,
+            status.HTTP_400_BAD_REQUEST: ErrorSerializer
+        },
+    )
     def post(self, request: Request):
 
         keys = ['code', 'id_token']
@@ -283,3 +302,37 @@ class AppleCallbackView(APIView):
             lambda key: request.data.get(key, None), keys)
 
         return self.request_callback_process(code, id_token)
+
+
+class AppleTokenLoginView(APIView):
+    @ staticmethod
+    def get_decoded_token(id_token):
+        return jwt.decode(id_token, options={
+            "verify_signature": False})
+
+    @ swagger_auto_schema(
+        operation_id="애플 토큰 로그인",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'code': openapi.Schema(type=openapi.TYPE_STRING),
+                'email': openapi.Schema(type=openapi.TYPE_STRING),
+            }
+        ),
+        responses={
+            status.HTTP_200_OK: AuthSerializer,
+            status.HTTP_400_BAD_REQUEST: ErrorSerializer
+        },
+    )
+    def post(self, request: Request):
+        that = AppleCallbackView
+
+        keys = ['code', 'email']
+        code, email = map(
+            lambda key: request.data.get(key, None), keys)
+
+        if not code or not email:
+            name = 'code' if not code else 'email'
+            return JsonResponse(data={'error': f'{name} not given'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return that.request_callback_process(code, email=email)

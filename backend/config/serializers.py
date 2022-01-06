@@ -442,3 +442,8 @@ class SnapshotSerializer(serializers.ModelSerializer):
     def get_dates(self, obj):
         calculator = SnapshotWithDateCalculator(obj)
         return calculator.calculate()
+
+
+class AuthSerializer(serializers.Serializer):
+    access_token = serializers.CharField()
+    profiles = ProfilesSerializer()
