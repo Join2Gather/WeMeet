@@ -59,7 +59,7 @@ export function ModalInfo({
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
 					<CloseButton closeBtn={onPressCloseBtn} />
-					<View style={{ justifyContent: 'flex-start' }}>
+					<View style={{ justifyContent: 'center' }}>
 						<View style={styles.blankView} />
 
 						<View style={{ flexDirection: 'row' }}>
@@ -109,22 +109,22 @@ export function ModalInfo({
 						</View>
 						<View style={{ flexDirection: 'row', marginTop: 15 }}>
 							<Text style={styles.touchText}></Text>
-							<Material color={color} name="settings" size={17}></Material>
+							<FontIcon color={color} name="user-plus" size={17}></FontIcon>
 							<Text
 								style={[styles.touchText, { marginLeft: 0, marginRight: 3 }]}
 							>
 								{' '}
-								{'아이콘을 터치 한 후'}
+								{
+									'설정 창에서 아이콘을 터치하여 \n 팀원 초대 코드를 생성할 수 있어요'
+								}
 							</Text>
-							<FontIcon color={color} name="user-plus" size={17}></FontIcon>
-							<Text style={[styles.touchText, { marginLeft: 0 }]}>
-								{'아이콘을 터치하여'}
-							</Text>
-							<Text
+							{/* <FontIcon color={color} name="user-plus" size={17}></FontIcon> */}
+							<Text style={[styles.touchText, { marginLeft: 0 }]}>{''}</Text>
+							{/* <Text
 								style={[styles.touchText, { marginLeft: -screen.width * 0.57 }]}
 							>
 								{'\n팀원 초대 코드를 생성할 수 있어요'}
-							</Text>
+							</Text> */}
 						</View>
 						<View
 							style={{ flexDirection: 'row', marginTop: 10, marginLeft: 3 }}
@@ -225,6 +225,7 @@ const styles = StyleSheet.create({
 		backgroundColor: Colors.white,
 		borderRadius: 13,
 		padding: 20,
+		justifyContent: 'center',
 		alignItems: 'center',
 		shadowColor: 'black',
 		elevation: 10,
@@ -242,6 +243,9 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
 		marginLeft: screen.width * 0.15,
+		justifyContent: 'center',
+		alignContent: 'center',
+		alignItems: 'center',
 		// justifyContent: 'flex-start',
 		// textAlignVertical: 'center',
 		// alignSelf: 'center',
