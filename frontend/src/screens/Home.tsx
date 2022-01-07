@@ -106,6 +106,7 @@ export default function Home() {
 		endHour,
 		appLoading,
 		seeTips,
+		isViewError,
 	} = useSelector(({ login, individual, loading }: RootState) => ({
 		token: login.token,
 		id: login.id,
@@ -123,6 +124,7 @@ export default function Home() {
 		endHour: login.homeTime.end,
 		appLoading: login.loading,
 		seeTips: login.seeTips,
+		isViewError: login.viewError,
 	}));
 
 	// useEffect(() => {
@@ -383,6 +385,7 @@ export default function Home() {
 						token={token}
 						color={individualColor}
 						onPressChangeTime={onPressChangeTime}
+						isViewError={isViewError}
 					/>
 					<ModalHomeInfo
 						infoVisible={infoVisible}
