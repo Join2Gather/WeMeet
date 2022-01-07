@@ -4,6 +4,7 @@ import * as api from '../lib/api/login';
 import { takeLatest } from 'redux-saga/effects';
 import { createAction } from 'redux-actions';
 import type {
+	appleLoginType,
 	homeTime,
 	kakaoLoginAPI,
 	Login,
@@ -54,23 +55,33 @@ const initialState: Login = {
 	loading: '',
 	seeTips: true,
 	seeTimeTips: true,
+	code: '',
+	email: '',
+	viewError: false,
 };
 
 const USER_ME = 'login/USER_ME';
 const CHANGE_NICKNAME = 'login/CHANGE_NICKNAME';
+const APPLE_LOGIN = 'login/APPLE_LOGIN';
 
 export const getUserMe = createAction(USER_ME, (data: userMeAPI) => data);
 export const changeNickname = createAction(
 	CHANGE_NICKNAME,
 	(data: nicknameAPI) => data
 );
+export const appleLogin = createAction(
+	APPLE_LOGIN,
+	(data: appleLoginType) => data
+);
 
 const getUserMeSaga = createRequestSaga(USER_ME, api.getUserMe);
 const changeNickSaga = createRequestSaga(CHANGE_NICKNAME, api.changeNickname);
+const appleLoginSaga = createRequestSaga(APPLE_LOGIN, api.appleLogin);
 
 export function* loginSaga() {
 	yield takeLatest(USER_ME, getUserMeSaga);
 	yield takeLatest(CHANGE_NICKNAME, changeNickSaga);
+	yield takeLatest(APPLE_LOGIN, appleLoginSaga);
 }
 
 export const loginSlice = createSlice({
@@ -224,6 +235,12 @@ export const loginSlice = createSlice({
 		CHANGE_NICKNAME_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 		},
+		APPLE_LOGIN_SUCCESS: (state, action: PayloadAction<any>) => {
+			console.log(action.payload);
+		},
+		APPLE_LOGIN_FAILURE: (state, action: PayloadAction<any>) => {
+			state.error = action.payload;
+		},
 		makeGroupColor: (state, action: PayloadAction<string>) => {
 			state.color = action.payload;
 		},
@@ -252,6 +269,13 @@ export const loginSlice = createSlice({
 		toggleUserMeSuccess: (state) => {
 			state.userMeSuccess = false;
 		},
+		setAppleLoginToken: (state, action: PayloadAction<appleLoginType>) => {
+			state.code = action.payload.code;
+			state.email = action.payload.email;
+		},
+		toggleViewError: (state, action: PayloadAction<boolean>) => {
+			state.viewError = action.payload;
+		},
 	},
 	extraReducers: {},
 });
@@ -270,6 +294,8 @@ export const {
 	setTipMode,
 	setTimeTipMode,
 	toggleUserMeSuccess,
+	setAppleLoginToken,
+	toggleViewError,
 } = loginSlice.actions;
 
 export default loginSlice.reducer;
