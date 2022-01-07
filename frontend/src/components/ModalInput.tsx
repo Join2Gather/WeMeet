@@ -397,10 +397,12 @@ export function ModalInput({
 						)}
 						{mode === 'joinSuccess' && (
 							<>
+								<View style={styles.blankView} />
 								<Text style={[styles.titleText, { fontSize: 17 }]}>
 									🎉 모임에 참여가 완료 되었습니다 {'\n'} 가능한 시간을
 									입력해주세요
 								</Text>
+								<View style={styles.blankView} />
 								<View style={styles.buttonOverLine} />
 								<Button
 									buttonNumber={1}
@@ -411,10 +413,11 @@ export function ModalInput({
 						)}
 						{mode === 'makeSuccess' && (
 							<>
-								<Text style={[styles.titleText, { fontSize: 17 }]}>
+								<View style={styles.blankView} />
+								<Text style={[styles.buttonText, { fontSize: 16 }]}>
 									🎉 모임 생성 완료 되었습니다 {'\n'} 가능한 시간을 입력해주세요
-									{'\n'}
 								</Text>
+								<View style={styles.blankView} />
 								<View style={styles.buttonOverLine} />
 								<Button
 									buttonNumber={1}
@@ -526,6 +529,7 @@ const styles = StyleSheet.create({
 	buttonText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
+		letterSpacing: -1,
 	},
 
 	textStyle: {
