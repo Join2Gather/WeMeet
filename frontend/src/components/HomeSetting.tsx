@@ -9,6 +9,7 @@ import {
 	ActivityIndicator,
 	Dimensions,
 	TextInput,
+	Platform,
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
@@ -18,7 +19,11 @@ import Ionic from 'react-native-vector-icons/Ionicons';
 import { hexToRGB } from '../lib/util/hexToRGB';
 import { Button } from '../lib/util/Button';
 import Material from 'react-native-vector-icons/MaterialIcons';
-import { changeNickname, changeTeamColor } from '../store/login';
+import {
+	changeNickname,
+	changeTeamColor,
+	toggleViewError,
+} from '../store/login';
 import ColorPicker from 'react-native-wheel-color-picker';
 const screen = Dimensions.get('screen');
 
@@ -31,6 +36,7 @@ interface props {
 	color: string;
 	userMeError: string;
 	onPressChangeTime: () => void;
+	isViewError: boolean;
 }
 
 export function HomeSetting({
@@ -42,6 +48,7 @@ export function HomeSetting({
 	color,
 	userMeError,
 	onPressChangeTime,
+	isViewError,
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
@@ -90,6 +97,11 @@ export function HomeSetting({
 		setSettingModalVisible(false);
 		setPickColor(Colors.red500);
 	}, []);
+
+	const onPressIsViewError = useCallback(() => {
+		dispatch(toggleViewError(!isViewError));
+		setMode('loading');
+	}, [isViewError]);
 
 	return (
 		<Modal
@@ -191,6 +203,40 @@ export function HomeSetting({
 												</View>
 											</View>
 										</TouchableHighlight>
+										{Platform.OS === 'android' && (
+											<TouchableHighlight
+												activeOpacity={1}
+												underlayColor={Colors.grey300}
+												onPress={() => setMode('timeError')}
+												style={[
+													styles.touchButtonStyle,
+													{
+														borderRadius: 0,
+													},
+												]}
+											>
+												<View style={styles.rowView}>
+													<Ionic
+														name="time"
+														size={25}
+														color={color}
+														style={[styles.iconStyle, { marginLeft: 8 }]}
+													/>
+													<Text style={styles.touchText}>
+														{' '}
+														시간표 오류 수정
+													</Text>
+													<View style={styles.iconView}>
+														<Font5Icon
+															name="angle-right"
+															size={19}
+															color={Colors.black}
+															style={styles.rightIconStyle}
+														/>
+													</View>
+												</View>
+											</TouchableHighlight>
+										)}
 										<TouchableHighlight
 											activeOpacity={1}
 											underlayColor={Colors.grey300}
@@ -298,6 +344,26 @@ export function HomeSetting({
 							<View style={styles.blankView} />
 							<ActivityIndicator size={'large'} color={color} />
 							<View style={styles.blankView} />
+						</>
+					)}
+					{mode === 'timeError' && (
+						<>
+							<View style={styles.blankView} />
+							<View style={styles.rowView}>
+								<Text style={styles.touchText}>
+									시간표에 흰색줄이 표시 되시나요?
+								</Text>
+							</View>
+
+							<View style={styles.blankView} />
+							<View style={styles.buttonOverLine} />
+							<Button
+								buttonNumber={2}
+								buttonText="아니요"
+								secondButtonText="네"
+								onPressFunction={onPressCloseButton}
+								secondOnPressFunction={onPressIsViewError}
+							/>
 						</>
 					)}
 					{mode === 'success' && (
