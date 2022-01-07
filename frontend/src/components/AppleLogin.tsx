@@ -24,11 +24,12 @@ import {
 } from '@invertase/react-native-apple-authentication';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { setAppleToken } from '../store/login';
+import { appleLogin, setAppleToken } from '../store/login';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { Colors } from 'react-native-paper';
 
 import jwtDecode from 'jwt-decode';
+import { mean } from 'lodash';
 
 /**
  * You'd technically persist this somewhere for later use.
@@ -71,24 +72,14 @@ export function AppleLogin() {
 	var user = '';
 	// const [credentialStateForUser, updateCredentialStateForUser] =
 	// 	useState<any>(-1);
-	const [userToken, setToken] = useState<any>('');
-	const [status, setStatus] = useState<any>('');
-	const [email, setEmail] = useState<any>('');
-	const [fullName, setFullName] = useState<any>('');
-	const [identityToken, setInToken] = useState<any>('');
-	const [state, setState] = useState<any>('');
-	const [users, setUsers] = useState<any>('');
-	const [authCode, setAuthCode] = useState<any>('');
+	const [userToken, setToken] = useState('');
+
 	const dispatch = useDispatch();
 	useEffect(() => {
 		dispatch(setAppleToken(userToken));
 	}, [userToken]);
 
 	const onAppleButtonPress = async () => {
-		let response: object = {};
-		let appleId: string = '';
-		let appleToken: string = '';
-		let appleEmail: string = '';
 		try {
 			const appleAuthRequestResponse = await AppleAuthentication.signInAsync({
 				requestedScopes: [
@@ -106,18 +97,22 @@ export function AppleLogin() {
 				state,
 				user,
 			} = appleAuthRequestResponse;
-			console.log(appleAuthRequestResponse);
+			appleAuthRequestResponse;
 			// fetchAndUpdateCredentialState(setToken, user).catch((error) =>
 			// 	// setToken(`Error: ${error.code}`)
 			// );
+			if (authorizationCode && email && identityToken) {
+				const decoded = jwtDecode(identityToken);
+				console.log('email', email);
+				console.log('code', authorizationCode);
+				dispatch(appleLogin({ code: authorizationCode, email: email }));
+			}
 
 			if (identityToken) {
-				const decoded = jwtDecode(identityToken);
-				console.log(decoded);
-
 				// setToken(access_token);
 			} else {
 				Alert.alert('로그인 실패');
+				return;
 			}
 		} catch (error: any) {
 			if (error.code === appleAuth.Error.CANCELED) {

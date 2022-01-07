@@ -22,6 +22,7 @@ import {
 	postTeamName,
 	setModalMode,
 } from '../store/team';
+import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 // import { ColorPicker, fromHsv } from 'react-native-color-picker';
@@ -76,7 +77,7 @@ export function ModalInput({
 	const dispatch = useDispatch();
 	// const [name, setName] = useState('2ff148e7-05b9-461e-a2c2-1d3ccce16ba9');
 	const [name, setName] = useState('');
-	const [code, setCode] = useState('');
+	const [code, setCode] = useState('0a006017-0c21-45fe-baa7-3ff21311a0a8');
 	const [mode, setMode] = useState('initial');
 	const [color, setColor] = useState(Colors.red500);
 	const [hsvColor, setHSV] = useState({
@@ -193,15 +194,13 @@ export function ModalInput({
 		setModalVisible(false);
 		setMode('initial');
 	}, []);
+
+	const onPressMakeTeam = useCallback((mode: string) => {
+		dispatch(setModalMode(mode));
+		setMode(mode);
+	}, []);
 	return (
-		<Modal
-			animationType="fade"
-			transparent={true}
-			visible={modalVisible}
-			onRequestClose={() => {
-				Alert.alert('Modal has been closed.');
-			}}
-		>
+		<Modal animationType="fade" transparent={true} visible={modalVisible}>
 			<KeyboardAvoidingView
 				behavior={'padding'}
 				enabled={Platform.OS === 'ios' ? true : false}
@@ -212,109 +211,194 @@ export function ModalInput({
 						{!loadingJoin && (
 							<>
 								<CloseButton closeBtn={onPressCloseButton} />
-								<>
-									{!loadingJoin && mode === 'makeError' && (
-										<>
-											<View style={styles.errorView}>
-												<Material
-													name={'error-outline'}
-													size={23}
-													style={{ alignSelf: 'center' }}
-													color={Colors.red300}
-												/>
-												<Text style={styles.errorText}> 서버 오류</Text>
-											</View>
-											<View style={styles.blankView} />
-											<View style={styles.buttonOverLine} />
-											<Button
-												buttonNumber={1}
-												buttonText="확인"
-												onPressFunction={onCloseError}
-											/>
-										</>
-									)}
-									{!loadingJoin && mode === 'joinError' && (
-										<>
-											<View style={styles.errorView}>
-												<Material
-													name={'error-outline'}
-													size={23}
-													style={{ alignSelf: 'center' }}
-													color={Colors.red300}
-												/>
 
-												<Text style={styles.errorText}>
-													{' '}
-													잘못된 공유 코드 입니다
-												</Text>
-											</View>
-											<View style={styles.blankView} />
-											<View style={styles.buttonOverLine} />
-											<Button
-												buttonNumber={1}
-												buttonText="확인"
-												onPressFunction={onCloseError}
+								{!loadingJoin && mode === 'makeError' && (
+									<>
+										<View style={styles.errorView}>
+											<Material
+												name={'error-outline'}
+												size={23}
+												style={{ alignSelf: 'center' }}
+												color={Colors.red300}
 											/>
-										</>
-									)}
-									{mode === 'initial' && modalMode === 'join' && (
-										<>
-											<Text style={styles.titleText}>
-												공유 코드를 입력하세요
+											<Text style={styles.errorText}> 서버 오류</Text>
+										</View>
+										<View style={styles.blankView} />
+										<View style={styles.buttonOverLine} />
+										<Button
+											buttonNumber={1}
+											buttonText="확인"
+											onPressFunction={onCloseError}
+										/>
+									</>
+								)}
+								{!loadingJoin && mode === 'joinError' && (
+									<>
+										<View style={styles.errorView}>
+											<Material
+												name={'error-outline'}
+												size={23}
+												style={{ alignSelf: 'center' }}
+												color={Colors.red300}
+											/>
+
+											<Text style={styles.errorText}>
+												{' '}
+												잘못된 공유 코드 입니다
 											</Text>
-
-											<View style={[styles.textInputView]}>
-												<TextInput
-													style={[styles.textInput, { color: Colors.black }]}
-													value={code}
-													onChangeText={(code) => setCode((text) => code)}
-													placeholder="Enter your Code"
-													placeholderTextColor={Colors.grey600}
-													autoFocus={true}
-												/>
-											</View>
-											<View style={styles.buttonOverLine} />
-											<Button
-												buttonNumber={1}
-												buttonText="확인"
-												onPressWithParam={() => onPressNext('send')}
-												pressParam="send"
+										</View>
+										<View style={styles.blankView} />
+										<View style={styles.buttonOverLine} />
+										<Button
+											buttonNumber={1}
+											buttonText="확인"
+											onPressFunction={onCloseError}
+										/>
+									</>
+								)}
+								{mode === 'join' && modalMode === 'join' && (
+									<>
+										<Text style={styles.titleText}>공유 코드를 입력하세요</Text>
+										<View style={styles.blankView} />
+										<View style={[styles.textInputView]}>
+											<TextInput
+												style={[styles.textInput, { color: Colors.black }]}
+												value={code}
+												onChangeText={(code) => setCode((text) => code)}
+												placeholder="Enter your Code"
+												placeholderTextColor={Colors.grey600}
+												autoFocus={true}
 											/>
-										</>
-									)}
-									{mode === 'initial' && modalMode === 'make' && (
-										<>
-											<Text style={styles.titleText}>모임명을 입력하세요</Text>
-											<View style={[styles.textInputView]}>
-												<TextInput
-													style={[styles.textInput, { color: Colors.black }]}
-													value={name}
-													onChangeText={(name) => setName((text) => name)}
-													placeholder="Enter your ID"
-													placeholderTextColor={Colors.grey600}
-													autoFocus={true}
-												/>
-											</View>
+										</View>
+										<View style={styles.buttonOverLine} />
+										<Button
+											buttonNumber={1}
+											buttonText="확인"
+											onPressWithParam={() => onPressNext('send')}
+											pressParam="send"
+										/>
+									</>
+								)}
+								{mode === 'initial' && (
+									<>
+										<Text
+											style={[
+												styles.titleText,
+												{ alignSelf: 'flex-start', marginLeft: '10%' },
+											]}
+										>
+											모임 관리
+										</Text>
+										<View style={styles.blankView} />
+										<View style={[styles.backgroundView]}>
+											<View style={styles.columnView}>
+												<TouchableHighlight
+													activeOpacity={1}
+													underlayColor={Colors.grey300}
+													onPress={() => onPressMakeTeam('make')}
+													style={[
+														styles.touchButtonStyle,
+														{
+															borderBottomLeftRadius: 0,
+															borderBottomRightRadius: 0,
+														},
+													]}
+												>
+													<View style={styles.rowView}>
+														<Font5Icon
+															name="pencil-alt"
+															size={21}
+															color={individualColor}
+															style={[styles.iconStyle, { marginTop: 10 }]}
+														/>
+														<Text style={styles.touchText}> 모임 생성</Text>
+														<View style={styles.iconView}>
+															<Font5Icon
+																name="angle-right"
+																size={19}
+																color={Colors.black}
+																style={styles.rightIconStyle}
+															/>
+														</View>
+													</View>
+												</TouchableHighlight>
 
-											<View style={styles.buttonOverLine} />
-											<Button
-												buttonNumber={1}
-												buttonText={'확인'}
-												onPressWithParam={() => onPressNext('time')}
-												pressParam="time"
+												<TouchableHighlight
+													activeOpacity={1}
+													underlayColor={Colors.grey300}
+													onPress={() => onPressMakeTeam('join')}
+													style={[
+														styles.touchButtonStyle,
+														{
+															borderTopLeftRadius: 0,
+															borderTopRightRadius: 0,
+														},
+													]}
+												>
+													<View style={styles.rowView}>
+														<Font5Icon
+															name="address-book"
+															size={25}
+															color={individualColor}
+															style={[
+																styles.iconStyle,
+																{ marginTop: 10, marginLeft: 10 },
+															]}
+														/>
+														<Text
+															style={[styles.touchText, { marginLeft: 13 }]}
+														>
+															모임 참여
+														</Text>
+														<View style={styles.iconView}>
+															<Font5Icon
+																name="angle-right"
+																size={19}
+																color={Colors.black}
+																style={styles.rightIconStyle}
+															/>
+														</View>
+													</View>
+												</TouchableHighlight>
+											</View>
+										</View>
+										<View style={styles.blankView} />
+									</>
+								)}
+								{mode === 'make' && modalMode === 'make' && (
+									<>
+										<Text style={[styles.titleText]}> 모임명을 입력하세요</Text>
+										<View style={styles.blankView} />
+										<View style={[styles.textInputView]}>
+											<TextInput
+												style={[styles.textInput, { color: Colors.black }]}
+												value={name}
+												onChangeText={(name) => setName((text) => name)}
+												placeholder="We Meet"
+												placeholderTextColor={Colors.grey600}
+												autoFocus={true}
 											/>
-										</>
-									)}
-								</>
+										</View>
+
+										<View style={styles.buttonOverLine} />
+										<Button
+											buttonNumber={1}
+											buttonText={'확인'}
+											onPressWithParam={() => onPressNext('time')}
+											pressParam="time"
+										/>
+									</>
+								)}
 							</>
 						)}
 						{mode === 'time' && (
 							<>
 								<Text style={styles.titleText}>모임 시간을 입력해 주세요</Text>
+								<View style={styles.blankView} />
 								<Text style={[styles.titleUnderText]}>
 									[ 24시간 단위로 입력해 주세요 ]
 								</Text>
-								<View style={styles.rowView}>
+								<View style={[styles.rowView, { justifyContent: 'center' }]}>
 									<Text style={styles.timeInputText}>시작 시간 : </Text>
 									<View style={styles.timeInputView}>
 										<TextInput
@@ -328,7 +412,7 @@ export function ModalInput({
 									</View>
 								</View>
 								<View style={styles.blankView} />
-								<View style={styles.rowView}>
+								<View style={[styles.rowView, { justifyContent: 'center' }]}>
 									<Text style={styles.timeInputText}>종료 시간 : </Text>
 									<View style={styles.timeInputView}>
 										<TextInput
@@ -357,6 +441,7 @@ export function ModalInput({
 						{mode === 'color' && (
 							<>
 								<Text style={styles.titleText}>모임 색상을 선택해 주세요 </Text>
+								<View style={styles.blankView} />
 								<View
 									style={{
 										height: 300,
@@ -391,7 +476,7 @@ export function ModalInput({
 						{mode === 'loading' && (
 							<>
 								<View style={{ height: 30 }} />
-								<ActivityIndicator size="large" color={Colors.blue500} />
+								<ActivityIndicator size="large" color={individualColor} />
 								<View style={{ height: 30 }} />
 							</>
 						)}
@@ -399,7 +484,7 @@ export function ModalInput({
 							<>
 								<View style={styles.blankView} />
 								<Text style={[styles.titleText, { fontSize: 17 }]}>
-									🎉 모임에 참여가 완료 되었습니다 {'\n'} 가능한 시간을
+									🎉 모임에 참여가 완료 되었습니다{'\n       '} 가능한 시간을
 									입력해주세요
 								</Text>
 								<View style={styles.blankView} />
@@ -443,9 +528,11 @@ const styles = StyleSheet.create({
 	},
 	rowView: {
 		flexDirection: 'row',
-		alignContent: 'center',
-		justifyContent: 'center',
-		width: '50%',
+		alignItems: 'center',
+		justifyContent: 'flex-start',
+		width: screen.width * 0.65,
+		height: screen.height * 0.05,
+		borderRadius: 13,
 	},
 	modalView: {
 		marginBottom: 60,
@@ -464,11 +551,10 @@ const styles = StyleSheet.create({
 		width: screen.width * 0.9,
 	},
 	titleText: {
-		textAlign: 'center',
-		fontFamily: 'NanumSquareBold',
 		fontSize: 20,
-
-		marginBottom: 20,
+		alignSelf: 'center',
+		fontFamily: 'NanumSquareBold',
+		letterSpacing: -1,
 	},
 	titleUnderText: {
 		textAlign: 'center',
@@ -511,7 +597,7 @@ const styles = StyleSheet.create({
 	timeInputView: {
 		paddingBottom: 2,
 		backgroundColor: Colors.white,
-		flex: 0.6,
+		flex: 0.3,
 		borderBottomWidth: 0.3,
 		marginLeft: '10%',
 		textAlign: 'center',
@@ -563,7 +649,46 @@ const styles = StyleSheet.create({
 	safeAreaView: {
 		flex: 1,
 		// marginTop: 50,
+		// justifyContent: 'center',
+		// alignItems: 'center',
+	},
+	backgroundView: {
+		borderRadius: 13,
+		backgroundColor: Colors.grey100,
+	},
+	columnView: {
+		flexDirection: 'column',
+		alignContent: 'center',
+	},
+	touchButtonStyle: {
+		padding: 5,
+		borderRadius: 13,
 		justifyContent: 'center',
-		alignItems: 'center',
+		paddingLeft: 5,
+		paddingRight: 5,
+	},
+	iconStyle: {
+		marginLeft: 10,
+		width: 30,
+		height: 30,
+		marginTop: 5,
+		textAlign: 'center',
+		alignContent: 'center',
+	},
+	touchText: {
+		fontSize: 14,
+		textAlign: 'center',
+		textAlignVertical: 'center',
+		fontFamily: 'NanumSquareR',
+		letterSpacing: -1,
+		marginLeft: 10,
+		top: 1,
+	},
+	iconView: {
+		alignItems: 'flex-end',
+		flex: 1,
+	},
+	rightIconStyle: {
+		marginRight: 10,
 	},
 });

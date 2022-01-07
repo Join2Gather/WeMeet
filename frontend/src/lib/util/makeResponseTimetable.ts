@@ -22,7 +22,9 @@ export function makeIndividualTimetable(state: timetable) {
 								Colors.grey600
 							);
 							state.isOverlap = true;
-						} else makeTime(state.dates[idx].times[i][j], 'individual', color);
+						} else {
+							makeTime(state.dates[idx].times[i][j], 'individual', color);
+						}
 					}
 				} else {
 					if (i === d.starting_hours) {
@@ -34,6 +36,11 @@ export function makeIndividualTimetable(state: timetable) {
 									Colors.grey600
 								);
 								state.isOverlap = true;
+							}
+							if (j === 0) {
+								state.dates[idx].times[i][j].color = color;
+								state.dates[idx].times[i][j].mode = 'individual';
+								state.dates[idx].times[i][j].borderWidth = 0.3;
 							} else
 								makeTime(state.dates[idx].times[i][j], 'individual', color);
 						}
@@ -88,7 +95,11 @@ export function makeGroupTimeTableWith60(state: timetable, dates: any) {
 					} else {
 						if (i === d.starting_hours) {
 							for (let j = startingMinute; j <= 5; j++) {
-								makeTime(dates[idx].times[i][j], 'team', color);
+								if (j === 0) {
+									dates[idx].times[i][j].color = color;
+									dates[idx].times[i][j].mode = 'team';
+									dates[idx].times[i][j].borderWidth = 0.3;
+								} else makeTime(dates[idx].times[i][j], 'team', color);
 							}
 						} else if (i === d.end_hours) {
 							for (let j = 0; j < endMinute; j++) {

@@ -127,11 +127,20 @@ export const individualSlice = createSlice({
 									if (i === d.starting_hours) {
 										for (let j = startingMinute; j <= 5; j++) {
 											if (state.individualDates[idx].times[i]) {
-												makeTime(
-													state.individualDates[idx].times[i][j],
-													date.color ? 'team' : 'everyTime',
-													date.color ? date.color : Colors.grey400
-												);
+												if (j === 0) {
+													state.individualDates[idx].times[i][j].color =
+														date.color ? date.color : Colors.grey400;
+													state.individualDates[idx].times[i][j].mode =
+														date.color ? 'team' : 'everyTime';
+													state.individualDates[idx].times[i][
+														j
+													].borderWidth = 0.3;
+												} else
+													makeTime(
+														state.individualDates[idx].times[i][j],
+														date.color ? 'team' : 'everyTime',
+														date.color ? date.color : Colors.grey400
+													);
 											}
 										}
 									} else if (i === d.end_hours) {
