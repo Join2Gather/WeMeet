@@ -96,8 +96,6 @@ export function ModalIndividualTime({
 		}, 1000);
 	}, [findIndividual]);
 	const onPressMove = useCallback(() => {
-		console.log(teamId);
-
 		dispatch(toggleIsInitial(true));
 		setTimeout(() => {
 			dispatch(

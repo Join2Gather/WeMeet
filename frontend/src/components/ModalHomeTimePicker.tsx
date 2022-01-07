@@ -57,8 +57,6 @@ export function ModalHomeTimePicker({ homeVisible, setHomeVisible }: props) {
 	const onPressFirstConfirm = useCallback((date) => {
 		setDate(date);
 		const start = date.getHours();
-		console.log(start);
-
 		setTimeout(() => {
 			setSecond(true);
 		}, 100);
