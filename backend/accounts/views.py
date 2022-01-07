@@ -241,6 +241,8 @@ class AppleCallbackView(APIView):
             Profiles.objects.create(name=nickname, user=user)
             profiles = Profiles.objects.filter(user=user)
 
+        return profiles
+
     @ staticmethod
     def generate_return_json(token_object, profiles):
         profiles = [ProfilesSerializer(profile).data for profile in profiles]
