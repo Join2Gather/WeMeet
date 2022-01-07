@@ -33,11 +33,19 @@ export interface Login {
 	loading: string;
 	seeTips: boolean;
 	seeTimeTips: boolean;
+	code: string;
+	email: string;
+	viewError: boolean;
 }
 
 export interface homeTime {
 	start: number;
 	end: number;
+}
+
+export interface appleLoginType {
+	code: string;
+	email: string;
 }
 
 export interface kakaoLoginAPI {
