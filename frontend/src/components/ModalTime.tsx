@@ -26,6 +26,12 @@ import {
 } from '../store/timetable';
 import { RootState } from '../store';
 import { CloseButton } from '../theme';
+import {
+	cloneINDates,
+	initialIndividualTimetable,
+	makeHomeTime,
+} from '../store/individual';
+import { getUserMe, toggleUserMeSuccess } from '../store/login';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -49,14 +55,27 @@ export function ModalTime({
 	tableMode,
 	isGroup,
 }: props) {
-	const { startHour, endHour, peopleCount, selectIdx } = useSelector(
-		({ login, timetable }: RootState) => ({
-			startHour: login.startHour,
-			endHour: login.endHour,
-			peopleCount: login.peopleCount,
-			selectIdx: timetable.selectIdx,
-		})
-	);
+	const {
+		startHour,
+		endHour,
+		peopleCount,
+		selectIdx,
+		token,
+		userMeSuccess,
+		confirmClubs,
+		confirmDatesTimetable,
+		isConfirmProve,
+	} = useSelector(({ login, timetable }: RootState) => ({
+		startHour: login.startHour,
+		endHour: login.endHour,
+		peopleCount: login.peopleCount,
+		selectIdx: timetable.selectIdx,
+		token: login.token,
+		userMeSuccess: login.userMeSuccess,
+		confirmClubs: login.confirmClubs,
+		confirmDatesTimetable: login.confirmDatesTimetable,
+		isConfirmProve: login.isConfirmProve,
+	}));
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
 
@@ -74,11 +93,24 @@ export function ModalTime({
 		dispatch(deletePostTime());
 		setMode('loading');
 		dispatch(setTimeModalMode(false));
+		isConfirmProve && dispatch(initialIndividualTimetable());
+
 		setTimeout(() => {
 			color &&
 				dispatch(makeTeamTime({ color, endHour, startHour, peopleCount }));
+			isConfirmProve && dispatch(getUserMe({ token }));
 		}, 100);
 	}, []);
+
+	useEffect(() => {
+		if (userMeSuccess) {
+			dispatch(makeHomeTime());
+			dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
+		}
+		setTimeout(() => {
+			dispatch(toggleUserMeSuccess());
+		}, 300);
+	}, [userMeSuccess]);
 
 	const onPressCloseBtn = useCallback(() => {
 		setTimeModalVisible && setTimeModalVisible(false);
