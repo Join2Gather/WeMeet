@@ -20,7 +20,7 @@
     "@types/react-native-loading-spinner-overlay": "^0.5.3",
     "@types/redux-actions": "^2.6.2",
     "@unimodules/core": "^7.1.2",
-    "axios": "^0.21.1",
+    "axios": "^0.24.0",
     "dayjs": "^1.10.7",
     "expo": "^43.0.3",
     "expo-apple-authentication": "~4.0.3",
