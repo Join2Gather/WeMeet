@@ -323,7 +323,7 @@ export const timetableSlice = createSlice({
 		},
 		POST_INDIVIDUAL_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.responseIndividual = action.payload;
-			// state.loginSuccess = true;
+			state.postConfirmSuccess = false;
 			state.postDatesPrepare = false;
 			state.reload = true;
 			state.isInitial = true;
@@ -390,7 +390,8 @@ export const timetableSlice = createSlice({
 		},
 		checkIsBlank: (state, action: PayloadAction<string>) => {
 			let isNonColor = 0;
-			const mode = action.payload === 'start' ? state.startTime : state.endTime;
+			const mode =
+				action.payload === 'start' ? state.startTime : state.endTime - 1;
 
 			state.dates[state.dayIdx].times[mode].forEach(
 				(t) => t.mode === 'normal' && isNonColor++
@@ -479,6 +480,22 @@ export const timetableSlice = createSlice({
 		},
 		changeDayIdx: (state, action: PayloadAction<any>) => {
 			state.dayIdx = action.payload;
+		},
+		initializeConfirmTime: (state) => {
+			const { defaultDatesWith60, timesText } = useMakeTimeTableWith60(
+				state.startHour,
+				state.endHour
+			);
+			state.confirmDates = {
+				sun: [],
+				mon: [],
+				tue: [],
+				wed: [],
+				thu: [],
+				fri: [],
+				sat: [],
+			};
+			state.teamConfirmDate = defaultDatesWith60;
 		},
 		changeConfirmTime: (state) => {
 			const startingMinute = Math.round(state.startMinute / 10);
@@ -754,6 +771,7 @@ export const {
 	setSelectIdx,
 	deleteAllIndividual,
 	setTimetableLoading,
+	initializeConfirmTime,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;
