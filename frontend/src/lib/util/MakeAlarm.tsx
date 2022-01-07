@@ -72,7 +72,6 @@ export default function MakeAlarm({
 				timeZone: Localization.timezone,
 				recurrenceRule: recRule,
 			};
-			// 	console.log('Creating new event:');
 			Calendar.createEventAsync(calendar_id, example_event)
 				.then((resp_id) => {
 					console.log(resp_id, 'it works');
