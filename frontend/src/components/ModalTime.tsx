@@ -326,14 +326,14 @@ export function ModalTime({
 								onPressFunction={() =>
 									setTimeModalVisible && setTimeModalVisible(false)
 								}
-								secondOnPressFunction={() => onPressNext && onPressNext()}
+								secondOnPressFunction={onPressNext}
 							/>
 						</>
 					)}
 					{mode === 'loading' && (
 						<>
 							<View style={{ height: 30 }} />
-							<ActivityIndicator size="large" color={Colors.blue500} />
+							<ActivityIndicator size="large" color={color} />
 							<View style={{ height: 30 }} />
 						</>
 					)}
