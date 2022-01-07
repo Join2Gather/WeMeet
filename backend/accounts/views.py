@@ -210,7 +210,7 @@ class AppleCallbackView(APIView):
         sign_type = 'signin' if is_sign_in else 'signup'
         if accept_status != 200:
             raise BadRequestError(
-                {'data': {'error': f'failed to {sign_type}'}, 'status': accept_status})
+                {'data': {'error': f'failed to {sign_type}', 'comment': token_response.text}, 'status': accept_status})
 
         token_json = token_response.json()
         refresh_token = token_json.get('refresh_token')
@@ -218,13 +218,13 @@ class AppleCallbackView(APIView):
         # name scope를 주어도 id_token에서 이름이 발급되지 않아 임시로 이메일로 대체함.
         username = email
 
-        if not is_sign_in:
+        if is_sign_in:
+            user: User = User.objects.get(email=email)
+        else:
             password = str(uuid.uuid4())
             user: User = User.objects.create_user(username, email, password)
             social_user: SocialAccount = SocialAccount.objects.create(
                 user=user, provider='apple')
-        else:
-            user: User = User.objects.get(email=email)
 
         if token_object := Token.objects.filter(user=user):
             token_object = token_object.get()
