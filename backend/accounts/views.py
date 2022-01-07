@@ -223,6 +223,8 @@ class AppleCallbackView(APIView):
             user: User = User.objects.create_user(username, email, password)
             social_user: SocialAccount = SocialAccount.objects.create(
                 user=user, provider='apple')
+        else:
+            user: User = User.objects.get(email=email)
 
         if token_object := Token.objects.filter(user=user):
             token_object = token_object.get()
