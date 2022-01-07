@@ -30,12 +30,15 @@ import { ModalIndividualTime } from './ModalIndividualTime';
 import { TouchableOpacity } from 'react-native';
 import { Spinner } from './Spinner';
 import { Platform } from 'react-native';
+import { useGetViewError } from '../hooks';
+import { setModalMode } from '../store/team';
 
 const boxHeight = 28.0;
 const inBoxHeight = 7.0;
 const lastBox = 25;
 const screen = Dimensions.get('screen');
 const borderWidth = 0.3;
+
 interface props {
 	mode?: string;
 	modalVisible?: boolean;
@@ -112,6 +115,7 @@ export function Timetable({
 		isInitial,
 		isOverlap,
 		todayDate,
+		isViewError,
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
@@ -142,6 +146,7 @@ export function Timetable({
 			isInitial: timetable.isInitial,
 			isOverlap: timetable.isOverlap,
 			todayDate: individual.todayDate,
+			isViewError: login.viewError,
 		})
 	);
 	const dispatch = useDispatch();
@@ -159,9 +164,6 @@ export function Timetable({
 	const [loading, setLoading] = useState('');
 	// useEffect
 	useEffect(() => {
-		console.log(isGroup, 'isGroup');
-	}, [isGroup]);
-	useEffect(() => {
 		date.setMinutes(0);
 	}, [date]);
 
@@ -178,7 +180,12 @@ export function Timetable({
 		if (isInitial) {
 			if (uri) {
 				dispatch(makeInitialIndividual());
-
+				if (isGroup) {
+					setLoading('loading');
+					setTimeout(() => {
+						setLoading('');
+					}, 500);
+				}
 				if (timeMode === 'make')
 					dispatch(getGroupDates({ id, user, token, uri: joinUri }));
 				else dispatch(getGroupDates({ id, user, token, uri }));
@@ -208,10 +215,6 @@ export function Timetable({
 					);
 				}, 100);
 			}
-			setLoading('loading');
-			setTimeout(() => {
-				setLoading('');
-			}, 500);
 		}
 	}, [uri, isGroup, isInitial]);
 
@@ -334,14 +337,13 @@ export function Timetable({
 		[]
 	);
 	const onPressNext = useCallback(() => {
+		setTimeModalVisible(false);
+		setInModalVisible(false);
 		setCurrent && setCurrent(1);
 		onSetStartHour(select.idx, select.time, select.day);
-		setTimeModalVisible(false);
+		dispatch(setTimeModalMode(false));
 	}, [select]);
 
-	useEffect(() => {
-		console.log('mode', mode);
-	}, [mode]);
 	const onSetStartHour = useCallback(
 		(idx: number, time: number, day: string) => {
 			dispatch(toggleTimePick());
@@ -373,6 +375,7 @@ export function Timetable({
 
 	return (
 		<View style={styles.view}>
+			<Spinner loading={loading} />
 			<View style={styles.rowView}>
 				<View style={[styles.timeView, {}]}>
 					{individualTimesText
@@ -380,7 +383,10 @@ export function Timetable({
 								<View
 									style={[
 										styles.timeEachView,
-										{ borderColor: color ? color : Colors.blue500 },
+										{
+											borderColor: color ? color : Colors.blue500,
+											height: isViewError ? 59.7 : 60,
+										},
 									]}
 									key={idx}
 								>
@@ -391,7 +397,10 @@ export function Timetable({
 								<View
 									style={[
 										styles.timeEachView,
-										{ borderColor: color ? color : Colors.blue500 },
+										{
+											borderColor: color ? color : Colors.blue500,
+											height: isViewError ? 59.7 : 60,
+										},
 									]}
 									key={idx}
 								>
@@ -408,7 +417,10 @@ export function Timetable({
 									{Object.keys(day.times).map((time) => (
 										<TouchableOpacity
 											accessibilityRole="button"
-											style={[styles.boxView]}
+											style={[
+												styles.boxView,
+												{ marginBottom: isViewError ? -0.14 : 0 },
+											]}
 											key={time}
 											onPress={() => {
 												mode === 'confirmMode' &&
@@ -423,6 +435,8 @@ export function Timetable({
 													style={[
 														styles.timeSmallView,
 														{
+															marginBottom: isViewError ? -0.008 : 0,
+															marginTop: isViewError ? -0.01 : 0,
 															backgroundColor: t.color,
 															borderTopWidth:
 																Number(time) === endHour
@@ -453,7 +467,10 @@ export function Timetable({
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
 										<TouchableOpacity
-											style={[styles.boxView]}
+											style={[
+												styles.boxView,
+												{ marginBottom: isViewError ? -0.14 : 0 },
+											]}
 											key={time}
 											onPress={() => {
 												onPressHomeTime(Number(time), day.day, idx);
@@ -465,6 +482,8 @@ export function Timetable({
 													style={[
 														styles.timeSmallView,
 														{
+															marginBottom: isViewError ? -0.008 : 0,
+															marginTop: isViewError ? -0.01 : 0,
 															backgroundColor: t.color,
 															borderTopWidth:
 																Number(time) === endHour
@@ -495,7 +514,10 @@ export function Timetable({
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
 										<TouchableOpacity
-											style={[styles.boxView]}
+											style={[
+												styles.boxView,
+												{ marginBottom: isViewError ? -0.14 : 0 },
+											]}
 											key={time}
 											onPress={() => {
 												console.log('hi');
@@ -507,6 +529,8 @@ export function Timetable({
 													style={[
 														styles.timeSmallView,
 														{
+															marginBottom: isViewError ? -0.008 : 0,
+															marginTop: isViewError ? -0.01 : 0,
 															backgroundColor: t.color,
 															borderTopWidth:
 																Number(time) === endHour
@@ -537,7 +561,10 @@ export function Timetable({
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
 										<TouchableOpacity
-											style={[styles.boxView]}
+											style={[
+												styles.boxView,
+												{ marginBottom: isViewError ? -0.14 : 0 },
+											]}
 											key={time}
 											onPress={() => {
 												onPressGroupTime(Number(time), day.day, true, idx);
@@ -549,6 +576,8 @@ export function Timetable({
 													style={[
 														styles.timeSmallView,
 														{
+															marginBottom: isViewError ? -0.008 : 0,
+															marginTop: isViewError ? -0.01 : 0,
 															backgroundColor: t.color,
 															borderTopWidth:
 																Number(time) === endHour
@@ -587,7 +616,10 @@ export function Timetable({
 								<View style={styles.columnView} key={day.day}>
 									{Object.keys(day.times).map((time) => (
 										<TouchableOpacity
-											style={[styles.boxView]}
+											style={[
+												styles.boxView,
+												{ marginBottom: isViewError ? -0.14 : 0 },
+											]}
 											key={time}
 											onPress={() => {
 												mode === 'normal' &&
@@ -602,6 +634,8 @@ export function Timetable({
 													style={[
 														styles.timeSmallView,
 														{
+															marginBottom: isViewError ? -0.008 : 0,
+															marginTop: isViewError ? -0.01 : 0,
 															backgroundColor: t.color,
 															borderTopWidth:
 																Number(time) === endHour
@@ -701,7 +735,6 @@ const styles = StyleSheet.create({
 	},
 
 	timeEachView: {
-		height: Platform.OS === 'android' ? 59.7 : 60,
 		borderTopWidth: 2,
 
 		width: screen.width / 3,
@@ -712,12 +745,9 @@ const styles = StyleSheet.create({
 		borderColor: Colors.black,
 
 		width: screen.width / 9,
-		marginBottom: Platform.OS === 'android' ? -0.14 : 0,
 	},
 	timeSmallView: {
 		// flex: 1,
 		height: 5,
-		marginBottom: Platform.OS === 'android' ? -0.008 : 0,
-		marginTop: Platform.OS === 'android' ? -0.01 : 0,
 	},
 });
