@@ -138,48 +138,47 @@ export default function TeamList() {
 		b: 0,
 	});
 
-	const ios = Platform.OS === 'ios';
+	// const ios = Platform.OS === 'ios';
 
-	const scrolling = useAnimatedValue(0);
+	// const scrolling = useAnimatedValue(0);
 
-	const panResponser = usePanResponder({
-		onPanResponderGrant() {
-			ios && setScrollEnabled(false);
-		},
-		onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
-			return gestureState.dx != 0 && gestureState.dy != 0;
-		},
-		onPanResponderMove(e: Event, s: State) {
-			const { dx, dy } = s;
-			animValueXY.setValue({ x: dx, y: dy });
-			if (dy > 5) {
-				Animated.timing(scrolling, {
-					useNativeDriver: true, // -1-
-					toValue: 0, // -2-
-					duration: 500, // -3-
-					easing: Easing.ease, // -4-
-				}).start();
-			} else if (dy < -5) {
-				Animated.timing(scrolling, {
-					useNativeDriver: true, // -1-
-					toValue: 100, // -2-
-					duration: 500, // -3-
-					easing: Easing.ease, // -4-
-				}).start();
-			}
-			console.log(dx, dy);
-		},
-		onPanResponderRelease() {
-			animValueXY.extractOffset();
-			ios && setScrollEnabled(true);
-		},
-	});
+	// const panResponser = usePanResponder({
+	// 	onPanResponderGrant() {
+	// 		ios && setScrollEnabled(false);
+	// 	},
+	// 	onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
+	// 		return gestureState.dx != 0 && gestureState.dy != 0;
+	// 	},
+	// 	onPanResponderMove(e: Event, s: State) {
+	// 		const { dx, dy } = s;
+	// 		animValueXY.setValue({ x: dx, y: dy });
+	// 		if (dy > 5) {
+	// 			Animated.timing(scrolling, {
+	// 				useNativeDriver: true, // -1-
+	// 				toValue: 0, // -2-
+	// 				duration: 500, // -3-
+	// 				easing: Easing.ease, // -4-
+	// 			}).start();
+	// 		} else if (dy < -5) {
+	// 			Animated.timing(scrolling, {
+	// 				useNativeDriver: true, // -1-
+	// 				toValue: 100, // -2-
+	// 				duration: 500, // -3-
+	// 				easing: Easing.ease, // -4-
+	// 			}).start();
+	// 		}
+	// 	},
+	// 	onPanResponderRelease() {
+	// 		animValueXY.extractOffset();
+	// 		ios && setScrollEnabled(true);
+	// 	},
+	// });
 
 	const [loading, setLoading] = useState('');
 
-	const animValue = useAnimatedValue(0);
-	const AnimatedTouchable =
-		Animated.createAnimatedComponent(TouchableHighlight);
+	// const animValue = useAnimatedValue(0);
+	// const AnimatedTouchable =
+	// 	Animated.createAnimatedComponent(TouchableHighlight);
 	const dispatch = useDispatch();
 
 	// useEffect
@@ -365,52 +364,22 @@ export default function TeamList() {
 							</Text>
 						</View>
 					)}
-					<Animated.View style={{ flex: 2 }}>
-						<Animated.FlatList
-							{...panResponser.panHandlers}
+					<View style={{ flex: 2 }}>
+						<FlatList
 							style={[styles.FlatView]}
 							data={clubs}
 							scrollEnabled={scrollEnabled}
-							onScroll={Animated.event(
-								[
-									{
-										nativeEvent: {
-											contentOffset: {
-												y: animValue,
-											},
-										},
-									},
-								],
-								{ useNativeDriver: false }
-							)}
 							renderItem={({ item }) => (
 								<View
 									style={{
 										backgroundColor: Colors.black,
 									}}
 								>
-									<AnimatedTouchable
+									<TouchableHighlight
 										onPress={() => onPressGoTeamTime(item)}
 										activeOpacity={0.1}
 										underlayColor={Colors.grey300}
-										style={[
-											styles.teamListTouchableView,
-											{
-												opacity:
-													item.id === 0
-														? interpolate(animValue, [1, 0.9], [item.id, 18])
-														: 1,
-
-												// backgroundColor:
-												// 	item.id === 1
-												// 		? interpolate(
-												// 				animValue,
-												// 				[Colors.grey800, Colors.white],
-												// 				[-30, 0]
-												// 		  )
-												// 		: Colors.white,
-											},
-										]}
+										style={[styles.teamListTouchableView, {}]}
 									>
 										<View style={styles.teamView}>
 											<View
@@ -428,12 +397,12 @@ export default function TeamList() {
 											</Text>
 											<Icons size={15} name="right" style={styles.iconStyle} />
 										</View>
-									</AnimatedTouchable>
+									</TouchableHighlight>
 								</View>
 							)}
 							keyExtractor={(item, index) => String(item.id)}
 						/>
-					</Animated.View>
+					</View>
 					<Spinner loading={loading} />
 					<ModalInput
 						modalVisible={modalVisible}
@@ -454,10 +423,10 @@ export default function TeamList() {
 						sequence={sequence}
 					/>
 
-					<Animated.View
+					{/* <Animated.View
 						style={{
 							// position: 'absolute',
-							// bottom: '20%',
+
 							transform: [{ translateY: scrolling }],
 						}}
 					>
@@ -472,7 +441,7 @@ export default function TeamList() {
 						>
 							<Text style={styles.loginText}>모임 참여</Text>
 						</TouchableView>
-					</Animated.View>
+					</Animated.View> */}
 				</View>
 			</ScrollEnabledProvider>
 		</SafeAreaView>
@@ -557,9 +526,9 @@ const styles = StyleSheet.create({
 	touchableView: {
 		flexDirection: 'row',
 		height: 50,
-		bottom: 30,
+		marginBottom: 30,
 		borderRadius: 10,
-		position: 'absolute',
+		// position: 'absolute',
 		width: '65%',
 		// left: '60%',
 		justifyContent: 'center',
@@ -594,10 +563,7 @@ const styles = StyleSheet.create({
 		paddingTop: 5,
 		paddingBottom: 10,
 		opacity: 0.5,
-		backgroundColor: Colors.grey200,
-		position: 'absolute',
-		bottom: 10,
-		height: 30,
+		// backgroundColor: Colors.grey200,
 	},
 	FlatView: {
 		height: '100%',
