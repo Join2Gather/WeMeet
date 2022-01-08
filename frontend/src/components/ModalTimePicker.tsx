@@ -101,6 +101,7 @@ export function ModalTimePicker({
 		confirmCount,
 		selectIdx,
 		userMeSuccess,
+		isConfirmProve,
 	} = useSelector(({ timetable, login, individual }: RootState) => ({
 		postConfirmSuccess: timetable.postConfirmSuccess,
 		confirmClubs: login.confirmClubs,
@@ -117,6 +118,7 @@ export function ModalTimePicker({
 		confirmCount: timetable.confirmCount,
 		selectIdx: timetable.selectIdx,
 		userMeSuccess: login.userMeSuccess,
+		isConfirmProve: login.isConfirmProve,
 	}));
 	const dispatch = useDispatch();
 	// const [minute, setMinute] = useState(0);
@@ -159,7 +161,7 @@ export function ModalTimePicker({
 			}
 			setTimeout(() => {
 				setMode && setMode('normal');
-			}, 500);
+			}, 50);
 		}
 	}, [
 		mode,
@@ -214,6 +216,7 @@ export function ModalTimePicker({
 	const onPressEndConfirm = useCallback(
 		(date) => {
 			setSecond(false);
+			setFirst(false);
 			setModalVisible && setModalVisible(false);
 			setIsTimeMode && setIsTimeMode(false);
 			setCurrent && setCurrent(0);
@@ -242,6 +245,8 @@ export function ModalTimePicker({
 					setMode && setMode('loading');
 				} else {
 					if (isConfirm) {
+						dispatch(checkIsExist('end'));
+						dispatch(changeConfirmTime());
 						if (confirmCount === count) {
 							setCurrent && setCurrent(3);
 							setCount && setCount(1);
@@ -249,8 +254,6 @@ export function ModalTimePicker({
 							setCurrent && setCurrent(0);
 							setCount && setCount((count) => count + 1);
 						}
-						dispatch(checkIsExist('end'));
-						dispatch(changeConfirmTime());
 					} else {
 						dispatch(checkIsBlank('end'));
 					}
@@ -306,6 +309,10 @@ export function ModalTimePicker({
 						user,
 					})
 				);
+			// if (isConfirmProve) {
+			// 	dispatch(getUserMe({ token }));
+			// 	dispatch(initialIndividualTimetable());
+			// }
 		}
 	}, [postDatesPrepare, uri, joinUri]);
 	useEffect(() => {
@@ -341,7 +348,7 @@ export function ModalTimePicker({
 				}}
 				onDateChange={(date) => setDate(date)}
 				onCancel={onPressClose}
-				androidVariant={'iosClone'}
+				androidVariant={'nativeAndroid'}
 				minuteInterval={10}
 				textColor={
 					Platform.OS === 'ios'
@@ -353,7 +360,7 @@ export function ModalTimePicker({
 				title={
 					isConfirm
 						? findTime && findTime.length !== 0
-							? `시작시간 설정\n 가능 시간 : [ ${findTime[selectIdx].timeText} ]`
+							? `시작시간 설정\n ${findTime[selectIdx].timeText}`
 							: ``
 						: '시작시간 설정'
 				}
@@ -367,11 +374,12 @@ export function ModalTimePicker({
 				mode="time"
 				onConfirm={(date) => {
 					setSecond(false);
+					setFirst(false);
 					onPressEndConfirm(date);
 				}}
 				onDateChange={(date) => setDate(date)}
 				onCancel={onPressClose}
-				androidVariant={'iosClone'}
+				androidVariant={'nativeAndroid'}
 				minuteInterval={10}
 				textColor={
 					Platform.OS === 'ios'
@@ -383,11 +391,11 @@ export function ModalTimePicker({
 				title={
 					isConfirm
 						? findTime && findTime.length !== 0
-							? `종료시간 설정\n${findTime[selectIdx].timeText}`
+							? `${findTime[selectIdx].timeText}`
 							: ''
-						: `시작 시간 : ${
+						: `${
 								startTime.hour > 12 ? startTime.hour - 12 : startTime.hour
-						  }시 : ${startTime.minute}분 \n종료시간 설정`
+						  }시 : ${startTime.minute}분`
 				}
 				confirmText="확인"
 				cancelText="취소"

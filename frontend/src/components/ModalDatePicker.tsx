@@ -107,7 +107,7 @@ export function ModalDatePicker({
 				}}
 				onDateChange={(date) => setDate(date)}
 				onCancel={onPressClose}
-				androidVariant={'iosClone'}
+				androidVariant={'nativeAndroid'}
 				minuteInterval={10}
 				minimumDate={date}
 				textColor={

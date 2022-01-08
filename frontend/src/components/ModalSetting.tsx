@@ -188,9 +188,6 @@ export function ModalSetting({
 			animationType="fade"
 			transparent={true}
 			visible={settingModalVisible}
-			onRequestClose={() => {
-				Alert.alert('Modal has been closed.');
-			}}
 		>
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
@@ -823,10 +820,8 @@ const styles = StyleSheet.create({
 		marginLeft: 10,
 		width: 30,
 		height: 30,
-		// backgroundColor: Colors.blue100,
 		marginTop: 5,
 		textAlign: 'center',
-
 		alignContent: 'center',
 	},
 	rightIconStyle: {

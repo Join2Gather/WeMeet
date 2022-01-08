@@ -43,7 +43,6 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 					ellipsizeMode="tail"
 				>
 					{title}
-					{console.log('len', title?.length)}
 				</Text>
 			</View>
 			<View

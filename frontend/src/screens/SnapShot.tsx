@@ -29,20 +29,22 @@ import {
 	getGroupDates,
 	getIndividualDates,
 	getOtherConfirmDates,
+	initializeConfirmTime,
 	makeConfirmDates,
 	makeConfirmPrepare,
 	makeInitialConfirmTime,
+	makeInitialIndividual,
 	makeTeamTime,
 	postConfirm,
 	postRevert,
 	postSnapShot,
 } from '../store/timetable';
-import { initialIndividualTimetable } from '../store/individual';
+import { cloneINDates, initialIndividualTimetable } from '../store/individual';
 import team from '../store/team';
 import { ModalLoading } from '../components/ModalLoading';
 import { Sequence } from '../components/Sequence';
 import { DayOfWeek } from '../components';
-import { confirmProve } from '../store/login';
+import { confirmProve, getUserMe } from '../store/login';
 
 export default function SnapShot({ route }: Props) {
 	const {
@@ -65,8 +67,8 @@ export default function SnapShot({ route }: Props) {
 		snapShotDate: timetable.snapShotDate,
 		teamConfirmDate: timetable.teamConfirmDate,
 		peopleCount: login.peopleCount,
-		startHour: login.startHour,
-		endHour: login.endHour,
+		startHour: timetable.startHour,
+		endHour: timetable.endHour,
 		user: login.user,
 		id: login.id,
 		token: login.token,
@@ -123,6 +125,22 @@ export default function SnapShot({ route }: Props) {
 	}, [mode, timeMode, loadingMode]);
 	// useCallback
 	const goLeft = useCallback(() => {
+		if (timetableMode === 'confirm') {
+			dispatch(initializeConfirmTime());
+			setLoadingVisible(false);
+			// dispatch(makeInitialIndividual());
+			dispatch(getUserMe({ token }));
+			setTimeout(() => {
+				dispatch(
+					getOtherConfirmDates({
+						confirmClubs,
+						confirmDatesTimetable,
+						isGroup: true,
+					})
+				);
+				// dispatch(cloneINDates)
+			}, 100);
+		}
 		navigation.goBack();
 	}, []);
 	const onPressConfirm = useCallback(() => {
@@ -150,6 +168,7 @@ export default function SnapShot({ route }: Props) {
 	}, []);
 	const onPressRevertOk = useCallback(() => {
 		dispatch(postRevert({ id, uri, user, token }));
+		dispatch(makeInitialIndividual());
 		setLoading('loading');
 	}, []);
 	return (

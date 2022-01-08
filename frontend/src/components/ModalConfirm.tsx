@@ -56,6 +56,7 @@ export function ModalConfirm({
 	const onPressMoveConfirmPage = useCallback(() => {
 		setConfirm(false);
 		dispatch(setConfirmCount(Number(confirmCount)));
+
 		navigation.navigate('SnapShot', {
 			name,
 			color,
@@ -64,6 +65,7 @@ export function ModalConfirm({
 			uri,
 			confirmCount,
 		});
+		setCount('1');
 	}, [confirmCount]);
 	return (
 		<Modal
