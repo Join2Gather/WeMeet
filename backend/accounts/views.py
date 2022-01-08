@@ -90,8 +90,11 @@ class KakaoCallbackView(APIView):
             user: User = User.objects.get(email=email)
             # 기존에 가입된 유저의 Provider가 kakao가 아니면 에러 발생, 맞으면 로그인
             # 다른 SNS로 가입된 유저
-            social_user: SocialAccount = SocialAccount.objects.get(
-                user=user)
+            try:
+                social_user: SocialAccount = SocialAccount.objects.get(
+                    user=user)
+            except SocialAccount.DoesNotExist:
+                return JsonResponse({'error': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
             if social_user is None:
                 return JsonResponse({'error': 'email exists but not social user'}, status=status.HTTP_400_BAD_REQUEST)
             if social_user.provider != 'kakao':
@@ -99,8 +102,6 @@ class KakaoCallbackView(APIView):
             is_sign_in = True
         except User.DoesNotExist:
             is_sign_in = False
-        except SocialAccount.DoesNotExist:
-            return JsonResponse({'error': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
         # 로그인 / 가입 로직
         data = {'access_token': access_token, 'code': code}
         accept = requests.post(
@@ -158,8 +159,12 @@ class AppleCallbackView(APIView):
             user: User = User.objects.get(email=email)
             # 기존에 가입된 유저의 Provider가 kakao가 아니면 에러 발생, 맞으면 로그인
             # 다른 SNS로 가입된 유저
-            social_user: SocialAccount = SocialAccount.objects.get(
-                user=user)
+            try:
+                social_user: SocialAccount = SocialAccount.objects.get(
+                    user=user)
+            except SocialAccount.DoesNotExist:
+                raise BadRequestError({'data': {
+                    'err_msg': 'no matching social type'}, 'status': status.HTTP_400_BAD_REQUEST})
             if social_user is None:
                 raise BadRequestError({'data': {
                     'err_msg': 'email exists but not social user'}, 'status': status.HTTP_400_BAD_REQUEST})
@@ -169,9 +174,6 @@ class AppleCallbackView(APIView):
             is_sign_in = True
         except User.DoesNotExist:
             is_sign_in = False
-        except SocialAccount.DoesNotExist:
-            raise BadRequestError({'data': {
-                'err_msg': 'no matching social type'}, 'status': status.HTTP_400_BAD_REQUEST})
 
         return is_sign_in
 
