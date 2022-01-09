@@ -237,7 +237,14 @@ export function makeConfirmWith(
 							if (i === d.starting_hours) {
 								for (let j = startingMinute; j <= 5; j++) {
 									if (dates[idx].times[i]) {
-										makeTime(dates[idx]?.times[i][j], 'other', greyColor);
+										if (j === 0) {
+											makeOtherTime(
+												dates[idx]?.times[i][j],
+												'other',
+												greyColor
+											);
+										} else
+											makeTime(dates[idx]?.times[i][j], 'other', greyColor);
 									}
 								}
 							} else if (i === d.end_hours) {
@@ -343,5 +350,17 @@ export function makeTime(changeTime: any, mode: string, funcColor: string) {
 		changeTime.borderWidth = 0.3;
 		// changeTime.borderBottom = false;
 		changeTime.borderTop = false;
+	}
+}
+
+export function makeOtherTime(
+	changeTime: any,
+	mode: string,
+	funcColor: string
+) {
+	if (changeTime) {
+		changeTime.color = funcColor;
+		changeTime.mode = mode;
+		changeTime.borderWidth = 0.3;
 	}
 }
