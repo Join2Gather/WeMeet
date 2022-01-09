@@ -232,12 +232,14 @@ class AppleCallbackView(APIView):
             user: User = User.objects.create_user(username, email, password)
             social_user: SocialAccount = SocialAccount.objects.create(
                 user=user, provider='apple')
+            social_user.save()
 
         if token_object := Token.objects.filter(user=user):
             token_object = token_object.get()
         else:
             token_object: Token = Token.objects.get_or_create(
                 key=refresh_token, user=user)[0]
+            token_object.save()
 
         return token_object, user, username
 
@@ -272,7 +274,7 @@ class AppleCallbackView(APIView):
             decoded_token = self.get_decoded_token(id_token)
 
             email = decoded_token.get('email')
-        elif not email:
+        if not email:
             raise ValueError('email not given')
 
         try:
