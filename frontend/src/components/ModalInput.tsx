@@ -77,7 +77,7 @@ export function ModalInput({
 	const dispatch = useDispatch();
 	// const [name, setName] = useState('2ff148e7-05b9-461e-a2c2-1d3ccce16ba9');
 	const [name, setName] = useState('');
-	const [code, setCode] = useState('0a006017-0c21-45fe-baa7-3ff21311a0a8');
+	const [code, setCode] = useState('');
 	const [mode, setMode] = useState('initial');
 	const [color, setColor] = useState(Colors.red500);
 	const [hsvColor, setHSV] = useState({

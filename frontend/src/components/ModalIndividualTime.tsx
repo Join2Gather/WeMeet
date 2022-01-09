@@ -180,6 +180,8 @@ export function ModalIndividualTime({
 											<Text style={styles.touchText}>
 												{findIndividual[0].selectTime > 12
 													? `오후  ${findIndividual[0].selectTime - 12}시`
+													: findIndividual[0].selectTime === 0
+													? '오전 12시'
 													: `오전  ${findIndividual[0].selectTime}시`}
 											</Text>
 										</View>
@@ -199,6 +201,8 @@ export function ModalIndividualTime({
 											<Text style={styles.touchText}>
 												{t.startTime.hour > 12
 													? `오후  ${t.startTime.hour - 12}`
+													: t.startTime.hour === 0
+													? '오전 12'
 													: `오전  ${t.startTime.hour}`}
 												{'  : '}
 												{t.startTime.minute < 10
@@ -210,7 +214,9 @@ export function ModalIndividualTime({
 											<Text style={styles.touchText}>
 												{t.endTime.hour >= 12
 													? `오후  ${t.endTime.hour - 12}`
-													: `오전  ${t.endTime.hour}`}
+													: t.startTime.hour === 0
+													? '오전 12'
+													: `오전  ${t.startTime.hour}`}
 												{' : '}
 												{t.endTime.minute < 10
 													? '0' + t.endTime.minute

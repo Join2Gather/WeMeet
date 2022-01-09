@@ -17,43 +17,16 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Alert, ScrollView } from 'react-native';
+import { StyleSheet } from 'react-native';
 import {
 	appleAuth,
 	AppleButton,
 } from '@invertase/react-native-apple-authentication';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../store';
+
 import { appleLogin, setAppleToken } from '../store/login';
-import * as AppleAuthentication from 'expo-apple-authentication';
+
 import { Colors } from 'react-native-paper';
-
-import jwtDecode from 'jwt-decode';
-import { mean } from 'lodash';
-
-/**
- * You'd technically persist this somewhere for later use.
- */
-let user = null;
-
-/**
- * Fetches the credential state for the current user, if any, and updates state on completion.
- */
-async function fetchAndUpdateCredentialState(
-	updateCredentialStateForUser: any,
-	user: any
-) {
-	if (user === null) {
-		updateCredentialStateForUser('N/A');
-	} else {
-		const credentialState = await appleAuth.getCredentialStateForUser(user);
-		if (credentialState === appleAuth.State.AUTHORIZED) {
-			updateCredentialStateForUser('AUTHORIZED');
-		} else {
-			updateCredentialStateForUser(credentialState);
-		}
-	}
-}
 
 /**
  * Starts the Sign In flow.
@@ -69,9 +42,6 @@ interface errorType {
 }
 
 export function AppleLogin() {
-	var user = '';
-	// const [credentialStateForUser, updateCredentialStateForUser] =
-	// 	useState<any>(-1);
 	const [userToken, setToken] = useState('');
 
 	const dispatch = useDispatch();
@@ -81,38 +51,15 @@ export function AppleLogin() {
 
 	const onAppleButtonPress = async () => {
 		try {
-			const appleAuthRequestResponse = await AppleAuthentication.signInAsync({
-				requestedScopes: [
-					AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-					AppleAuthentication.AppleAuthenticationScope.EMAIL,
-				],
+			const appleAuthRequestResponse = await appleAuth.performRequest({
+				requestedOperation: appleAuth.Operation.LOGIN,
+				requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
 			});
-
-			const {
-				realUserStatus,
-				authorizationCode,
-				email,
-				fullName,
-				identityToken,
-				state,
-				user,
-			} = appleAuthRequestResponse;
+			const { authorizationCode, email } = appleAuthRequestResponse;
 			appleAuthRequestResponse;
-			// fetchAndUpdateCredentialState(setToken, user).catch((error) =>
-			// 	// setToken(`Error: ${error.code}`)
-			// );
-			if (authorizationCode && email && identityToken) {
-				const decoded = jwtDecode(identityToken);
-				console.log('email', email);
-				console.log('code', authorizationCode);
-				dispatch(appleLogin({ code: authorizationCode, email: email }));
-			}
 
-			if (identityToken) {
-				// setToken(access_token);
-			} else {
-				Alert.alert('로그인 실패');
-				return;
+			if (authorizationCode && email) {
+				dispatch(appleLogin({ code: authorizationCode, email: email }));
 			}
 		} catch (error: any) {
 			if (error.code === appleAuth.Error.CANCELED) {
@@ -122,32 +69,6 @@ export function AppleLogin() {
 			}
 		}
 	};
-	// useEffect(() => {
-	// 	if (!appleAuth.isSupported) return;
-
-	// 	fetchAndUpdateCredentialState(updateCredentialStateForUser, user).catch(
-	// 		(error: errorType) => updateCredentialStateForUser(`Error: ${error.code}`)
-	// 	);
-	// }, []);
-
-	// useEffect(() => {
-	// 	if (!appleAuth.isSupported) return;
-
-	// 	return appleAuth.onCredentialRevoked(async () => {
-	// 		console.warn('Credential Revoked');
-	// 		fetchAndUpdateCredentialState(updateCredentialStateForUser, user).catch(
-	// 			(error) => updateCredentialStateForUser(`Error: ${error.code}`)
-	// 		);
-	// 	});
-	// }, []);
-
-	// if (!appleAuth.isSupported) {
-	// 	return (
-	// 		<View style={[styles.container, styles.horizontal]}>
-	// 			<Text style={styles.textColor}>Apple Authentication is not supported on this device.</Text>
-	// 		</View>
-	// 	);
-	// }
 
 	return (
 		<AppleButton

@@ -21,9 +21,14 @@ export const changeNickname = ({ id, token, user, nickname }: nicknameAPI) => {
 };
 
 export const appleLogin = ({ code, email }: appleLoginType) => {
+	const headers = {
+		'Content-type': 'Application/json',
+		Accept: '*/*',
+	};
 	const data = JSON.stringify({
-		code: code,
-		email: email,
+		code,
+		email,
 	});
-	return client.post(`accounts/apple/login/token/`, data);
+	console.log(data);
+	return client.post('accounts/apple/login/token/', data, { headers });
 };
