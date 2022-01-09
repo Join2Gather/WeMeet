@@ -11,6 +11,7 @@ import type {
 	nicknameAPI,
 	userMeAPI,
 } from '../interface';
+import { Alert } from 'react-native';
 
 const initialState: Login = {
 	id: 0,
@@ -236,10 +237,12 @@ export const loginSlice = createSlice({
 			state.error = action.payload;
 		},
 		APPLE_LOGIN_SUCCESS: (state, action: PayloadAction<any>) => {
-			console.log(action.payload);
+			state.token = action.payload.access_token;
 		},
 		APPLE_LOGIN_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
+			console.log(action.payload);
+			Alert.alert('로그인 에러');
 		},
 		makeGroupColor: (state, action: PayloadAction<string>) => {
 			state.color = action.payload;
