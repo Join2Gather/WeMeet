@@ -163,8 +163,9 @@ class AppleCallbackView(APIView):
                 social_user: SocialAccount = SocialAccount.objects.get(
                     user=user)
             except SocialAccount.DoesNotExist:
-                raise BadRequestError({'data': {
-                    'err_msg': 'no matching social type'}, 'status': status.HTTP_400_BAD_REQUEST})
+                social_user: SocialAccount = SocialAccount.objects.create(
+                    user=user, provider='apple')
+                social_user.save()
             if social_user is None:
                 raise BadRequestError({'data': {
                     'err_msg': 'email exists but not social user'}, 'status': status.HTTP_400_BAD_REQUEST})
