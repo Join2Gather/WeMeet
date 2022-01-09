@@ -163,8 +163,9 @@ class AppleCallbackView(APIView):
                 social_user: SocialAccount = SocialAccount.objects.get(
                     user=user)
             except SocialAccount.DoesNotExist:
+                uid = str(uuid.uuid4())
                 social_user: SocialAccount = SocialAccount.objects.create(
-                    user=user, provider='apple')
+                    user=user, uid=uid, provider='apple')
                 social_user.save()
             if social_user is None:
                 raise BadRequestError({'data': {
@@ -231,8 +232,9 @@ class AppleCallbackView(APIView):
         else:
             password = str(uuid.uuid4())
             user: User = User.objects.create_user(username, email, password)
+            uid = str(uuid.uuid4())
             social_user: SocialAccount = SocialAccount.objects.create(
-                user=user, provider='apple')
+                user=user, uid=uid, provider='apple')
             social_user.save()
 
         if token_object := Token.objects.filter(user=user):
