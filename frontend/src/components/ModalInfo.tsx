@@ -15,7 +15,7 @@ import Material from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontIcon from 'react-native-vector-icons/FontAwesome';
 import { Button } from '../lib/util/Button';
-import { setTimeTipMode, setTipMode } from '../store/login';
+import { setTimeTipMode, setTimeTipVisible, setTipMode } from '../store/login';
 import { RootState } from '../store';
 import Ionic from 'react-native-vector-icons/Ionicons';
 import { CloseButton } from '../theme';
@@ -35,23 +35,23 @@ export function ModalInfo({
 	seeTips,
 	color,
 }: props) {
-	const { seeTimeTips } = useSelector(({ timetable, login }: RootState) => ({
-		seeTimeTips: login.seeTimeTips,
-	}));
+	const { seeTimeTips, uri, timeTipVisible } = useSelector(
+		({ timetable, login }: RootState) => ({
+			seeTimeTips: login.seeTimeTips,
+			uri: timetable.teamURI,
+			timeTipVisible: login.timeTipVisible,
+		})
+	);
 	const dispatch = useDispatch();
 	const onPressCloseBtn = useCallback(() => {
-		setInfoVisible(false);
+		dispatch(setTimeTipVisible(false));
 	}, []);
-	const onPressTimeTipBtn = useCallback(() => {
-		dispatch(setTimeTipMode(!seeTimeTips));
-	}, [seeTimeTips]);
-	const [infoMode, setInfoMode] = useState('');
 
 	return (
 		<Modal
 			animationType="fade"
 			transparent={true}
-			visible={infoVisible}
+			visible={timeTipVisible}
 			onRequestClose={() => {
 				Alert.alert('Modal has been closed.');
 			}}
@@ -146,7 +146,7 @@ export function ModalInfo({
 								{' 도움말 아이콘을 터치 하여 언제나 다시\n 확인 할 수 있어요'}
 							</Text>
 						</View>
-						<TouchableHighlight
+						{/* <TouchableHighlight
 							style={[
 								styles.rowView,
 								{
@@ -171,7 +171,7 @@ export function ModalInfo({
 									다시 보지 않기
 								</Text>
 							</>
-						</TouchableHighlight>
+						</TouchableHighlight> */}
 
 						<View style={styles.blankView} />
 						<View style={styles.buttonOverLine} />

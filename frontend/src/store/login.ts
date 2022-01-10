@@ -59,6 +59,7 @@ const initialState: Login = {
 	code: '',
 	email: '',
 	viewError: false,
+	timeTipVisible: true,
 };
 
 const USER_ME = 'login/USER_ME';
@@ -242,7 +243,6 @@ export const loginSlice = createSlice({
 		APPLE_LOGIN_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = action.payload;
 			console.log(action.payload);
-			Alert.alert('로그인 에러');
 		},
 		makeGroupColor: (state, action: PayloadAction<string>) => {
 			state.color = action.payload;
@@ -279,6 +279,9 @@ export const loginSlice = createSlice({
 		toggleViewError: (state, action: PayloadAction<boolean>) => {
 			state.viewError = action.payload;
 		},
+		setTimeTipVisible: (state, action: PayloadAction<boolean>) => {
+			state.timeTipVisible = action.payload;
+		},
 	},
 	extraReducers: {},
 });
@@ -299,6 +302,7 @@ export const {
 	toggleUserMeSuccess,
 	setAppleLoginToken,
 	toggleViewError,
+	setTimeTipVisible,
 } = loginSlice.actions;
 
 export default loginSlice.reducer;

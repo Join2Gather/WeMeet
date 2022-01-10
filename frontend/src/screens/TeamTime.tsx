@@ -32,6 +32,7 @@ type TeamStackParamList = {
 		id: number;
 		token: string;
 		modalMode: string;
+		seeTips: boolean;
 	};
 };
 
@@ -40,6 +41,7 @@ import { setModalMode, shareUri } from '../store/team';
 import { ModalSetting } from '../components/ModalSetting';
 import { Sequence } from '../components/Sequence';
 import { TouchableHighlight } from 'react-native-gesture-handler';
+import { setTimeTipVisible } from '../store/login';
 
 const iconSize = 22;
 
@@ -62,7 +64,6 @@ export default function TeamTime({ route }: Props) {
 		isConfirmProve,
 		alarmTime,
 		isOverlap,
-		seeTips,
 		seeTimeTips,
 	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
 		uri: timetable.teamURI,
@@ -85,11 +86,10 @@ export default function TeamTime({ route }: Props) {
 		isConfirmProve: login.isConfirmProve,
 		alarmTime: login.alarmTime,
 		isOverlap: timetable.isOverlap,
-		seeTips: login.seeTips,
 		seeTimeTips: login.seeTimeTips,
 	}));
 	// navigation
-	const { id, user, token, modalMode } = route.params;
+	const { id, user, token, modalMode, seeTips } = route.params;
 	const navigation = useNavigation();
 	const dispatch = useDispatch();
 
@@ -107,15 +107,11 @@ export default function TeamTime({ route }: Props) {
 	const [currentNumber, setCurrent] = useState(0);
 	const [sequence, setSequence] = useState([0, 1, 2]);
 	const [dateVisible, setDateVisible] = useState(false);
-	const [infoVisible, setInfoVisible] = useState(false);
+
 	// initial
 	useEffect(() => {
 		makeReady && dispatch(makeInitialTimetable());
 	}, [name, makeReady]);
-
-	useEffect(() => {
-		seeTimeTips;
-	}, [seeTimeTips]);
 
 	useEffect(() => {
 		if (joinTeamError || error !== '') {
@@ -123,9 +119,11 @@ export default function TeamTime({ route }: Props) {
 		}
 	}, [joinTeamError, loadingJoin, error]);
 
-	useEffect(() => {
-		seeTimeTips ? setInfoVisible(true) : setInfoVisible(false);
-	}, [seeTimeTips]);
+	const [infoVisible, setInfoVisible] = useState(false);
+
+	// useEffect(() => {
+	// 	seeTips ? setInfoVisible(true) : setInfoVisible(false);
+	// }, [seeTips]);
 
 	useEffect(() => {
 		isOverlap &&
@@ -221,7 +219,7 @@ export default function TeamTime({ route }: Props) {
 						thirdRight={() => (
 							<TouchHeaderIconView
 								underlayColor={color}
-								onPress={() => setInfoVisible(true)}
+								onPress={() => dispatch(setTimeTipVisible(true))}
 							>
 								<FontAwesome5Icon
 									name="question-circle"

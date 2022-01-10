@@ -36,6 +36,7 @@ export interface Login {
 	code: string;
 	email: string;
 	viewError: boolean;
+	timeTipVisible: boolean;
 }
 
 export interface homeTime {
