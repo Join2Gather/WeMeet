@@ -200,12 +200,12 @@ export function Timetable({
 					);
 				}, 200);
 
-				if (timeMode == 'make')
-					dispatch(getIndividualDates({ id, user, token, uri: joinUri }));
-				else {
-					dispatch(getIndividualDates({ id, user, token, uri }));
-				}
 				setTimeout(() => {
+					if (timeMode == 'make')
+						dispatch(getIndividualDates({ id, user, token, uri: joinUri }));
+					else {
+						dispatch(getIndividualDates({ id, user, token, uri }));
+					}
 					dispatch(
 						getOtherConfirmDates({
 							confirmClubs,
@@ -213,7 +213,7 @@ export function Timetable({
 							isGroup: false,
 						})
 					);
-				}, 100);
+				}, 400);
 			}
 		}
 	}, [uri, isGroup, isInitial]);
