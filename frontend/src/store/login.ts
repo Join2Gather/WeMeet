@@ -46,7 +46,7 @@ const initialState: Login = {
 	weekIndex: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
 	joinClubNum: 0,
 	confirmClubNum: 0,
-	appleUser: null,
+	appleUser: '',
 	isConfirmProve: false,
 	alarmTime: 1,
 	homeTime: {
@@ -256,6 +256,9 @@ export const loginSlice = createSlice({
 		setAppleToken: (state, action: PayloadAction<string>) => {
 			state.token = action.payload;
 		},
+		setAppleUser: (state, action: PayloadAction<string>) => {
+			state.appleUser = action.payload;
+		},
 		setHomeTime: (state, action: PayloadAction<homeTime>) => {
 			state.homeTime.start = action.payload.start;
 			state.homeTime.end = action.payload.end;
@@ -303,6 +306,7 @@ export const {
 	setAppleLoginToken,
 	toggleViewError,
 	setTimeTipVisible,
+	setAppleUser,
 } = loginSlice.actions;
 
 export default loginSlice.reducer;

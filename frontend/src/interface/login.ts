@@ -26,7 +26,7 @@ export interface Login {
 	weekIndex: string[];
 	joinClubNum: number;
 	confirmClubNum: number;
-	appleUser: string | null;
+	appleUser: string;
 	isConfirmProve: boolean;
 	alarmTime: number;
 	homeTime: homeTime;
