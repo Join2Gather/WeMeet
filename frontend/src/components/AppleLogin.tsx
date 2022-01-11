@@ -17,17 +17,23 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 import {
 	appleAuth,
 	AppleButton,
 } from '@invertase/react-native-apple-authentication';
 import { useDispatch, useSelector } from 'react-redux';
+import * as AppleAuthentication from 'expo-apple-authentication';
 
-import { appleLogin, setAppleToken } from '../store/login';
+import { appleLogin, setAppleToken, setAppleUser } from '../store/login';
 
 import { Colors } from 'react-native-paper';
-
+import { RootState } from '../store';
+import {
+	AppleAuthenticationCredentialState,
+	AppleAuthenticationRefreshOptions,
+} from 'expo-apple-authentication';
+import jwt_decode from 'jwt-decode';
 /**
  * Starts the Sign In flow.
  */
@@ -41,25 +47,81 @@ interface errorType {
 	code: number;
 }
 
-export function AppleLogin() {
-	const [userToken, setToken] = useState('');
+interface decode {
+	email: string;
+}
 
+interface functionParam {
+	setState: React.Dispatch<any>;
+	user: string;
+}
+
+async function fetchState({ setState, user }: functionParam) {
+	const state = await AppleAuthentication.getCredentialStateAsync(user);
+
+	if (state === AppleAuthenticationCredentialState.AUTHORIZED) {
+		setState('AUTHORIZED');
+	} else {
+		setState('other');
+	}
+	console.log(state);
+}
+
+export function AppleLogin() {
+	const { appleUser } = useSelector(({ login }: RootState) => ({
+		appleUser: login.appleUser,
+	}));
+
+	const [userToken, setToken] = useState('');
+	const [state, setState] = useState<any>('');
 	const dispatch = useDispatch();
-	useEffect(() => {
-		dispatch(setAppleToken(userToken));
-	}, [userToken]);
+
+	// useEffect(() => {
+	// 	dispatch(setAppleToken(userToken));
+	// }, [userToken]);
 
 	const onAppleButtonPress = async () => {
 		try {
-			const appleAuthRequestResponse = await appleAuth.performRequest({
-				requestedOperation: appleAuth.Operation.LOGIN,
-				requestedScopes: [appleAuth.Scope.EMAIL],
-			});
-			const { authorizationCode, email } = appleAuthRequestResponse;
-			appleAuthRequestResponse;
+			let appleAuthRequestResponse;
 
-			if (authorizationCode && email) {
+			appleAuthRequestResponse = await AppleAuthentication.signInAsync({
+				requestedScopes: [
+					AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+					AppleAuthentication.AppleAuthenticationScope.EMAIL,
+				],
+			});
+
+			const { authorizationCode, email, user, identityToken } =
+				appleAuthRequestResponse;
+			if (identityToken && authorizationCode) {
+				const decoded: decode = jwt_decode(identityToken);
+				const { email } = decoded;
+				dispatch(setAppleUser(user));
 				dispatch(appleLogin({ code: authorizationCode, email: email }));
+			}
+			console.log(authorizationCode, email);
+			if (authorizationCode && email && user) {
+			}
+			if (user) {
+				await fetchState({ setState, user });
+				console.log('state', state);
+				// if (state === 'AUTHORIZED') {
+				// 	appleAuthRequestResponse = null;
+				// 	appleAuthRequestResponse = await AppleAuthentication.refreshAsync({
+				// 		user: user,
+				// 	});
+				// 	const { authorizationCode, email } = appleAuthRequestResponse;
+				// 	if (authorizationCode && email && user) {
+				// 		console.log(authorizationCode, '존재');
+				// 		dispatch(setAppleUser(user));
+				// 		dispatch(appleLogin({ code: authorizationCode, email: email }));
+				// 	}
+				// } else {
+				if (authorizationCode && email && user) {
+					dispatch(setAppleUser(user));
+					dispatch(appleLogin({ code: authorizationCode, email: email }));
+				}
+				// }
 			}
 		} catch (error: any) {
 			if (error.code === appleAuth.Error.CANCELED) {
