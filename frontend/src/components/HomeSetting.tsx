@@ -22,6 +22,8 @@ import Material from 'react-native-vector-icons/MaterialIcons';
 import {
 	changeNickname,
 	changeTeamColor,
+	getUserMe,
+	setInTimeColor,
 	toggleViewError,
 } from '../store/login';
 import ColorPicker from 'react-native-wheel-color-picker';
@@ -34,6 +36,7 @@ interface props {
 	id: number;
 	token: string;
 	color: string;
+	inTimeColor: string;
 	userMeError: string;
 	onPressChangeTime: () => void;
 	isViewError: boolean;
@@ -46,6 +49,7 @@ export function HomeSetting({
 	id,
 	token,
 	color,
+	inTimeColor,
 	userMeError,
 	onPressChangeTime,
 	isViewError,
@@ -53,6 +57,7 @@ export function HomeSetting({
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
 	const [pickColor, setPickColor] = useState(Colors.red500);
+	const [inPickColor, setInPickColor] = useState(inTimeColor);
 	const [nickname, setNickname] = useState('');
 	// const [color, setColor] = useState(Colors.red500);
 	const [RGBColor, setRGBColor] = useState({
@@ -84,6 +89,12 @@ export function HomeSetting({
 		dispatch(changeTeamColor(pickColor));
 		setMode('loading');
 	}, [pickColor]);
+
+	const onChangeInColor = useCallback(() => {
+		dispatch(setInTimeColor(inPickColor));
+		dispatch(getUserMe({ token }));
+		setMode('loading');
+	}, [inPickColor]);
 
 	const onPressNickConfirm = useCallback(() => {
 		dispatch(changeNickname({ id, token, user, nickname }));
@@ -240,6 +251,33 @@ export function HomeSetting({
 										<TouchableHighlight
 											activeOpacity={1}
 											underlayColor={Colors.grey300}
+											style={[styles.touchButtonStyle, { borderRadius: 0 }]}
+											onPress={() => setMode('inColor')}
+										>
+											<View style={styles.rowView}>
+												<Material
+													name="format-color-fill"
+													size={21}
+													color={color}
+													style={styles.iconStyle}
+												/>
+												<Text style={styles.touchText}>
+													{' '}
+													개인 일정 색상 변경
+												</Text>
+												<View style={styles.iconView}>
+													<Font5Icon
+														name="angle-right"
+														size={19}
+														color={Colors.black}
+														style={styles.rightIconStyle}
+													/>
+												</View>
+											</View>
+										</TouchableHighlight>
+										<TouchableHighlight
+											activeOpacity={1}
+											underlayColor={Colors.grey300}
 											style={[
 												styles.touchButtonStyle,
 												{ borderTopLeftRadius: 0, borderTopRightRadius: 0 },
@@ -305,6 +343,44 @@ export function HomeSetting({
 								onPressWithParam={() => setMode('initial')}
 								pressParam="initial"
 								secondOnPressFunction={onChangeColor}
+							/>
+						</>
+					)}
+					{mode === 'inColor' && (
+						<>
+							<Text style={[styles.titleText, { justifyContent: 'center' }]}>
+								개인 일정 색상을 선택해 주세요
+							</Text>
+							<View style={styles.blankView} />
+
+							<View style={styles.blankView} />
+							<View style={styles.blankView} />
+							<View
+								style={{
+									height: 300,
+									width: '80%',
+								}}
+							>
+								<ColorPicker
+									color={inTimeColor}
+									swatchesOnly={false}
+									onColorChange={(color) => setInPickColor(color)}
+									onColorChangeComplete={(color) => setInPickColor(color)}
+									thumbSize={40}
+									sliderSize={40}
+									noSnap={false}
+									row={false}
+									swatchesLast={false}
+								/>
+							</View>
+							<View style={styles.buttonOverLine} />
+							<Button
+								buttonNumber={2}
+								buttonText={'이전'}
+								secondButtonText={'확인'}
+								onPressWithParam={() => setMode('initial')}
+								pressParam="initial"
+								secondOnPressFunction={onChangeInColor}
 							/>
 						</>
 					)}
