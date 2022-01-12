@@ -102,6 +102,7 @@ export function ModalTimePicker({
 		selectIdx,
 		userMeSuccess,
 		isConfirmProve,
+		inTimeColor,
 	} = useSelector(({ timetable, login, individual }: RootState) => ({
 		postConfirmSuccess: timetable.postConfirmSuccess,
 		confirmClubs: login.confirmClubs,
@@ -119,6 +120,7 @@ export function ModalTimePicker({
 		selectIdx: timetable.selectIdx,
 		userMeSuccess: login.userMeSuccess,
 		isConfirmProve: login.isConfirmProve,
+		inTimeColor: login.inTimeColor,
 	}));
 	const dispatch = useDispatch();
 	// const [minute, setMinute] = useState(0);
@@ -325,7 +327,7 @@ export function ModalTimePicker({
 	useEffect(() => {
 		if (userMeSuccess) {
 			dispatch(makeHomeTime());
-			dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
+			dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable, inTimeColor }));
 		}
 		setTimeout(() => {
 			dispatch(toggleUserMeSuccess());
