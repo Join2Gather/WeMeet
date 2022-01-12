@@ -30,6 +30,7 @@ export interface individual {
 	individualCount: number;
 	groupCount: number;
 	homeTime: homeTime;
+	inTimeColor: string;
 }
 
 export interface postImageAPI {

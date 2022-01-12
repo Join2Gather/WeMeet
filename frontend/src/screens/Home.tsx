@@ -92,7 +92,7 @@ export default function Home() {
 	const {
 		token,
 		individualDates,
-
+		inTimeColor,
 		id,
 		user,
 		userMeSuccess,
@@ -107,12 +107,13 @@ export default function Home() {
 		appLoading,
 		seeTips,
 		isViewError,
+		
 	} = useSelector(({ login, individual, loading }: RootState) => ({
 		token: login.token,
 		id: login.id,
 		user: login.user,
 		individualDates: individual.individualDates,
-
+		inTimeColor: login.inTimeColor,
 		userMeSuccess: login.userMeSuccess,
 		confirmClubs: login.confirmClubs,
 		confirmDatesTimetable: login.confirmDatesTimetable,
@@ -155,7 +156,7 @@ export default function Home() {
 		dispatch(getUserMe({ token }));
 	}, []);
 	useEffect(() => {
-		dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
+		dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable, inTimeColor }));
 	}, [confirmClubs, confirmDatesTimetable]);
 	// navigation
 
@@ -384,6 +385,7 @@ export default function Home() {
 						id={id}
 						token={token}
 						color={individualColor}
+						inTimeColor={inTimeColor}
 						onPressChangeTime={onPressChangeTime}
 						isViewError={isViewError}
 					/>

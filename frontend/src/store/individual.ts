@@ -80,6 +80,7 @@ const initialState: individual = {
 		start: 0,
 		end: 24,
 	},
+	inTimeColor: Colors.grey600,
 };
 
 export const individualSlice = createSlice({
@@ -95,11 +96,13 @@ export const individualSlice = createSlice({
 			action: PayloadAction<{
 				confirmDatesTimetable: any;
 				confirmClubs: Array<string>;
+				inTimeColor: string;
 			}>
 		) => {
 			const { confirmClubs, confirmDatesTimetable } = action.payload;
 			state.confirmClubs = confirmClubs;
 			state.confirmDatesTimetable = confirmDatesTimetable;
+			state.inTimeColor = action.payload.inTimeColor;
 			state.confirmDatesTimetable?.length &&
 				state.confirmDatesTimetable.map((date, dIdx) => {
 					state.weekIndex.map((day, idx) => {
@@ -120,7 +123,7 @@ export const individualSlice = createSlice({
 											makeTime(
 												state.individualDates[idx].times[i][j],
 												date.color ? 'team' : 'everyTime',
-												date.color ? date.color : Colors.grey400
+												date.color ? date.color : state.inTimeColor
 											);
 									}
 								} else {
@@ -129,7 +132,7 @@ export const individualSlice = createSlice({
 											if (state.individualDates[idx].times[i]) {
 												if (j === 0) {
 													state.individualDates[idx].times[i][j].color =
-														date.color ? date.color : Colors.grey400;
+														date.color ? date.color : state.inTimeColor;
 													state.individualDates[idx].times[i][j].mode =
 														date.color ? 'team' : 'everyTime';
 													state.individualDates[idx].times[i][
@@ -139,7 +142,7 @@ export const individualSlice = createSlice({
 													makeTime(
 														state.individualDates[idx].times[i][j],
 														date.color ? 'team' : 'everyTime',
-														date.color ? date.color : Colors.grey400
+														date.color ? date.color : state.inTimeColor
 													);
 											}
 										}
@@ -149,7 +152,7 @@ export const individualSlice = createSlice({
 												makeTime(
 													state.individualDates[idx].times[i][j],
 													date.color ? 'team' : 'everyTime',
-													date.color ? date.color : Colors.grey400
+													date.color ? date.color : state.inTimeColor
 												);
 											}
 										}
@@ -159,7 +162,7 @@ export const individualSlice = createSlice({
 												makeTime(
 													state.individualDates[idx].times[i][j],
 													date.color ? 'team' : 'everyTime',
-													date.color ? date.color : Colors.grey400
+													date.color ? date.color : state.inTimeColor
 												);
 											}
 										}
@@ -231,7 +234,7 @@ export const individualSlice = createSlice({
 										makeTime(
 											state.individualDates[idx].times[i][j],
 											'team',
-											Colors.grey400
+											state.inTimeColor
 										);
 								}
 							} else {
@@ -241,7 +244,7 @@ export const individualSlice = createSlice({
 											makeTime(
 												state.individualDates[idx].times[i][j],
 												'team',
-												Colors.grey400
+												state.inTimeColor
 											);
 									}
 								} else if (i === d.end_hours) {
@@ -250,7 +253,7 @@ export const individualSlice = createSlice({
 											makeTime(
 												state.individualDates[idx].times[i][j],
 												'team',
-												Colors.grey400
+												state.inTimeColor
 											);
 									}
 								} else {
@@ -259,7 +262,7 @@ export const individualSlice = createSlice({
 											makeTime(
 												state.individualDates[idx].times[i][j],
 												'team',
-												Colors.grey400
+												state.inTimeColor
 											);
 									}
 								}

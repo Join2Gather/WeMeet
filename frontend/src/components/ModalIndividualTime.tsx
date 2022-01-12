@@ -57,6 +57,7 @@ export function ModalIndividualTime({
 		peopleCount,
 		startHour,
 		endHour,
+		inTimeColor,
 	} = useSelector(({ login }: RootState) => ({
 		user: login.user,
 		id: login.id,
@@ -67,6 +68,7 @@ export function ModalIndividualTime({
 		peopleCount: login.peopleCount,
 		startHour: login.startHour,
 		endHour: login.endHour,
+		inTimeColor: login.inTimeColor,
 	}));
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
@@ -149,7 +151,7 @@ export function ModalIndividualTime({
 										{
 											backgroundColor: findIndividual[0].color
 												? findIndividual[0].color
-												: Colors.grey600,
+												: inTimeColor,
 										},
 									]}
 								>
