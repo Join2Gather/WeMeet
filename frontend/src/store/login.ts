@@ -12,6 +12,7 @@ import type {
 	userMeAPI,
 } from '../interface';
 import { Alert } from 'react-native';
+import { Colors } from 'react-native-paper';
 
 const initialState: Login = {
 	id: 0,
@@ -60,6 +61,7 @@ const initialState: Login = {
 	email: '',
 	viewError: false,
 	timeTipVisible: true,
+	inTimeColor: Colors.grey600,
 };
 
 const USER_ME = 'login/USER_ME';
@@ -285,6 +287,9 @@ export const loginSlice = createSlice({
 		setTimeTipVisible: (state, action: PayloadAction<boolean>) => {
 			state.timeTipVisible = action.payload;
 		},
+		setInTimeColor: (state, action: PayloadAction<string>) => {
+			state.inTimeColor = action.payload;
+		},
 	},
 	extraReducers: {},
 });
@@ -307,6 +312,7 @@ export const {
 	toggleViewError,
 	setTimeTipVisible,
 	setAppleUser,
+	setInTimeColor,
 } = loginSlice.actions;
 
 export default loginSlice.reducer;
