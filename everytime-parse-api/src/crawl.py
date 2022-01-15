@@ -101,7 +101,7 @@ async def get_result(id: str, password: str) -> dict:
         table_id = await get_table_id(session, year, semester)
 
         week = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
-        if not table_id:
+        if table_id is None:
             return {day: [] for day in week}
 
         return await get_times(session, table_id)
