@@ -14,5 +14,12 @@
             ],
             "django": true
         },
+        {
+            "name": "Python: FastAPI",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/everytime-parse-api",
+            "program": "${workspaceFolder}/everytime-parse-api/src/main.py",
+        },
     ]
 }
