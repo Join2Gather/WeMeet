@@ -16,21 +16,21 @@ async def get_year_semester(session: aiohttp.ClientSession):
     parsed = etree.fromstring(data)
 
     datetime_format = '%Y-%m-%d'
-    
+
     # result는 최신순으로 정렬되어 있음.
     result = parsed.xpath('//response/semester')
-    
+
     if filtered := [semester for semester in result
-                if datetime.strptime(semester.attrib['start_date'], datetime_format) <= datetime.now() <= datetime.strptime(semester.attrib['end_date'], datetime_format)]:
+                    if datetime.strptime(semester.attrib['start_date'], datetime_format) <= datetime.now() <= datetime.strptime(semester.attrib['end_date'], datetime_format)]:
         result = filtered
     else:
         # 현재 진행되는 학기가 없다면, 마지막에 끝난 학기를 불러온다.
         result = [semester for semester in result
-                if datetime.strptime(semester.attrib['end_date'], datetime_format) <= datetime.now()]
+                  if datetime.strptime(semester.attrib['end_date'], datetime_format) <= datetime.now()]
 
     result = result[0]
     year, semester = result.attrib['year'], result.attrib['semester']
-    
+
     return year, semester
 
 
@@ -41,8 +41,11 @@ async def get_table_id(session: aiohttp.ClientSession, year: str, semester: str)
     data = data.encode()
     parsed = etree.fromstring(data)
 
-    id = parsed.xpath(
-        '//response/table')[0].attrib['id']
+    try:
+        id = parsed.xpath(
+            '//response/table')[0].attrib['id']
+    except:
+        return None
 
     return id
 
@@ -96,4 +99,9 @@ async def get_result(id: str, password: str) -> dict:
             return {'error': 'login failed'}
         year, semester = await get_year_semester(session)
         table_id = await get_table_id(session, year, semester)
+
+        week = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+        if not table_id:
+            return {day: [] for day in week}
+
         return await get_times(session, table_id)
