@@ -166,7 +166,7 @@ export function ModalTimePicker({
 			}
 			setTimeout(() => {
 				setMode && setMode('normal');
-			}, 50);
+			}, 500);
 		}
 	}, [
 		mode,
