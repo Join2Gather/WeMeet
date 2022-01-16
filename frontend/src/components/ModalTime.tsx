@@ -163,6 +163,8 @@ export function ModalTime({
 													>
 														{findTime[0].selectTime > 12
 															? `오후  ${findTime[0].selectTime - 12}시`
+															: findTime[0].selectTime === 12
+															? '오전 12시'
 															: `오전  ${findTime[0].selectTime}시`}
 													</Text>
 												</View>
