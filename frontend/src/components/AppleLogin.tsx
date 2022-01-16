@@ -64,7 +64,6 @@ async function fetchState({ setState, user }: functionParam) {
 	} else {
 		setState('other');
 	}
-	console.log(state);
 }
 
 export function AppleLogin() {
@@ -99,24 +98,11 @@ export function AppleLogin() {
 				dispatch(setAppleUser(user));
 				dispatch(appleLogin({ code: authorizationCode, email: email }));
 			}
-			console.log(authorizationCode, email);
 			if (authorizationCode && email && user) {
 			}
 			if (user) {
 				await fetchState({ setState, user });
-				console.log('state', state);
-				// if (state === 'AUTHORIZED') {
-				// 	appleAuthRequestResponse = null;
-				// 	appleAuthRequestResponse = await AppleAuthentication.refreshAsync({
-				// 		user: user,
-				// 	});
-				// 	const { authorizationCode, email } = appleAuthRequestResponse;
-				// 	if (authorizationCode && email && user) {
-				// 		console.log(authorizationCode, '존재');
-				// 		dispatch(setAppleUser(user));
-				// 		dispatch(appleLogin({ code: authorizationCode, email: email }));
-				// 	}
-				// } else {
+
 				if (authorizationCode && email && user) {
 					dispatch(setAppleUser(user));
 					dispatch(appleLogin({ code: authorizationCode, email: email }));
