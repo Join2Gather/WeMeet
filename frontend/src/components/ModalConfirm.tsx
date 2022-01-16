@@ -13,7 +13,7 @@ import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
-import { Button } from '../lib/util/Button';
+import { Button } from '../theme/Button';
 import { setConfirmCount } from '../store/timetable';
 import { useNavigation } from '@react-navigation/core';
 import { CloseButton } from '../theme';
