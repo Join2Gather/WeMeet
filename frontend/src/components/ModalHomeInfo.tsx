@@ -12,7 +12,7 @@ import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import FontIcon from 'react-native-vector-icons/FontAwesome';
-import { Button } from '../lib/util/Button';
+import { Button } from '../theme/Button';
 import { setTimeTipMode, setTipMode } from '../store/login';
 import { RootState } from '../store';
 import Ionic from 'react-native-vector-icons/Ionicons';
@@ -52,14 +52,7 @@ export function ModalHomeInfo({
 	const [infoMode, setInfoMode] = useState('');
 
 	return (
-		<Modal
-			animationType="fade"
-			transparent={true}
-			visible={infoVisible}
-			onRequestClose={() => {
-				Alert.alert('Modal has been closed.');
-			}}
-		>
+		<Modal animationType="fade" transparent={true} visible={infoVisible}>
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
 					<CloseButton closeBtn={onPressCloseBtn} />
@@ -121,7 +114,7 @@ export function ModalHomeInfo({
 								{'도움말 아이콘을 터치 하여 언제나 다시\n 확인 할 수 있어요'}
 							</Text>
 						</View>
-						<TouchableHighlight
+						{/* <TouchableHighlight
 							style={[
 								styles.rowView,
 								{
@@ -146,7 +139,7 @@ export function ModalHomeInfo({
 									다시 보지 않기
 								</Text>
 							</>
-						</TouchableHighlight>
+						</TouchableHighlight> */}
 						<View style={styles.blankView} />
 						<View style={styles.buttonOverLine} />
 						<Button

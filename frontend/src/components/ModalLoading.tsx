@@ -13,7 +13,7 @@ import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Button } from '../lib/util/Button';
+import { Button } from '../theme/Button';
 import { CloseButton } from '../theme';
 
 const screen = Dimensions.get('screen');

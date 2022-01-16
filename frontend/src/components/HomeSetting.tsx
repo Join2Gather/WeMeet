@@ -17,7 +17,7 @@ import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionic from 'react-native-vector-icons/Ionicons';
 import { hexToRGB } from '../lib/util/hexToRGB';
-import { Button } from '../lib/util/Button';
+import { Button } from '../theme/Button';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import {
 	changeNickname,

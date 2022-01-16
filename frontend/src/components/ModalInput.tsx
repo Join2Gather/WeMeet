@@ -31,7 +31,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import { getUserMe } from '../store/login';
 import { setTimeMode } from '../store/timetable';
-import { Button } from '../lib/util/Button';
+import { Button } from '../theme/Button';
 import { Sequence } from './Sequence';
 import { current } from '@reduxjs/toolkit';
 import ColorPicker from 'react-native-wheel-color-picker';

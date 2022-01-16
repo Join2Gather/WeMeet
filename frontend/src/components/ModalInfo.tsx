@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontIcon from 'react-native-vector-icons/FontAwesome';
-import { Button } from '../lib/util/Button';
+import { Button } from '../theme/Button';
 import { setTimeTipMode, setTimeTipVisible, setTipMode } from '../store/login';
 import { RootState } from '../store';
 import Ionic from 'react-native-vector-icons/Ionicons';

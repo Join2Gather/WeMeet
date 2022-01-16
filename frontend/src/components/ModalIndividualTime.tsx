@@ -19,7 +19,7 @@ import {
 	setTimeModalMode,
 	toggleIsInitial,
 } from '../store/timetable';
-import { Button } from '../lib/util/Button';
+import { Button } from '../theme/Button';
 import {
 	deleteHomeTime,
 	initialIndividualTimetable,

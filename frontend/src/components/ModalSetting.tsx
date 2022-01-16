@@ -20,7 +20,7 @@ import { hexToRGB } from '../lib/util/hexToRGB';
 // import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import ColorPicker from 'react-native-wheel-color-picker';
 import { changeColor, leaveTeam, setModalMode } from '../store/team';
-import { Button } from '../lib/util/Button';
+import { Button } from '../theme/Button';
 import {
 	changeTimetableColor,
 	deleteAllIndividual,
