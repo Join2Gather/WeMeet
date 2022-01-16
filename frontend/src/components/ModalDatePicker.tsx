@@ -10,6 +10,7 @@ import { useIsDarkMode } from '../hooks';
 import MakeAlarm from '../lib/util/MakeAlarm';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
+import { useColorScheme } from 'react-native-appearance';
 dayjs.locale('ko');
 interface props {
 	dateVisible: boolean;
@@ -92,7 +93,7 @@ export function ModalDatePicker({
 	useEffect(() => {
 		dateVisible && setVisible(true);
 	}, [dateVisible]);
-	const { isDark } = useIsDarkMode();
+	const isDark = useColorScheme() === 'dark' ? true : false;
 	return (
 		<>
 			<DatePicker
@@ -113,8 +114,8 @@ export function ModalDatePicker({
 				textColor={
 					Platform.OS === 'ios'
 						? isDark
-							? Colors.black
-							: Colors.white
+							? Colors.white
+							: Colors.black
 						: Colors.black
 				}
 				title={`오늘 날짜 : ${today}`}

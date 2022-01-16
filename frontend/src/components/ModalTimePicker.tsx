@@ -16,7 +16,7 @@ import {
 	toggleIsInitial,
 	setSelectIdx,
 } from '../store/timetable';
-import { Colors } from 'react-native-paper';
+import { Colors, useTheme } from 'react-native-paper';
 import { RootState } from '../store';
 import { getUserMe, toggleUserMeSuccess } from '../store/login';
 import individual, {
@@ -34,6 +34,7 @@ import DatePicker from 'react-native-date-picker';
 import { Spinner } from '.';
 import { findTime } from '../interface';
 import { useIsDarkMode } from '../hooks';
+import { useColorScheme } from 'react-native-appearance';
 interface props {
 	modalVisible?: boolean;
 	setModalVisible?: React.Dispatch<React.SetStateAction<boolean>> | null;
@@ -142,7 +143,9 @@ export function ModalTimePicker({
 		hour: 0,
 		minute: 0,
 	});
-	const { isDark } = useIsDarkMode();
+
+	const isDark = useColorScheme() === 'dark' ? true : false;
+
 	useEffect(() => {
 		if (modalVisible) setFirst(true);
 	}, [modalVisible]);
@@ -215,6 +218,7 @@ export function ModalTimePicker({
 		},
 		[mode, isConfirm, date, modalVisible, isHomeTime, checkTime]
 	);
+	console.log(isDark);
 	const onPressEndConfirm = useCallback(
 		(date) => {
 			setSecond(false);
@@ -327,7 +331,9 @@ export function ModalTimePicker({
 	useEffect(() => {
 		if (userMeSuccess) {
 			dispatch(makeHomeTime());
-			dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable, inTimeColor }));
+			dispatch(
+				cloneINDates({ confirmClubs, confirmDatesTimetable, inTimeColor })
+			);
 		}
 		setTimeout(() => {
 			dispatch(toggleUserMeSuccess());
@@ -352,11 +358,12 @@ export function ModalTimePicker({
 				onCancel={onPressClose}
 				androidVariant={'nativeAndroid'}
 				minuteInterval={10}
+				style={{ backgroundColor: Colors.green100 }}
 				textColor={
 					Platform.OS === 'ios'
 						? isDark
-							? Colors.black
-							: Colors.white
+							? Colors.white
+							: Colors.black
 						: Colors.black
 				}
 				title={
@@ -386,8 +393,8 @@ export function ModalTimePicker({
 				textColor={
 					Platform.OS === 'ios'
 						? isDark
-							? Colors.black
-							: Colors.white
+							? Colors.white
+							: Colors.black
 						: Colors.black
 				}
 				title={
@@ -395,9 +402,9 @@ export function ModalTimePicker({
 						? findTime && findTime.length !== 0
 							? `${findTime[selectIdx].timeText}`
 							: ''
-						: `${
+						: `종료시간 설정\n시작시간 : ${
 								startTime.hour > 12 ? startTime.hour - 12 : startTime.hour
-						  }시 : ${startTime.minute}분`
+						  }시 ${startTime.minute}분`
 				}
 				confirmText="확인"
 				cancelText="취소"
