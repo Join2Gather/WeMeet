@@ -80,7 +80,7 @@ const initialState: individual = {
 		start: 0,
 		end: 24,
 	},
-	inTimeColor: Colors.grey600,
+	inTimeColor: Colors.grey400,
 };
 
 export const individualSlice = createSlice({

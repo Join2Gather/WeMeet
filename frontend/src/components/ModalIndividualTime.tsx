@@ -19,7 +19,7 @@ import {
 	setTimeModalMode,
 	toggleIsInitial,
 } from '../store/timetable';
-import { Button } from '../lib/util/Button';
+import { Button } from '../theme/Button';
 import {
 	deleteHomeTime,
 	initialIndividualTimetable,
@@ -203,7 +203,7 @@ export function ModalIndividualTime({
 											<Text style={styles.touchText}>
 												{t.startTime.hour > 12
 													? `오후  ${t.startTime.hour - 12}`
-													: t.startTime.hour === 0
+													: t.startTime.hour === 12
 													? '오전 12'
 													: `오전  ${t.startTime.hour}`}
 												{'  : '}
@@ -214,9 +214,9 @@ export function ModalIndividualTime({
 											</Text>
 
 											<Text style={styles.touchText}>
-												{t.endTime.hour >= 12
+												{t.endTime.hour > 12
 													? `오후  ${t.endTime.hour - 12}`
-													: t.startTime.hour === 0
+													: t.endTime.hour === 12
 													? '오전 12'
 													: `오전  ${t.startTime.hour}`}
 												{' : '}

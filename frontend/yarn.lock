@@ -4428,7 +4428,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4":
+"debug@npm:4, debug@npm:^4.3.2":
   version: 4.3.3
   resolution: "debug@npm:4.3.3"
   dependencies:
@@ -5046,6 +5046,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-modules-core@npm:~0.4.2":
+  version: 0.4.10
+  resolution: "expo-modules-core@npm:0.4.10"
+  dependencies:
+    compare-versions: ^3.4.0
+    invariant: ^2.2.4
+  checksum: 92bd05c15a6f1c65dbb89e993f6672e40e3d8f34702faf238a71eea15ca816d4aeb6216ff2eafb5151e7d14e1e373a823b90e085f421304751566f5e776855d8
+  languageName: node
+  linkType: hard
+
 "expo-modules-core@npm:~0.4.4, expo-modules-core@npm:~0.4.7, expo-modules-core@npm:~0.4.8":
   version: 0.4.8
   resolution: "expo-modules-core@npm:0.4.8"
@@ -5108,6 +5118,18 @@ __metadata:
   version: 2.0.0
   resolution: "expo-structured-headers@npm:2.0.0"
   checksum: 566cbe67b14eb255c0457d9bb3c400774fa37cf205ced00fa5fb949e8a0351a8210a7c7ec1feae6f7871fdc159d1a837fa46f06821a01cabe695482ffb7f9b35
+  languageName: node
+  linkType: hard
+
+"expo-system-ui@npm:~1.0.0":
+  version: 1.0.0
+  resolution: "expo-system-ui@npm:1.0.0"
+  dependencies:
+    "@expo/config-plugins": ^4.0.2
+    "@react-native/normalize-color": ^2.0.0
+    debug: ^4.3.2
+    expo-modules-core: ~0.4.2
+  checksum: 59e6833ab7871ad412f4c3fa16c6702f2e73337786f5f6ec16bf3466eaef67707b885d4af591ed7362b5b5176ad04dc36fec5eb66e2ee86df366a5bf51d8ec70
   languageName: node
   linkType: hard
 
@@ -5486,6 +5508,7 @@ __metadata:
     expo-screen-orientation: ^4.0.3
     expo-splash-screen: ~0.13.5
     expo-status-bar: ~1.1.0
+    expo-system-ui: ~1.0.0
     expo-updates: ~0.10.13
     form-data: ^4.0.0
     jwt-decode: ^3.1.2

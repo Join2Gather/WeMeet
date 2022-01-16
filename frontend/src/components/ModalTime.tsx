@@ -16,7 +16,7 @@ import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import type { findTime } from '../interface/timetable';
-import { Button } from '../lib/util/Button';
+import { Button } from '../theme/Button';
 import {
 	deletePostTime,
 	makeTeamTime,
@@ -107,7 +107,9 @@ export function ModalTime({
 	useEffect(() => {
 		if (userMeSuccess) {
 			dispatch(makeHomeTime());
-			dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable, inTimeColor }));
+			dispatch(
+				cloneINDates({ confirmClubs, confirmDatesTimetable, inTimeColor })
+			);
 		}
 		setTimeout(() => {
 			dispatch(toggleUserMeSuccess());
@@ -161,6 +163,8 @@ export function ModalTime({
 													>
 														{findTime[0].selectTime > 12
 															? `오후  ${findTime[0].selectTime - 12}시`
+															: findTime[0].selectTime === 12
+															? '오전 12시'
 															: `오전  ${findTime[0].selectTime}시`}
 													</Text>
 												</View>

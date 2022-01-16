@@ -729,7 +729,9 @@ export const timetableSlice = createSlice({
 		setTimetableLoading: (state, action: PayloadAction<string>) => {
 			state.loading = action.payload;
 		},
-		// checkTimeMode(state, action:PayloadAction<)
+		setGroupTimeToConfirm: (state) => {
+			makeGroupTimeTableWith60(state, state.teamConfirmDate);
+		},
 	},
 	extraReducers: {},
 });
@@ -772,6 +774,7 @@ export const {
 	deleteAllIndividual,
 	setTimetableLoading,
 	initializeConfirmTime,
+	setGroupTimeToConfirm,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;

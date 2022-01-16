@@ -22,7 +22,7 @@ import {
 import type { RootState } from '../store';
 import { setModalMode } from '../store/team';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
-import { Button } from '../lib/util/Button';
+import { Button } from '../theme/Button';
 import { CloseButton } from '../theme';
 
 const screen = Dimensions.get('screen');

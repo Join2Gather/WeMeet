@@ -67,6 +67,8 @@ PODS:
     - React-Core
   - ExpoModulesCore (0.4.8):
     - React-Core
+  - ExpoSystemUI (1.0.0):
+    - ExpoModulesCore
   - EXScreenOrientation (4.0.3):
     - ExpoModulesCore
     - React-Core
@@ -440,6 +442,7 @@ DEPENDENCIES:
   - expo-dev-menu (from `../node_modules/expo-dev-menu`)
   - expo-dev-menu-interface (from `../node_modules/expo-dev-menu-interface`)
   - ExpoModulesCore (from `../node_modules/expo-modules-core/ios`)
+  - ExpoSystemUI (from `../node_modules/expo-system-ui/ios`)
   - EXScreenOrientation (from `../node_modules/expo-screen-orientation/ios`)
   - EXSplashScreen (from `../node_modules/expo-splash-screen/ios`)
   - EXStructuredHeaders (from `../node_modules/expo-structured-headers/ios`)
@@ -539,6 +542,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-dev-menu-interface"
   ExpoModulesCore:
     :path: "../node_modules/expo-modules-core/ios"
+  ExpoSystemUI:
+    :path: "../node_modules/expo-system-ui/ios"
   EXScreenOrientation:
     :path: "../node_modules/expo-screen-orientation/ios"
   EXSplashScreen:
@@ -651,6 +656,7 @@ SPEC CHECKSUMS:
   expo-dev-menu: 07e44bd1432b2bdfe249f76c37a090510c5dcebc
   expo-dev-menu-interface: 508467f2ba2aedda7a44e5080cc1e9a43ab7375e
   ExpoModulesCore: a9a9bf32b2da35cd9b7299c80790c03a91ac7d15
+  ExpoSystemUI: 3c969e3db290fcd5edb9c466d585f183d934b421
   EXScreenOrientation: 80c8c07ab3f2beb8e83ba94ab6ee4fb7a6bf01a6
   EXSplashScreen: 57f329dbf25c5c12800feed79068a056453dc772
   EXStructuredHeaders: 873e7f329c2f6279c1b1e0229df59c9861560b53

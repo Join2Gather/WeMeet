@@ -38,8 +38,8 @@ import {
 	postConfirm,
 	postRevert,
 	postSnapShot,
+	setGroupTimeToConfirm,
 } from '../store/timetable';
-import { cloneINDates, initialIndividualTimetable } from '../store/individual';
 import team from '../store/team';
 import { ModalLoading } from '../components/ModalLoading';
 import { Sequence } from '../components/Sequence';
@@ -138,7 +138,7 @@ export default function SnapShot({ route }: Props) {
 						isGroup: true,
 					})
 				);
-				// dispatch(cloneINDates)
+				dispatch(setGroupTimeToConfirm());
 			}, 100);
 		}
 		navigation.goBack();
