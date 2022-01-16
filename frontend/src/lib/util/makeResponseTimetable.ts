@@ -137,11 +137,16 @@ export function makeHomeTimetable(state: individual) {
 						if (i === d.starting_hours) {
 							for (let j = startingMinute; j <= 5; j++) {
 								if (state.individualDates[idx].times[i]) {
-									makeTime(
-										state.individualDates[idx].times[i][j],
-										'everyTime',
-										greyColor
-									);
+									if (j === 0) {
+										state.individualDates[idx].times[i][j].color = greyColor;
+										state.individualDates[idx].times[i][j].mode = 'team';
+										state.individualDates[idx].times[i][j].borderWidth = 0.3;
+									} else
+										makeTime(
+											state.individualDates[idx].times[i][j],
+											'everyTime',
+											greyColor
+										);
 								}
 							}
 						} else if (i === d.end_hours) {
