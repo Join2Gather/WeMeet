@@ -49,6 +49,20 @@ import * as Font from 'expo-font';
 
 enableScreens();
 sagaMiddleware.run(rootSaga);
+
+import messaging from '@react-native-firebase/messaging';
+
+async function requestUserPermission() {
+	const authStatus = await messaging().requestPermission();
+	const enabled =
+		authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+		authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+	if (enabled) {
+		console.log('Authorization status:', authStatus);
+	}
+}
+
 export default function App() {
 	const scheme = useColorScheme();
 	const [theme, setTheme] = useState(
@@ -60,6 +74,7 @@ export default function App() {
 	const [isLoading, onChangeLoading] = useState(false);
 	useEffect(() => {
 		loadAssetsAsync();
+		requestUserPermission();
 	}, []);
 	const loadAssetsAsync = async () => {
 		await Font.loadAsync({
