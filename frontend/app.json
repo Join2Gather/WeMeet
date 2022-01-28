@@ -14,8 +14,10 @@
 		"ios": {
 			"supportsTablet": true,
 			"bundleIdentifier": "com.ww8007.weMeet",
-			"userInterfaceStyle": "automatic"
+			"userInterfaceStyle": "automatic",
+			"googleServicesFile": "./ios/GoogleService-Info.plist"
 		},
+		"plugins": ["@react-native-firebase/app"],
 		"android": {
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/icon.png",
