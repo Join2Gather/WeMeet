@@ -160,11 +160,11 @@ export function ModalInput({
 		setCurrent((current) => current + 1);
 	}, []);
 	const onCloseError = useCallback(() => {
+		dispatch(initialError());
 		setMode('initial');
 		dispatch(setTimeMode('normal'));
 		dispatch(setModalMode('normal'));
 		setModalMode('normal');
-		dispatch(initialError());
 		setModalVisible(false);
 		setColor(Colors.red500);
 		dispatch(getUserMe({ token }));
