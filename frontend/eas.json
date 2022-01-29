@@ -4,11 +4,18 @@
 	},
 	"build": {
 		"development": {
+			"distribution": "internal",
 			"developmentClient": true,
-			"distribution": "internal"
+			"ios": {
+				"cocoapods": "1.10.2"
+			}
 		},
 		"preview": {
-			"distribution": "internal"
+			"distribution": "internal",
+			"developmentClient": true,
+			"ios": {
+				"cocoapods": "1.10.2"
+			}
 		},
 		"production": {}
 	},
