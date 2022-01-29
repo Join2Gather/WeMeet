@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "630254022609",
+    "project_id": "we-meet-86aee",
+    "storage_bucket": "we-meet-86aee.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:630254022609:android:32356495671e3f8fc0baf0",
+        "android_client_info": {
+          "package_name": "com.ww8007.weMeet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "630254022609-58fmt9jf77n28a4hh8uhlamgehdvtknh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ww8007.weMeet",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "630254022609-2539roq63mov1fjm7gfm93fmre8hdcii.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5Y39Lu2VP5u3gLLziH7Fc8AYA8eejuXw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "630254022609-2539roq63mov1fjm7gfm93fmre8hdcii.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "630254022609-pmj333d4gg7tuvu33932587mnqlvhtdq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ww8007.weMeet"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

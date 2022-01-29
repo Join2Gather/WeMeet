@@ -1,4 +1,4 @@
-package com.ww8007.Join2Gather;
+package com.ww8007.weMeet;
 import expo.modules.updates.UpdatesDevLauncherController;
 import expo.modules.devlauncher.DevLauncherController;
 
@@ -91,7 +91,7 @@ public class MainApplication extends Application implements ReactApplication {
          We use reflection here to pick up the class that initializes Flipper,
         since Flipper library is not available in release mode
         */
-        Class<?> aClass = Class.forName("com.ww8007.Join2Gather.ReactNativeFlipper");
+        Class<?> aClass = Class.forName("com.ww8007.weMeet.ReactNativeFlipper");
         aClass
             .getMethod("initializeFlipper", Context.class, ReactInstanceManager.class)
             .invoke(null, context, reactInstanceManager);
