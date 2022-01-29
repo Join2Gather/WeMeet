@@ -93,7 +93,7 @@ export interface responseTime {
 	starting_minutes: number;
 	end_hours: number;
 	end_minutes: number;
-	dayOfWeek: number;
+	dayOfWeek?: number;
 }
 
 export interface postEveryTimeAPI {
