@@ -6,7 +6,6 @@
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"userInterfaceStyle": "automatic",
-		"jsEngine": "hermes",
 		"updates": {
 			"fallbackToCacheTimeout": 0
 		},
@@ -23,7 +22,7 @@
 				"foregroundImage": "./assets/icon.png",
 				"backgroundColor": "#FFFFFF"
 			},
-			"package": "com.ww8007.Join2Gather"
+			"package": "com.ww8007.weMeet"
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
