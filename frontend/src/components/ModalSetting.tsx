@@ -21,6 +21,7 @@ import { hexToRGB } from '../lib/util/hexToRGB';
 import ColorPicker from 'react-native-wheel-color-picker';
 import { changeColor, leaveTeam, setModalMode } from '../store/team';
 import { Button } from '../theme/Button';
+import * as Calendar from 'expo-calendar';
 import {
 	changeTimetableColor,
 	deleteAllIndividual,
@@ -160,7 +161,11 @@ export function ModalSetting({
 	}, []);
 
 	const onPressMakeAlarm = useCallback(() => {
-		setSetting('alarm');
+		(async () => {
+			const { status } = await Calendar.requestCalendarPermissionsAsync();
+			if (status === 'granted') setSetting('alarm');
+			else Alert.alert('켈린더 권한을 승인해 주세요');
+		})();
 		// const add = MakeAlarm({title, });
 	}, []);
 
@@ -194,7 +199,7 @@ export function ModalSetting({
 					<CloseButton closeBtn={onPressCloseButton} />
 					{settingMode === 'initial' && (
 						<>
-							<View style={styles.blankView} />
+							{/* <View style={styles.blankView} /> */}
 							<Text style={styles.titleText}>팀 설정</Text>
 							<View style={styles.blankView} />
 							<View style={[styles.backgroundView]}>
@@ -419,7 +424,7 @@ export function ModalSetting({
 					)}
 					{settingMode === 'snapShot' && (
 						<>
-							<View style={styles.blankView} />
+							{/* <View style={styles.blankView} /> */}
 							<Text style={[styles.titleText]}>저장 시간 불러오기</Text>
 
 							<View style={styles.blankView} />
@@ -568,7 +573,7 @@ export function ModalSetting({
 							{isConfirmProve && subMode === 'initial' && (
 								<>
 									<Text style={styles.titleText}>
-										{'알람을 모임 몇 시간 전으로 설정\n 할까요?'}
+										{'알람을 모임 몇 시간 전으로 \n설정 할까요?'}
 									</Text>
 									<View style={styles.blankView} />
 									<View style={styles.blankView} />
@@ -795,7 +800,7 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
 		marginLeft: '10%',
-		marginTop: 15,
+		// marginTop: 15,
 	},
 	blankView: {
 		height: 15,
@@ -829,7 +834,7 @@ const styles = StyleSheet.create({
 	},
 	textInputView: {
 		paddingBottom: 2,
-		backgroundColor: Colors.grey100,
+		// backgroundColor: Colors.grey100,
 		borderBottomWidth: 0.3,
 		width: '20%',
 		textAlign: 'center',
