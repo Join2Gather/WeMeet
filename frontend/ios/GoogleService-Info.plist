@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>630254022609-pmj333d4gg7tuvu33932587mnqlvhtdq.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.630254022609-pmj333d4gg7tuvu33932587mnqlvhtdq</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCxZTK_ogSc6pk778TiaZJQD4K3Ul3stUw</string>
+	<key>GCM_SENDER_ID</key>
+	<string>630254022609</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.ww8007.weMeet</string>
+	<key>PROJECT_ID</key>
+	<string>we-meet-86aee</string>
+	<key>STORAGE_BUCKET</key>
+	<string>we-meet-86aee.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:630254022609:ios:0da2949e16fe5634c0baf0</string>
+</dict>
+</plist>

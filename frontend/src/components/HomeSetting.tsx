@@ -27,6 +27,7 @@ import {
 	toggleViewError,
 } from '../store/login';
 import ColorPicker from 'react-native-wheel-color-picker';
+import { setIndividualTimeColor } from '../store/individual';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -92,6 +93,7 @@ export function HomeSetting({
 
 	const onChangeInColor = useCallback(() => {
 		dispatch(setInTimeColor(inPickColor));
+		dispatch(setIndividualTimeColor(inPickColor));
 		dispatch(getUserMe({ token }));
 		setMode('loading');
 	}, [inPickColor]);
@@ -151,6 +153,7 @@ export function HomeSetting({
 					{mode === 'initial' && (
 						<>
 							<>
+								{/* <View style={styles.blankView} /> */}
 								<Text style={styles.titleText}>계정 설정</Text>
 								<View style={styles.blankView} />
 								<View style={[styles.backgroundView]}>
@@ -553,7 +556,7 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
 		marginLeft: '10%',
-		marginTop: 15,
+		// marginTop: 15,
 	},
 	blankView: {
 		height: 15,

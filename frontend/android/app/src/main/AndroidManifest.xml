@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.ww8007.Join2Gather">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.ww8007.weMeet">
   <uses-permission android:name="android.permission.CAMERA"/>
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.READ_CALENDAR"/>
@@ -30,7 +30,7 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="com.ww8007.Join2Gather"/>
+        <data android:scheme="com.ww8007.weMeet"/>
         <data android:scheme="exp+wemeet"/>
       </intent-filter>
     </activity>

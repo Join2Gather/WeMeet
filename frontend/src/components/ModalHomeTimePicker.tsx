@@ -18,14 +18,14 @@ interface props {
 }
 
 export function ModalHomeTimePicker({ homeVisible, setHomeVisible }: props) {
-	const { alarmArray, confirmClubs, confirmDatesTimetable } = useSelector(
-		({ timetable, login }: RootState) => ({
+	const { alarmArray, confirmClubs, confirmDatesTimetable, inTimeColor } =
+		useSelector(({ timetable, login }: RootState) => ({
 			alarmArray: timetable.alarmArray,
 
 			confirmClubs: login.confirmClubs,
 			confirmDatesTimetable: login.confirmDatesTimetable,
-		})
-	);
+			inTimeColor: login.inTimeColor,
+		}));
 	const dispatch = useDispatch();
 	// const [minute, setMinute] = useState(0);
 	// const [hour, setHour] = useState(0);
@@ -78,7 +78,9 @@ export function ModalHomeTimePicker({ homeVisible, setHomeVisible }: props) {
 				dispatch(setHomeTime({ start: start, end: end }));
 			}
 			setTimeout(() => {
-				dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
+				dispatch(
+					cloneINDates({ confirmClubs, confirmDatesTimetable, inTimeColor })
+				);
 			}, 100);
 			dispatch(setAppLoading('loading'));
 			setTimeout(() => dispatch(setAppLoading('')), 500);
@@ -106,8 +108,8 @@ export function ModalHomeTimePicker({ homeVisible, setHomeVisible }: props) {
 				textColor={
 					Platform.OS === 'ios'
 						? isDark
-							? Colors.black
-							: Colors.white
+							? Colors.white
+							: Colors.black
 						: Colors.black
 				}
 				title={`시작 시간 설정`}
@@ -130,8 +132,8 @@ export function ModalHomeTimePicker({ homeVisible, setHomeVisible }: props) {
 				textColor={
 					Platform.OS === 'ios'
 						? isDark
-							? Colors.black
-							: Colors.white
+							? Colors.white
+							: Colors.black
 						: Colors.black
 				}
 				title={`종료 시간 설정`}

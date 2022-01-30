@@ -1,4 +1,4 @@
-package com.ww8007.Join2Gather;
+package com.ww8007.weMeet;
 import expo.modules.devmenu.react.DevMenuAwareReactActivity;
 import android.content.Intent;
 import expo.modules.devlauncher.DevLauncherController;
