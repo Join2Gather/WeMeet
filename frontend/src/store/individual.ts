@@ -157,6 +157,10 @@ export const individualSlice = createSlice({
 											}
 										}
 									} else {
+										if (state.individualDates[idx].times[i])
+											state.individualDates[idx].timeBackColor[i] = date.color
+												? date.color
+												: state.inTimeColor;
 										for (let j = 0; j <= 5; j++) {
 											if (state.individualDates[idx].times[i]) {
 												makeTime(
@@ -257,6 +261,8 @@ export const individualSlice = createSlice({
 											);
 									}
 								} else {
+									state.individualDates[idx].timeBackColor[i] =
+										state.inTimeColor;
 									for (let j = 0; j <= 5; j++) {
 										if (state.individualDates[idx].times[i])
 											makeTime(
@@ -398,6 +404,9 @@ export const individualSlice = createSlice({
 		initialIndividualError: (state) => {
 			state.error = '';
 		},
+		setIndividualTimeColor: (state, action: PayloadAction<string>) => {
+			state.inTimeColor = action.payload;
+		},
 	},
 	extraReducers: {},
 });
@@ -419,6 +428,7 @@ export const {
 	cloneHomeDate,
 	makeHomeTime,
 	initialIndividualError,
+	setIndividualTimeColor,
 } = individualSlice.actions;
 
 export default individualSlice.reducer;
