@@ -107,7 +107,6 @@ export default function Home() {
 		appLoading,
 		seeTips,
 		isViewError,
-		
 	} = useSelector(({ login, individual, loading }: RootState) => ({
 		token: login.token,
 		id: login.id,
@@ -156,7 +155,9 @@ export default function Home() {
 		dispatch(getUserMe({ token }));
 	}, []);
 	useEffect(() => {
-		dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable, inTimeColor }));
+		dispatch(
+			cloneINDates({ confirmClubs, confirmDatesTimetable, inTimeColor })
+		);
 	}, [confirmClubs, confirmDatesTimetable]);
 	// navigation
 
@@ -271,10 +272,8 @@ export default function Home() {
 							{groupCount !== 0 && individualCount !== 0 && (
 								<>
 									<Text style={styles.titleText}>
-										오늘은 {individualCount}개의 개인 일정과
-									</Text>
-									<Text style={styles.titleText}>
-										오늘은 {individualCount}개의 팀 일정이 있어요
+										오늘은 {individualCount}개의 개인 일정과 {groupCount}
+										개의 팀 일정이 있어요
 									</Text>
 								</>
 							)}
@@ -312,10 +311,7 @@ export default function Home() {
 									</View>
 									<Text style={styles.infoText}>모임 일정</Text>
 									<View
-										style={[
-											styles.boxView,
-											{ backgroundColor: Colors.grey300 },
-										]}
+										style={[styles.boxView, { backgroundColor: inTimeColor }]}
 									/>
 									<Text style={styles.infoText}>개인 일정</Text>
 									<View
