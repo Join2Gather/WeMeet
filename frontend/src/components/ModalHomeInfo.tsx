@@ -58,8 +58,6 @@ export function ModalHomeInfo({
 					<CloseButton closeBtn={onPressCloseBtn} />
 
 					<View style={{ justifyContent: 'flex-start' }}>
-						<View style={styles.blankView} />
-						<Text style={styles.touchText}></Text>
 						<Text
 							style={[
 								styles.touchText,

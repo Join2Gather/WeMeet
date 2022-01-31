@@ -72,7 +72,7 @@ export default function TabNavigator() {
 				name="HomeNavigator"
 				component={HomeNavigator}
 				options={{
-					tabBarLabel: '팀 페이지',
+					tabBarLabel: '팀 일정',
 					tabBarLabelStyle: {
 						fontSize: 11,
 						fontFamily: 'NanumSquareBold',

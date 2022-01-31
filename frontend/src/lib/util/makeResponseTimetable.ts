@@ -57,6 +57,7 @@ export function makeIndividualTimetable(state: timetable) {
 								makeTime(state.dates[idx].times[i][j], 'individual', color);
 						}
 					} else {
+						state.dates[idx].timeBackColor[i] = color;
 						for (let j = 0; j <= 5; j++) {
 							if (state.dates[idx].times[i][j].color !== Colors.white) {
 								makeTime(
@@ -94,6 +95,7 @@ export function makeGroupTimeTableWith60(state: timetable, dates: any) {
 						}
 					} else {
 						if (i === d.starting_hours) {
+							dates[idx].timeBackColor[i] = color;
 							for (let j = startingMinute; j <= 5; j++) {
 								if (j === 0) {
 									dates[idx].times[i][j].color = color;
@@ -102,10 +104,12 @@ export function makeGroupTimeTableWith60(state: timetable, dates: any) {
 								} else makeTime(dates[idx].times[i][j], 'team', color);
 							}
 						} else if (i === d.end_hours) {
+							// dates[idx].timeBackColor[i] = color;
 							for (let j = 0; j < endMinute; j++) {
 								makeTime(dates[idx].times[i][j], 'team', color);
 							}
 						} else {
+							dates[idx].timeBackColor[i] = color;
 							for (let j = 0; j <= 5; j++) {
 								makeTime(dates[idx].times[i][j], 'team', color);
 							}
@@ -160,6 +164,7 @@ export function makeHomeTimetable(state: individual) {
 								}
 							}
 						} else {
+							state.individualDates[idx].timeBackColor[i] = greyColor;
 							for (let j = 0; j <= 5; j++) {
 								if (state.individualDates[idx].times[i]) {
 									makeTime(
@@ -206,6 +211,8 @@ export function addEveryTime(state: timetable, date: any) {
 									);
 								}
 							} else {
+								date[idx].timeBackColor[i] = Colors.grey600;
+
 								for (let j = 0; j <= 5; j++) {
 									makeTime(
 										date[idx].times[i][j].times[i][j],
@@ -259,6 +266,7 @@ export function makeConfirmWith(
 									}
 								}
 							} else {
+								dates[idx].timeBackColor[i] = greyColor;
 								for (let j = 0; j <= 5; j++) {
 									if (dates[idx].times[i]) {
 										makeTime(dates[idx]?.times[i][j], 'other', greyColor);
@@ -299,6 +307,7 @@ export function makeSnapShotDate(
 							makeTime(state.snapShotDate[idx].times[i][j], 'start', color);
 						}
 					} else {
+						state.snapShotDate[idx].timeBackColor[i] = color;
 						for (let j = 0; j <= 5; j++) {
 							makeTime(state.snapShotDate[idx].times[i][j], 'start', color);
 						}

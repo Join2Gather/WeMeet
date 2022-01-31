@@ -169,7 +169,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 									activeOpacity={0.5}
 									style={styles.touchButtonStyle}
 									onPress={onPressEverTime}
-									underlayColor={Colors.grey200}
+									underlayColor={Colors.grey300}
 								>
 									<View style={styles.rowView}>
 										<MaterialCommunityIcon
@@ -193,7 +193,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 									activeOpacity={0.5}
 									style={styles.touchButtonStyle}
 									onPress={onPressGallery}
-									underlayColor={Colors.grey200}
+									underlayColor={Colors.grey300}
 								>
 									<View style={styles.rowView}>
 										<FontAwesome
@@ -233,7 +233,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 									activeOpacity={0.5}
 									style={styles.touchButtonStyle}
 									onPress={onClickOpenChat}
-									underlayColor={Colors.grey200}
+									underlayColor={Colors.grey300}
 								>
 									<View style={styles.rowView}>
 										<Ionic
@@ -257,7 +257,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 									activeOpacity={0.5}
 									style={styles.touchButtonStyle}
 									onPress={onPressEMail}
-									underlayColor={Colors.grey200}
+									underlayColor={Colors.grey300}
 								>
 									<View style={styles.rowView}>
 										<Ionic
@@ -339,14 +339,11 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
 		marginLeft: 5,
-		// position: 'absolute',
-		// left: '16%',
-		// justifyContent: 'center',
-		// textAlignVertical: 'center',
 	},
 	iconView: {
 		alignItems: 'flex-end',
 		flex: 1.5,
+		backgroundColor: 'transparent',
 	},
 	rightIconStyle: {
 		marginRight: 10,

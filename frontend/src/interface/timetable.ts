@@ -100,6 +100,7 @@ export interface make_days {
 export interface make60 {
 	day: string;
 	times: timeWith60;
+	timeBackColor: string[];
 }
 
 export interface state_time {

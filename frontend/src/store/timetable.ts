@@ -526,6 +526,7 @@ export const timetableSlice = createSlice({
 							state.teamConfirmDate[dayIdx].times[i][j].mode = 'confirm';
 						}
 					} else {
+						state.teamConfirmDate[dayIdx].timeBackColor[i] = state.color;
 						for (let j = 0; j <= 5; j++) {
 							state.teamConfirmDate[dayIdx].times[i][j].color = state.color;
 							state.teamConfirmDate[dayIdx].times[i][j].borderWidth = 2;

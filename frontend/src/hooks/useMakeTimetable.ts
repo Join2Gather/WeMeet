@@ -4,6 +4,7 @@ import type { state_time, timeWith60 } from '../interface';
 export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 	const times: timeWith60 = {};
 	const timesText: Array<string> = [];
+	const timeBackColor: Array<string> = [];
 
 	for (let i = startHour; i <= endHour; i++) {
 		if (i < endHour) {
@@ -30,7 +31,7 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 				}
 			}
 		}
-
+		timeBackColor.push('#fff');
 		if (startHour % 2) {
 			if (i <= 12) {
 				if ((i + 1) % 2 === 0) {
@@ -57,13 +58,13 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 	}
 
 	const defaultDatesWith60 = [
-		{ day: 'sun', times: times },
-		{ day: 'mon', times: times },
-		{ day: 'tue', times: times },
-		{ day: 'wed', times: times },
-		{ day: 'thu', times: times },
-		{ day: 'fri', times: times },
-		{ day: 'sat', times: times },
+		{ day: 'sun', times: times, timeBackColor: timeBackColor },
+		{ day: 'mon', times: times, timeBackColor: timeBackColor },
+		{ day: 'tue', times: times, timeBackColor: timeBackColor },
+		{ day: 'wed', times: times, timeBackColor: timeBackColor },
+		{ day: 'thu', times: times, timeBackColor: timeBackColor },
+		{ day: 'fri', times: times, timeBackColor: timeBackColor },
+		{ day: 'sat', times: times, timeBackColor: timeBackColor },
 	];
 	return { defaultDatesWith60, timesText };
 }

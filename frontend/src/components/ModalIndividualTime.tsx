@@ -27,7 +27,7 @@ import {
 } from '../store/individual';
 import { RootState } from '../store';
 import { Spinner } from '.';
-import { findTeam } from '../store/login';
+import { findTeam, setConfirmProve } from '../store/login';
 import { useNavigation } from '@react-navigation/native';
 import { CloseButton } from '../theme';
 const screen = Dimensions.get('screen');
@@ -90,6 +90,7 @@ export function ModalIndividualTime({
 	const onPressDeleteBtn = useCallback(() => {
 		dispatch(deleteHomeTime(findIndividual));
 		dispatch(initialTimeMode());
+		dispatch(setConfirmProve(false));
 		setMode('loading');
 		dispatch(initialIndividualTimetable());
 		setTimeout(() => {
