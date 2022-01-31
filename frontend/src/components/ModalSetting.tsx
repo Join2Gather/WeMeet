@@ -27,7 +27,12 @@ import {
 	deleteAllIndividual,
 	getSnapShot,
 } from '../store/timetable';
-import { getUserMe, makeGroupColor, setAlarmTime } from '../store/login';
+import {
+	getUserMe,
+	makeGroupColor,
+	setAlarmTime,
+	setConfirmProve,
+} from '../store/login';
 import { useNavigation } from '@react-navigation/core';
 import { CloseButton } from '../theme';
 import { initialIndividualTimetable } from '../store/individual';
@@ -166,7 +171,6 @@ export function ModalSetting({
 			if (status === 'granted') setSetting('alarm');
 			else Alert.alert('켈린더 권한을 승인해 주세요');
 		})();
-		// const add = MakeAlarm({title, });
 	}, []);
 
 	const onPressSetTime = useCallback(() => {
@@ -182,6 +186,9 @@ export function ModalSetting({
 	}, []);
 	const onPressDeleteAll = useCallback(() => {
 		dispatch(deleteAllIndividual());
+		dispatch(initialIndividualTimetable());
+		dispatch(getUserMe({ token }));
+		dispatch(setConfirmProve(false));
 		setSetting('loading');
 		setSubMode('loading');
 	}, []);
@@ -424,9 +431,7 @@ export function ModalSetting({
 					)}
 					{settingMode === 'snapShot' && (
 						<>
-							{/* <View style={styles.blankView} /> */}
 							<Text style={[styles.titleText]}>저장 시간 불러오기</Text>
-
 							<View style={styles.blankView} />
 							<View style={[styles.backgroundView]}>
 								<View style={styles.columnView}>
@@ -434,7 +439,6 @@ export function ModalSetting({
 										<TouchableHighlight
 											activeOpacity={1}
 											underlayColor={Colors.grey300}
-											// onPress={goSnapShotPage}
 											style={styles.touchButtonStyle}
 										>
 											<View style={styles.rowView}>
@@ -792,7 +796,7 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
 		marginLeft: 10,
-		top: 1,
+		// top: 1,
 	},
 	titleText: {
 		fontSize: 20,
