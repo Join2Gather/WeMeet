@@ -218,7 +218,6 @@ export function ModalTimePicker({
 		},
 		[mode, isConfirm, date, modalVisible, isHomeTime, checkTime]
 	);
-	console.log(isDark);
 	const onPressEndConfirm = useCallback(
 		(date) => {
 			setSecond(false);
