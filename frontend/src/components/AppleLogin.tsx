@@ -29,10 +29,7 @@ import { appleLogin } from '../store/login';
 
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
-import {
-	AppleAuthenticationCredentialState,
-	AppleAuthenticationRefreshOptions
-} from 'expo-apple-authentication';
+import { AppleAuthenticationCredentialState } from 'expo-apple-authentication';
 import jwt_decode from 'jwt-decode';
 /**
  * Starts the Sign In flow.
