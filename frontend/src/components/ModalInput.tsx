@@ -10,7 +10,7 @@ import {
 	ActivityIndicator,
 	Dimensions,
 	KeyboardAvoidingView,
-	Platform,
+	Platform
 } from 'react-native';
 
 import { Colors } from 'react-native-paper';
@@ -20,7 +20,7 @@ import {
 	inputTeamName,
 	joinTeam,
 	postTeamName,
-	setModalMode,
+	setModalMode
 } from '../store/team';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 
@@ -52,7 +52,7 @@ interface props {
 	joinUri: string;
 	joinName: string;
 	makeReady: boolean;
-	individualColor: string;
+	inThemeColor: string;
 	sequence: number[];
 }
 
@@ -71,8 +71,8 @@ export function ModalInput({
 	postTeamError,
 	joinName,
 	makeReady,
-	individualColor,
-	sequence,
+	inThemeColor,
+	sequence
 }: props) {
 	const dispatch = useDispatch();
 	// const [name, setName] = useState('2ff148e7-05b9-461e-a2c2-1d3ccce16ba9');
@@ -83,7 +83,7 @@ export function ModalInput({
 	const [hsvColor, setHSV] = useState({
 		hue: 0,
 		sat: 0,
-		val: 0,
+		val: 0
 	});
 	const [startTime, setStartTime] = useState('9');
 
@@ -94,14 +94,14 @@ export function ModalInput({
 		setHSV((prevState) => ({
 			...prevState,
 			sat: sat,
-			val: val,
+			val: val
 		}));
 	}, []);
 
 	const onHuePickerChange = useCallback((hue) => {
 		setHSV((prevState) => ({
 			...prevState,
-			hue: hue,
+			hue: hue
 		}));
 	}, []);
 
@@ -135,7 +135,7 @@ export function ModalInput({
 						id,
 						token,
 						name,
-						user,
+						user
 					})
 				);
 				setCurrent(3);
@@ -284,7 +284,7 @@ export function ModalInput({
 										<Text
 											style={[
 												styles.titleText,
-												{ alignSelf: 'flex-start', marginLeft: '10%' },
+												{ alignSelf: 'flex-start', marginLeft: '10%' }
 											]}
 										>
 											모임 관리
@@ -300,15 +300,15 @@ export function ModalInput({
 														styles.touchButtonStyle,
 														{
 															borderBottomLeftRadius: 0,
-															borderBottomRightRadius: 0,
-														},
+															borderBottomRightRadius: 0
+														}
 													]}
 												>
 													<View style={styles.rowView}>
 														<Font5Icon
 															name="pencil-alt"
 															size={21}
-															color={individualColor}
+															color={inThemeColor}
 															style={[styles.iconStyle, { marginTop: 10 }]}
 														/>
 														<Text style={styles.touchText}> 모임 생성</Text>
@@ -331,18 +331,18 @@ export function ModalInput({
 														styles.touchButtonStyle,
 														{
 															borderTopLeftRadius: 0,
-															borderTopRightRadius: 0,
-														},
+															borderTopRightRadius: 0
+														}
 													]}
 												>
 													<View style={styles.rowView}>
 														<Font5Icon
 															name="address-book"
 															size={25}
-															color={individualColor}
+															color={inThemeColor}
 															style={[
 																styles.iconStyle,
-																{ marginTop: 10, marginLeft: 10 },
+																{ marginTop: 10, marginLeft: 10 }
 															]}
 														/>
 														<Text
@@ -445,7 +445,7 @@ export function ModalInput({
 								<View
 									style={{
 										height: 300,
-										width: '80%',
+										width: '80%'
 									}}
 								>
 									<ColorPicker
@@ -476,7 +476,7 @@ export function ModalInput({
 						{mode === 'loading' && (
 							<>
 								<View style={{ height: 30 }} />
-								<ActivityIndicator size="large" color={individualColor} />
+								<ActivityIndicator size="large" color={inThemeColor} />
 								<View style={{ height: 30 }} />
 							</>
 						)}
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginTop: -20,
+		marginTop: -20
 	},
 	rowView: {
 		flexDirection: 'row',
@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'flex-start',
 		width: screen.width * 0.65,
 		height: screen.height * 0.05,
-		borderRadius: 13,
+		borderRadius: 13
 	},
 	modalView: {
 		marginBottom: 60,
@@ -544,44 +544,44 @@ const styles = StyleSheet.create({
 		elevation: 10,
 		shadowOffset: {
 			width: 1,
-			height: 1,
+			height: 1
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
-		width: screen.width * 0.9,
+		width: screen.width * 0.9
 	},
 	titleText: {
 		fontSize: 20,
 		alignSelf: 'center',
 		fontFamily: 'NanumSquareBold',
-		letterSpacing: -1,
+		letterSpacing: -1
 	},
 	titleUnderText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		fontSize: 13,
 		marginTop: 0,
-		marginBottom: 20,
+		marginBottom: 20
 	},
 	errorView: {
 		flexDirection: 'row',
 		marginTop: 15,
 		justifyContent: 'center',
-		alignContent: 'center',
+		alignContent: 'center'
 	},
 	errorText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		fontSize: 15,
-		alignSelf: 'center',
+		alignSelf: 'center'
 	},
 	textView: {
-		width: '100%',
+		width: '100%'
 	},
 	textInput: {
 		fontSize: 18,
 		fontFamily: 'NanumSquareR',
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	textInputView: {
 		paddingBottom: 2,
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
 
 		// marginLeft: '15%',
 		padding: 10,
-		marginBottom: 15,
+		marginBottom: 15
 	},
 	timeInputView: {
 		paddingBottom: 2,
@@ -600,72 +600,72 @@ const styles = StyleSheet.create({
 		flex: 0.3,
 		borderBottomWidth: 0.3,
 		marginLeft: '10%',
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	timeInputText: {
 		marginTop: 3,
 		fontSize: 14,
-		fontFamily: 'NanumSquareR',
+		fontFamily: 'NanumSquareR'
 	},
 	timeInput: {
 		fontSize: 18,
 		fontFamily: 'NanumSquareR',
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	buttonText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
-		letterSpacing: -1,
+		letterSpacing: -1
 	},
 
 	textStyle: {
 		color: 'white',
 		fontWeight: 'bold',
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 
 	modalText: {
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	verticalLine: {
 		height: '50%',
 		borderLeftWidth: 0.16,
-		width: 1,
+		width: 1
 	},
 	blankView: {
-		height: 20,
+		height: 20
 	},
 	rowLine: {
 		borderWidth: 0.4,
 		width: '110%',
-		marginTop: 15,
+		marginTop: 15
 	},
 	buttonOverLine: {
 		borderTopWidth: 0.4,
 		width: screen.width * 0.9,
 		marginTop: 20,
-		borderColor: Colors.black,
+		borderColor: Colors.black
 	},
 	safeAreaView: {
-		flex: 1,
+		flex: 1
 		// marginTop: 50,
 		// justifyContent: 'center',
 		// alignItems: 'center',
 	},
 	backgroundView: {
 		borderRadius: 13,
-		backgroundColor: Colors.grey100,
+		backgroundColor: Colors.grey100
 	},
 	columnView: {
 		flexDirection: 'column',
-		alignContent: 'center',
+		alignContent: 'center'
 	},
 	touchButtonStyle: {
 		padding: 5,
 		borderRadius: 13,
 		justifyContent: 'center',
 		paddingLeft: 5,
-		paddingRight: 5,
+		paddingRight: 5
 	},
 	iconStyle: {
 		marginLeft: 10,
@@ -673,7 +673,7 @@ const styles = StyleSheet.create({
 		height: 30,
 		marginTop: 5,
 		textAlign: 'center',
-		alignContent: 'center',
+		alignContent: 'center'
 	},
 	touchText: {
 		fontSize: 14,
@@ -682,13 +682,13 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
 		marginLeft: 10,
-		top: 1,
+		top: 1
 	},
 	iconView: {
 		alignItems: 'flex-end',
-		flex: 1,
+		flex: 1
 	},
 	rightIconStyle: {
-		marginRight: 10,
-	},
+		marginRight: 10
+	}
 });

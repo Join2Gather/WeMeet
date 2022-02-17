@@ -8,7 +8,7 @@ import {
 	View,
 	TextInput,
 	ActivityIndicator,
-	Dimensions,
+	Dimensions
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
@@ -25,13 +25,13 @@ import * as Calendar from 'expo-calendar';
 import {
 	changeTimetableColor,
 	deleteAllIndividual,
-	getSnapShot,
+	getSnapShot
 } from '../store/timetable';
 import {
+	changeInPersistColor,
 	getUserMe,
-	makeGroupColor,
 	setAlarmTime,
-	setConfirmProve,
+	setConfirmProve
 } from '../store/login';
 import { useNavigation } from '@react-navigation/core';
 import { CloseButton } from '../theme';
@@ -81,7 +81,7 @@ export function ModalSetting({
 	setSetting,
 	settingMode,
 	subMode,
-	setSubMode,
+	setSubMode
 }: props) {
 	const dispatch = useDispatch();
 
@@ -92,7 +92,7 @@ export function ModalSetting({
 	const [RGBColor, setRGBColor] = useState({
 		r: 0,
 		g: 0,
-		b: 0,
+		b: 0
 	});
 	const navigation = useNavigation();
 	useEffect(() => {
@@ -129,7 +129,7 @@ export function ModalSetting({
 	const onPressChangeColor = useCallback(() => {
 		uri && dispatch(changeColor({ color: pickColor, id, token, user, uri }));
 		dispatch(getUserMe({ token }));
-		dispatch(makeGroupColor(pickColor));
+		dispatch(changeInPersistColor({ color: pickColor, use: 'normal' }));
 
 		setSetting('loading');
 	}, [pickColor]);
@@ -217,7 +217,7 @@ export function ModalSetting({
 										onPress={() => onPresssetSetting('color')}
 										style={[
 											styles.touchButtonStyle,
-											{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
+											{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }
 										]}
 									>
 										<View style={styles.rowView}>
@@ -245,7 +245,7 @@ export function ModalSetting({
 										onPress={onShareURI}
 										style={[
 											styles.touchButtonStyle,
-											{ borderTopLeftRadius: 0, borderTopRightRadius: 0 },
+											{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }
 										]}
 									>
 										<View style={styles.rowView}>
@@ -255,7 +255,7 @@ export function ModalSetting({
 												color={color}
 												style={[
 													styles.iconStyle,
-													{ marginTop: 10, marginLeft: 13 },
+													{ marginTop: 10, marginLeft: 13 }
 												]}
 											/>
 											<Text style={styles.touchText}>팀원 초대</Text>
@@ -282,7 +282,7 @@ export function ModalSetting({
 										onPress={onPressGetSnapShot}
 										style={[
 											styles.touchButtonStyle,
-											{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
+											{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }
 										]}
 									>
 										<View style={styles.rowView}>
@@ -360,7 +360,7 @@ export function ModalSetting({
 										onPress={onPressLeaveTeamFirst}
 										style={[
 											styles.touchButtonStyle,
-											{ borderTopLeftRadius: 0, borderTopRightRadius: 0 },
+											{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }
 										]}
 									>
 										<View style={styles.rowView}>
@@ -393,7 +393,7 @@ export function ModalSetting({
 							<Text
 								style={[
 									styles.titleText,
-									{ color: Colors.red500, fontSize: 13, marginTop: 0 },
+									{ color: Colors.red500, fontSize: 13, marginTop: 0 }
 								]}
 							>
 								주의 사항 : 팀원 전체의 모임 색상이 변경되게 됩니다
@@ -403,7 +403,7 @@ export function ModalSetting({
 							<View
 								style={{
 									height: 300,
-									width: '80%',
+									width: '80%'
 								}}
 							>
 								<ColorPicker
@@ -586,7 +586,7 @@ export function ModalSetting({
 											flexDirection: 'row',
 											justifyContent: 'center',
 											alignItems: 'center',
-											alignContent: 'center',
+											alignContent: 'center'
 										}}
 									>
 										<View style={[styles.textInputView]}>
@@ -604,7 +604,7 @@ export function ModalSetting({
 										<Text
 											style={[
 												styles.touchText,
-												{ paddingBottom: 10, marginLeft: 0, fontSize: 15 },
+												{ paddingBottom: 10, marginLeft: 0, fontSize: 15 }
 											]}
 										>
 											시간
@@ -750,7 +750,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginTop: -20,
+		marginTop: -20
 	},
 	rowView: {
 		flexDirection: 'row',
@@ -758,19 +758,19 @@ const styles = StyleSheet.create({
 		justifyContent: 'flex-start',
 		width: screen.width * 0.65,
 		height: screen.height * 0.05,
-		borderRadius: 13,
+		borderRadius: 13
 	},
 	columnView: {
 		flexDirection: 'column',
-		alignContent: 'center',
+		alignContent: 'center'
 	},
 	backgroundView: {
 		borderRadius: 13,
-		backgroundColor: Colors.grey100,
+		backgroundColor: Colors.grey100
 	},
 	iconView: {
 		alignItems: 'flex-end',
-		flex: 1,
+		flex: 1
 	},
 	modalView: {
 		// margin: 10,
@@ -783,11 +783,11 @@ const styles = StyleSheet.create({
 		elevation: 10,
 		shadowOffset: {
 			width: 1,
-			height: 1,
+			height: 1
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
-		width: screen.width * 0.9,
+		width: screen.width * 0.9
 	},
 	touchText: {
 		fontSize: 14,
@@ -795,7 +795,7 @@ const styles = StyleSheet.create({
 		textAlignVertical: 'center',
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
-		marginLeft: 10,
+		marginLeft: 10
 		// top: 1,
 	},
 	titleText: {
@@ -803,27 +803,27 @@ const styles = StyleSheet.create({
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
-		marginLeft: '10%',
+		marginLeft: '10%'
 		// marginTop: 15,
 	},
 	blankView: {
-		height: 15,
+		height: 15
 	},
 	textView: {
-		width: '100%',
+		width: '100%'
 	},
 	touchButtonStyle: {
 		padding: 5,
 		borderRadius: 13,
 		justifyContent: 'center',
 		paddingLeft: 5,
-		paddingRight: 5,
+		paddingRight: 5
 	},
 	buttonOverLine: {
 		borderTopWidth: 0.4,
 		width: screen.width * 0.9,
 		marginTop: 20,
-		borderColor: Colors.black,
+		borderColor: Colors.black
 	},
 	iconStyle: {
 		marginLeft: 10,
@@ -831,10 +831,10 @@ const styles = StyleSheet.create({
 		height: 30,
 		marginTop: 5,
 		textAlign: 'center',
-		alignContent: 'center',
+		alignContent: 'center'
 	},
 	rightIconStyle: {
-		marginRight: 10,
+		marginRight: 10
 	},
 	textInputView: {
 		paddingBottom: 2,
@@ -844,11 +844,11 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		// marginLeft: '15%',
 		padding: 5,
-		marginBottom: 15,
+		marginBottom: 15
 	},
 	textInput: {
 		fontSize: 18,
 		fontFamily: 'NanumSquareR',
-		textAlign: 'center',
-	},
+		textAlign: 'center'
+	}
 });

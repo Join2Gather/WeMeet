@@ -6,14 +6,14 @@ import {
 	Text,
 	TouchableHighlight,
 	View,
-	Dimensions,
+	Dimensions
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import FontIcon from 'react-native-vector-icons/FontAwesome';
 import { Button } from '../theme/Button';
-import { setTimeTipMode, setTipMode } from '../store/login';
+import { setTipMode } from '../store/login';
 import { RootState } from '../store';
 import Ionic from 'react-native-vector-icons/Ionicons';
 import { CloseButton } from '../theme';
@@ -31,12 +31,12 @@ export function ModalHomeInfo({
 	infoVisible,
 	setInfoVisible,
 	seeTips,
-	color,
+	color
 }: props) {
 	const { inColor, seeTimeTips } = useSelector(
 		({ timetable, login }: RootState) => ({
-			inColor: login.individualColor,
-			seeTimeTips: login.seeTimeTips,
+			inColor: login.inThemeColor,
+			seeTimeTips: login.seeTimeTips
 		})
 	);
 	const dispatch = useDispatch();
@@ -46,9 +46,7 @@ export function ModalHomeInfo({
 	const onPressCloseBtn = useCallback(() => {
 		setInfoVisible(false);
 	}, []);
-	const onPressTimeTipBtn = useCallback(() => {
-		dispatch(setTimeTipMode(!seeTimeTips));
-	}, [seeTimeTips]);
+
 	const [infoMode, setInfoMode] = useState('');
 
 	return (
@@ -61,7 +59,7 @@ export function ModalHomeInfo({
 						<Text
 							style={[
 								styles.touchText,
-								{ marginLeft: screen.width * 0.15 + 1 },
+								{ marginLeft: screen.width * 0.15 + 1 }
 							]}
 						>
 							WE MEET에 오신걸 환영 합니다 😆
@@ -105,7 +103,7 @@ export function ModalHomeInfo({
 							<Text
 								style={[
 									styles.touchText,
-									{ color: Colors.grey700, marginLeft: 1, marginRight: 3 },
+									{ color: Colors.grey700, marginLeft: 1, marginRight: 3 }
 								]}
 							>
 								{' '}
@@ -158,13 +156,13 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginTop: -20,
+		marginTop: -20
 	},
 	rowView: {
 		flexDirection: 'row',
 		alignItems: 'center',
 
-		justifyContent: 'center',
+		justifyContent: 'center'
 		// width: screen.width * 0.53,
 	},
 	columnView: {
@@ -174,15 +172,15 @@ const styles = StyleSheet.create({
 		alignContent: 'center',
 		margin: 30,
 		marginBottom: 20,
-		marginTop: 20,
+		marginTop: 20
 	},
 	backgroundView: {
 		borderRadius: 13,
-		backgroundColor: Colors.grey100,
+		backgroundColor: Colors.grey100
 	},
 	iconView: {
 		alignItems: 'flex-end',
-		flex: 1,
+		flex: 1
 	},
 	modalView: {
 		// margin: 10,
@@ -195,18 +193,18 @@ const styles = StyleSheet.create({
 		elevation: 10,
 		shadowOffset: {
 			width: 1,
-			height: 1,
+			height: 1
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
-		width: screen.width * 0.9,
+		width: screen.width * 0.9
 	},
 	touchText: {
 		fontSize: 14,
 		textAlign: 'left',
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
-		marginLeft: screen.width * 0.15,
+		marginLeft: screen.width * 0.15
 	},
 	titleText: {
 		fontSize: 20,
@@ -214,23 +212,23 @@ const styles = StyleSheet.create({
 		justifyContent: 'flex-start',
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
-		letterSpacing: -1,
+		letterSpacing: -1
 	},
 	blankView: {
-		height: 10,
+		height: 10
 	},
 	textView: {
-		width: '100%',
+		width: '100%'
 	},
 	touchButtonStyle: {
 		padding: 5,
 		borderRadius: 10,
-		justifyContent: 'center',
+		justifyContent: 'center'
 	},
 	buttonOverLine: {
 		borderTopWidth: 0.4,
 		width: screen.width * 0.9,
 		marginTop: 20,
-		borderColor: Colors.black,
-	},
+		borderColor: Colors.black
+	}
 });

@@ -5,64 +5,24 @@ import { takeLatest } from 'redux-saga/effects';
 import { createAction } from 'redux-actions';
 import type {
 	appleLoginType,
+	changeColor,
 	homeTime,
 	kakaoLoginAPI,
 	Login,
 	nicknameAPI,
-	userMeAPI,
+	userMeAPI
 } from '../interface';
 import { Alert } from 'react-native';
 import { Colors } from 'react-native-paper';
+import {
+	changeTeamInfo,
+	loginInitialState,
+	setUserMeData
+} from '../lib/util/loginHepler';
+import { filter, map, pipe, range, reduce, take } from '@fxts/core';
+import { toArray } from 'lodash';
 
-const initialState: Login = {
-	id: 0,
-	name: '',
-	user: 0,
-	token: '',
-	clubs: [],
-	kakaoDates: [],
-	uri: '',
-	error: '',
-	color: '',
-	peopleCount: 0,
-	response: '',
-	confirmDatesTimetable: [],
-	confirmClubs: [],
-	userMeSuccess: true,
-	startHour: 0,
-	endHour: 0,
-	dates: [],
-	individualColor: '#33aafc',
-	nickname: '',
-	findIndividual: [],
-	inDates: {
-		sun: [],
-		mon: [],
-		tue: [],
-		wed: [],
-		thu: [],
-		fri: [],
-		sat: [],
-	},
-	weekIndex: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
-	joinClubNum: 0,
-	confirmClubNum: 0,
-	appleUser: '',
-	isConfirmProve: false,
-	alarmTime: 1,
-	homeTime: {
-		start: 0,
-		end: 25,
-	},
-	loading: '',
-	seeTips: true,
-	seeTimeTips: true,
-	code: '',
-	email: '',
-	viewError: false,
-	timeTipVisible: true,
-	inTimeColor: Colors.grey600,
-};
+export const initialState: Login = loginInitialState;
 
 const USER_ME = 'login/USER_ME';
 const CHANGE_NICKNAME = 'login/CHANGE_NICKNAME';
@@ -78,9 +38,12 @@ export const appleLogin = createAction(
 	(data: appleLoginType) => data
 );
 
-const getUserMeSaga = createRequestSaga(USER_ME, api.getUserMe);
-const changeNickSaga = createRequestSaga(CHANGE_NICKNAME, api.changeNickname);
-const appleLoginSaga = createRequestSaga(APPLE_LOGIN, api.appleLogin);
+export const getUserMeSaga = createRequestSaga(USER_ME, api.getUserMe);
+export const changeNickSaga = createRequestSaga(
+	CHANGE_NICKNAME,
+	api.changeNickname
+);
+export const appleLoginSaga = createRequestSaga(APPLE_LOGIN, api.appleLogin);
 
 export function* loginSaga() {
 	yield takeLatest(USER_ME, getUserMeSaga);
@@ -92,59 +55,16 @@ export const loginSlice = createSlice({
 	name: 'login',
 	initialState,
 	reducers: {
-		getSocialLogin: (state, action: PayloadAction<kakaoLoginAPI>) => {
-			const { id, clubs, dates, kakaoDates, name, token, user } =
-				action.payload;
-			state.kakaoDates = [];
-			state.clubs = [];
-			state.id = id;
-			state.name = name;
-			state.user = user;
-			state.token = token;
-			state.clubs = clubs;
-			state.clubs.map((club) => {
-				club.name = decodeURIComponent(club.name);
-			});
-			state.kakaoDates = kakaoDates;
-			state.dates = dates;
+		findTeam: (state, action: PayloadAction<{ data: string; use: string }>) => {
+			let data = state.clubs.find(
+				(club) => club[action.payload.use] == action.payload.data
+			);
+			if (action.payload.use == 'id') {
+				changeTeamInfo(state, data, true);
+			} else changeTeamInfo(state, data, false);
 		},
-		findTeam: (
-			state,
-			action: PayloadAction<{ uri?: string; name?: string; id?: string }>
-		) => {
-			let data;
-			let dateInfo;
-			if (action.payload.name) {
-				data = state.clubs.find((club) => club.name === action.payload.name);
-			} else if (action.payload.uri) {
-				data = state.clubs.find((club) => club.uri === action.payload.uri);
-			} else if (action.payload.id) {
-				data = state.clubs.find((club) => club?.id == action.payload.id);
-				dateInfo = state.confirmDatesTimetable.find(
-					(date: any) => date?.club?.id === action.payload.id
-				);
-				if (dateInfo) console.log(dateInfo, 'hihi');
-			}
-			if (data && dateInfo) {
-				state.name = data.name;
-				state.uri = data.uri;
-				state.color = data.color;
-				state.peopleCount = data.people_count;
-				state.startHour = data.starting_hours;
-				state.endHour = data.end_hours;
-				state.isConfirmProve = true;
-			} else {
-				state.name = data.name;
-				state.uri = data.uri;
-				state.color = data.color;
-				state.peopleCount = data.people_count;
-				state.startHour = data.starting_hours;
-				state.endHour = data.end_hours;
-				state.isConfirmProve = false;
-			}
-		},
-		confirmProve: (state) => {
-			state.isConfirmProve = true;
+		setConfirmProve: (state, action: PayloadAction<boolean>) => {
+			state.isConfirmProve = action.payload;
 		},
 		findHomeTime: (
 			state,
@@ -160,37 +80,51 @@ export const loginSlice = createSlice({
 						color: d.color,
 						name: decodeURIComponent(d.name),
 						selectTime: time,
-						id: d.id,
+						id: d.id
 					};
 					state.findIndividual = [...state.findIndividual, data];
 				}
 			});
 		},
+
+		setAlarmTime: (state, action: PayloadAction<number>) => {
+			state.alarmTime = action.payload;
+		},
+		setAppleToken: (state, action: PayloadAction<string>) => {
+			state.token = action.payload;
+		},
+		setHomeTime: (state, action: PayloadAction<homeTime>) => {
+			state.homeTime.start = action.payload.start;
+			state.homeTime.end = action.payload.end;
+		},
+		setAppLoading: (state, action: PayloadAction<string>) => {
+			state.loading = action.payload;
+		},
+		setTipMode: (state, action: PayloadAction<boolean>) => {
+			state.seeTips = action.payload;
+		},
+		toggleUserMeSuccess: (state) => {
+			state.userMeSuccess = false;
+		},
+		toggleViewError: (state, action: PayloadAction<boolean>) => {
+			state.viewError = action.payload;
+		},
+		setTimeTipVisible: (state, action: PayloadAction<boolean>) => {
+			state.timeTipVisible = action.payload;
+		},
+		changeInPersistColor: (state, action: PayloadAction<changeColor>) => {
+			const { color, use } = action.payload;
+			if (use === 'theme') state.inThemeColor = color;
+			else if (use === 'time') state.inTimeColor = color;
+			else if (use === 'normal') state.color = color;
+		},
 		USER_ME_SUCCESS: (state, action: PayloadAction<any>) => {
-			state.confirmClubs = [];
-			state.inDates = {
-				sun: [],
-				mon: [],
-				tue: [],
-				wed: [],
-				thu: [],
-				fri: [],
-				sat: [],
-			};
-			const { clubs, dates, nickname, id, name, user } = action.payload;
-			state.id = id;
-			state.name = name;
-			state.dates = dates;
-			state.user = user;
-			state.joinClubNum = clubs.length;
-			state.nickname = nickname;
-			state.clubs = clubs;
-			state.dates = dates;
-			state.confirmDatesTimetable = dates.filter(
-				(da: any) => !da.is_temporary_reserved
+			setUserMeData(state, action);
+			state.confirmDatesTimetable = state.dates.filter(
+				(day: any) => !day.is_temporary_reserved
 			);
 			state.confirmDatesTimetable.forEach((day: any) => {
-				const find = clubs.find((date: any) => date.id === day.club?.id);
+				const find = state.clubs.find((date: any) => date.id === day.club?.id);
 				if (find) {
 					day['color'] = find.color;
 					day.club.name = decodeURIComponent(day.club.name);
@@ -207,27 +141,26 @@ export const loginSlice = createSlice({
 							const data = {
 								start: {
 									hour: d.starting_hours,
-									minute: d.starting_minutes,
+									minute: d.starting_minutes
 								},
 								end: {
 									hour: d.end_hours,
-									minute: d.end_minutes,
+									minute: d.end_minutes
 								},
 								color: day.color,
 								name: day.club === null ? '개인 시간표' : day.club.name,
-								id: day.club?.id,
+								id: day.club?.id
 							};
 							state.inDates[dayString] = [...state.inDates[dayString], data];
 						});
 					}
 				});
 			});
-			state.clubs = action.payload.clubs;
+
 			state.clubs.map((club) => {
 				club.name = decodeURIComponent(club.name);
 			});
 			state.userMeSuccess = true;
-			state.error = '';
 		},
 		USER_ME_FAILURE: (state, action: PayloadAction<any>) => {
 			state.error = 'error';
@@ -237,82 +170,31 @@ export const loginSlice = createSlice({
 			state.nickname = action.payload.nickname;
 		},
 		CHANGE_NICKNAME_FAILURE: (state, action: PayloadAction<any>) => {
-			state.error = action.payload;
+			state.error = 'nickname error';
 		},
 		APPLE_LOGIN_SUCCESS: (state, action: PayloadAction<any>) => {
 			state.token = action.payload.access_token;
 		},
 		APPLE_LOGIN_FAILURE: (state, action: PayloadAction<any>) => {
-			state.error = action.payload;
-			console.log(action.payload);
-		},
-		makeGroupColor: (state, action: PayloadAction<string>) => {
-			state.color = action.payload;
-		},
-		changeTeamColor: (state, action: PayloadAction<string>) => {
-			state.individualColor = action.payload;
-		},
-		setAlarmTime: (state, action: PayloadAction<number>) => {
-			state.alarmTime = action.payload;
-		},
-		setAppleToken: (state, action: PayloadAction<string>) => {
-			state.token = action.payload;
-		},
-		setAppleUser: (state, action: PayloadAction<string>) => {
-			state.appleUser = action.payload;
-		},
-		setHomeTime: (state, action: PayloadAction<homeTime>) => {
-			state.homeTime.start = action.payload.start;
-			state.homeTime.end = action.payload.end;
-		},
-		setAppLoading: (state, action: PayloadAction<string>) => {
-			state.loading = action.payload;
-		},
-		setTipMode: (state, action: PayloadAction<boolean>) => {
-			state.seeTips = action.payload;
-		},
-		setTimeTipMode: (state, action: PayloadAction<boolean>) => {
-			state.seeTimeTips = action.payload;
-		},
-		toggleUserMeSuccess: (state) => {
-			state.userMeSuccess = false;
-		},
-		setAppleLoginToken: (state, action: PayloadAction<appleLoginType>) => {
-			state.code = action.payload.code;
-			state.email = action.payload.email;
-		},
-		toggleViewError: (state, action: PayloadAction<boolean>) => {
-			state.viewError = action.payload;
-		},
-		setTimeTipVisible: (state, action: PayloadAction<boolean>) => {
-			state.timeTipVisible = action.payload;
-		},
-		setInTimeColor: (state, action: PayloadAction<string>) => {
-			state.inTimeColor = action.payload;
-		},
+			state.error = 'appleLogin error';
+		}
 	},
-	extraReducers: {},
+	extraReducers: {}
 });
 
 export const {
-	getSocialLogin,
 	findTeam,
-	makeGroupColor,
-	changeTeamColor,
 	findHomeTime,
 	setAlarmTime,
 	setAppleToken,
-	confirmProve,
+	setConfirmProve,
 	setHomeTime,
 	setAppLoading,
 	setTipMode,
-	setTimeTipMode,
 	toggleUserMeSuccess,
-	setAppleLoginToken,
 	toggleViewError,
 	setTimeTipVisible,
-	setAppleUser,
-	setInTimeColor,
+	changeInPersistColor
 } = loginSlice.actions;
 
 export default loginSlice.reducer;

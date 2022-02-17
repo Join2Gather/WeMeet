@@ -9,7 +9,7 @@ import {
 	ActivityIndicator,
 	Dimensions,
 	TextInput,
-	Platform,
+	Platform
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
@@ -20,11 +20,10 @@ import { hexToRGB } from '../lib/util/hexToRGB';
 import { Button } from '../theme/Button';
 import Material from 'react-native-vector-icons/MaterialIcons';
 import {
+	changeInPersistColor,
 	changeNickname,
-	changeTeamColor,
 	getUserMe,
-	setInTimeColor,
-	toggleViewError,
+	toggleViewError
 } from '../store/login';
 import ColorPicker from 'react-native-wheel-color-picker';
 import { setIndividualTimeColor } from '../store/individual';
@@ -53,7 +52,7 @@ export function HomeSetting({
 	inTimeColor,
 	userMeError,
 	onPressChangeTime,
-	isViewError,
+	isViewError
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
@@ -64,7 +63,7 @@ export function HomeSetting({
 	const [RGBColor, setRGBColor] = useState({
 		r: 0,
 		g: 0,
-		b: 0,
+		b: 0
 	});
 	useEffect(() => {
 		userMeError && setMode('error');
@@ -86,13 +85,13 @@ export function HomeSetting({
 		setNickname('');
 	}, []);
 
-	const onChangeColor = useCallback(() => {
-		dispatch(changeTeamColor(pickColor));
+	const onChangeInThemColor = useCallback(() => {
+		dispatch(changeInPersistColor({ color: pickColor, use: 'theme' }));
 		setMode('loading');
 	}, [pickColor]);
 
 	const onChangeInColor = useCallback(() => {
-		dispatch(setInTimeColor(inPickColor));
+		dispatch(changeInPersistColor({ color: inPickColor, use: 'time' }));
 		dispatch(setIndividualTimeColor(inPickColor));
 		dispatch(getUserMe({ token }));
 		setMode('loading');
@@ -132,8 +131,8 @@ export function HomeSetting({
 							(styles.textView,
 							[
 								{
-									marginBottom: 10,
-								},
+									marginBottom: 10
+								}
 							])
 						}
 					>
@@ -142,7 +141,7 @@ export function HomeSetting({
 							underlayColor={Colors.white}
 							style={{
 								marginLeft: '90%',
-								width: '9%',
+								width: '9%'
 							}}
 							onPress={onPressCloseButton}
 						>
@@ -166,8 +165,8 @@ export function HomeSetting({
 												styles.touchButtonStyle,
 												{
 													borderBottomLeftRadius: 0,
-													borderBottomRightRadius: 0,
-												},
+													borderBottomRightRadius: 0
+												}
 											]}
 										>
 											<View style={styles.rowView}>
@@ -195,8 +194,8 @@ export function HomeSetting({
 											style={[
 												styles.touchButtonStyle,
 												{
-													borderRadius: 0,
-												},
+													borderRadius: 0
+												}
 											]}
 										>
 											<View style={styles.rowView}>
@@ -225,8 +224,8 @@ export function HomeSetting({
 												style={[
 													styles.touchButtonStyle,
 													{
-														borderRadius: 0,
-													},
+														borderRadius: 0
+													}
 												]}
 											>
 												<View style={styles.rowView}>
@@ -283,7 +282,7 @@ export function HomeSetting({
 											underlayColor={Colors.grey300}
 											style={[
 												styles.touchButtonStyle,
-												{ borderTopLeftRadius: 0, borderTopRightRadius: 0 },
+												{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }
 											]}
 											onPress={() => setMode('color')}
 										>
@@ -323,7 +322,7 @@ export function HomeSetting({
 							<View
 								style={{
 									height: 300,
-									width: '80%',
+									width: '80%'
 								}}
 							>
 								<ColorPicker
@@ -345,7 +344,7 @@ export function HomeSetting({
 								secondButtonText={'확인'}
 								onPressWithParam={() => setMode('initial')}
 								pressParam="initial"
-								secondOnPressFunction={onChangeColor}
+								secondOnPressFunction={onChangeInThemColor}
 							/>
 						</>
 					)}
@@ -361,7 +360,7 @@ export function HomeSetting({
 							<View
 								style={{
 									height: 300,
-									width: '80%',
+									width: '80%'
 								}}
 							>
 								<ColorPicker
@@ -502,7 +501,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginTop: -20,
+		marginTop: -20
 	},
 	rowView: {
 		flexDirection: 'row',
@@ -510,19 +509,19 @@ const styles = StyleSheet.create({
 		justifyContent: 'flex-start',
 		width: screen.width * 0.65,
 		height: screen.height * 0.05,
-		borderRadius: 13,
+		borderRadius: 13
 	},
 	columnView: {
 		flexDirection: 'column',
-		alignContent: 'center',
+		alignContent: 'center'
 	},
 	backgroundView: {
 		borderRadius: 13,
-		backgroundColor: Colors.grey100,
+		backgroundColor: Colors.grey100
 	},
 	iconView: {
 		alignItems: 'flex-end',
-		flex: 1,
+		flex: 1
 	},
 	modalView: {
 		marginBottom: 60,
@@ -534,11 +533,11 @@ const styles = StyleSheet.create({
 		elevation: 10,
 		shadowOffset: {
 			width: 1,
-			height: 1,
+			height: 1
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
-		width: screen.width * 0.9,
+		width: screen.width * 0.9
 	},
 	touchText: {
 		fontSize: 14,
@@ -548,34 +547,34 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		left: '16%',
 		justifyContent: 'center',
-		textAlignVertical: 'center',
+		textAlignVertical: 'center'
 	},
 	titleText: {
 		fontSize: 20,
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
-		marginLeft: '10%',
+		marginLeft: '10%'
 		// marginTop: 15,
 	},
 	blankView: {
-		height: 15,
+		height: 15
 	},
 	textView: {
-		width: '100%',
+		width: '100%'
 	},
 	touchButtonStyle: {
 		padding: 5,
 		borderRadius: 13,
 		justifyContent: 'center',
 		paddingLeft: 5,
-		paddingRight: 5,
+		paddingRight: 5
 	},
 	buttonOverLine: {
 		borderTopWidth: 0.4,
 		width: screen.width * 0.9,
 		marginTop: 20,
-		borderColor: Colors.black,
+		borderColor: Colors.black
 	},
 	textInputView: {
 		paddingBottom: 2,
@@ -583,28 +582,28 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 0.3,
 		width: '70%',
 		marginLeft: '10%',
-		padding: 10,
+		padding: 10
 	},
 	textInput: {
 		fontSize: 18,
-		fontFamily: 'NanumSquareR',
+		fontFamily: 'NanumSquareR'
 	},
 	iconStyle: {
-		marginLeft: 10,
+		marginLeft: 10
 	},
 	rightIconStyle: {
-		marginRight: 10,
+		marginRight: 10
 	},
 	errorView: {
 		flexDirection: 'row',
 		marginTop: 15,
 		justifyContent: 'center',
-		alignContent: 'center',
+		alignContent: 'center'
 	},
 	errorText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		fontSize: 15,
-		alignSelf: 'center',
-	},
+		alignSelf: 'center'
+	}
 });

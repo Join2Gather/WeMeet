@@ -20,19 +20,16 @@ import React, { useState, useEffect } from 'react';
 import { Alert, StyleSheet } from 'react-native';
 import {
 	appleAuth,
-	AppleButton,
+	AppleButton
 } from '@invertase/react-native-apple-authentication';
 import { useDispatch, useSelector } from 'react-redux';
 import * as AppleAuthentication from 'expo-apple-authentication';
 
-import { appleLogin, setAppleToken, setAppleUser } from '../store/login';
+import { appleLogin } from '../store/login';
 
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
-import {
-	AppleAuthenticationCredentialState,
-	AppleAuthenticationRefreshOptions,
-} from 'expo-apple-authentication';
+import { AppleAuthenticationCredentialState } from 'expo-apple-authentication';
 import jwt_decode from 'jwt-decode';
 /**
  * Starts the Sign In flow.
@@ -68,7 +65,7 @@ async function fetchState({ setState, user }: functionParam) {
 
 export function AppleLogin() {
 	const { appleUser } = useSelector(({ login }: RootState) => ({
-		appleUser: login.appleUser,
+		appleUser: login.appleUser
 	}));
 
 	const [userToken, setToken] = useState('');
@@ -86,8 +83,8 @@ export function AppleLogin() {
 			appleAuthRequestResponse = await AppleAuthentication.signInAsync({
 				requestedScopes: [
 					AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-					AppleAuthentication.AppleAuthenticationScope.EMAIL,
-				],
+					AppleAuthentication.AppleAuthenticationScope.EMAIL
+				]
 			});
 
 			const { authorizationCode, email, user, identityToken } =
@@ -95,7 +92,7 @@ export function AppleLogin() {
 			if (identityToken && authorizationCode) {
 				const decoded: decode = jwt_decode(identityToken);
 				const { email } = decoded;
-				dispatch(setAppleUser(user));
+
 				dispatch(appleLogin({ code: authorizationCode, email: email }));
 			}
 			if (authorizationCode && email && user) {
@@ -104,7 +101,6 @@ export function AppleLogin() {
 				await fetchState({ setState, user });
 
 				if (authorizationCode && email && user) {
-					dispatch(setAppleUser(user));
 					dispatch(appleLogin({ code: authorizationCode, email: email }));
 				}
 				// }
@@ -140,30 +136,30 @@ const styles = StyleSheet.create({
 		shadowColor: 'black',
 		shadowOffset: {
 			width: 1,
-			height: 1,
+			height: 1
 		},
 		shadowOpacity: 0.21,
-		shadowRadius: 1.0,
+		shadowRadius: 1.0
 	},
 	header: {
 		margin: 10,
 		marginTop: 30,
 		fontSize: 18,
-		fontWeight: '600',
+		fontWeight: '600'
 	},
 	container: {
 		flex: 1,
 		justifyContent: 'center',
-		backgroundColor: 'pink',
+		backgroundColor: 'pink'
 	},
 	horizontal: {
 		flexDirection: 'column',
 		justifyContent: 'center',
 		alignItems: 'center',
-		padding: 10,
+		padding: 10
 	},
 	textColor: {
 		color: Colors.black,
-		fontSize: 30,
-	},
+		fontSize: 30
+	}
 });

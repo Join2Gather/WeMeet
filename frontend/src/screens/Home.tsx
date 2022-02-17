@@ -6,7 +6,7 @@ import {
 	Platform,
 	Image,
 	ScrollView,
-	Animated,
+	Animated
 } from 'react-native';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 import Constants from 'expo-constants';
@@ -21,7 +21,7 @@ import {
 	DayOfWeek,
 	ModalHomeTimePicker,
 	ModalInfo,
-	ModalHomeInfo,
+	ModalHomeInfo
 } from '../components';
 import { Timetable } from '../components/Timetable';
 import type { LeftRightNavigationMethods } from '../components';
@@ -32,7 +32,7 @@ import { RootState } from '../store';
 import {
 	cloneINDates,
 	cloneIndividualDates,
-	postImage,
+	postImage
 } from '../store/individual';
 import * as FileSystem from 'expo-file-system';
 import { useAnimatedValue, useMakeTimetable } from '../hooks';
@@ -82,7 +82,7 @@ async function registerForPushNotificationsAsync() {
 			name: 'default',
 			importance: Notifications.AndroidImportance.MAX,
 			vibrationPattern: [0, 250, 250, 250],
-			lightColor: '#FF231F7C',
+			lightColor: '#FF231F7C'
 		});
 	}
 
@@ -99,14 +99,14 @@ export default function Home() {
 		confirmClubs,
 		confirmDatesTimetable,
 		individualTimesText,
-		individualColor,
+		inThemeColor,
 		userMeError,
 		individualCount,
 		groupCount,
 		endHour,
 		appLoading,
 		seeTips,
-		isViewError,
+		isViewError
 	} = useSelector(({ login, individual, loading }: RootState) => ({
 		token: login.token,
 		id: login.id,
@@ -117,14 +117,14 @@ export default function Home() {
 		confirmClubs: login.confirmClubs,
 		confirmDatesTimetable: login.confirmDatesTimetable,
 		individualTimesText: individual.individualTimesText,
-		individualColor: login.individualColor,
+		inThemeColor: login.inThemeColor,
 		userMeError: individual.error,
 		individualCount: individual.individualCount,
 		groupCount: individual.groupCount,
 		endHour: login.homeTime.end,
 		appLoading: login.loading,
 		seeTips: login.seeTips,
-		isViewError: login.viewError,
+		isViewError: login.viewError
 	}));
 
 	// useEffect(() => {
@@ -190,7 +190,7 @@ export default function Home() {
 		Animated.timing(animValue, {
 			toValue: headerShown ? 0 : -115,
 			duration: 250,
-			useNativeDriver: true,
+			useNativeDriver: true
 		}).start();
 	}, [headerShown]);
 
@@ -209,14 +209,14 @@ export default function Home() {
 		setHomeVisible(true);
 	}, []);
 	return (
-		<SafeAreaView style={{ backgroundColor: individualColor }}>
+		<SafeAreaView style={{ backgroundColor: inThemeColor }}>
 			<View style={[styles.view]}>
 				<StatusBar style="light" />
 				<NavigationHeader
 					title="내 일정 등록하기"
-					headerColor={individualColor}
+					headerColor={inThemeColor}
 					Left={() => (
-						<TouchHeaderIconView underlayColor={individualColor} onPress={open}>
+						<TouchHeaderIconView underlayColor={inThemeColor} onPress={open}>
 							<Ionic
 								name="menu"
 								size={iconSize + 11}
@@ -227,7 +227,7 @@ export default function Home() {
 					)}
 					Right={() => (
 						<TouchHeaderIconView
-							underlayColor={individualColor}
+							underlayColor={inThemeColor}
 							onPress={onPressPlus}
 						>
 							<FontAwesome5Icon
@@ -240,7 +240,7 @@ export default function Home() {
 					)}
 					secondRight={() => (
 						<TouchHeaderIconView
-							underlayColor={individualColor}
+							underlayColor={inThemeColor}
 							onPress={() => setSettingModalVisible(true)}
 						>
 							<MaterialIcon
@@ -252,7 +252,7 @@ export default function Home() {
 					)}
 					thirdRight={() => (
 						<TouchHeaderIconView
-							underlayColor={individualColor}
+							underlayColor={inThemeColor}
 							onPress={() => setInfoVisible(true)}
 						>
 							<FontAwesome5Icon
@@ -327,7 +327,7 @@ export default function Home() {
 						<View style={{ flexDirection: 'column' }}>
 							<View style={{ height: 30 }} />
 							<Sequence
-								color={individualColor}
+								color={inThemeColor}
 								currentNumber={currentNumber}
 								mode={sequence}
 							/>
@@ -364,7 +364,7 @@ export default function Home() {
 						isGroup={false}
 						individualTimesText={individualTimesText}
 						endIdx={endHour}
-						color={individualColor}
+						color={inThemeColor}
 						isHomeTime={true}
 						setCurrent={setCurrent}
 					/>
@@ -380,7 +380,7 @@ export default function Home() {
 						user={user}
 						id={id}
 						token={token}
-						color={individualColor}
+						color={inThemeColor}
 						inTimeColor={inTimeColor}
 						onPressChangeTime={onPressChangeTime}
 						isViewError={isViewError}
@@ -402,15 +402,15 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignContent: 'center',
 		justifyContent: 'center',
-		marginTop: 25,
+		marginTop: 25
 	},
 	viewHeight: {
-		height: 115,
+		height: 115
 	},
 	infoText: {
 		fontFamily: 'NanumSquareR',
 		fontSize: 13,
-		letterSpacing: -1,
+		letterSpacing: -1
 	},
 	stepText: {
 		fontFamily: 'NanumSquareBold',
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
 		letterSpacing: -1,
 		height: 40,
 		marginTop: 20,
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	boxView: {
 		width: 20,
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
 		marginLeft: 15,
 		borderWidth: 0.5,
 		// marginTop: 1,
-		flexDirection: 'column',
+		flexDirection: 'column'
 	},
 	titleText: {
 		fontSize: 15,
@@ -435,6 +435,6 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareBold',
 		marginTop: 25,
 		letterSpacing: -1,
-		height: 25,
-	},
+		height: 25
+	}
 });
