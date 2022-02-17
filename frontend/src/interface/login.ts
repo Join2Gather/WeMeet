@@ -10,7 +10,7 @@ export interface Login {
 	kakaoDates: Array<any>;
 	uri: string;
 	error: string;
-	color: string;
+
 	peopleCount: number;
 	response: '';
 	confirmDatesTimetable: Array<responseEveryTime>;
@@ -19,7 +19,6 @@ export interface Login {
 	startHour: number;
 	endHour: number;
 	dates: any;
-	individualColor: string;
 	nickname: string;
 	findIndividual: findTime[];
 	inDates: inDates;
@@ -37,6 +36,8 @@ export interface Login {
 	email: string;
 	viewError: boolean;
 	timeTipVisible: boolean;
+	color: string;
+	inThemeColor: string;
 	inTimeColor: string;
 }
 
@@ -85,9 +86,9 @@ export interface inDates {
 export interface date {
 	start: timeType;
 	end: timeType;
-	color: string;
+	color?: string;
 	name: string;
-	id: number;
+	id?: number;
 }
 
 export interface userMeAPI {
@@ -106,4 +107,9 @@ export interface findHome {
 	endTime: timeType;
 	color: string;
 	name: string;
+}
+
+export interface changeColor {
+	color: string;
+	use: string;
 }
