@@ -7,7 +7,7 @@ import {
 	TouchableHighlight,
 	View,
 	ActivityIndicator,
-	Dimensions,
+	Dimensions
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,7 +15,7 @@ import Material from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontIcon from 'react-native-vector-icons/FontAwesome';
 import { Button } from '../theme/Button';
-import { setTimeTipMode, setTimeTipVisible, setTipMode } from '../store/login';
+import { setTimeTipVisible, setTipMode } from '../store/login';
 import { RootState } from '../store';
 import Ionic from 'react-native-vector-icons/Ionicons';
 import { CloseButton } from '../theme';
@@ -33,13 +33,13 @@ export function ModalInfo({
 	infoVisible,
 	setInfoVisible,
 	seeTips,
-	color,
+	color
 }: props) {
 	const { seeTimeTips, uri, timeTipVisible } = useSelector(
 		({ timetable, login }: RootState) => ({
 			seeTimeTips: login.seeTimeTips,
 			uri: timetable.teamURI,
-			timeTipVisible: login.timeTipVisible,
+			timeTipVisible: login.timeTipVisible
 		})
 	);
 	const dispatch = useDispatch();
@@ -69,7 +69,7 @@ export function ModalInfo({
 									height: 15,
 									width: 30,
 									backgroundColor: Colors.white,
-									borderWidth: 0.5,
+									borderWidth: 0.5
 								}}
 							/>
 							<Text style={[styles.touchText, { marginLeft: 2 }]}>
@@ -82,14 +82,14 @@ export function ModalInfo({
 								style={{
 									height: 15,
 									width: 15,
-									backgroundColor: color,
+									backgroundColor: color
 								}}
 							/>
 							<View
 								style={{
 									height: 15,
 									width: 15,
-									backgroundColor: Colors.grey400,
+									backgroundColor: Colors.grey400
 								}}
 							/>
 							<Text style={[styles.touchText, { marginLeft: 2 }]}>
@@ -139,7 +139,7 @@ export function ModalInfo({
 							<Text
 								style={[
 									styles.touchText,
-									{ color: Colors.grey700, marginLeft: 1, marginRight: 3 },
+									{ color: Colors.grey700, marginLeft: 1, marginRight: 3 }
 								]}
 							>
 								{' '}
@@ -193,13 +193,13 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginTop: -20,
+		marginTop: -20
 	},
 	rowView: {
 		flexDirection: 'row',
 		alignItems: 'center',
 
-		justifyContent: 'center',
+		justifyContent: 'center'
 		// width: screen.width * 0.53,
 	},
 	columnView: {
@@ -209,15 +209,15 @@ const styles = StyleSheet.create({
 		alignContent: 'center',
 		margin: 30,
 		marginBottom: 20,
-		marginTop: 20,
+		marginTop: 20
 	},
 	backgroundView: {
 		borderRadius: 13,
-		backgroundColor: Colors.grey100,
+		backgroundColor: Colors.grey100
 	},
 	iconView: {
 		alignItems: 'flex-end',
-		flex: 1,
+		flex: 1
 	},
 	modalView: {
 		// margin: 10,
@@ -231,11 +231,11 @@ const styles = StyleSheet.create({
 		elevation: 10,
 		shadowOffset: {
 			width: 1,
-			height: 1,
+			height: 1
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
-		width: screen.width * 0.9,
+		width: screen.width * 0.9
 	},
 	touchText: {
 		fontSize: 14,
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
 		marginLeft: screen.width * 0.15,
 		justifyContent: 'center',
 		alignContent: 'center',
-		alignItems: 'center',
+		alignItems: 'center'
 		// justifyContent: 'flex-start',
 		// textAlignVertical: 'center',
 		// alignSelf: 'center',
@@ -258,13 +258,13 @@ const styles = StyleSheet.create({
 		justifyContent: 'flex-start',
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
-		letterSpacing: -1,
+		letterSpacing: -1
 	},
 	blankView: {
-		height: 10,
+		height: 10
 	},
 	textView: {
-		width: '100%',
+		width: '100%'
 	},
 	touchButtonStyle: {
 		padding: 5,
@@ -272,12 +272,12 @@ const styles = StyleSheet.create({
 		// alignItems: 'center',
 		// alignContent: 'center',
 		// alignSelf: 'center',
-		justifyContent: 'center',
+		justifyContent: 'center'
 	},
 	buttonOverLine: {
 		borderTopWidth: 0.4,
 		width: screen.width * 0.9,
 		marginTop: 20,
-		borderColor: Colors.black,
-	},
+		borderColor: Colors.black
+	}
 });

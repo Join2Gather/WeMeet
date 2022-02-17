@@ -16,8 +16,8 @@ export function DayOfWeek({ isTeam }: props) {
 	const { todayDate, inColor, teamColor } = useSelector(
 		({ individual, login, timetable }: RootState) => ({
 			todayDate: individual.todayDate,
-			inColor: login.individualColor,
-			teamColor: timetable.color,
+			inColor: login.inThemeColor,
+			teamColor: timetable.color
 		})
 	);
 	return (
@@ -36,8 +36,8 @@ export function DayOfWeek({ isTeam }: props) {
 										? isTeam
 											? teamColor
 											: inColor
-										: Colors.white,
-							},
+										: Colors.white
+							}
 						]}
 						key={idx}
 					>
@@ -52,8 +52,8 @@ export function DayOfWeek({ isTeam }: props) {
 											? Colors.red500
 											: idx === 6
 											? Colors.blue700
-											: Colors.black,
-								},
+											: Colors.black
+								}
 							]}
 						>
 							{dayText}
@@ -68,10 +68,10 @@ export function DayOfWeek({ isTeam }: props) {
 const styles = StyleSheet.create({
 	rowDayOfWeekView: {
 		flexDirection: 'row',
-		paddingBottom: 10,
+		paddingBottom: 10
 	},
 	timeView: {
-		width: screen.width / 13,
+		width: screen.width / 13
 	},
 	dayOfWeekView: {
 		width: screen.width / 9,
@@ -79,16 +79,16 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		alignContent: 'center',
 		alignItems: 'center',
-		justifyContent: 'center',
+		justifyContent: 'center'
 	},
 	contentView: {
 		flexDirection: 'row',
 		width: '90%',
-		justifyContent: 'space-evenly',
+		justifyContent: 'space-evenly'
 	},
 	dayOfText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
-		textAlignVertical: 'center',
-	},
+		textAlignVertical: 'center'
+	}
 });

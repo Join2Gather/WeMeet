@@ -29,12 +29,12 @@ export function ModalDatePicker({
 	alarmTime,
 	setSetting,
 	setSubMode,
-	setSettingModalVisible,
+	setSettingModalVisible
 }: props) {
 	const { alarmArray, color } = useSelector(
 		({ timetable, login }: RootState) => ({
 			alarmArray: timetable.alarmArray,
-			color: login.individualColor,
+			color: login.inThemeColor
 		})
 	);
 	const [date, setDate] = useState(dayjs().toDate());
@@ -80,7 +80,7 @@ export function ModalDatePicker({
 					calStartTime,
 					endDate: date,
 					alarmTime,
-					color,
+					color
 				});
 			});
 			setSettingModalVisible(true);

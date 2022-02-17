@@ -8,7 +8,7 @@ import {
 	View,
 	TextInput,
 	Dimensions,
-	ActivityIndicator,
+	ActivityIndicator
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,7 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
 	initialIndividualError,
 	loginEveryTime,
-	postEveryTime,
+	postEveryTime
 } from '../store/individual';
 import type { RootState } from '../store';
 import { setModalMode } from '../store/team';
@@ -40,7 +40,7 @@ export function ModalSelect({
 	setSelectModalVisible,
 	mode,
 	setMode,
-	color,
+	color
 }: props) {
 	const {
 		everyTime,
@@ -49,8 +49,8 @@ export function ModalSelect({
 		loadingLogin,
 		loginSuccess,
 		token,
-		individualColor,
-		loginError,
+		inThemeColor,
+		loginError
 	} = useSelector(({ individual, login, loading }: RootState) => ({
 		// dates: timetable.dates,
 		everyTime: individual.everyTime,
@@ -59,8 +59,8 @@ export function ModalSelect({
 		loadingLogin: loading['individual/POST_EVERYTIME'],
 		loginSuccess: individual.loginSuccess,
 		token: login.token,
-		individualColor: login.individualColor,
-		loginError: individual.error,
+		inThemeColor: login.inThemeColor,
+		loginError: individual.error
 	}));
 	const dispatch = useDispatch();
 
@@ -110,24 +110,24 @@ export function ModalSelect({
 								style={[
 									styles.textView,
 									{
-										marginBottom: 10,
-									},
+										marginBottom: 10
+									}
 								]}
 							>
 								<View
 									style={[
 										styles.textInputView,
 										,
-										{ borderColor: individualColor },
+										{ borderColor: inThemeColor }
 									]}
 								>
 									<Icon
 										name="account"
 										size={25}
-										color={individualColor}
+										color={inThemeColor}
 										style={{
 											// marginTop: 5,
-											paddingRight: 10,
+											paddingRight: 10
 										}}
 									/>
 									<TextInput
@@ -146,16 +146,16 @@ export function ModalSelect({
 									style={[
 										styles.textInputView,
 										,
-										{ borderColor: individualColor },
+										{ borderColor: inThemeColor }
 									]}
 								>
 									<Icon
 										name="lock"
 										size={25}
-										color={individualColor}
+										color={inThemeColor}
 										style={{
 											// marginTop: 5,
-											paddingRight: 10,
+											paddingRight: 10
 										}}
 									/>
 									<TextInput
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginTop: -20,
+		marginTop: -20
 	},
 	modalView: {
 		// margin: 10,
@@ -280,20 +280,20 @@ const styles = StyleSheet.create({
 		elevation: 10,
 		shadowOffset: {
 			width: 1,
-			height: 1,
+			height: 1
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
-		width: screen.width * 0.9,
+		width: screen.width * 0.9
 	},
 	titleText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareBold',
 		fontSize: 21,
-		marginBottom: 15,
+		marginBottom: 15
 	},
 	textView: {
-		width: '100%',
+		width: '100%'
 		// marginLeft: '5%',
 		//
 	},
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		fontFamily: 'NanumSquareR',
 		marginLeft: '0%',
-		color: Colors.black,
+		color: Colors.black
 	},
 	textInputView: {
 		flexDirection: 'row',
@@ -310,11 +310,11 @@ const styles = StyleSheet.create({
 		padding: 3,
 
 		width: '70%',
-		marginLeft: '20%',
+		marginLeft: '20%'
 	},
 	buttonText: {
 		textAlign: 'center',
-		fontFamily: 'NanumSquareR',
+		fontFamily: 'NanumSquareR'
 	},
 	buttonRowView: {
 		flexDirection: 'row',
@@ -322,58 +322,58 @@ const styles = StyleSheet.create({
 		alignContent: 'center',
 		alignSelf: 'center',
 		marginTop: 10,
-		marginBottom: -13,
+		marginBottom: -13
 	},
 	textStyle: {
 		color: 'white',
 		fontWeight: 'bold',
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	closeButtonStyle: {
 		padding: 0,
 		width: '100%',
 		height: '100%',
-		borderRadius: 13,
+		borderRadius: 13
 	},
 	acceptButtonStyle: {
 		padding: 15,
 		width: '50%',
 		height: '100%',
-		borderRadius: 10,
+		borderRadius: 10
 	},
 	modalText: {
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	verticalLine: {
 		height: '50%',
 		borderLeftWidth: 0.16,
-		width: 1,
+		width: 1
 	},
 	iconTouchableView: {
 		flex: 1,
 		height: 80,
 		borderWidth: 3,
 		justifyContent: 'center',
-		borderRadius: 15,
+		borderRadius: 15
 	},
 	iconUnderText: {
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
-		marginTop: 5,
+		marginTop: 5
 	},
 	touchButtonStyle: {
 		padding: 5,
 		borderRadius: 13,
 		justifyContent: 'center',
 		paddingLeft: 5,
-		paddingRight: 5,
+		paddingRight: 5
 	},
 	iconView: {
 		alignItems: 'flex-end',
-		flex: 1,
+		flex: 1
 	},
 	rightIconStyle: {
-		marginRight: 10,
+		marginRight: 10
 	},
 	rowView: {
 		flexDirection: 'row',
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'flex-start',
 		width: screen.width * 0.65,
 		height: screen.height * 0.05,
-		borderRadius: 13,
+		borderRadius: 13
 	},
 	touchText: {
 		fontSize: 14,
@@ -390,23 +390,23 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
 		marginLeft: 10,
-		top: 1,
+		top: 1
 	},
 	backgroundView: {
 		borderRadius: 13,
-		backgroundColor: Colors.grey100,
+		backgroundColor: Colors.grey100
 	},
 	columnView: {
 		flexDirection: 'column',
-		alignContent: 'center',
+		alignContent: 'center'
 	},
 	blankView: {
-		height: 15,
+		height: 15
 	},
 	buttonOverLine: {
 		borderTopWidth: 0.4,
 		width: '112%',
 		marginTop: 20,
-		borderColor: Colors.black,
-	},
+		borderColor: Colors.black
+	}
 });
