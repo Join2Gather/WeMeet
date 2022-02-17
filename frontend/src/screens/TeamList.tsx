@@ -10,7 +10,7 @@ import {
 	Platform,
 	GestureResponderEvent,
 	PanResponderGestureState,
-	Easing,
+	Easing
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -18,7 +18,7 @@ import {
 	SafeAreaView,
 	TouchableView,
 	TopBar,
-	MaterialCommunityIcon as Icon,
+	MaterialCommunityIcon as Icon
 } from '../theme/navigation';
 import Icons from 'react-native-vector-icons/AntDesign';
 import { useDispatch, useSelector } from 'react-redux';
@@ -33,7 +33,7 @@ import {
 	makeTeamTime,
 	setIsInTeamTime,
 	setTeamName,
-	toggleIsInitial,
+	toggleIsInitial
 } from '../store/timetable';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import { hexToRGB } from '../lib/util/hexToRGB';
@@ -43,7 +43,7 @@ import {
 	useAnimatedValue,
 	useAnimatedValueXY,
 	useNavigationHorizontalInterpolator,
-	usePanResponder,
+	usePanResponder
 } from '../hooks';
 import { transform } from 'lodash';
 import { initialTimeMode } from '../store/individual';
@@ -93,7 +93,7 @@ export default function TeamList() {
 		endHour,
 		makeStartHour,
 		makeEndHour,
-		individualColor,
+		inThemeColor
 	} = useSelector(({ login, team, loading, timetable }: RootState) => ({
 		user: login.user,
 		id: login.id,
@@ -121,7 +121,7 @@ export default function TeamList() {
 		endHour: login.endHour,
 		makeStartHour: team.startHour,
 		makeEndHour: team.endHour,
-		individualColor: login.individualColor,
+		inThemeColor: login.inThemeColor
 	}));
 
 	const [sequence, setSequence] = useState([0, 1, 2, 3]);
@@ -135,7 +135,7 @@ export default function TeamList() {
 	const [RGBColor, setRGBColor] = useState({
 		r: 0,
 		g: 0,
-		b: 0,
+		b: 0
 	});
 
 	// const ios = Platform.OS === 'ios';
@@ -186,9 +186,9 @@ export default function TeamList() {
 		dispatch(getUserMe({ token }));
 	}, [joinTeam]);
 	useEffect(() => {
-		const result = hexToRGB(individualColor);
+		const result = hexToRGB(inThemeColor);
 		result && setRGBColor(result);
-	}, [individualColor]);
+	}, [inThemeColor]);
 	useEffect(() => {
 		if (mode === 'next') {
 			if (modalMode === 'make') {
@@ -197,7 +197,7 @@ export default function TeamList() {
 						color: teamMakeColor,
 						peopleCount: 1,
 						startHour: makeStartHour,
-						endHour: makeEndHour,
+						endHour: makeEndHour
 					})
 				);
 				dispatch(setTeamName({ name: makeName, uri: teamUri }));
@@ -207,7 +207,7 @@ export default function TeamList() {
 						user,
 						id,
 						token,
-						modalMode,
+						modalMode
 					});
 				}, 50);
 				setMode('normal');
@@ -217,7 +217,7 @@ export default function TeamList() {
 						color: teamMakeColor,
 						peopleCount,
 						startHour,
-						endHour,
+						endHour
 					})
 				);
 				dispatch(setTeamName({ name: loginName, uri: loginURI }));
@@ -227,7 +227,7 @@ export default function TeamList() {
 						color,
 						peopleCount,
 						startHour,
-						endHour,
+						endHour
 					})
 				);
 				dispatch(setTeamName({ name: loginName, uri: loginURI }));
@@ -238,7 +238,7 @@ export default function TeamList() {
 					user,
 					id,
 					token,
-					modalMode,
+					modalMode
 				});
 			}, 50);
 			setMode('normal');
@@ -253,22 +253,16 @@ export default function TeamList() {
 		makeEndHour,
 		makeName,
 		loginURI,
-		loginName,
+		loginName
 	]);
 	const goTeamTime = useCallback(
 		({ id, name, uri }: goTeam) => {
-			if (modalMode === 'join') {
-				dispatch(findTeam({ uri }));
-				setMode('next');
-			} else if (modalMode === 'normal') {
-				dispatch(findTeam({ id }));
-				setMode('next');
-			} else if (modalMode === 'make') {
-				name && setMake(name);
-				// dispatch(findTeam({ name }));
-				setMode('next');
-			}
-
+			if (modalMode === 'join')
+				uri && dispatch(findTeam({ data: uri, use: 'uri' }));
+			else if (modalMode === 'normal')
+				id && dispatch(findTeam({ data: id, use: 'id' }));
+			else if (modalMode === 'make') name && setMake(name);
+			setMode('next');
 			dispatch(initialError());
 		},
 		[modalMode]
@@ -300,21 +294,21 @@ export default function TeamList() {
 	}, []);
 	return (
 		<SafeAreaView
-			style={{ backgroundColor: modalVisible ? Colors.white : individualColor }}
+			style={{ backgroundColor: modalVisible ? Colors.white : inThemeColor }}
 		>
 			<ScrollEnabledProvider>
 				<View
 					style={[
 						styles.view,
-						{ opacity: modalVisible ? 0.2 : 1, backgroundColor: Colors.white },
+						{ opacity: modalVisible ? 0.2 : 1, backgroundColor: Colors.white }
 					]}
 				>
 					<NavigationHeader
 						title="모임 목록"
-						headerColor={individualColor}
+						headerColor={inThemeColor}
 						Left={() => (
 							<TouchHeaderIconView
-								underlayColor={individualColor}
+								underlayColor={inThemeColor}
 								onPress={onReload}
 							>
 								<FontAwesome5Icon
@@ -327,7 +321,7 @@ export default function TeamList() {
 						)}
 						Right={() => (
 							<TouchHeaderIconView
-								underlayColor={individualColor}
+								underlayColor={inThemeColor}
 								onPress={onMakeTeamTime}
 							>
 								<FontAwesome5Icon
@@ -350,7 +344,7 @@ export default function TeamList() {
 								flexDirection: 'column',
 								marginLeft: '16%',
 								marginTop: 20,
-								flex: 0.3,
+								flex: 0.3
 							}}
 						>
 							<Text style={styles.noListText}>
@@ -372,7 +366,7 @@ export default function TeamList() {
 							renderItem={({ item }) => (
 								<View
 									style={{
-										backgroundColor: Colors.black,
+										backgroundColor: Colors.black
 									}}
 								>
 									<TouchableHighlight
@@ -385,7 +379,7 @@ export default function TeamList() {
 											<View
 												style={[
 													styles.rowCircle,
-													{ backgroundColor: item.color },
+													{ backgroundColor: item.color }
 												]}
 											/>
 											<Text
@@ -419,7 +413,7 @@ export default function TeamList() {
 						loadingChangeColor={loadingChangeColor}
 						joinName={joinName}
 						makeReady={makeReady}
-						individualColor={individualColor}
+						inThemeColor={inThemeColor}
 						sequence={sequence}
 					/>
 
@@ -434,7 +428,7 @@ export default function TeamList() {
 							style={[
 								styles.touchableView,
 								{
-									backgroundColor: individualColor,
+									backgroundColor: inThemeColor,
 								},
 							]}
 							onPress={onJoinTeamTime}
@@ -457,7 +451,7 @@ const styles = StyleSheet.create({
 		marginBottom: 20,
 		letterSpacing: -0.3,
 		flex: 0.08,
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 
 	text: {
@@ -466,32 +460,32 @@ const styles = StyleSheet.create({
 		marginBottom: 120,
 		letterSpacing: -3,
 		color: '#FFF',
-		fontFamily: 'SCDream3',
+		fontFamily: 'SCDream3'
 	},
 	buttonUnderText: {
 		marginTop: 12,
 		fontSize: 12,
 		color: '#FFF',
-		fontFamily: 'SCDream3',
+		fontFamily: 'SCDream3'
 	},
 	loginText: {
 		fontFamily: 'NanumSquareBold',
 		fontSize: 20,
 		marginLeft: 10,
-		color: Colors.white,
+		color: Colors.white
 	},
 	keyboardAwareFocus: {
 		flex: 1,
 		padding: 5,
 		alignItems: 'center',
-		justifyContent: 'center',
+		justifyContent: 'center'
 	},
 	rowCircle: {
 		width: circleWidth,
 		height: circleWidth,
 		borderRadius: circleWidth / 2,
 		// position: 'absolute',
-		marginLeft: '11%',
+		marginLeft: '11%'
 		// top: -7,
 	},
 	teamTitle: {
@@ -502,7 +496,7 @@ const styles = StyleSheet.create({
 		letterSpacing: -0.5,
 		left: '21%',
 		overflow: 'hidden',
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	noListText: {
 		fontSize: 13,
@@ -510,7 +504,7 @@ const styles = StyleSheet.create({
 		letterSpacing: -0.5,
 		overflow: 'hidden',
 		textAlign: 'left',
-		marginBottom: 30,
+		marginBottom: 30
 		// textAlign: 'center',
 	},
 	iconStyle: {
@@ -518,7 +512,7 @@ const styles = StyleSheet.create({
 		right: '11%',
 		alignItems: 'center',
 		alignContent: 'center',
-		alignSelf: 'center',
+		alignSelf: 'center'
 	},
 	textView: { width: '100%', padding: 5, marginBottom: 30 },
 	textInput: { fontSize: 24, padding: 10 },
@@ -537,11 +531,11 @@ const styles = StyleSheet.create({
 		backgroundColor: Colors.white,
 		shadowOffset: {
 			width: 1,
-			height: 1,
+			height: 1
 		},
 
 		shadowOpacity: 0.21,
-		shadowRadius: 1.0,
+		shadowRadius: 1.0
 	},
 	teamListTouchableView: {
 		flexDirection: 'row',
@@ -554,25 +548,25 @@ const styles = StyleSheet.create({
 		backgroundColor: 'white',
 		shadowOffset: {
 			width: 1,
-			height: 1,
+			height: 1
 		},
 		paddingTop: 13,
-		paddingBottom: 13,
+		paddingBottom: 13
 	},
 	blurView: {
 		paddingTop: 5,
 		paddingBottom: 10,
-		opacity: 0.5,
+		opacity: 0.5
 		// backgroundColor: Colors.grey200,
 	},
 	FlatView: {
 		height: '100%',
-		flexGrow: 0,
+		flexGrow: 0
 	},
 	teamView: {
 		justifyContent: 'flex-start',
 		flexDirection: 'row',
 		alignItems: 'center',
-		width: '100%',
-	},
+		width: '100%'
+	}
 });
