@@ -7,7 +7,7 @@ import {
 	TouchableHighlight,
 	View,
 	Dimensions,
-	ScrollView,
+	ScrollView
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,13 +17,13 @@ import {
 	makeTeamTime,
 	setTeamName,
 	setTimeModalMode,
-	toggleIsInitial,
+	toggleIsInitial
 } from '../store/timetable';
 import { Button } from '../theme/Button';
 import {
 	deleteHomeTime,
 	initialIndividualTimetable,
-	initialTimeMode,
+	initialTimeMode
 } from '../store/individual';
 import { RootState } from '../store';
 import { Spinner } from '.';
@@ -45,7 +45,7 @@ export function ModalIndividualTime({
 	setInModalVisible,
 
 	findIndividual,
-	inTimeMode,
+	inTimeMode
 }: props) {
 	const {
 		user,
@@ -57,7 +57,7 @@ export function ModalIndividualTime({
 		peopleCount,
 		startHour,
 		endHour,
-		inTimeColor,
+		inTimeColor
 	} = useSelector(({ login }: RootState) => ({
 		user: login.user,
 		id: login.id,
@@ -68,7 +68,7 @@ export function ModalIndividualTime({
 		peopleCount: login.peopleCount,
 		startHour: login.startHour,
 		endHour: login.endHour,
-		inTimeColor: login.inTimeColor,
+		inTimeColor: login.inTimeColor
 	}));
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
@@ -78,7 +78,7 @@ export function ModalIndividualTime({
 	useEffect(() => {
 		if (findIndividual && findIndividual[0]?.id && inModalVisible) {
 			const id = String(findIndividual[0].id);
-			dispatch(findTeam({ id: id }));
+			dispatch(findTeam({ data: id, use: 'id' }));
 		}
 	}, [findIndividual, teamId, inModalVisible]);
 
@@ -106,7 +106,7 @@ export function ModalIndividualTime({
 					color,
 					peopleCount,
 					startHour,
-					endHour,
+					endHour
 				})
 			);
 			dispatch(setTeamName({ name: loginName, uri: loginURI }));
@@ -119,7 +119,7 @@ export function ModalIndividualTime({
 				user,
 				id,
 				token,
-				modalMode: 'normal',
+				modalMode: 'normal'
 			});
 		}, 300);
 		setInModalVisible && setInModalVisible(false);
@@ -152,8 +152,8 @@ export function ModalIndividualTime({
 										{
 											backgroundColor: findIndividual[0].color
 												? findIndividual[0].color
-												: inTimeColor,
-										},
+												: inTimeColor
+										}
 									]}
 								>
 									<View style={styles.columnView}>
@@ -269,29 +269,29 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginTop: -20,
+		marginTop: -20
 	},
 	rowView: {
 		flexDirection: 'row',
 		width: screen.width * 0.53,
 		alignItems: 'center',
 		alignSelf: 'center',
-		justifyContent: 'flex-start',
+		justifyContent: 'flex-start'
 	},
 	columnView: {
 		flexDirection: 'column',
 
 		borderRadius: 13,
 
-		margin: 20,
+		margin: 20
 	},
 	backgroundView: {
 		borderRadius: 13,
-		backgroundColor: Colors.grey100,
+		backgroundColor: Colors.grey100
 	},
 	iconView: {
 		alignItems: 'flex-end',
-		flex: 1,
+		flex: 1
 	},
 	modalView: {
 		// margin: 10,
@@ -304,19 +304,19 @@ const styles = StyleSheet.create({
 		elevation: 10,
 		shadowOffset: {
 			width: 1,
-			height: 1,
+			height: 1
 		},
 		shadowOpacity: 0.21,
 		shadowRadius: 1.0,
 		width: screen.width * 0.9,
-		maxHeight: screen.height * 0.7,
+		maxHeight: screen.height * 0.7
 	},
 	touchText: {
 		fontSize: 14,
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
-		justifyContent: 'center',
+		justifyContent: 'center'
 	},
 	titleText: {
 		fontSize: 20,
@@ -325,28 +325,28 @@ const styles = StyleSheet.create({
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
-		marginLeft: '1%',
+		marginLeft: '1%'
 	},
 	blankView: {
-		height: 10,
+		height: 10
 	},
 	textView: {
-		width: '100%',
+		width: '100%'
 	},
 	touchButtonStyle: {
 		padding: 5,
 		borderRadius: 10,
-		justifyContent: 'center',
+		justifyContent: 'center'
 	},
 	buttonOverLine: {
 		borderWidth: 0.4,
 		width: screen.width * 0.9,
 		marginTop: 20,
-		borderColor: Colors.black,
+		borderColor: Colors.black
 	},
 	rowLine: {
 		borderTopWidth: 0.4,
 		width: '113%',
-		marginTop: 15,
-	},
+		marginTop: 15
+	}
 });
