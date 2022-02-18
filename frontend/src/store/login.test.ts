@@ -3,10 +3,7 @@ import login, {
 	initialState,
 	changeInPersistColor,
 	toggleViewError,
-	getUserMe,
-	getUserMeSaga,
 	loginSaga,
-	changeNickSaga,
 	setTimeTipVisible,
 	setHomeTime,
 	findHomeTime,
@@ -17,12 +14,8 @@ import login, {
 } from './login';
 import type { Login } from '../interface/login';
 import * as api from '../lib/api/login';
-import { useDispatch } from 'react-redux';
-import { call, put, takeLatest } from 'redux-saga/effects';
-import { runSaga } from 'redux-saga';
-import { startLoading } from './loading';
+import { call } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
-import { throwError } from 'redux-saga-test-plan/providers';
 import type { nicknameAPI, appleLoginType } from '../interface/login';
 import { cloneDeep } from 'lodash';
 jest.mock('react-redux');
@@ -110,39 +103,66 @@ describe('login  reducer', () => {
 
 describe('login Saga test', () => {
 	let state: Login;
-	const token =
-		'rfa893c932dd142c28ee531bb1a92b08b.0.rvss.87TdhEUGO-cCD36l0F2cyQ';
-	beforeEach(() => {
-		state = initialState;
-	});
+	const token = 'enter your token';
+
 	it('로그인 성공', async () => {
+		const mockingResponse = {
+			id: 9,
+			clubs: [
+				{
+					id: 32,
+					people_count: 1,
+					name: 'We Meet',
+					uri: 'aa',
+					color: '#cb0d1f',
+					starting_hours: 9,
+					end_hours: 22
+				}
+			],
+			dates: [],
+			nickname: 'ss',
+			name: '장동현',
+			user: 12
+		};
 		const { storeState } = await expectSaga(loginSaga)
 			.withReducer(login)
-			.withState(state)
-			.dispatch({ type: 'LOADING/startLoading' })
-			.dispatch({
-				type: 'login/USER_ME',
-				payload: {
-					token
-				}
+			.provide([[call(api.getUserMe, { token }), { data: mockingResponse }]])
+			.put({
+				type: 'LOADING/startLoading',
+				payload: 'login/USER_ME'
 			})
-			// .provide([[call(api.getUserMe, { token }), true]])
-			.dispatch({ type: 'LOADING/endLoading', payload: 'login/USER_ME' })
+			.put({
+				type: 'login/USER_ME_SUCCESS',
+				payload: mockingResponse
+			})
+			.put({
+				type: 'LOADING/endLoading',
+				payload: 'login/USER_ME'
+			})
+			.dispatch({ type: 'login/USER_ME', payload: { token } })
 			.silentRun();
-
-		expect(storeState.name).toHaveLength;
+		console.log(storeState);
+		expect(storeState.name).toEqual('장동현');
 	});
 	it('로그인 실패', async () => {
+		const action = 'USER_ME';
 		const { storeState } = await expectSaga(loginSaga)
 			.withReducer(login)
-			.dispatch({ type: 'LOADING/startLoading' })
-			.dispatch({ type: 'login/USER_ME', payload: { token: '1111' } })
 			.provide([
 				[
 					call(api.getUserMe, { token: '1111' }),
 					new Error('Page Not Found 404')
 				]
 			])
+			.put({
+				type: 'LOADING/startLoading',
+				payload: `login/${action}`
+			})
+			.put({
+				type: 'LOADING/endLoading',
+				payload: `login/${action}`
+			})
+			.dispatch({ type: 'login/USER_ME', payload: { token: '1111' } })
 			.silentRun();
 		expect(storeState.error).toEqual('error');
 	});
@@ -151,18 +171,26 @@ describe('login Saga test', () => {
 			id: 9,
 			user: 12,
 			nickname: '장동현',
-			token
+			token: '123'
 		};
 		const { storeState } = await expectSaga(loginSaga)
 			.withReducer(login)
-			.withState(state)
-			.dispatch({ type: 'login/CHANGE_NICKNAME', payload: data })
-			// .provide([[call(api.changeNickname, data), true]])
-			.put({ type: 'LOADING/startLoading', payload: 'login/CHANGE_NICKNAME' })
+			.provide([
+				[call(api.changeNickname, data), { data: { nickname: '장동현' } }]
+			])
+			.put({
+				type: 'LOADING/startLoading',
+				payload: 'login/CHANGE_NICKNAME'
+			})
+			.put({
+				type: 'login/CHANGE_NICKNAME_SUCCESS',
+				payload: { nickname: '장동현' }
+			})
 			.put({
 				type: 'LOADING/endLoading',
 				payload: 'login/CHANGE_NICKNAME'
 			})
+			.dispatch({ type: 'login/CHANGE_NICKNAME', payload: data })
 			.silentRun();
 		expect(storeState.nickname).toEqual('장동현');
 	});
@@ -185,21 +213,27 @@ describe('login Saga test', () => {
 			code: '',
 			email: 'ww8007@hanmail.net'
 		};
+		const action = 'APPLE_LOGIN';
 		const { storeState } = await expectSaga(loginSaga)
 			.withReducer(login)
-			.withState(state)
-			.dispatch({ type: 'LOADING/startLoading' })
-			.dispatch({
-				type: 'login/APPLE_LOGIN',
-				payload: data
+			.provide([
+				[call(api.appleLogin, data), { data: { access_token: '1111' } }]
+			])
+			.put({
+				type: 'LOADING/startLoading',
+				payload: `login/${action}`
 			})
-			// .provide([[call(api.getUserMe, { token }), true]])
-			.dispatch({
+			.put({
+				type: `login/${action}_SUCCESS`,
+				payload: { access_token: '1111' }
+			})
+			.put({
 				type: 'LOADING/endLoading',
-				payload: 'login/APPLE_LOGIN'
+				payload: `login/${action}`
 			})
+			.dispatch({ type: `login/${action}`, payload: data })
 			.silentRun();
-		// expect(storeState.nickname).toEqual('장동현');
+		expect(storeState.token).toEqual('1111');
 	});
 	it('애플 로그인 실패', async () => {
 		const { storeState } = await expectSaga(loginSaga)
