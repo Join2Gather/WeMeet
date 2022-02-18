@@ -8,7 +8,7 @@ import {
 	View,
 	ActivityIndicator,
 	Dimensions,
-	ScrollView,
+	ScrollView
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,14 +22,14 @@ import {
 	makeTeamTime,
 	setSelectIdx,
 	setTimeModalMode,
-	toggleIsInitial,
+	toggleIsInitial
 } from '../store/timetable';
 import { RootState } from '../store';
-import { CloseButton } from '../theme';
+import { CloseButton, ModalView } from '../theme';
 import {
 	cloneINDates,
 	initialIndividualTimetable,
-	makeHomeTime,
+	makeHomeTime
 } from '../store/individual';
 import { getUserMe, toggleUserMeSuccess } from '../store/login';
 const screen = Dimensions.get('screen');
@@ -53,7 +53,7 @@ export function ModalTime({
 	isConfirmMode,
 	onPressNext,
 	tableMode,
-	isGroup,
+	isGroup
 }: props) {
 	const {
 		startHour,
@@ -65,7 +65,7 @@ export function ModalTime({
 		confirmClubs,
 		confirmDatesTimetable,
 		isConfirmProve,
-		inTimeColor,
+		inTimeColor
 	} = useSelector(({ login, timetable }: RootState) => ({
 		startHour: login.startHour,
 		endHour: login.endHour,
@@ -76,7 +76,7 @@ export function ModalTime({
 		confirmClubs: login.confirmClubs,
 		confirmDatesTimetable: login.confirmDatesTimetable,
 		isConfirmProve: login.isConfirmProve,
-		inTimeColor: login.inTimeColor,
+		inTimeColor: login.inTimeColor
 	}));
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('initial');
@@ -127,16 +127,10 @@ export function ModalTime({
 	}, []);
 
 	return (
-		<Modal
-			animationType="fade"
-			transparent={true}
-			visible={timeModalVisible}
-			onRequestClose={() => {
-				Alert.alert('Modal has been closed.');
-			}}
-		>
-			<View style={styles.centeredView}>
-				<View style={styles.modalView}>
+		<ModalView
+			modalVisible={timeModalVisible}
+			ModalViewRender={() => (
+				<>
 					<CloseButton closeBtn={onPressCloseBtn} />
 					<ScrollView>
 						{mode === 'initial' && (
@@ -150,7 +144,7 @@ export function ModalTime({
 										<View
 											style={[
 												styles.backgroundView,
-												{ backgroundColor: color },
+												{ backgroundColor: color }
 											]}
 										>
 											<View style={styles.columnView}>
@@ -158,7 +152,7 @@ export function ModalTime({
 													<Text
 														style={[
 															styles.touchText,
-															{ color: Colors.grey100 },
+															{ color: Colors.grey100 }
 														]}
 													>
 														{findTime[0].selectTime > 12
@@ -191,8 +185,8 @@ export function ModalTime({
 																? idx == selectIdx
 																	? Colors.grey600
 																	: Colors.grey100
-																: Colors.grey100,
-														},
+																: Colors.grey100
+														}
 													]}
 												>
 													<View style={styles.rowView}>
@@ -204,8 +198,8 @@ export function ModalTime({
 																		? idx === selectIdx
 																			? Colors.white
 																			: Colors.grey800
-																		: Colors.black,
-																},
+																		: Colors.black
+																}
 															]}
 														>
 															{t.timeText}
@@ -274,8 +268,8 @@ export function ModalTime({
 																		backgroundColor:
 																			idx == selectIdx
 																				? Colors.grey600
-																				: Colors.grey100,
-																	},
+																				: Colors.grey100
+																	}
 																]}
 															>
 																<View style={styles.rowView}>
@@ -286,8 +280,8 @@ export function ModalTime({
 																				color:
 																					idx === selectIdx
 																						? Colors.white
-																						: Colors.grey800,
-																			},
+																						: Colors.grey800
+																			}
 																		]}
 																		numberOfLines={5}
 																	>
@@ -366,66 +360,43 @@ export function ModalTime({
 							/>
 						</>
 					)}
-				</View>
-			</View>
-		</Modal>
+				</>
+			)}
+		/>
 		// </AutoFocusProvider>
 	);
 }
 
 const styles = StyleSheet.create({
-	centeredView: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginTop: -20,
-	},
 	rowView: {
 		flexDirection: 'row',
 		width: screen.width * 0.52,
 
 		justifyContent: 'flex-start',
-		alignItems: 'center',
+		alignItems: 'center'
 	},
 	columnView: {
 		flexDirection: 'column',
 
 		// borderRadius: 13,
 
-		margin: 20,
+		margin: 20
 	},
 	backgroundView: {
 		borderRadius: 13,
-		backgroundColor: Colors.grey100,
+		backgroundColor: Colors.grey100
 	},
 	iconView: {
 		alignItems: 'flex-end',
-		flex: 1,
+		flex: 1
 	},
-	modalView: {
-		// margin: 10,
-		marginBottom: 60,
-		backgroundColor: Colors.white,
-		borderRadius: 13,
-		padding: 20,
-		alignItems: 'center',
-		shadowColor: 'black',
-		elevation: 10,
-		shadowOffset: {
-			width: 1,
-			height: 1,
-		},
-		shadowOpacity: 0.21,
-		shadowRadius: 1.0,
-		width: screen.width * 0.9,
-		maxHeight: screen.height * 0.7,
-	},
+
 	touchText: {
 		fontSize: 13,
 		textAlign: 'left',
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
-		justifyContent: 'center',
+		justifyContent: 'center'
 	},
 	titleText: {
 		fontSize: 20,
@@ -434,34 +405,31 @@ const styles = StyleSheet.create({
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
-		marginLeft: '1%',
+		marginLeft: '1%'
 	},
 	blankView: {
-		height: 10,
+		height: 10
 	},
 	textView: {
-		width: '100%',
+		width: '100%'
 	},
 	touchButtonStyle: {
 		padding: 20,
 		borderRadius: 13,
-		// alignItems: 'center',
-		// alignContent: 'center',
-		// alignSelf: 'center',
 		justifyContent: 'center',
 		alignItems: 'center',
 		alignContent: 'center',
-		alignSelf: 'center',
+		alignSelf: 'center'
 	},
 	buttonOverLine: {
 		borderWidth: 0.4,
 		width: screen.width * 0.9,
 		marginTop: 20,
-		borderColor: Colors.black,
+		borderColor: Colors.black
 	},
 	rowLine: {
 		borderTopWidth: 0.4,
 		width: '113%',
-		marginTop: 15,
-	},
+		marginTop: 15
+	}
 });

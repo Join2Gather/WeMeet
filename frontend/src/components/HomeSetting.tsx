@@ -27,6 +27,7 @@ import {
 } from '../store/login';
 import ColorPicker from 'react-native-wheel-color-picker';
 import { setIndividualTimeColor } from '../store/individual';
+import { CloseButton, ModalView } from '../theme';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -116,38 +117,11 @@ export function HomeSetting({
 	}, [isViewError]);
 
 	return (
-		<Modal
-			animationType="fade"
-			transparent={true}
-			visible={settingModalVisible}
-			onRequestClose={() => {
-				Alert.alert('Modal has been closed.');
-			}}
-		>
-			<View style={styles.centeredView}>
-				<View style={styles.modalView}>
-					<View
-						style={
-							(styles.textView,
-							[
-								{
-									marginBottom: 10
-								}
-							])
-						}
-					>
-						<TouchableHighlight
-							activeOpacity={1}
-							underlayColor={Colors.white}
-							style={{
-								marginLeft: '90%',
-								width: '9%'
-							}}
-							onPress={onPressCloseButton}
-						>
-							<Icon style={{ alignSelf: 'flex-end' }} name="close" size={25} />
-						</TouchableHighlight>
-					</View>
+		<ModalView
+			modalVisible={settingModalVisible}
+			ModalViewRender={() => (
+				<>
+					<CloseButton closeBtn={onPressCloseButton} />
 
 					{mode === 'initial' && (
 						<>
@@ -490,19 +464,13 @@ export function HomeSetting({
 							/>
 						</>
 					)}
-				</View>
-			</View>
-		</Modal>
+				</>
+			)}
+		/>
 	);
 }
 
 const styles = StyleSheet.create({
-	centeredView: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginTop: -20
-	},
 	rowView: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -523,22 +491,7 @@ const styles = StyleSheet.create({
 		alignItems: 'flex-end',
 		flex: 1
 	},
-	modalView: {
-		marginBottom: 60,
-		backgroundColor: Colors.white,
-		borderRadius: 13,
-		padding: 20,
-		alignItems: 'center',
-		shadowColor: 'black',
-		elevation: 10,
-		shadowOffset: {
-			width: 1,
-			height: 1
-		},
-		shadowOpacity: 0.21,
-		shadowRadius: 1.0,
-		width: screen.width * 0.9
-	},
+
 	touchText: {
 		fontSize: 14,
 		textAlign: 'center',

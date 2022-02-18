@@ -16,7 +16,7 @@ import { Button } from '../theme/Button';
 import { setTipMode } from '../store/login';
 import { RootState } from '../store';
 import Ionic from 'react-native-vector-icons/Ionicons';
-import { CloseButton } from '../theme';
+import { CloseButton, ModalView } from '../theme';
 
 const screen = Dimensions.get('screen');
 
@@ -50,9 +50,10 @@ export function ModalHomeInfo({
 	const [infoMode, setInfoMode] = useState('');
 
 	return (
-		<Modal animationType="fade" transparent={true} visible={infoVisible}>
-			<View style={styles.centeredView}>
-				<View style={styles.modalView}>
+		<ModalView
+			modalVisible={infoVisible}
+			ModalViewRender={() => (
+				<>
 					<CloseButton closeBtn={onPressCloseBtn} />
 
 					<View style={{ justifyContent: 'flex-start' }}>
@@ -110,32 +111,7 @@ export function ModalHomeInfo({
 								{'도움말 아이콘을 터치 하여 언제나 다시\n 확인 할 수 있어요'}
 							</Text>
 						</View>
-						{/* <TouchableHighlight
-							style={[
-								styles.rowView,
-								{
-									justifyContent: 'center',
-									marginTop: 20,
-								},
-							]}
-							underlayColor={Colors.white}
-							onPress={onPressTipBtn}
-						>
-							<>
-								{seeTips ? (
-									<Material
-										name={'check-box-outline-blank'}
-										color={inColor}
-										size={20}
-									/>
-								) : (
-									<Material name={'check-box'} color={inColor} size={20} />
-								)}
-								<Text style={[styles.touchText, { marginLeft: 0 }]}>
-									다시 보지 않기
-								</Text>
-							</>
-						</TouchableHighlight> */}
+
 						<View style={styles.blankView} />
 						<View style={styles.buttonOverLine} />
 						<Button
@@ -144,26 +120,17 @@ export function ModalHomeInfo({
 							onPressFunction={onPressCloseBtn}
 						/>
 					</View>
-				</View>
-			</View>
-		</Modal>
-		// </AutoFocusProvider>
+				</>
+			)}
+		/>
 	);
 }
 
 const styles = StyleSheet.create({
-	centeredView: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginTop: -20
-	},
 	rowView: {
 		flexDirection: 'row',
 		alignItems: 'center',
-
 		justifyContent: 'center'
-		// width: screen.width * 0.53,
 	},
 	columnView: {
 		flexDirection: 'column',
@@ -181,23 +148,6 @@ const styles = StyleSheet.create({
 	iconView: {
 		alignItems: 'flex-end',
 		flex: 1
-	},
-	modalView: {
-		// margin: 10,
-		marginBottom: 60,
-		backgroundColor: Colors.white,
-		borderRadius: 13,
-		padding: 20,
-		alignItems: 'center',
-		shadowColor: 'black',
-		elevation: 10,
-		shadowOffset: {
-			width: 1,
-			height: 1
-		},
-		shadowOpacity: 0.21,
-		shadowRadius: 1.0,
-		width: screen.width * 0.9
 	},
 	touchText: {
 		fontSize: 14,

@@ -1,24 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-	Alert,
-	Modal,
-	StyleSheet,
-	Text,
-	TouchableHighlight,
-	View,
-	ActivityIndicator,
-	Dimensions
-} from 'react-native';
+import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import Material from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontIcon from 'react-native-vector-icons/FontAwesome';
 import { Button } from '../theme/Button';
 import { setTimeTipVisible, setTipMode } from '../store/login';
 import { RootState } from '../store';
-import Ionic from 'react-native-vector-icons/Ionicons';
-import { CloseButton } from '../theme';
+import { CloseButton, ModalView } from '../theme';
 
 const screen = Dimensions.get('screen');
 
@@ -48,16 +37,10 @@ export function ModalInfo({
 	}, []);
 
 	return (
-		<Modal
-			animationType="fade"
-			transparent={true}
-			visible={timeTipVisible}
-			onRequestClose={() => {
-				Alert.alert('Modal has been closed.');
-			}}
-		>
-			<View style={styles.centeredView}>
-				<View style={styles.modalView}>
+		<ModalView
+			modalVisible={infoVisible}
+			ModalViewRender={() => (
+				<>
 					<CloseButton closeBtn={onPressCloseBtn} />
 					<View style={{ justifyContent: 'center' }}>
 						<View style={styles.blankView} />
@@ -118,13 +101,8 @@ export function ModalInfo({
 									'설정 창에서 아이콘을 터치하여 \n 팀원 초대 코드를 생성할 수 있어요'
 								}
 							</Text>
-							{/* <FontIcon color={color} name="user-plus" size={17}></FontIcon> */}
+
 							<Text style={[styles.touchText, { marginLeft: 0 }]}>{''}</Text>
-							{/* <Text
-								style={[styles.touchText, { marginLeft: -screen.width * 0.57 }]}
-							>
-								{'\n팀원 초대 코드를 생성할 수 있어요'}
-							</Text> */}
 						</View>
 						<View
 							style={{ flexDirection: 'row', marginTop: 10, marginLeft: 3 }}
@@ -146,32 +124,6 @@ export function ModalInfo({
 								{' 도움말 아이콘을 터치 하여 언제나 다시\n 확인 할 수 있어요'}
 							</Text>
 						</View>
-						{/* <TouchableHighlight
-							style={[
-								styles.rowView,
-								{
-									justifyContent: 'center',
-									marginTop: 20,
-								},
-							]}
-							underlayColor={Colors.white}
-							onPress={onPressTimeTipBtn}
-						>
-							<>
-								{seeTimeTips ? (
-									<Material
-										name={'check-box-outline-blank'}
-										color={color}
-										size={20}
-									/>
-								) : (
-									<Material name={'check-box'} color={color} size={20} />
-								)}
-								<Text style={[styles.touchText, { marginLeft: 0 }]}>
-									다시 보지 않기
-								</Text>
-							</>
-						</TouchableHighlight> */}
 
 						<View style={styles.blankView} />
 						<View style={styles.buttonOverLine} />
@@ -181,62 +133,19 @@ export function ModalInfo({
 							onPressFunction={onPressCloseBtn}
 						/>
 					</View>
-				</View>
-			</View>
-		</Modal>
+				</>
+			)}
+		/>
 		// </AutoFocusProvider>
 	);
 }
 
 const styles = StyleSheet.create({
-	centeredView: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginTop: -20
-	},
-	rowView: {
-		flexDirection: 'row',
-		alignItems: 'center',
-
-		justifyContent: 'center'
-		// width: screen.width * 0.53,
-	},
-	columnView: {
-		flexDirection: 'column',
-
-		borderRadius: 13,
-		alignContent: 'center',
-		margin: 30,
-		marginBottom: 20,
-		marginTop: 20
-	},
-	backgroundView: {
-		borderRadius: 13,
-		backgroundColor: Colors.grey100
-	},
 	iconView: {
 		alignItems: 'flex-end',
 		flex: 1
 	},
-	modalView: {
-		// margin: 10,
-		marginBottom: 60,
-		backgroundColor: Colors.white,
-		borderRadius: 13,
-		padding: 20,
-		justifyContent: 'center',
-		alignItems: 'center',
-		shadowColor: 'black',
-		elevation: 10,
-		shadowOffset: {
-			width: 1,
-			height: 1
-		},
-		shadowOpacity: 0.21,
-		shadowRadius: 1.0,
-		width: screen.width * 0.9
-	},
+
 	touchText: {
 		fontSize: 14,
 		textAlign: 'left',
@@ -246,11 +155,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignContent: 'center',
 		alignItems: 'center'
-		// justifyContent: 'flex-start',
-		// textAlignVertical: 'center',
-		// alignSelf: 'center',
-		// alignContent: 'center',
-		// alignItems: 'center',
 	},
 	titleText: {
 		fontSize: 20,
@@ -269,9 +173,6 @@ const styles = StyleSheet.create({
 	touchButtonStyle: {
 		padding: 5,
 		borderRadius: 10,
-		// alignItems: 'center',
-		// alignContent: 'center',
-		// alignSelf: 'center',
 		justifyContent: 'center'
 	},
 	buttonOverLine: {
