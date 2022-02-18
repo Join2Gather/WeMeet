@@ -23,7 +23,7 @@ import type { RootState } from '../store';
 import { setModalMode } from '../store/team';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 import { Button } from '../theme/Button';
-import { CloseButton } from '../theme';
+import { CloseButton, ModalView } from '../theme';
 
 const screen = Dimensions.get('screen');
 
@@ -89,17 +89,10 @@ export function ModalSelect({
 		loginError === 'everyTime' && setMode('error');
 	}, [loginError]);
 	return (
-		// <AutoFocusProvider contentContainerStyle={[styles.keyboardAwareFocus]}>
-		<Modal
-			animationType="fade"
-			transparent={true}
-			visible={selectModalVisible}
-			onRequestClose={() => {
-				Alert.alert('Modal has been closed.');
-			}}
-		>
-			<View style={styles.centeredView}>
-				<View style={styles.modalView}>
+		<ModalView
+			modalVisible={selectModalVisible}
+			ModalViewRender={() => (
+				<>
 					<CloseButton closeBtn={onPressCloseBtn} />
 
 					{mode === 'everytime' && (
@@ -255,9 +248,9 @@ export function ModalSelect({
 							<View />
 						</>
 					)}
-				</View>
-			</View>
-		</Modal>
+				</>
+			)}
+		/>
 		// </AutoFocusProvider>
 	);
 }

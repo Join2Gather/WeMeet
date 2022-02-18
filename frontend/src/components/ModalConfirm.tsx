@@ -1,22 +1,19 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import {
-	Alert,
-	Modal,
 	StyleSheet,
 	Text,
 	TouchableHighlight,
 	View,
 	TextInput,
-	Dimensions,
+	Dimensions
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
 import { Button } from '../theme/Button';
 import { setConfirmCount } from '../store/timetable';
 import { useNavigation } from '@react-navigation/core';
-import { CloseButton } from '../theme';
+import { CloseButton, ModalView } from '../theme';
 
 const screen = Dimensions.get('screen');
 
@@ -35,7 +32,7 @@ export function ModalConfirm({
 	color,
 	name,
 	uri,
-	isOverlap,
+	isOverlap
 }: props) {
 	const dispatch = useDispatch();
 	const [mode, setMode] = useState('');
@@ -63,21 +60,15 @@ export function ModalConfirm({
 			timetableMode: 'confirm',
 			isConfirm: true,
 			uri,
-			confirmCount,
+			confirmCount
 		});
 		setCount('1');
 	}, [confirmCount]);
 	return (
-		<Modal
-			animationType="fade"
-			transparent={true}
-			visible={confirmModalVisible}
-			onRequestClose={() => {
-				Alert.alert('Modal has been closed.');
-			}}
-		>
-			<View style={styles.centeredView}>
-				<View style={styles.modalView}>
+		<ModalView
+			modalVisible={confirmModalVisible}
+			ModalViewRender={() => (
+				<>
 					<CloseButton closeBtn={onPressCloseBtn} />
 					<>
 						{mode === 'initial' && (
@@ -116,7 +107,7 @@ export function ModalConfirm({
 									<Text
 										style={[
 											styles.textInput,
-											{ alignSelf: 'center', padding: 5, marginBottom: 5 },
+											{ alignSelf: 'center', padding: 5, marginBottom: 5 }
 										]}
 									>
 										번
@@ -169,38 +160,13 @@ export function ModalConfirm({
 							</>
 						)}
 					</>
-				</View>
-			</View>
-		</Modal>
-		// </AutoFocusProvider>
+				</>
+			)}
+		/>
 	);
 }
 
 const styles = StyleSheet.create({
-	centeredView: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginTop: -20,
-	},
-
-	modalView: {
-		// margin: 10,
-		marginBottom: 60,
-		backgroundColor: Colors.white,
-		borderRadius: 13,
-		padding: 20,
-		alignItems: 'center',
-		shadowColor: 'black',
-		elevation: 10,
-		shadowOffset: {
-			width: 1,
-			height: 1,
-		},
-		shadowOpacity: 0.21,
-		shadowRadius: 1.0,
-		width: screen.width * 0.9,
-	},
 	touchText: {
 		fontSize: 14,
 		textAlign: 'center',
@@ -208,7 +174,7 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
 		marginLeft: 10,
-		top: 1,
+		top: 1
 	},
 	titleText: {
 		fontSize: 18,
@@ -217,32 +183,32 @@ const styles = StyleSheet.create({
 		letterSpacing: -1,
 		marginLeft: '10%',
 		marginTop: 15,
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	blankView: {
-		height: 15,
+		height: 15
 	},
 	textView: {
-		width: '100%',
+		width: '100%'
 	},
 	touchButtonStyle: {
 		padding: 5,
 		borderRadius: 13,
 		justifyContent: 'center',
 		paddingLeft: 5,
-		paddingRight: 5,
+		paddingRight: 5
 	},
 	buttonOverLine: {
 		borderTopWidth: 0.4,
 		width: screen.width * 0.9,
 		marginTop: 25,
-		borderColor: Colors.black,
+		borderColor: Colors.black
 	},
 	iconStyle: {
-		marginLeft: 10,
+		marginLeft: 10
 	},
 	rightIconStyle: {
-		marginRight: 10,
+		marginRight: 10
 	},
 	textInputView: {
 		paddingBottom: 2,
@@ -253,12 +219,12 @@ const styles = StyleSheet.create({
 		padding: 10,
 		textAlign: 'center',
 		marginBottom: 15,
-		flexDirection: 'row',
+		flexDirection: 'row'
 	},
 	textInput: {
 		fontSize: 18,
 		fontFamily: 'NanumSquareR',
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	rowView: {
 		flexDirection: 'row',
@@ -266,6 +232,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'flex-start',
 		width: screen.width * 0.65,
 		height: screen.height * 0.05,
-		borderRadius: 13,
-	},
+		borderRadius: 13
+	}
 });

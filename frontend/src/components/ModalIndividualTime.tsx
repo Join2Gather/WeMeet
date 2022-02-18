@@ -29,7 +29,7 @@ import { RootState } from '../store';
 import { Spinner } from '.';
 import { findTeam, setConfirmProve } from '../store/login';
 import { useNavigation } from '@react-navigation/native';
-import { CloseButton } from '../theme';
+import { CloseButton, ModalView } from '../theme';
 const screen = Dimensions.get('screen');
 
 interface props {
@@ -126,20 +126,14 @@ export function ModalIndividualTime({
 		dispatch(initialTimeMode());
 	}, [teamId, findIndividual, color, loginName, loginURI]);
 	return (
-		<Modal
-			animationType="fade"
-			transparent={true}
-			visible={inModalVisible}
-			onRequestClose={() => {
-				Alert.alert('Modal has been closed.');
-			}}
-		>
-			<Spinner loading={mode} />
-			<View style={styles.centeredView}>
-				<View style={styles.modalView}>
+		<ModalView
+			modalVisible={inModalVisible}
+			ModalViewRender={() => (
+				<>
 					<CloseButton closeBtn={onPressCloseBtn} />
 
 					<ScrollView>
+						<Spinner loading={mode} />
 						{findIndividual && findIndividual[0] && (
 							<>
 								<View style={styles.blankView} />
@@ -257,10 +251,9 @@ export function ModalIndividualTime({
 							/>
 						</>
 					)}
-				</View>
-			</View>
-		</Modal>
-		// </AutoFocusProvider>
+				</>
+			)}
+		/>
 	);
 }
 

@@ -34,7 +34,7 @@ import {
 	setConfirmProve
 } from '../store/login';
 import { useNavigation } from '@react-navigation/core';
-import { CloseButton } from '../theme';
+import { CloseButton, ModalView } from '../theme';
 import { initialIndividualTimetable } from '../store/individual';
 
 const screen = Dimensions.get('screen');
@@ -196,13 +196,10 @@ export function ModalSetting({
 		setSetting('questionOut');
 	}, []);
 	return (
-		<Modal
-			animationType="fade"
-			transparent={true}
-			visible={settingModalVisible}
-		>
-			<View style={styles.centeredView}>
-				<View style={styles.modalView}>
+		<ModalView
+			modalVisible={settingModalVisible}
+			ModalViewRender={() => (
+				<>
 					<CloseButton closeBtn={onPressCloseButton} />
 					{settingMode === 'initial' && (
 						<>
@@ -730,17 +727,10 @@ export function ModalSetting({
 							/>
 						</>
 					)}
-				</View>
-			</View>
-			{/* <ModalDatePicker
-				dateVisible={dateVisible}
-				setDateVisible={setDateVisible}
-				name={name}
-				alarmTime={Number(alarmTime)}
-				setSetting={setSetting}
-				setSubMode={setSubMode}
-			/> */}
-		</Modal>
+				</>
+			)}
+		/>
+
 		// </AutoFocusProvider>
 	);
 }

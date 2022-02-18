@@ -1,20 +1,16 @@
 import React, { useCallback } from 'react';
 import {
-	Alert,
-	Modal,
 	StyleSheet,
 	Text,
-	TouchableHighlight,
 	View,
 	ActivityIndicator,
-	Dimensions,
+	Dimensions
 } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import Font5Icon from 'react-native-vector-icons/FontAwesome5';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Button } from '../theme/Button';
-import { CloseButton } from '../theme';
+import { CloseButton, ModalView } from '../theme';
 
 const screen = Dimensions.get('screen');
 
@@ -34,28 +30,19 @@ export function ModalLoading({
 	setLoadingVisible,
 	color,
 	loadingMode,
-	setLoading,
 	onPressRevertOk,
 	onPressOk,
-	goLeft,
+	goLeft
 }: props) {
-	const dispatch = useDispatch();
-
 	const onPressCloseBtn = useCallback(() => {
 		setLoadingVisible(false);
 	}, []);
 
 	return (
-		<Modal
-			animationType="fade"
-			transparent={true}
-			visible={loadingVisible}
-			onRequestClose={() => {
-				Alert.alert('Modal has been closed.');
-			}}
-		>
-			<View style={styles.centeredView}>
-				<View style={styles.modalView}>
+		<ModalView
+			modalVisible={loadingVisible}
+			ModalViewRender={() => (
+				<>
 					<CloseButton closeBtn={onPressCloseBtn} />
 					{loadingMode === 'initial' && (
 						<>
@@ -79,7 +66,6 @@ export function ModalLoading({
 								secondButtonText="확인"
 								onPressFunction={onPressCloseBtn}
 								secondOnPressFunction={onPressOk}
-								// onPressFunction={onFinishChangeColor}
 							/>
 						</>
 					)}
@@ -105,7 +91,6 @@ export function ModalLoading({
 								secondButtonText="확인"
 								onPressFunction={onPressCloseBtn}
 								secondOnPressFunction={onPressRevertOk}
-								// onPressFunction={onFinishChangeColor}
 							/>
 						</>
 					)}
@@ -141,60 +126,34 @@ export function ModalLoading({
 							/>
 						</>
 					)}
-				</View>
-			</View>
-		</Modal>
-		// </AutoFocusProvider>
+				</>
+			)}
+		/>
 	);
 }
 
 const styles = StyleSheet.create({
-	centeredView: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginTop: -20,
-	},
 	rowView: {
 		flexDirection: 'row',
 		alignItems: 'center',
-
 		justifyContent: 'center',
-		width: screen.width * 0.53,
+		width: screen.width * 0.53
 	},
 	columnView: {
 		flexDirection: 'column',
-
 		borderRadius: 13,
 		alignContent: 'center',
 		margin: 30,
 		marginBottom: 20,
-		marginTop: 20,
+		marginTop: 20
 	},
 	backgroundView: {
 		borderRadius: 13,
-		backgroundColor: Colors.grey100,
+		backgroundColor: Colors.grey100
 	},
 	iconView: {
 		alignItems: 'flex-end',
-		flex: 1,
-	},
-	modalView: {
-		// margin: 10,
-		marginBottom: 60,
-		backgroundColor: Colors.white,
-		borderRadius: 13,
-		padding: 20,
-		alignItems: 'center',
-		shadowColor: 'black',
-		elevation: 10,
-		shadowOffset: {
-			width: 1,
-			height: 1,
-		},
-		shadowOpacity: 0.21,
-		shadowRadius: 1.0,
-		width: screen.width * 0.9,
+		flex: 1
 	},
 	touchText: {
 		fontSize: 14,
@@ -203,10 +162,7 @@ const styles = StyleSheet.create({
 		letterSpacing: -1,
 		marginLeft: 10,
 		justifyContent: 'center',
-		textAlignVertical: 'center',
-		// alignSelf: 'center',
-		// alignContent: 'center',
-		// alignItems: 'center',
+		textAlignVertical: 'center'
 	},
 	titleText: {
 		fontSize: 20,
@@ -215,26 +171,23 @@ const styles = StyleSheet.create({
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
-		marginLeft: '8%',
+		marginLeft: '8%'
 	},
 	blankView: {
-		height: 10,
+		height: 10
 	},
 	textView: {
-		width: '100%',
+		width: '100%'
 	},
 	touchButtonStyle: {
 		padding: 5,
 		borderRadius: 10,
-		// alignItems: 'center',
-		// alignContent: 'center',
-		// alignSelf: 'center',
-		justifyContent: 'center',
+		justifyContent: 'center'
 	},
 	buttonOverLine: {
 		borderTopWidth: 0.4,
 		width: screen.width * 0.9,
 		marginTop: 20,
-		borderColor: Colors.black,
-	},
+		borderColor: Colors.black
+	}
 });
