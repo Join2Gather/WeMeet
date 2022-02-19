@@ -5,17 +5,18 @@ import { takeLatest } from 'redux-saga/effects';
 import { createAction } from 'redux-actions';
 import type {
 	postImageAPI,
-	individual,
+	Individual,
 	responseImageAPI,
 	make_days,
 	postEveryTimeAPI,
 	findTime,
-	homeTime,
+	homeTime
 } from '../interface';
 import { Colors } from 'react-native-paper';
 import { useMakeTimeTableWith60 } from '../hooks';
 import { makeHomeTimetable, makeTime } from '../lib/util';
 import { Alert } from 'react-native';
+import { individualInitialState } from '../lib/util/individualReducerHelper';
 
 const POST_IMAGE = 'individual/POST_IMAGE';
 const LOGIN_EVERYTIME = 'individual/LOGIN_EVERYTIME';
@@ -40,57 +41,12 @@ export function* individualSaga() {
 
 const { defaultDatesWith60, timesText } = useMakeTimeTableWith60(0, 25);
 
-const initialState: individual = {
-	individualDates: defaultDatesWith60,
-	error: '',
-	everyTime: {
-		sun: [],
-		mon: [],
-		tue: [],
-		wed: [],
-		thu: [],
-		fri: [],
-		sat: [],
-	},
-	weekIndex: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
-	loginSuccess: false,
-	cloneDateSuccess: false,
-	confirmDatesTimetable: [],
-	confirmClubs: [],
-	individualTimesText: timesText,
-	startTime: {
-		hour: 0,
-		minute: 0,
-	},
-	endTime: {
-		hour: 0,
-		minute: 0,
-	},
-	inTimeMode: '',
-	dayIdx: 0,
-	dayString: '',
-	isHomeTimePicked: false,
-	postHomePrepare: false,
-	postHomeSuccess: false,
-	setTime: 0,
-	todayDate: 0,
-	individualCount: 0,
-	groupCount: 0,
-	homeTime: {
-		start: 0,
-		end: 24,
-	},
-	inTimeColor: Colors.grey400,
-};
+const initialState: Individual = individualInitialState;
 
 export const individualSlice = createSlice({
 	name: 'individual',
 	initialState,
 	reducers: {
-		POST_IMAGE_SUCCESS: (state, action: PayloadAction<responseImageAPI>) => {},
-		POST_IMAGE_FAILURE: (state, action: PayloadAction<any>) => {
-			state.error = action.payload;
-		},
 		cloneINDates: (
 			state,
 			action: PayloadAction<{
@@ -182,7 +138,6 @@ export const individualSlice = createSlice({
 				state.homeTime.start,
 				state.homeTime.end
 			);
-
 			state.individualDates = defaultDatesWith60;
 			state.individualTimesText = timesText;
 		},
@@ -212,7 +167,7 @@ export const individualSlice = createSlice({
 						wed: [],
 						thu: [],
 						fri: [],
-						sat: [],
+						sat: []
 					}),
 						(state.everyTime = action.payload);
 					delete state.everyTime['club'];
@@ -324,20 +279,20 @@ export const individualSlice = createSlice({
 			let modeSelect = [
 				{
 					count: 0,
-					content: 'normal',
+					content: 'normal'
 				},
 				{
 					count: 0,
-					content: 'team',
+					content: 'team'
 				},
 				{
 					count: 0,
-					content: 'home',
+					content: 'home'
 				},
 				{
 					count: 0,
-					content: 'everyTime',
-				},
+					content: 'everyTime'
+				}
 			];
 			state.individualDates[idx].times[time].forEach((t) => {
 				modeSelect.forEach((mode) => {
@@ -359,12 +314,12 @@ export const individualSlice = createSlice({
 				starting_hours: state.startTime.hour,
 				starting_minutes: state.startTime.minute,
 				end_hours: state.endTime.hour,
-				end_minutes: state.endTime.minute,
+				end_minutes: state.endTime.minute
 			};
 
 			state.everyTime[state.dayString] = [
 				...state.everyTime[state.dayString],
-				data,
+				data
 			];
 			state.postHomePrepare = true;
 		},
@@ -372,20 +327,22 @@ export const individualSlice = createSlice({
 			let isNonColor = 0;
 			const dayIdx = state.dayIdx;
 			const endHour = state.endTime.hour;
-
+			const endMinute = Math.round(state.endTime.minute / 10);
+			console.log(endMinute);
 			state.isHomeTimePicked = false;
-			state.individualDates[dayIdx].times[endHour].forEach((t) => {
-				t.mode !== 'normal' && isNonColor++;
+			state.individualDates[dayIdx].times[endHour].forEach((t, idx) => {
+				if (idx < endMinute) t.mode !== 'normal' && isNonColor++;
 			});
 
 			if (isNonColor !== 0) {
 				Alert.alert('알림', '이미 지정된 시간 입니다', [
 					{
 						text: '확인',
-						onPress: () => {},
-					},
+						onPress: () => {}
+					}
 				]);
 				state.isHomeTimePicked = true;
+				state.inTimeMode = '';
 			}
 		},
 		deleteHomeTime: (state, action: PayloadAction<findTime[]>) => {
@@ -407,8 +364,12 @@ export const individualSlice = createSlice({
 		setIndividualTimeColor: (state, action: PayloadAction<string>) => {
 			state.inTimeColor = action.payload;
 		},
+		POST_IMAGE_SUCCESS: (state, action: PayloadAction<responseImageAPI>) => {},
+		POST_IMAGE_FAILURE: (state, action: PayloadAction<any>) => {
+			state.error = action.payload;
+		}
 	},
-	extraReducers: {},
+	extraReducers: {}
 });
 
 export const {
@@ -428,7 +389,7 @@ export const {
 	cloneHomeDate,
 	makeHomeTime,
 	initialIndividualError,
-	setIndividualTimeColor,
+	setIndividualTimeColor
 } = individualSlice.actions;
 
 export default individualSlice.reducer;
