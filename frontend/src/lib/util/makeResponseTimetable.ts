@@ -1,4 +1,4 @@
-import type { individual, time, timetable } from '../../interface';
+import type { Individual, time, timetable } from '../../interface';
 import { hexToRGB } from './hexToRGB';
 import { Colors } from 'react-native-paper';
 
@@ -120,7 +120,7 @@ export function makeGroupTimeTableWith60(state: timetable, dates: any) {
 		});
 }
 
-export function makeHomeTimetable(state: individual) {
+export function makeHomeTimetable(state: Individual) {
 	state.weekIndex.map(
 		(day, idx) =>
 			state.everyTime[day]?.length &&
