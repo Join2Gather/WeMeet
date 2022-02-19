@@ -18,7 +18,7 @@ import {
 	changeTeamInfo,
 	loginInitialState,
 	setUserMeData
-} from '../lib/util/loginHepler';
+} from '../lib/util/loginReducerHelper';
 import { filter, map, pipe, range, reduce, take } from '@fxts/core';
 import { toArray } from 'lodash';
 
