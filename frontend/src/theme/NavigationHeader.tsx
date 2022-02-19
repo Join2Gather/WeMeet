@@ -6,7 +6,7 @@ import type { StyleProp, ViewStyle, TextStyle } from 'react-native';
 import { Colors } from 'react-native-paper';
 
 export type NavigationHeaderProps = {
-	title: string;
+	title?: string;
 	Left?: () => ReactNode;
 	Right?: () => ReactNode;
 	secondRight?: () => ReactNode;
@@ -24,14 +24,14 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 	thirdRight,
 	viewStyle,
 	titleStyle,
-	headerColor,
+	headerColor
 }) => {
 	return (
 		<View
 			style={[
 				styles.view,
 				viewStyle,
-				{ backgroundColor: headerColor ? headerColor : '#33aafc' },
+				{ backgroundColor: headerColor ? headerColor : '#33aafc' }
 			]}
 		>
 			{/* <View style={{ flex: 0.01, backgroundColor: 'transparent' }}></View> */}
@@ -48,7 +48,7 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 			<View
 				style={[
 					styles.halfFlex,
-					{ flexDirection: 'row', justifyContent: 'flex-end' },
+					{ flexDirection: 'row', justifyContent: 'flex-end' }
 				]}
 			>
 				{thirdRight && thirdRight()}
@@ -65,11 +65,11 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 const styles = StyleSheet.create({
 	flex: {
 		flex: 0.6,
-		backgroundColor: 'transparent',
+		backgroundColor: 'transparent'
 	},
 	halfFlex: {
 		flex: 0.5,
-		backgroundColor: 'transparent',
+		backgroundColor: 'transparent'
 	},
 	view: {
 		width: '100%',
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#33aafc',
 		borderBottomEndRadius: 15,
 		borderBottomLeftRadius: 15,
-		height: 55,
+		height: 55
 	},
 	title: {
 		fontSize: 18,
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
 
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -2,
-		color: '#fff',
-	},
+		color: '#fff'
+	}
 	// flex: { flex: 1, backgroundColor: 'transparent' },
 });
