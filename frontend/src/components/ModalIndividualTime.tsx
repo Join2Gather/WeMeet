@@ -213,7 +213,7 @@ export function ModalIndividualTime({
 													? `오후  ${t.endTime.hour - 12}`
 													: t.endTime.hour === 12
 													? '오전 12'
-													: `오전  ${t.startTime.hour}`}
+													: `오전  ${t.endTime.hour}`}
 												{' : '}
 												{t.endTime.minute < 10
 													? '0' + t.endTime.minute
