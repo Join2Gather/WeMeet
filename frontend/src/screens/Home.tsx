@@ -6,7 +6,8 @@ import {
 	Platform,
 	Image,
 	ScrollView,
-	Animated
+	Animated,
+	RefreshControl
 } from 'react-native';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 import Constants from 'expo-constants';
@@ -47,16 +48,17 @@ import Ionic from 'react-native-vector-icons/Ionicons';
 import { StatusBar } from 'expo-status-bar';
 
 import * as Notifications from 'expo-notifications';
+import { withRepeat } from 'react-native-reanimated';
 
 const iconSize = 22;
 
-export async function allowsNotificationsAsync() {
-	const settings = await Notifications.getPermissionsAsync();
-	return (
-		settings.granted ||
-		settings.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL
-	);
-}
+// export async function allowsNotificationsAsync() {
+// 	const settings = await Notifications.getPermissionsAsync();
+// 	return (
+// 		settings.granted ||
+// 		settings.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL
+// 	);
+// }
 async function registerForPushNotificationsAsync() {
 	let token;
 	if (Constants.isDevice) {
@@ -72,7 +74,6 @@ async function registerForPushNotificationsAsync() {
 			return;
 		}
 		token = (await Notifications.getExpoPushTokenAsync()).data;
-		console.log(token);
 	} else {
 		alert('Must use physical device for Push Notifications');
 	}
@@ -173,16 +174,13 @@ export default function Home() {
 		seeTips ? setInfoVisible(true) : setInfoVisible(false);
 	}, [seeTips]);
 	// image pic1er
-
+	const [refreshing, setRefreshing] = useState(false);
 	const [mode, setMode] = useState('normal');
 	const [isTimeMode, setIsTimeMode] = useState(false);
 	const [currentNumber, setCurrent] = useState(0);
 	const [sequence, setSequence] = useState([0, 1, 2]);
 	const [homeVisible, setHomeVisible] = useState(false);
-	const onPressPlus = useCallback(() => {
-		setIsTimeMode(true);
-		setMode('startMode');
-	}, []);
+
 	const [headerShown, setHeaderShown] = useState(true);
 	const animValue = useAnimatedValue(115);
 
@@ -197,7 +195,10 @@ export default function Home() {
 	useEffect(() => {
 		userMeError && setSettingModalVisible(true);
 	}, [userMeError]);
-
+	const onPressPlus = useCallback(() => {
+		setIsTimeMode(true);
+		setMode('startMode');
+	}, []);
 	// modal
 
 	const open = useCallback(() => {
@@ -208,6 +209,12 @@ export default function Home() {
 		setSettingModalVisible(false);
 		setHomeVisible(true);
 	}, []);
+
+	const onRefresh = useCallback(() => {
+		setRefreshing(true);
+		dispatch(getUserMe({ token }));
+		setTimeout(() => setRefreshing(false), 1000);
+	}, [token]);
 	return (
 		<SafeAreaView style={{ backgroundColor: inThemeColor }}>
 			<View style={[styles.view]}>
@@ -353,7 +360,12 @@ export default function Home() {
 					)}
 				</View>
 				<DayOfWeek isTeam={false} />
-				<ScrollView style={{ backgroundColor: Colors.white }}>
+				<ScrollView
+					style={{ backgroundColor: Colors.white }}
+					refreshControl={
+						<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+					}
+				>
 					<Timetable
 						modalVisible={modalVisible}
 						setModalVisible={setModalVisible}

@@ -1,6 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useEffect } from 'react';
-import { StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import {
+	StyleSheet,
+	TouchableOpacity,
+	ScrollView,
+	Alert,
+	RefreshControl
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 // prettier-ignore
 import {SafeAreaView, View, 
@@ -12,7 +18,7 @@ import {
 	ModalConfirm,
 	ModalDatePicker,
 	ModalInfo,
-	Spinner,
+	Spinner
 } from '../components';
 import { Timetable } from '../components/Timetable';
 import { Colors } from 'react-native-paper';
@@ -21,7 +27,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
 	makeInitialTimetable,
 	setIsInTeamTime,
-	toggleIsInitial,
+	toggleIsInitial
 } from '../store/timetable';
 import { RootState } from '../store';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -42,6 +48,7 @@ import { ModalSetting } from '../components/ModalSetting';
 import { Sequence } from '../components/Sequence';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { setTimeTipVisible } from '../store/login';
+import { getGroupIndividualTime } from '../hooks/getGroupIndividualTime';
 
 const iconSize = 22;
 
@@ -65,6 +72,9 @@ export default function TeamTime({ route }: Props) {
 		alarmTime,
 		isOverlap,
 		seeTimeTips,
+		confirmClubs,
+		confirmDatesTimetable,
+		timeMode
 	} = useSelector(({ timetable, login, loading, team }: RootState) => ({
 		uri: timetable.teamURI,
 		color: timetable.color,
@@ -87,6 +97,9 @@ export default function TeamTime({ route }: Props) {
 		alarmTime: login.alarmTime,
 		isOverlap: timetable.isOverlap,
 		seeTimeTips: login.seeTimeTips,
+		confirmClubs: login.confirmClubs,
+		confirmDatesTimetable: login.confirmDatesTimetable,
+		timeMode: timetable.timeMode
 	}));
 	// navigation
 	const { id, user, token, modalMode, seeTips } = route.params;
@@ -107,7 +120,7 @@ export default function TeamTime({ route }: Props) {
 	const [currentNumber, setCurrent] = useState(0);
 	const [sequence, setSequence] = useState([0, 1, 2]);
 	const [dateVisible, setDateVisible] = useState(false);
-
+	const [refreshing, setRefreshing] = useState(false);
 	// initial
 	useEffect(() => {
 		makeReady && dispatch(makeInitialTimetable());
@@ -158,6 +171,15 @@ export default function TeamTime({ route }: Props) {
 	const onPressGrInBtn = useCallback((groupMode) => {
 		setGroupMode(groupMode);
 	}, []);
+	const onRefresh = useCallback(() => {
+		setRefreshing(true);
+		getGroupIndividualTime(
+			{ id, token, uri: timeMode == 'make' ? joinUri : uri, user },
+			{ confirmClubs, confirmDatesTimetable },
+			dispatch
+		);
+		setTimeout(() => setRefreshing(false), 1000);
+	}, [token]);
 	return (
 		<>
 			<SafeAreaView style={{ backgroundColor: color }}>
@@ -242,7 +264,7 @@ export default function TeamTime({ route }: Props) {
 												flexDirection: 'row',
 												justifyContent: 'center',
 												// marginTop: 25,
-												height: 25,
+												height: 25
 											}}
 										>
 											<TouchableOpacity
@@ -287,7 +309,7 @@ export default function TeamTime({ route }: Props) {
 												<View
 													style={[
 														styles.boxView,
-														{ backgroundColor: Colors.grey600 },
+														{ backgroundColor: Colors.grey600 }
 													]}
 												/>
 												<Text style={styles.infoText}>중복 일정</Text>
@@ -296,14 +318,14 @@ export default function TeamTime({ route }: Props) {
 										<View
 											style={[
 												styles.boxView,
-												{ backgroundColor: Colors.grey300 },
+												{ backgroundColor: Colors.grey300 }
 											]}
 										/>
 										<Text style={styles.infoText}>개인 일정</Text>
 										<View
 											style={[
 												styles.boxView,
-												{ backgroundColor: Colors.white },
+												{ backgroundColor: Colors.white }
 											]}
 										/>
 										<Text style={styles.infoText}>비어있는 일정</Text>
@@ -343,7 +365,12 @@ export default function TeamTime({ route }: Props) {
 						</View>
 					</View>
 					<DayOfWeek isTeam={true} />
-					<ScrollView style={{ backgroundColor: Colors.white }}>
+					<ScrollView
+						style={{ backgroundColor: Colors.white }}
+						refreshControl={
+							<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+						}
+					>
 						<Timetable
 							mode={mode}
 							setMode={setMode}
@@ -416,16 +443,16 @@ const styles = StyleSheet.create({
 	rowButtonView: {
 		flexDirection: 'row',
 		justifyContent: 'center',
-		alignSelf: 'center',
+		alignSelf: 'center'
 	},
 	rowView: {
 		flexDirection: 'row',
 		alignContent: 'center',
 		justifyContent: 'center',
-		marginTop: 25,
+		marginTop: 25
 	},
 	viewHeight: {
-		height: 115,
+		height: 115
 	},
 	touchableBoxView: {
 		flexDirection: 'row',
@@ -433,12 +460,12 @@ const styles = StyleSheet.create({
 		// marginBottom: 25,
 		justifyContent: 'center',
 		alignContent: 'center',
-		alignSelf: 'center',
+		alignSelf: 'center'
 		// height: 20,
 	},
 	modeDescriptionText: {
 		flexDirection: 'row',
-		alignSelf: 'center',
+		alignSelf: 'center'
 	},
 	iconText: {
 		fontFamily: 'NanumSquareBold',
@@ -449,7 +476,7 @@ const styles = StyleSheet.create({
 		marginLeft: 1,
 		alignSelf: 'center',
 		justifyContent: 'center',
-		textAlignVertical: 'center',
+		textAlignVertical: 'center'
 	},
 	infoText: {
 		fontFamily: 'NanumSquareR',
@@ -459,12 +486,12 @@ const styles = StyleSheet.create({
 
 		alignSelf: 'center',
 		justifyContent: 'center',
-		textAlignVertical: 'center',
+		textAlignVertical: 'center'
 	},
 	boxButtonView: {
 		width: 15,
 		height: 15,
-		borderWidth: 0.3,
+		borderWidth: 0.3
 	},
 	boxView: {
 		width: 20,
@@ -473,14 +500,14 @@ const styles = StyleSheet.create({
 		marginLeft: 15,
 		borderWidth: 0.5,
 		// marginTop: 1,
-		alignSelf: 'center',
+		alignSelf: 'center'
 	},
 	titleText: {
 		fontSize: 17,
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		marginTop: 12,
-		letterSpacing: -1,
+		letterSpacing: -1
 	},
 	stepText: {
 		fontFamily: 'NanumSquareBold',
@@ -488,15 +515,15 @@ const styles = StyleSheet.create({
 		letterSpacing: -1,
 		height: 40,
 		marginTop: 20,
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	loadingText: {
 		fontFamily: 'NanumSquareR',
 		fontSize: 20,
-		color: Colors.white,
+		color: Colors.white
 	},
 	boxOverView: {
 		flexDirection: 'column',
-		marginTop: 25,
-	},
+		marginTop: 25
+	}
 });
