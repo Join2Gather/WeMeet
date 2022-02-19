@@ -14,7 +14,7 @@ import {
 	checkIsBlank,
 	makeInitialTimePicked,
 	toggleIsInitial,
-	setSelectIdx,
+	setSelectIdx
 } from '../store/timetable';
 import { Colors, useTheme } from 'react-native-paper';
 import { RootState } from '../store';
@@ -28,7 +28,7 @@ import individual, {
 	makePostHomeDates,
 	postEveryTime,
 	setInEndTime,
-	setInStartTime,
+	setInStartTime
 } from '../store/individual';
 import DatePicker from 'react-native-date-picker';
 import { Spinner } from '.';
@@ -84,7 +84,7 @@ export function ModalTimePicker({
 	findTime,
 	onPlusHour,
 	count,
-	setCount,
+	setCount
 }: props) {
 	const {
 		postConfirmSuccess,
@@ -103,7 +103,7 @@ export function ModalTimePicker({
 		selectIdx,
 		userMeSuccess,
 		isConfirmProve,
-		inTimeColor,
+		inTimeColor
 	} = useSelector(({ timetable, login, individual }: RootState) => ({
 		postConfirmSuccess: timetable.postConfirmSuccess,
 		confirmClubs: login.confirmClubs,
@@ -121,7 +121,7 @@ export function ModalTimePicker({
 		selectIdx: timetable.selectIdx,
 		userMeSuccess: login.userMeSuccess,
 		isConfirmProve: login.isConfirmProve,
-		inTimeColor: login.inTimeColor,
+		inTimeColor: login.inTimeColor
 	}));
 	const dispatch = useDispatch();
 	// const [minute, setMinute] = useState(0);
@@ -129,7 +129,7 @@ export function ModalTimePicker({
 
 	const [checkTime, setCheck] = useState({
 		start: 0,
-		end: 0,
+		end: 0
 	});
 	useEffect(() => {
 		!isHomeTime &&
@@ -141,7 +141,7 @@ export function ModalTimePicker({
 	const [firstVisible, setFirst] = useState(false);
 	const [startTime, setStartTime] = useState({
 		hour: 0,
-		minute: 0,
+		minute: 0
 	});
 
 	const isDark = useColorScheme() === 'dark' ? true : false;
@@ -154,7 +154,7 @@ export function ModalTimePicker({
 			//
 			if (isHomeTime && !isHomeTimePicked) {
 				dispatch(makePostHomeDates());
-			} else {
+			} else if (!isHomeTime) {
 				if (!isConfirm && !isTimePicked) {
 					dispatch(makePostIndividualDates());
 				} else if (isConfirm && !isTimeNoExist) {
@@ -174,7 +174,7 @@ export function ModalTimePicker({
 		isTimeNoExist,
 		isTimePicked,
 		isHomeTime,
-		isHomeTimePicked,
+		isHomeTimePicked
 	]);
 	const initialWithError = useCallback(() => {
 		setCurrent && setCurrent(0);
@@ -188,7 +188,7 @@ export function ModalTimePicker({
 			const timeMinute = date.getMinutes();
 			setStartTime({
 				hour: timeHour,
-				minute: timeMinute,
+				minute: timeMinute
 			});
 			onPlusHour(timeHour);
 			setModalVisible && setModalVisible(false);
@@ -201,12 +201,12 @@ export function ModalTimePicker({
 			if (timeHour < checkTime.start) {
 				initialWithError();
 				Alert.alert('경고', '모임 시간 이전 시간으로 선택하실 수 없습니다', [
-					{ text: '확인', onPress: () => {} },
+					{ text: '확인', onPress: () => {} }
 				]);
 			} else if (timeHour >= checkTime.end) {
 				initialWithError();
 				Alert.alert('경고', '모임 시간 이후 시간으로 선택하실 수 없습니다', [
-					{ text: '확인', onPress: () => {} },
+					{ text: '확인', onPress: () => {} }
 				]);
 			} else {
 				setCurrent && setCurrent(2);
@@ -237,12 +237,12 @@ export function ModalTimePicker({
 			if (checkTime.end < timeHour) {
 				initialWithError();
 				Alert.alert('경고', '모임 시간 이후 시간으로 선택하실 수 없습니다', [
-					{ text: '확인', onPress: () => {} },
+					{ text: '확인', onPress: () => {} }
 				]);
 			} else if (startTime.hour > timeHour) {
 				initialWithError();
 				Alert.alert('경고', '시작시간 전으로 시간 설정이 불가능 합니다', [
-					{ text: '확인', onPress: () => {} },
+					{ text: '확인', onPress: () => {} }
 				]);
 			} else {
 				if (isHomeTime) {
@@ -301,7 +301,7 @@ export function ModalTimePicker({
 						id,
 						token,
 						uri: joinUri,
-						user,
+						user
 					})
 				);
 			else
@@ -311,13 +311,9 @@ export function ModalTimePicker({
 						id,
 						token,
 						uri,
-						user,
+						user
 					})
 				);
-			// if (isConfirmProve) {
-			// 	dispatch(getUserMe({ token }));
-			// 	dispatch(initialIndividualTimetable());
-			// }
 		}
 	}, [postDatesPrepare, uri, joinUri]);
 	useEffect(() => {
@@ -338,9 +334,6 @@ export function ModalTimePicker({
 			dispatch(toggleUserMeSuccess());
 		}, 300);
 	}, [userMeSuccess]);
-	// useEffect(() => {
-	// 	dispatch(cloneINDates({ confirmClubs, confirmDatesTimetable }));
-	// }, []);
 	return (
 		<>
 			<Spinner loading={mode} />
