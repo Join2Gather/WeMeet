@@ -12,7 +12,7 @@
 		},
 		"preview": {
 			"distribution": "internal",
-			"developmentClient": true,
+
 			"ios": {
 				"cocoapods": "1.10.2"
 			}

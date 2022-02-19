@@ -1,7 +1,7 @@
 import type { make60 } from './timetable';
 import type { confirmDates } from './login';
 import type { homeTime } from '.';
-export interface individual {
+export interface Individual {
 	individualDates: make60[];
 	error: string;
 	everyTime: responseEveryTime;

@@ -12,19 +12,19 @@ type TabBarIconProps = { focused: boolean; color: string; size: number };
 
 const icons: Record<string, string[]> = {
 	Home: ['calendar-check', 'calendar-blank-outline'],
-	HomeNavigator: ['account-multiple', 'account-multiple-outline'],
+	HomeNavigator: ['account-multiple', 'account-multiple-outline']
 };
 
 const screenOptions = ({
-	route,
+	route
 }: {
 	route: RouteProp<ParamListBase, string>;
 }) => {
-	const { individualColor, teamColor, isInTeamTime } = useSelector(
+	const { inThemeColor, teamColor, isInTeamTime } = useSelector(
 		({ login, timetable }: RootState) => ({
-			individualColor: login.individualColor,
+			inThemeColor: login.inThemeColor,
 			teamColor: timetable.color,
-			isInTeamTime: timetable.isInTeamTime,
+			isInTeamTime: timetable.isInTeamTime
 		})
 	);
 	return {
@@ -35,7 +35,7 @@ const screenOptions = ({
 			const focusedColor = focused
 				? name !== 'Home' && isInTeamTime
 					? teamColor
-					: individualColor
+					: inThemeColor
 				: color;
 			const [icon, iconOutline] = icons[name];
 
@@ -45,11 +45,11 @@ const screenOptions = ({
 		tabBarActiveBackgroundColor: Colors.white,
 		tabBarInactiveBackgroundColor: Colors.white,
 		tabBarActiveTintColor:
-			route.name !== 'Home' && isInTeamTime ? teamColor : individualColor,
+			route.name !== 'Home' && isInTeamTime ? teamColor : inThemeColor,
 
 		innerHeight: 40,
 		headerShown: false,
-		tabBarStyle: Platform.OS === 'ios' ? { height: 85 } : { height: 50 },
+		tabBarStyle: Platform.OS === 'ios' ? { height: 85 } : { height: 50 }
 	};
 };
 const Tab = createBottomTabNavigator();
@@ -64,8 +64,8 @@ export default function TabNavigator() {
 					tabBarLabel: '개인 시간표',
 					tabBarLabelStyle: {
 						fontSize: 11,
-						fontFamily: 'NanumSquareBold',
-					},
+						fontFamily: 'NanumSquareBold'
+					}
 				}}
 			/>
 			<Tab.Screen
@@ -75,8 +75,8 @@ export default function TabNavigator() {
 					tabBarLabel: '팀 일정',
 					tabBarLabelStyle: {
 						fontSize: 11,
-						fontFamily: 'NanumSquareBold',
-					},
+						fontFamily: 'NanumSquareBold'
+					}
 				}}
 			/>
 		</Tab.Navigator>

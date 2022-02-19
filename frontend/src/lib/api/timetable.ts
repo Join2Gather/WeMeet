@@ -5,22 +5,19 @@ import type {
 	requestIndividualDatesAPI,
 	postIndividualDatesAPI,
 	postConfirmAPI,
-	getSnapShotAPI,
+	getSnapShotAPI
 } from '../../interface';
 import { makeHeader } from '../util/header';
-import { API_URL } from 'react-native-dotenv';
-
-console.log(API_URL);
 // 개인 시간 받아오기
 export const getIndividualDates = ({
 	user,
 	id,
 	uri,
-	token,
+	token
 }: requestIndividualDatesAPI) => {
 	const headers = makeHeader(token);
 	return client.get(`users/${user}/profiles/${id}/clubs/${uri}/individual`, {
-		headers,
+		headers
 	});
 };
 
@@ -29,11 +26,11 @@ export const getGroupDates = ({
 	user,
 	id,
 	uri,
-	token,
+	token
 }: requestGroupDatesAPI) => {
 	const headers = makeHeader(token);
 	return client.get(`users/${user}/profiles/${id}/clubs/${uri}/group`, {
-		headers,
+		headers
 	});
 };
 
@@ -43,13 +40,13 @@ export const postIndividualTime = ({
 	id,
 	uri,
 	dates,
-	token,
+	token
 }: postIndividualDatesAPI) => {
 	const headers = makeHeader(token);
 	const data = JSON.stringify(dates);
 
 	return client.post(`users/${user}/profiles/${id}/clubs/${uri}`, data, {
-		headers,
+		headers
 	});
 };
 
@@ -62,7 +59,7 @@ export const postConfirm = ({ user, id, uri, date, token }: postConfirmAPI) => {
 		`users/${user}/profiles/${id}/clubs/${uri}/confirm/ok`,
 		data,
 		{
-			headers,
+			headers
 		}
 	);
 };
@@ -72,7 +69,7 @@ export const getSnapShot = ({ id, uri, user, token }: getSnapShotAPI) => {
 	const headers = makeHeader(token);
 
 	return client.get(`users/${user}/profiles/${id}/clubs/${uri}/snapshot`, {
-		headers,
+		headers
 	});
 };
 

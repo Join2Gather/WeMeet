@@ -7,7 +7,7 @@ import type {
 	getSnapShotAPI,
 	responseSnapShotTimetable,
 	timetable,
-	makeTeam,
+	makeTeam
 } from '../interface';
 
 import { createAction } from 'redux-actions';
@@ -18,11 +18,10 @@ import { useMakeTimeTableWith60 } from '../hooks';
 import { Alert } from 'react-native';
 import {
 	addEveryTime,
-	deleteDate,
 	makeConfirmWith,
 	makeGroupTimeTableWith60,
 	makeIndividualTimetable,
-	makeSnapShotDate,
+	makeSnapShotDate
 } from '../lib/util';
 import _ from 'lodash';
 const GET_INDIVIDUAL = 'timetable/GET_INDIVIDUAL';
@@ -103,7 +102,7 @@ const initialState: timetable = {
 		thu: [],
 		wed: [],
 		fri: [],
-		sat: [],
+		sat: []
 	},
 	day: '',
 	dayIdx: 0,
@@ -117,7 +116,7 @@ const initialState: timetable = {
 		wed: [],
 		thu: [],
 		fri: [],
-		sat: [],
+		sat: []
 	},
 	confirmDates: {
 		sun: [],
@@ -126,7 +125,7 @@ const initialState: timetable = {
 		wed: [],
 		thu: [],
 		fri: [],
-		sat: [],
+		sat: []
 	},
 	error: '',
 	postDatesPrepare: false,
@@ -138,44 +137,44 @@ const initialState: timetable = {
 		wed: [],
 		thu: [],
 		fri: [],
-		sat: [],
+		sat: []
 	},
 	responseGroup: {
 		sun: {
 			avail_people: [],
 			avail_time: [],
-			count: [],
+			count: []
 		},
 		mon: {
 			avail_people: [],
 			avail_time: [],
-			count: [],
+			count: []
 		},
 		tue: {
 			avail_people: [],
 			avail_time: [],
-			count: [],
+			count: []
 		},
 		wed: {
 			avail_people: [],
 			avail_time: [],
-			count: [],
+			count: []
 		},
 		thu: {
 			avail_people: [],
 			avail_time: [],
-			count: [],
+			count: []
 		},
 		fri: {
 			avail_people: [],
 			avail_time: [],
-			count: [],
+			count: []
 		},
 		sat: {
 			avail_people: [],
 			avail_time: [],
-			count: [],
-		},
+			count: []
+		}
 	},
 	everyTime: {
 		sun: [],
@@ -184,7 +183,7 @@ const initialState: timetable = {
 		wed: [],
 		thu: [],
 		fri: [],
-		sat: [],
+		sat: []
 	},
 	isTimePicked: false,
 	isTimeNotExist: false,
@@ -213,7 +212,7 @@ const initialState: timetable = {
 	isInitial: true,
 	isOverlap: false,
 	selectIdx: 0,
-	loading: '',
+	loading: ''
 };
 
 export const timetableSlice = createSlice({
@@ -245,7 +244,7 @@ export const timetableSlice = createSlice({
 				wed: [],
 				thu: [],
 				fri: [],
-				sat: [],
+				sat: []
 			};
 
 			state.timesText = timesText;
@@ -259,7 +258,7 @@ export const timetableSlice = createSlice({
 				wed: [],
 				thu: [],
 				fri: [],
-				sat: [],
+				sat: []
 			};
 		},
 		getOtherConfirmDates: (
@@ -298,7 +297,7 @@ export const timetableSlice = createSlice({
 				wed: [],
 				thu: [],
 				fri: [],
-				sat: [],
+				sat: []
 			};
 			state.responseIndividual = action.payload;
 			state.postIndividualDates = action.payload;
@@ -340,7 +339,7 @@ export const timetableSlice = createSlice({
 			action: PayloadAction<responseSnapShotTimetable>
 		) => {
 			const { created_date, dates } = action.payload;
-			console.log(action.payload);
+
 			state.snapShotError = false;
 			makeSnapShotDate(state, created_date, dates);
 		},
@@ -401,13 +400,11 @@ export const timetableSlice = createSlice({
 				Alert.alert('알림', '이미 지정된 시간 입니다', [
 					{
 						text: '확인',
-						onPress: () => {},
-					},
+						onPress: () => {}
+					}
 				]);
 				state.isTimePicked = true;
 			}
-
-			// state.selectTime[state.day].push(action.payload);
 		},
 		toggleTimePick: (state) => {
 			state.isTimePicked = false;
@@ -424,8 +421,8 @@ export const timetableSlice = createSlice({
 					Alert.alert('알림', '가능 시간 중에서 선택해 주세요', [
 						{
 							text: '확인',
-							onPress: () => {},
-						},
+							onPress: () => {}
+						}
 					]);
 					state.isTimeNotExist = true;
 				}
@@ -440,24 +437,24 @@ export const timetableSlice = createSlice({
 			let modeSelect = [
 				{
 					count: 0,
-					content: 'individual',
+					content: 'individual'
 				},
 				{
 					count: 0,
-					content: 'other',
+					content: 'other'
 				},
 				{
 					count: 0,
-					content: 'everyTime',
+					content: 'everyTime'
 				},
 				{
 					count: 0,
-					content: 'normal',
+					content: 'normal'
 				},
 				{
 					count: 0,
-					content: 'team',
-				},
+					content: 'team'
+				}
 			];
 			if (mode === 'group') {
 				state.teamDatesWith60[state.dayIdx].times[time].forEach((t) => {
@@ -493,7 +490,7 @@ export const timetableSlice = createSlice({
 				wed: [],
 				thu: [],
 				fri: [],
-				sat: [],
+				sat: []
 			};
 			state.teamConfirmDate = defaultDatesWith60;
 		},
@@ -543,12 +540,12 @@ export const timetableSlice = createSlice({
 					starting_hours: state.startTime,
 					starting_minutes: state.startMinute,
 					end_hours: state.endTime,
-					end_minutes: state.endMinute,
+					end_minutes: state.endMinute
 				};
 
 				state.postIndividualDates[state.weekIndex[state.dayIdx]] = [
 					...state.postIndividualDates[state.weekIndex[state.dayIdx]],
-					data,
+					data
 				];
 
 				state.postDatesPrepare = true;
@@ -573,7 +570,7 @@ export const timetableSlice = createSlice({
 					starting_hours: state.startTime,
 					starting_minutes: state.startMinute,
 					end_hours: state.endTime,
-					end_minutes: state.endMinute,
+					end_minutes: state.endMinute
 				};
 
 				state.confirmDates[state.weekIndex[state.dayIdx]].push(data);
@@ -615,11 +612,11 @@ export const timetableSlice = createSlice({
 
 							startTime: {
 								hour: t.starting_hours,
-								minute: t.starting_minutes,
+								minute: t.starting_minutes
 							},
 							endTime: {
 								hour: t.end_hours,
-								minute: t.end_minutes,
+								minute: t.end_minutes
 							},
 							selectTime: time,
 							timeText: `${
@@ -634,7 +631,7 @@ export const timetableSlice = createSlice({
 								t.end_hours > 12
 									? `오후  ${t.end_hours - 12}`
 									: `오전  ${t.end_hours}`
-							} : ${t.end_minutes < 10 ? '0' + t.end_minutes : t.end_minutes}`,
+							} : ${t.end_minutes < 10 ? '0' + t.end_minutes : t.end_minutes}`
 						};
 
 						// data.people.forEach((p:any) => {
@@ -653,11 +650,11 @@ export const timetableSlice = createSlice({
 						const data = {
 							startTime: {
 								hour: t.starting_hours,
-								minute: t.starting_minutes,
+								minute: t.starting_minutes
 							},
 							endTime: {
 								hour: t.end_hours,
-								minute: t.end_minutes,
+								minute: t.end_minutes
 							},
 							selectTime: time,
 							timeText: `${
@@ -672,7 +669,7 @@ export const timetableSlice = createSlice({
 								t.end_hours > 12
 									? `오후  ${t.end_hours - 12}`
 									: `오전  ${t.end_hours}`
-							} : ${t.end_minutes < 10 ? '0' + t.end_minutes : t.end_minutes}`,
+							} : ${t.end_minutes < 10 ? '0' + t.end_minutes : t.end_minutes}`
 						};
 						state.findTime = [...state.findTime, data];
 					}
@@ -723,7 +720,7 @@ export const timetableSlice = createSlice({
 				wed: [],
 				thu: [],
 				fri: [],
-				sat: [],
+				sat: []
 			};
 			state.postDatesPrepare = true;
 		},
@@ -732,9 +729,9 @@ export const timetableSlice = createSlice({
 		},
 		setGroupTimeToConfirm: (state) => {
 			makeGroupTimeTableWith60(state, state.teamConfirmDate);
-		},
+		}
 	},
-	extraReducers: {},
+	extraReducers: {}
 });
 
 export const {
@@ -775,7 +772,7 @@ export const {
 	deleteAllIndividual,
 	setTimetableLoading,
 	initializeConfirmTime,
-	setGroupTimeToConfirm,
+	setGroupTimeToConfirm
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;
