@@ -12,14 +12,14 @@ import timetable, { timetableSaga } from './timetable';
 const persistConfig = {
 	key: 'root',
 	storage: AsyncStorage,
-	blacklist: ['team', 'timetable', 'timetable'],
+	blacklist: ['team', 'timetable']
 };
 const rootReducer = combineReducers({
 	loading,
 	login,
 	team,
 	individual,
-	timetable,
+	timetable
 });
 export default persistReducer(persistConfig, rootReducer);
 export type RootState = ReturnType<typeof rootReducer>;
