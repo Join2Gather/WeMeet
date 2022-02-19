@@ -38,7 +38,7 @@ export function ModalInfo({
 
 	return (
 		<ModalView
-			modalVisible={infoVisible}
+			modalVisible={timeTipVisible}
 			ModalViewRender={() => (
 				<>
 					<CloseButton closeBtn={onPressCloseBtn} />
