@@ -17,7 +17,7 @@ import {
 	setDay,
 	setStartHour,
 	setTimeModalMode,
-	toggleTimePick,
+	toggleTimePick
 } from '../store/timetable';
 import type { make60, timeType } from '../interface';
 import { Text } from '../theme';
@@ -31,6 +31,7 @@ import { TouchableOpacity } from 'react-native';
 import { Spinner } from './Spinner';
 import { Platform } from 'react-native';
 import { setModalMode } from '../store/team';
+import { getGroupIndividualTime } from '../hooks/getGroupIndividualTime';
 
 const isAOS = Platform.OS === 'android';
 
@@ -85,22 +86,17 @@ export function Timetable({
 	endIdx,
 	color,
 	teamConfirmDate,
-	isHomeTime,
+	isHomeTime
 }: props) {
 	const {
 		dates,
 		id,
 		user,
 		token,
-		cloneDateSuccess,
-		kakaoDates,
 		isTimePicked,
 		postIndividualDates,
 		confirmDates,
-		loadingJoin,
-		joinTeamError,
 		teamDatesWith60,
-		isTimeNotExist,
 		timeMode,
 		joinUri,
 		confirmClubs,
@@ -113,25 +109,17 @@ export function Timetable({
 		selectTimeMode,
 		modalMode,
 		inTimeMode,
-		isInitial,
-		isOverlap,
-		todayDate,
-		isViewError,
+		isInitial
 	} = useSelector(
 		({ timetable, individual, login, loading, team }: RootState) => ({
 			dates: timetable.dates,
 			id: login.id,
 			user: login.user,
 			token: login.token,
-			cloneDateSuccess: individual.cloneDateSuccess,
-			kakaoDates: login.kakaoDates,
 			postIndividualDates: timetable.postIndividualDates,
 			confirmDates: timetable.confirmDates,
 			isTimePicked: timetable.isTimePicked,
-			loadingJoin: loading['team/JOIN_TEAM'],
-			joinTeamError: team.joinTeamError,
 			teamDatesWith60: timetable.teamDatesWith60,
-			isTimeNotExist: timetable.isTimeNotExist,
 			timeMode: timetable.timeMode,
 			joinUri: team.joinUri,
 			confirmClubs: login.confirmClubs,
@@ -144,10 +132,7 @@ export function Timetable({
 			selectTimeMode: timetable.selectTimeMode,
 			modalMode: timetable.modalMode,
 			inTimeMode: individual.inTimeMode,
-			isInitial: timetable.isInitial,
-			isOverlap: timetable.isOverlap,
-			todayDate: individual.todayDate,
-			isViewError: login.viewError,
+			isInitial: timetable.isInitial
 		})
 	);
 	const dispatch = useDispatch();
@@ -159,7 +144,7 @@ export function Timetable({
 	const [select, setSelect] = useState({
 		idx: 0,
 		time: 0,
-		day: '',
+		day: ''
 	});
 	const [count, setCount] = useState(1);
 	const [loading, setLoading] = useState('');
@@ -179,52 +164,19 @@ export function Timetable({
 	// 최초 렌더링 개인 페이지 정보 받아오기
 	useEffect(() => {
 		if (isInitial) {
-			if (uri) {
-				dispatch(makeInitialIndividual());
-				if (isGroup) {
-					setLoading('loading');
-					setTimeout(() => {
-						setLoading('');
-					}, 500);
-				}
-				if (timeMode === 'make')
-					dispatch(getGroupDates({ id, user, token, uri: joinUri }));
-				else dispatch(getGroupDates({ id, user, token, uri }));
-
+			isGroup && setLoading('loading'),
 				setTimeout(() => {
-					dispatch(
-						getOtherConfirmDates({
-							confirmClubs,
-							confirmDatesTimetable,
-							isGroup: true,
-						})
-					);
-				}, 200);
-
-				setTimeout(() => {
-					if (timeMode == 'make')
-						dispatch(getIndividualDates({ id, user, token, uri: joinUri }));
-					else {
-						dispatch(getIndividualDates({ id, user, token, uri }));
-					}
-					dispatch(
-						getOtherConfirmDates({
-							confirmClubs,
-							confirmDatesTimetable,
-							isGroup: false,
-						})
-					);
-				}, 400);
-			}
+					setLoading('');
+				}, 500);
+			uri &&
+				getGroupIndividualTime(
+					{ id, token, uri: timeMode === 'make' ? joinUri : uri, user },
+					{ confirmClubs, confirmDatesTimetable },
+					dispatch
+				);
 		}
 	}, [uri, isGroup, isInitial]);
 
-	// useEffect(() => {
-	// 	if (cloneDateSuccess) {
-	// 		dispatch(kakaoLogin(kakaoDates));
-	// 		dispatch(cloneEveryTime(kakaoDates));
-	// 	}
-	// }, [cloneDateSuccess, kakaoDates]);
 	useEffect(() => {
 		// 시간 누르기 로직
 		if (!isHomeTime) {
@@ -237,7 +189,7 @@ export function Timetable({
 					findTimeFromResponse({
 						time: select.time,
 						day: select.day,
-						isTeam: false,
+						isTeam: false
 					})
 				);
 				dispatch(findHomeTime({ day: select.day, time: select.time }));
@@ -247,7 +199,7 @@ export function Timetable({
 					findTimeFromResponse({
 						time: select.time,
 						day: select.day,
-						isTeam: true,
+						isTeam: true
 					})
 				);
 				setTimeout(() => {
@@ -386,8 +338,8 @@ export function Timetable({
 										styles.timeEachView,
 										{
 											borderColor: color ? color : Colors.blue500,
-											height: 60,
-										},
+											height: 60
+										}
 									]}
 									key={idx}
 								>
@@ -400,8 +352,8 @@ export function Timetable({
 										styles.timeEachView,
 										{
 											borderColor: color ? color : Colors.blue500,
-											height: 60,
-										},
+											height: 60
+										}
 									]}
 									key={idx}
 								>
@@ -423,7 +375,7 @@ export function Timetable({
 												{
 													// borderColor: day.timeBackColor[Number(time)],
 													// backgroundColor: day.timeBackColor[Number(time)],
-												},
+												}
 											]}
 											key={time}
 											onPress={() => {
@@ -454,8 +406,8 @@ export function Timetable({
 															borderLeftWidth:
 																Number(time) === endHour ? 0 : borderWidth,
 															borderRightWidth:
-																Number(time) === endHour ? 0 : borderWidth,
-														},
+																Number(time) === endHour ? 0 : borderWidth
+														}
 													]}
 												/>
 											))}
@@ -472,7 +424,7 @@ export function Timetable({
 										<TouchableOpacity
 											style={[
 												styles.boxView,
-												{ backgroundColor: day.timeBackColor[Number(time)] },
+												{ backgroundColor: day.timeBackColor[Number(time)] }
 											]}
 											key={time}
 											onPress={() => {
@@ -500,8 +452,8 @@ export function Timetable({
 															borderLeftWidth:
 																Number(time) === endHour ? 0 : borderWidth,
 															borderRightWidth:
-																Number(time) === endHour ? 0 : borderWidth,
-														},
+																Number(time) === endHour ? 0 : borderWidth
+														}
 													]}
 												/>
 											))}
@@ -518,7 +470,7 @@ export function Timetable({
 										<TouchableOpacity
 											style={[
 												styles.boxView,
-												{ backgroundColor: day.timeBackColor[Number(time)] },
+												{ backgroundColor: day.timeBackColor[Number(time)] }
 											]}
 											key={time}
 											onPress={() => {
@@ -545,8 +497,8 @@ export function Timetable({
 															borderLeftWidth:
 																Number(time) === endHour ? 0 : borderWidth,
 															borderRightWidth:
-																Number(time) === endHour ? 0 : borderWidth,
-														},
+																Number(time) === endHour ? 0 : borderWidth
+														}
 													]}
 												/>
 											))}
@@ -563,7 +515,7 @@ export function Timetable({
 										<TouchableOpacity
 											style={[
 												styles.boxView,
-												{ backgroundColor: day.timeBackColor[Number(time)] },
+												{ backgroundColor: day.timeBackColor[Number(time)] }
 											]}
 											key={time}
 											onPress={() => {
@@ -598,8 +550,8 @@ export function Timetable({
 															borderRightWidth:
 																Number(time) === endHour
 																	? t.borderWidth
-																	: t.borderWidth,
-														},
+																	: t.borderWidth
+														}
 													]}
 												/>
 											))}
@@ -616,7 +568,7 @@ export function Timetable({
 										<TouchableOpacity
 											style={[
 												styles.boxView,
-												{ backgroundColor: day.timeBackColor[Number(time)] },
+												{ backgroundColor: day.timeBackColor[Number(time)] }
 											]}
 											key={time}
 											onPress={() => {
@@ -647,8 +599,8 @@ export function Timetable({
 															borderLeftWidth:
 																Number(time) === endHour ? 0 : borderWidth,
 															borderRightWidth:
-																Number(time) === endHour ? 0 : borderWidth,
-														},
+																Number(time) === endHour ? 0 : borderWidth
+														}
 													]}
 												/>
 											))}
@@ -712,38 +664,38 @@ const styles = StyleSheet.create({
 	contentView: {
 		flexDirection: 'row',
 		width: '90%',
-		justifyContent: 'space-evenly',
+		justifyContent: 'space-evenly'
 	},
 	timeView: {
-		width: screen.width / 13,
+		width: screen.width / 13
 	},
 	timeText: {
 		fontSize: 10,
 		alignSelf: 'flex-end',
 		textAlign: 'right',
 		fontFamily: 'NanumSquareR',
-		marginTop: 2,
+		marginTop: 2
 	},
 	columnView: {
-		flexDirection: 'column',
+		flexDirection: 'column'
 	},
 	rowView: {
-		flexDirection: 'row',
+		flexDirection: 'row'
 	},
 
 	timeEachView: {
 		borderTopWidth: 2,
 
 		width: screen.width / 3,
-		alignSelf: 'flex-end',
+		alignSelf: 'flex-end'
 	},
 	boxView: {
 		height: 30,
 		borderColor: Colors.black,
-		width: screen.width / 9,
+		width: screen.width / 9
 	},
 	timeSmallView: {
 		flex: isAOS ? 1 : 0,
-		height: 5,
-	},
+		height: 5
+	}
 });
