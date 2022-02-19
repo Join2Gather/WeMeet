@@ -22,9 +22,6 @@ jest.mock('react-redux');
 
 describe('login  reducer', () => {
 	let initial: Login;
-	const dispatch = jest.fn();
-	const dispatched = [];
-	let iter;
 	beforeEach(() => {
 		initial = initialState;
 	});
@@ -141,7 +138,6 @@ describe('login Saga test', () => {
 			})
 			.dispatch({ type: 'login/USER_ME', payload: { token } })
 			.silentRun();
-		console.log(storeState);
 		expect(storeState.name).toEqual('장동현');
 	});
 	it('로그인 실패', async () => {
@@ -195,16 +191,24 @@ describe('login Saga test', () => {
 		expect(storeState.nickname).toEqual('장동현');
 	});
 	it('닉네임 변경 실패', async () => {
+		const action = 'CHANGE_NICKNAME';
 		const { storeState } = await expectSaga(loginSaga)
 			.withReducer(login)
-			.dispatch({ type: 'LOADING/startLoading' })
-			.dispatch({ type: 'login/CHANGE_NICKNAME', payload: { token: '1111' } })
 			.provide([
 				[
 					call(api.getUserMe, { token: '1111' }),
 					new Error('Page Not Found 404')
 				]
 			])
+			.put({
+				type: 'LOADING/startLoading',
+				payload: `login/${action}`
+			})
+			.put({
+				type: 'LOADING/endLoading',
+				payload: `login/${action}`
+			})
+			.dispatch({ type: 'login/CHANGE_NICKNAME', payload: { token: '1111' } })
 			.silentRun();
 		expect(storeState.error).toEqual('nickname error');
 	});
