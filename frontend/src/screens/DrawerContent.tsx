@@ -4,7 +4,7 @@ import {
 	Dimensions,
 	Platform,
 	StyleSheet,
-	TouchableHighlight,
+	TouchableHighlight
 } from 'react-native';
 // prettier-ignore
 import {View, Text, NavigationHeader, UnderlineText,
@@ -29,19 +29,19 @@ const screen = Dimensions.get('screen');
 
 const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 	const {
-		individualColor,
+		inThemeColor,
 		myNickName,
 		joinClubNum,
 		confirmClubNum,
 		token,
-		color,
+		color
 	} = useSelector(({ login }: RootState) => ({
-		individualColor: login.individualColor,
+		inThemeColor: login.inThemeColor,
 		myNickName: login.nickname,
 		joinClubNum: login.joinClubNum,
 		confirmClubNum: login.confirmClubNum,
 		token: login.token,
-		color: login.individualColor,
+		color: login.inThemeColor
 	}));
 	const { navigation } = props;
 	const close = useCallback(
@@ -67,7 +67,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
 			allowsEditing: false,
 			aspect: [4, 3],
-			quality: 1,
+			quality: 1
 		});
 		if (!result.cancelled) {
 			const imagePath = result.uri;
@@ -91,10 +91,10 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 
 	// }, []);
 	return (
-		<SafeAreaView style={{ backgroundColor: individualColor }}>
+		<SafeAreaView style={{ backgroundColor: inThemeColor }}>
 			<View style={{ flex: 1 }}>
 				<NavigationHeader
-					headerColor={individualColor}
+					headerColor={inThemeColor}
 					Right={() => (
 						<Icon color={Colors.white} name="close" size={31} onPress={close} />
 					)}
@@ -114,7 +114,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 										<Font5Icon
 											name="user-alt"
 											size={21}
-											color={individualColor}
+											color={inThemeColor}
 											style={styles.iconStyle}
 										/>
 										<Text style={styles.touchText}> 닉네임 : {myNickName}</Text>
@@ -129,7 +129,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 										<Font5Icon
 											name="th-list"
 											size={21}
-											color={individualColor}
+											color={inThemeColor}
 											style={styles.iconStyle}
 										/>
 										<Text style={styles.touchText}>
@@ -147,7 +147,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 										<Font5Icon
 											name="check-square"
 											size={21}
-											color={individualColor}
+											color={inThemeColor}
 											style={styles.iconStyle}
 										/>
 										<Text style={styles.touchText}>
@@ -175,7 +175,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 										<MaterialCommunityIcon
 											name="clock"
 											size={23}
-											color={individualColor}
+											color={inThemeColor}
 											style={styles.iconStyle}
 										/>
 										<Text style={styles.touchText}>에브리 타임</Text>
@@ -199,7 +199,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 										<FontAwesome
 											name="photo"
 											size={22}
-											color={individualColor}
+											color={inThemeColor}
 											style={styles.iconStyle}
 										/>
 										<Text style={styles.touchText}>갤러리</Text>
@@ -239,7 +239,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 										<Ionic
 											name="chatbubble-sharp"
 											size={21}
-											color={individualColor}
+											color={inThemeColor}
 											style={styles.iconStyle}
 										/>
 										<Text style={styles.touchText}>카카오톡 </Text>
@@ -263,7 +263,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 										<Ionic
 											name="mail-sharp"
 											size={21}
-											color={individualColor}
+											color={inThemeColor}
 											style={styles.iconStyle}
 										/>
 										<Text style={styles.touchText}>이메일 </Text>
@@ -294,23 +294,23 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
 		marginLeft: '5%',
-		marginTop: 20,
+		marginTop: 20
 	},
 	blankView: {
-		height: 15,
+		height: 15
 	},
 	blankGreyView: {
 		height: 20,
 		backgroundColor: Colors.grey200,
-		marginTop: 20,
+		marginTop: 20
 	},
 	backgroundView: {
 		borderRadius: 13,
-		backgroundColor: Colors.grey100,
+		backgroundColor: Colors.grey100
 	},
 	columnView: {
 		flexDirection: 'column',
-		alignContent: 'center',
+		alignContent: 'center'
 	},
 	touchButtonStyle: {
 		// padding: 10,
@@ -325,27 +325,27 @@ const styles = StyleSheet.create({
 		width: '100%',
 		height: screen.height * 0.05,
 		// backgroundColor: Colors.grey400,
-		padding: 5,
+		padding: 5
 	},
 	iconStyle: {
 		marginLeft: 10,
 		height: 25,
 		width: 25,
-		marginTop: 3,
+		marginTop: 3
 	},
 	touchText: {
 		fontSize: 14,
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
-		marginLeft: 5,
+		marginLeft: 5
 	},
 	iconView: {
 		alignItems: 'flex-end',
 		flex: 1.5,
-		backgroundColor: 'transparent',
+		backgroundColor: 'transparent'
 	},
 	rightIconStyle: {
-		marginRight: 10,
-	},
+		marginRight: 10
+	}
 });
