@@ -9,7 +9,8 @@ import type {
 	requestTeamAPI,
 	responseTeamAPI,
 	shareUriAPI,
-	team,
+	leaveTeamAPI,
+	team
 } from '../interface';
 import * as Clipboard from 'expo-clipboard';
 import { Alert } from 'react-native';
@@ -24,8 +25,8 @@ export const postTeamName = createAction(
 	(data: requestTeamAPI) => data
 );
 export const shareUri = createAction(SHARE_URI, (data: shareUriAPI) => data);
-export const joinTeam = createAction(JOIN_TEAM, (data: joinTeamAPI) => data);
-export const leaveTeam = createAction(LEAVE_TEAM, (data: joinTeamAPI) => data);
+export const joinTeam = createAction(JOIN_TEAM, (data: leaveTeamAPI) => data);
+export const leaveTeam = createAction(LEAVE_TEAM, (data: leaveTeamAPI) => data);
 export const changeColor = createAction(
 	CHANGE_COLOR,
 	(data: changeColorAPI) => data
@@ -61,7 +62,7 @@ const initialState: team = {
 	leaveTeamOK: false,
 	startHour: 0,
 	endHour: 0,
-	peopleCount: 0,
+	peopleCount: 0
 };
 
 export const teamSlice = createSlice({
@@ -131,9 +132,9 @@ export const teamSlice = createSlice({
 		},
 		setModalMode: (state, action: PayloadAction<string>) => {
 			state.modalMode = action.payload;
-		},
+		}
 	},
-	extraReducers: {},
+	extraReducers: {}
 });
 
 export const { inputTeamName, initialError, initialJoinTeam, setModalMode } =

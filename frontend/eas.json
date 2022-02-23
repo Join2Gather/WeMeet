@@ -17,7 +17,11 @@
 				"cocoapods": "1.10.2"
 			}
 		},
-		"production": {}
+		"production": {
+			"ios": {
+				"cocoapods": "1.10.2"
+			}
+		}
 	},
 	"submit": {
 		"production": {}

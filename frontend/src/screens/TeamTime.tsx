@@ -71,7 +71,7 @@ export default function TeamTime({ route }: Props) {
 		isConfirmProve,
 		alarmTime,
 		isOverlap,
-		seeTimeTips,
+		timeTipVisible,
 		confirmClubs,
 		confirmDatesTimetable,
 		timeMode
@@ -96,7 +96,7 @@ export default function TeamTime({ route }: Props) {
 		isConfirmProve: login.isConfirmProve,
 		alarmTime: login.alarmTime,
 		isOverlap: timetable.isOverlap,
-		seeTimeTips: login.seeTimeTips,
+		timeTipVisible: login.timeTipVisible,
 		confirmClubs: login.confirmClubs,
 		confirmDatesTimetable: login.confirmDatesTimetable,
 		timeMode: timetable.timeMode
@@ -134,9 +134,9 @@ export default function TeamTime({ route }: Props) {
 
 	const [infoVisible, setInfoVisible] = useState(false);
 
-	// useEffect(() => {
-	// 	seeTips ? setInfoVisible(true) : setInfoVisible(false);
-	// }, [seeTips]);
+	useEffect(() => {
+		timeTipVisible ? setInfoVisible(true) : setInfoVisible(false);
+	}, [timeTipVisible]);
 
 	useEffect(() => {
 		isOverlap &&
@@ -241,7 +241,7 @@ export default function TeamTime({ route }: Props) {
 						thirdRight={() => (
 							<TouchHeaderIconView
 								underlayColor={color}
-								onPress={() => dispatch(setTimeTipVisible(true))}
+								onPress={() => setInfoVisible(true)}
 							>
 								<FontAwesome5Icon
 									name="question-circle"

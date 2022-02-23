@@ -10,7 +10,7 @@ export interface Login {
 	kakaoDates: Array<any>;
 	uri: string;
 	error: string;
-
+	everyTime: confirmDates;
 	peopleCount: number;
 	response: '';
 	confirmDatesTimetable: Array<responseEveryTime>;
@@ -18,7 +18,7 @@ export interface Login {
 	userMeSuccess: boolean;
 	startHour: number;
 	endHour: number;
-	dates: any;
+	dates: dates[];
 	nickname: string;
 	findIndividual: findTime[];
 	inDates: inDates;
@@ -44,6 +44,22 @@ export interface Login {
 export interface homeTime {
 	start: number;
 	end: number;
+}
+
+export interface dates {
+	sun: date[];
+	mon: date[];
+	tue: date[];
+	wed: date[];
+	thu: date[];
+	fri: date[];
+	sat: date[];
+	club: {
+		id: number;
+		name: string;
+	};
+	is_temporary_reserved: boolean;
+	color: string;
 }
 
 export interface appleLoginType {
@@ -80,6 +96,7 @@ export interface inDates {
 	thu: date[];
 	fri: date[];
 	sat: date[];
+
 	[prop: string]: date[];
 }
 

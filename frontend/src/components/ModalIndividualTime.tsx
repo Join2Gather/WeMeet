@@ -1,17 +1,7 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import {
-	Alert,
-	Modal,
-	StyleSheet,
-	Text,
-	TouchableHighlight,
-	View,
-	Dimensions,
-	ScrollView
-} from 'react-native';
+import { StyleSheet, Text, View, Dimensions, ScrollView } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import type { findTime } from '../interface/timetable';
 import {
 	makeTeamTime,
@@ -35,7 +25,6 @@ const screen = Dimensions.get('screen');
 interface props {
 	inModalVisible?: boolean;
 	setInModalVisible?: React.Dispatch<React.SetStateAction<boolean>>;
-
 	findIndividual: findTime[];
 	inTimeMode: string;
 }

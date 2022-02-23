@@ -3,9 +3,8 @@ import React, { useEffect } from 'react';
 import { WebView } from 'react-native-webview';
 import { useDispatch } from 'react-redux';
 import { kakaoLogin } from '../../store/individual';
-import { setAppleToken } from '../../store/login';
+import { setAppleToken, getUserMe } from '../../store/login';
 import type { kakaoLoginAPI } from '../../interface';
-import { getUserMe } from '../../lib/api/login';
 
 export function SocialWebview({ closeSocialModal, source }: any) {
 	const dispatch = useDispatch();
@@ -39,7 +38,7 @@ export function SocialWebview({ closeSocialModal, source }: any) {
 			dispatch(setAppleToken(data.token));
 			dispatch(getUserMe({ token: data.token }));
 		} catch (e) {
-			console.log(e);
+			console.log('Error', e);
 		}
 
 		navigation.navigate('TabNavigator');

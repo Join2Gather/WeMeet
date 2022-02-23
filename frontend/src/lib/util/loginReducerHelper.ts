@@ -1,6 +1,9 @@
+import { each, filter, map, pipe, reject, take, toArray } from '@fxts/core';
 import { Colors } from 'react-native-paper';
+import { Individual } from '../../interface';
 import type { Login } from '../../interface/login';
-
+import * as _ from 'fxjs';
+import * as L from 'fxjs/Lazy';
 export function changeTeamInfo(
 	state: Login,
 	data: any,
@@ -56,13 +59,22 @@ export const loginInitialState: Login = {
 		end: 25
 	},
 	loading: '',
-	seeTips: true,
-	seeTimeTips: true,
+	seeTips: false,
+	seeTimeTips: false,
 	code: '',
 	email: '',
 	viewError: false,
-	timeTipVisible: true,
-	inTimeColor: Colors.grey600
+	timeTipVisible: false,
+	inTimeColor: Colors.grey600,
+	everyTime: {
+		sun: [],
+		mon: [],
+		tue: [],
+		wed: [],
+		thu: [],
+		fri: [],
+		sat: []
+	}
 };
 
 export function setUserMeData(state: Login, action: any) {
@@ -85,6 +97,21 @@ export function setUserMeData(state: Login, action: any) {
 	state.nickname = nickname;
 	state.clubs = clubs;
 	state.dates = dates;
-
 	state.error = '';
+}
+
+export function makeConfirmTimeData(d: any, day: any) {
+	return {
+		start: {
+			hour: d.starting_hours,
+			minute: d.starting_minutes
+		},
+		end: {
+			hour: d.end_hours,
+			minute: d.end_minutes
+		},
+		color: day.color,
+		name: day.club === null ? '개인 시간표' : day.club.name,
+		id: day.club?.id
+	};
 }

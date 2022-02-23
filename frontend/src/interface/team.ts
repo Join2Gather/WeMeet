@@ -65,3 +65,5 @@ export interface changeColorAPI {
 	user: number;
 	color: string;
 }
+
+export type leaveTeamAPI = Pick<joinTeamAPI, 'id' | 'token' | 'uri' | 'user'>;

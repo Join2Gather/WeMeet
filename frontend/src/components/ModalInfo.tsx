@@ -24,7 +24,7 @@ export function ModalInfo({
 	seeTips,
 	color
 }: props) {
-	const { seeTimeTips, uri, timeTipVisible } = useSelector(
+	const { seeTimeTips, timeTipVisible } = useSelector(
 		({ timetable, login }: RootState) => ({
 			seeTimeTips: login.seeTimeTips,
 			uri: timetable.teamURI,
@@ -33,12 +33,12 @@ export function ModalInfo({
 	);
 	const dispatch = useDispatch();
 	const onPressCloseBtn = useCallback(() => {
-		dispatch(setTimeTipVisible(false));
+		setInfoVisible(false);
 	}, []);
 
 	return (
 		<ModalView
-			modalVisible={timeTipVisible}
+			modalVisible={infoVisible}
 			ModalViewRender={() => (
 				<>
 					<CloseButton closeBtn={onPressCloseBtn} />

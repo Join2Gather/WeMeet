@@ -38,13 +38,13 @@ import {
 	postConfirm,
 	postRevert,
 	postSnapShot,
-	setGroupTimeToConfirm,
+	setGroupTimeToConfirm
 } from '../store/timetable';
 import team from '../store/team';
 import { ModalLoading } from '../components/ModalLoading';
 import { Sequence } from '../components/Sequence';
 import { DayOfWeek } from '../components';
-import { confirmProve, getUserMe } from '../store/login';
+import { confirmProve, getUserMe, setConfirmProve } from '../store/login';
 
 export default function SnapShot({ route }: Props) {
 	const {
@@ -62,7 +62,7 @@ export default function SnapShot({ route }: Props) {
 		confirmClubs,
 		confirmDatesTimetable,
 		createdDate,
-		uri,
+		uri
 	} = useSelector(({ timetable, login, team }: RootState) => ({
 		snapShotDate: timetable.snapShotDate,
 		teamConfirmDate: timetable.teamConfirmDate,
@@ -78,7 +78,7 @@ export default function SnapShot({ route }: Props) {
 		confirmClubs: login.confirmClubs,
 		confirmDatesTimetable: login.confirmDatesTimetable,
 		createdDate: timetable.createdDate,
-		uri: timetable.teamURI,
+		uri: timetable.teamURI
 	}));
 	// useState
 	const [mode, setMode] = useState('initial');
@@ -108,14 +108,14 @@ export default function SnapShot({ route }: Props) {
 					getOtherConfirmDates({
 						confirmClubs,
 						confirmDatesTimetable,
-						isGroup: true,
+						isGroup: true
 					})
 				);
 				dispatch(
 					getOtherConfirmDates({
 						confirmClubs,
 						confirmDatesTimetable,
-						isGroup: false,
+						isGroup: false
 					})
 				);
 				dispatch(makeInitialConfirmTime());
@@ -135,7 +135,7 @@ export default function SnapShot({ route }: Props) {
 					getOtherConfirmDates({
 						confirmClubs,
 						confirmDatesTimetable,
-						isGroup: true,
+						isGroup: true
 					})
 				);
 				dispatch(setGroupTimeToConfirm());
@@ -159,7 +159,7 @@ export default function SnapShot({ route }: Props) {
 			dispatch(postSnapShot({ uri, id, token, user }));
 		}
 		dispatch(makeTeamTime({ color, endHour, startHour, peopleCount }));
-		dispatch(confirmProve());
+		dispatch(setConfirmProve(true));
 		setLoading('loading');
 	}, [confirmDates, timeMode, joinUri]);
 	const onPressRevert = useCallback(() => {
@@ -235,7 +235,7 @@ export default function SnapShot({ route }: Props) {
 										flexDirection: 'row',
 										justifyContent: 'center',
 										alignContent: 'center',
-										alignItems: 'center',
+										alignItems: 'center'
 									}}
 								>
 									<Text style={styles.stepText}>상단의 </Text>
@@ -263,7 +263,7 @@ export default function SnapShot({ route }: Props) {
 									<View
 										style={[
 											styles.boxView,
-											{ backgroundColor: Colors.grey300 },
+											{ backgroundColor: Colors.grey300 }
 										]}
 									/>
 									<Text style={styles.infoText}>개인 일정</Text>
@@ -319,10 +319,10 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'center',
 		marginTop: 25,
-		alignSelf: 'center',
+		alignSelf: 'center'
 	},
 	viewHeight: {
-		height: 115,
+		height: 115
 	},
 	touchableBoxView: {
 		flexDirection: 'row',
@@ -330,12 +330,12 @@ const styles = StyleSheet.create({
 		marginBottom: 15,
 		justifyContent: 'center',
 		alignContent: 'center',
-		alignSelf: 'center',
+		alignSelf: 'center'
 		// height: 20,
 	},
 	modeDescriptionText: {
 		flexDirection: 'row',
-		alignSelf: 'center',
+		alignSelf: 'center'
 	},
 	iconText: {
 		fontFamily: 'NanumSquareR',
@@ -346,13 +346,13 @@ const styles = StyleSheet.create({
 		marginLeft: 1,
 		alignSelf: 'center',
 		justifyContent: 'center',
-		textAlignVertical: 'center',
+		textAlignVertical: 'center'
 	},
 	rowView: {
 		flexDirection: 'row',
 		alignContent: 'center',
 		justifyContent: 'center',
-		marginTop: 25,
+		marginTop: 25
 	},
 	infoText: {
 		fontFamily: 'NanumSquareR',
@@ -362,12 +362,12 @@ const styles = StyleSheet.create({
 
 		alignSelf: 'center',
 		justifyContent: 'center',
-		textAlignVertical: 'center',
+		textAlignVertical: 'center'
 	},
 	boxButtonView: {
 		width: 15,
 		height: 15,
-		borderWidth: 0.3,
+		borderWidth: 0.3
 	},
 	boxView: {
 		width: 20,
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
 		marginLeft: 15,
 		borderWidth: 0.5,
 		marginTop: 1,
-		alignSelf: 'center',
+		alignSelf: 'center'
 	},
 	titleText: {
 		fontSize: 15,
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareBold',
 		marginTop: 25,
 		letterSpacing: -1,
-		height: 25,
+		height: 25
 	},
 	stepText: {
 		fontFamily: 'NanumSquareBold',
@@ -392,11 +392,11 @@ const styles = StyleSheet.create({
 		letterSpacing: -1,
 		height: 40,
 		marginTop: 20,
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	loadingText: {
 		fontFamily: 'NanumSquareR',
 		fontSize: 20,
-		color: Colors.white,
-	},
+		color: Colors.white
+	}
 });
