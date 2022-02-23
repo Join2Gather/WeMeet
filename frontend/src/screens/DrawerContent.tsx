@@ -49,7 +49,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 		[]
 	);
 	const onClickOpenChat = useCallback(() => {
-		Linking.openURL('https://open.kakao.com/o/sA4uughd');
+		Linking.openURL('https://open.kakao.com/o/sEnDEM1d');
 	}, []);
 	const onPressEMail = useCallback(() => {
 		Linking.openURL('mailto:wshmin1234@gmail.com');
@@ -161,7 +161,7 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 					</>
 					<View style={styles.blankGreyView} />
 					<>
-						<Text style={styles.titleText}>시간표 불러오기</Text>
+						{/* <Text style={styles.titleText}>시간표 불러오기</Text>
 						<View style={styles.blankView} />
 						<View style={[styles.backgroundView]}>
 							<View style={styles.columnView}>
@@ -213,17 +213,17 @@ const DrawerContent: FC<DrawerContentComponentProps> = (props) => {
 										</View>
 									</View>
 								</TouchableHighlight> */}
-								<ModalSelect
+						{/* <ModalSelect
 									selectModalVisible={selectModalVisible}
 									setSelectModalVisible={setSelectModalVisible}
 									mode={mode}
 									setMode={setMode}
 									color={color}
-								/>
-							</View>
-						</View>
+								/> */}
+						{/* </View> */}
+						{/* </View> */}
 					</>
-					<View style={styles.blankGreyView} />
+					{/* <View style={styles.blankGreyView} /> */}
 					<>
 						<Text style={styles.titleText}>문의 하기</Text>
 						<View style={styles.blankView} />
