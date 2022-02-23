@@ -1,12 +1,10 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { Platform, StyleSheet } from 'react-native';
-// import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { useDispatch, useSelector } from 'react-redux';
+import { Platform } from 'react-native';
+import { useSelector } from 'react-redux';
 
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
 import DatePicker from 'react-native-date-picker';
-import { useIsDarkMode } from '../hooks';
 import MakeAlarm from '../lib/util/MakeAlarm';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
