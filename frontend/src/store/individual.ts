@@ -59,6 +59,8 @@ export const individualSlice = createSlice({
 			state.confirmClubs = confirmClubs;
 			state.confirmDatesTimetable = confirmDatesTimetable;
 			state.inTimeColor = action.payload.inTimeColor;
+			state.individualCount = 0;
+			state.groupCount = 0;
 			state.confirmDatesTimetable?.length &&
 				state.confirmDatesTimetable.map((date, dIdx) => {
 					state.weekIndex.map((day, idx) => {
@@ -144,6 +146,11 @@ export const individualSlice = createSlice({
 		makeHomeTime: (state) => {
 			makeHomeTimetable(state);
 			state.postHomeSuccess = false;
+		},
+		setEveryTimeData: (state, action: PayloadAction<any>) => {
+			state.everyTime = action.payload;
+			delete state.everyTime['club'];
+			delete state.everyTime['is_temporary_reserved'];
 		},
 
 		cloneHomeDate: (state, action: PayloadAction<homeTime>) => {
@@ -316,11 +323,9 @@ export const individualSlice = createSlice({
 				end_hours: state.endTime.hour,
 				end_minutes: state.endTime.minute
 			};
-
-			state.everyTime[state.dayString] = [
-				...state.everyTime[state.dayString],
-				data
-			];
+			delete state.everyTime['club'];
+			delete state.everyTime['is_temporary_reserved'];
+			state.everyTime[state.dayString].push(data);
 			state.postHomePrepare = true;
 		},
 		checkHomeIstBlank: (state) => {
@@ -389,7 +394,8 @@ export const {
 	cloneHomeDate,
 	makeHomeTime,
 	initialIndividualError,
-	setIndividualTimeColor
+	setIndividualTimeColor,
+	setEveryTimeData
 } = individualSlice.actions;
 
 export default individualSlice.reducer;
