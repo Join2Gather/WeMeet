@@ -12,10 +12,11 @@
 		},
 		"assetBundlePatterns": ["**/*"],
 		"ios": {
-			"supportsTablet": true,
+			"supportsTablet": false,
 			"bundleIdentifier": "com.ww8007.weMeet",
 			"userInterfaceStyle": "automatic",
-			"googleServicesFile": "./ios/GoogleService-Info.plist"
+			"googleServicesFile": "./ios/GoogleService-Info.plist",
+			"buildNumber": "1.0.0"
 		},
 		"plugins": ["@react-native-firebase/app"],
 		"android": {
@@ -23,7 +24,8 @@
 				"foregroundImage": "./assets/icon.png",
 				"backgroundColor": "#FFFFFF"
 			},
-			"package": "com.ww8007.weMeet"
+			"package": "com.ww8007.weMeet",
+			"versionCode": 3
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
