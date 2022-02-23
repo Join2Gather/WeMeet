@@ -4,7 +4,6 @@ import {
 	StyleSheet,
 	FlatList,
 	Platform,
-	Image,
 	ScrollView,
 	Animated,
 	RefreshControl
@@ -12,16 +11,13 @@ import {
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 import Constants from 'expo-constants';
 // prettier-ignore
-import {SafeAreaView, View, UnderlineText,TopBar,
+import {SafeAreaView, View,
 NavigationHeader, MaterialCommunityIcon as Icon, Text, TouchHeaderIconView} from '../theme';
-import { ScrollEnabledProvider, useScrollEnabled } from '../contexts';
+import { useScrollEnabled } from '../contexts';
 import {
-	LeftRightNavigation,
 	Spinner,
-	ModalSelect,
 	DayOfWeek,
 	ModalHomeTimePicker,
-	ModalInfo,
 	ModalHomeInfo
 } from '../components';
 import { Timetable } from '../components/Timetable';
@@ -33,22 +29,19 @@ import { RootState } from '../store';
 import {
 	cloneINDates,
 	cloneIndividualDates,
-	postImage
+	initialIndividualTimetable,
+	setEveryTimeData
 } from '../store/individual';
-import * as FileSystem from 'expo-file-system';
 import { useAnimatedValue, useMakeTimetable } from '../hooks';
 import { getUserMe } from '../store/login';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import { HomeSetting } from '../components/HomeSetting';
 import { Sequence } from '../components/Sequence';
-import { TouchableHighlight } from 'react-native-gesture-handler';
-import { setIsInTeamTime } from '../store/timetable';
 import Ionic from 'react-native-vector-icons/Ionicons';
 import { StatusBar } from 'expo-status-bar';
 
 import * as Notifications from 'expo-notifications';
-import { withRepeat } from 'react-native-reanimated';
 
 const iconSize = 22;
 
@@ -107,7 +100,8 @@ export default function Home() {
 		endHour,
 		appLoading,
 		seeTips,
-		isViewError
+		isViewError,
+		everyTime
 	} = useSelector(({ login, individual, loading }: RootState) => ({
 		token: login.token,
 		id: login.id,
@@ -125,7 +119,8 @@ export default function Home() {
 		endHour: login.homeTime.end,
 		appLoading: login.loading,
 		seeTips: login.seeTips,
-		isViewError: login.viewError
+		isViewError: login.viewError,
+		everyTime: login.everyTime
 	}));
 
 	// useEffect(() => {
@@ -154,6 +149,9 @@ export default function Home() {
 	}, []);
 	useEffect(() => {
 		dispatch(getUserMe({ token }));
+		setTimeout(() => {
+			dispatch(setEveryTimeData(everyTime));
+		}, 1000);
 	}, []);
 	useEffect(() => {
 		dispatch(
@@ -195,13 +193,13 @@ export default function Home() {
 	useEffect(() => {
 		userMeError && setSettingModalVisible(true);
 	}, [userMeError]);
-	const onPressPlus = useCallback(() => {
+	const onPressPlusBtn = useCallback(() => {
 		setIsTimeMode(true);
 		setMode('startMode');
 	}, []);
 	// modal
 
-	const open = useCallback(() => {
+	const openDrawer = useCallback(() => {
 		navigation.dispatch(DrawerActions.openDrawer());
 	}, []);
 
@@ -210,8 +208,9 @@ export default function Home() {
 		setHomeVisible(true);
 	}, []);
 
-	const onRefresh = useCallback(() => {
+	const onScrollForRefresh = useCallback(() => {
 		setRefreshing(true);
+		dispatch(initialIndividualTimetable());
 		dispatch(getUserMe({ token }));
 		setTimeout(() => setRefreshing(false), 1000);
 	}, [token]);
@@ -223,7 +222,10 @@ export default function Home() {
 					title="내 일정 등록하기"
 					headerColor={inThemeColor}
 					Left={() => (
-						<TouchHeaderIconView underlayColor={inThemeColor} onPress={open}>
+						<TouchHeaderIconView
+							underlayColor={inThemeColor}
+							onPress={openDrawer}
+						>
 							<Ionic
 								name="menu"
 								size={iconSize + 11}
@@ -235,7 +237,7 @@ export default function Home() {
 					Right={() => (
 						<TouchHeaderIconView
 							underlayColor={inThemeColor}
-							onPress={onPressPlus}
+							onPress={onPressPlusBtn}
 						>
 							<FontAwesome5Icon
 								name="plus"
@@ -363,7 +365,10 @@ export default function Home() {
 				<ScrollView
 					style={{ backgroundColor: Colors.white }}
 					refreshControl={
-						<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+						<RefreshControl
+							refreshing={refreshing}
+							onRefresh={onScrollForRefresh}
+						/>
 					}
 				>
 					<Timetable
