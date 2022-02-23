@@ -78,8 +78,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 
 		backgroundColor: '#33aafc',
-		borderBottomEndRadius: 15,
-		borderBottomLeftRadius: 15,
+		// borderBottomEndRadius: 15,
+		// borderBottomLeftRadius: 15,
 		height: 55
 	},
 	title: {
