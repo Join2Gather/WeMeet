@@ -32,7 +32,7 @@ import {
 	initialIndividualTimetable,
 	setEveryTimeData
 } from '../store/individual';
-import { useAnimatedValue, useMakeTimetable } from '../hooks';
+import { useAnimatedValue } from '../hooks';
 import { getUserMe } from '../store/login';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
@@ -137,16 +137,13 @@ export default function Home() {
 	// 	});
 	// }, []);
 	const dispatch = useDispatch();
-	const { defaultDates } = useMakeTimetable();
+
 	const navigation = useNavigation();
-	useEffect(() => {
-		const isFocus = navigation.getState().routes;
-	}, [navigation]);
-	useEffect(() => {
-		if (!individualDates.length) {
-		}
-		dispatch(cloneIndividualDates(defaultDates));
-	}, []);
+
+	// useEffect(() => {
+	// 	if (!individualDates.length) {
+	// 	}
+	// }, []);
 	useEffect(() => {
 		dispatch(getUserMe({ token }));
 		setTimeout(() => {
