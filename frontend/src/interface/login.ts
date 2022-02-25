@@ -1,5 +1,5 @@
 import { findTime, timeProps, timeType } from '.';
-import type { responseEveryTime } from './individual';
+import type { responseEveryTime, confirmDatesType } from './individual';
 
 export interface Login {
 	id: number;
@@ -13,7 +13,7 @@ export interface Login {
 	everyTime: confirmDates;
 	peopleCount: number;
 	response: '';
-	confirmDatesTimetable: Array<responseEveryTime>;
+	confirmDatesTimetable: Array<confirmDatesType>;
 	confirmClubs: Array<string>;
 	userMeSuccess: boolean;
 	startHour: number;
