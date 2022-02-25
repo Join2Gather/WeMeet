@@ -190,7 +190,7 @@ export function HomeSetting({
 												</View>
 											</View>
 										</TouchableHighlight>
-										{Platform.OS === 'android' && (
+										{/* {Platform.OS === 'android' && (
 											<TouchableHighlight
 												activeOpacity={1}
 												underlayColor={Colors.grey300}
@@ -223,7 +223,7 @@ export function HomeSetting({
 													</View>
 												</View>
 											</TouchableHighlight>
-										)}
+										)} */}
 										<TouchableHighlight
 											activeOpacity={1}
 											underlayColor={Colors.grey300}

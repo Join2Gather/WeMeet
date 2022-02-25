@@ -81,11 +81,11 @@ export interface confirmDatesType {
 	thu: Array<responseTime>;
 	fri: Array<responseTime>;
 	sat: Array<responseTime>;
-	color: string;
+	color?: string;
 	club: {
+		id: number;
 		name: string;
 	};
-	[prop: string]: any;
 }
 
 export interface responseTime {
