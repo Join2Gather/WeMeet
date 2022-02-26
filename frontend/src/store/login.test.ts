@@ -10,7 +10,8 @@ import login, {
 	findTeam,
 	setAlarmTime,
 	setAppleToken,
-	setAppLoading
+	setAppLoading,
+	checkIsConfirmTeam
 } from './login';
 import type { Login } from '../interface/login';
 import * as api from '../lib/api/login';
@@ -40,8 +41,8 @@ describe('login  reducer', () => {
 		expect(state.name).toEqual('We Meet');
 	});
 	it('모임 확정 토글 [setConfirmProve]', () => {
-		const state = login(initial, setConfirmProve(true));
-		expect(state.isConfirmProve === true);
+		const state = login(initial, setConfirmProve(false));
+		expect(state.isConfirmProve === false);
 	});
 	it('홈 시간 찾기 [findHomeTime]', () => {
 		let obj = cloneDeep(initial);
@@ -92,7 +93,24 @@ describe('login  reducer', () => {
 		const state = login(initial, toggleViewError(false));
 		expect(state.viewError).toEqual(false);
 	});
-
+	it('확정 모임인지 확인 [checkIsConfirmTeam]', () => {
+		let obj = cloneDeep(initial);
+		obj.confirmDatesTimetable.push({
+			sun: [],
+			mon: [],
+			tue: [],
+			wed: [],
+			thu: [],
+			fri: [],
+			sat: [],
+			club: {
+				id: 1,
+				name: 'We Meet'
+			}
+		});
+		const state = login(obj, checkIsConfirmTeam(1));
+		expect(state.isConfirmProve).toBe(true);
+	});
 	it('홈 화면 시간 터치 시간 찾기', () => {
 		// const state = login(initial, findHomeTime({ day: '1', time: 20 }));
 	});
