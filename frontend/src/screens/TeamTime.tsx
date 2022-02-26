@@ -47,7 +47,7 @@ import { setModalMode, shareUri } from '../store/team';
 import { ModalSetting } from '../components/ModalSetting';
 import { Sequence } from '../components/Sequence';
 import { TouchableHighlight } from 'react-native-gesture-handler';
-import { setTimeTipVisible } from '../store/login';
+import { setConfirmProve, setTimeTipVisible } from '../store/login';
 import { getGroupIndividualTime } from '../hooks/getGroupIndividualTime';
 
 const iconSize = 22;
@@ -156,6 +156,7 @@ export default function TeamTime({ route }: Props) {
 		dispatch(setModalMode('normal'));
 		dispatch(setIsInTeamTime(false));
 		dispatch(toggleIsInitial(false));
+		dispatch(setConfirmProve(false));
 	}, []);
 	// 공유하기 버튼
 	const onShareURI = useCallback(() => {
