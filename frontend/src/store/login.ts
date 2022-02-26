@@ -17,10 +17,11 @@ import { Colors } from 'react-native-paper';
 import {
 	changeTeamInfo,
 	loginInitialState,
+	makeConfirmTimeData,
 	setUserMeData
 } from '../lib/util/loginReducerHelper';
-import { filter, map, pipe, range, reduce, take } from '@fxts/core';
-import { toArray } from 'lodash';
+import { filter, includes, map, pipe, range, reduce, take } from '@fxts/core';
+import _, { toArray } from 'lodash';
 
 export const initialState: Login = loginInitialState;
 
@@ -56,12 +57,20 @@ export const loginSlice = createSlice({
 	initialState,
 	reducers: {
 		findTeam: (state, action: PayloadAction<{ data: string; use: string }>) => {
-			let data = state.clubs.find(
+			const data = state.clubs.find(
 				(club) => club[action.payload.use] == action.payload.data
 			);
 			if (action.payload.use == 'id') {
-				changeTeamInfo(state, data, true);
-			} else changeTeamInfo(state, data, false);
+				changeTeamInfo(state, data);
+			} else changeTeamInfo(state, data);
+		},
+		checkIsConfirmTeam: (state, action: PayloadAction<number>) => {
+			const result = pipe(
+				state.confirmDatesTimetable,
+				map((c) => c.club?.id),
+				includes(action.payload)
+			);
+			if (result) state.isConfirmProve = true;
 		},
 		setConfirmProve: (state, action: PayloadAction<boolean>) => {
 			state.isConfirmProve = action.payload;
@@ -120,6 +129,7 @@ export const loginSlice = createSlice({
 		},
 		USER_ME_SUCCESS: (state, action: PayloadAction<any>) => {
 			setUserMeData(state, action);
+			// setConfirmDate(state);
 			state.confirmDatesTimetable = state.dates.filter(
 				(day: any) => !day.is_temporary_reserved
 			);
@@ -138,25 +148,18 @@ export const loginSlice = createSlice({
 				state.weekIndex.forEach((dayString) => {
 					if (day[dayString].length) {
 						day[dayString].map((d: any) => {
-							const data = {
-								start: {
-									hour: d.starting_hours,
-									minute: d.starting_minutes
-								},
-								end: {
-									hour: d.end_hours,
-									minute: d.end_minutes
-								},
-								color: day.color,
-								name: day.club === null ? '개인 시간표' : day.club.name,
-								id: day.club?.id
-							};
-							state.inDates[dayString] = [...state.inDates[dayString], data];
+							state.inDates[dayString] = [
+								...state.inDates[dayString],
+								makeConfirmTimeData(d, day)
+							];
 						});
 					}
 				});
 			});
-
+			const find = state.dates.find((d) => d.club == null);
+			if (find) {
+				state.everyTime = find;
+			}
 			state.clubs.map((club) => {
 				club.name = decodeURIComponent(club.name);
 			});
@@ -194,7 +197,8 @@ export const {
 	toggleUserMeSuccess,
 	toggleViewError,
 	setTimeTipVisible,
-	changeInPersistColor
+	changeInPersistColor,
+	checkIsConfirmTeam
 } = loginSlice.actions;
 
 export default loginSlice.reducer;
