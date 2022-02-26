@@ -373,7 +373,7 @@ export function HomeSetting({
 									style={[styles.textInput, { color: Colors.black }]}
 									value={nickname}
 									onChangeText={(nickname) => setNickname((text) => nickname)}
-									placeholder="Enter your Nickname"
+									placeholder="We Meet"
 									placeholderTextColor={Colors.grey600}
 									autoFocus={true}
 									autoCapitalize="none"
@@ -539,7 +539,8 @@ const styles = StyleSheet.create({
 	},
 	textInput: {
 		fontSize: 18,
-		fontFamily: 'NanumSquareR'
+		fontFamily: 'NanumSquareR',
+		textAlign: 'center'
 	},
 	iconStyle: {
 		marginLeft: 10
