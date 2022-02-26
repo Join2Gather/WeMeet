@@ -239,6 +239,11 @@ export function ModalTimePicker({
 				Alert.alert('경고', '모임 시간 이후 시간으로 선택하실 수 없습니다', [
 					{ text: '확인', onPress: () => {} }
 				]);
+			} else if (checkTime.end == timeHour && timeMinute !== 0) {
+				initialWithError();
+				Alert.alert('경고', '모임 시간 이후 시간으로 선택하실 수 없습니다', [
+					{ text: '확인', onPress: () => {} }
+				]);
 			} else if (startTime.hour > timeHour) {
 				initialWithError();
 				Alert.alert('경고', '시작시간 전으로 시간 설정이 불가능 합니다', [
