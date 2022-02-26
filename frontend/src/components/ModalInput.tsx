@@ -90,21 +90,6 @@ export function ModalInput({
 	const [endTime, setEndTime] = useState('22');
 	const [currentNumber, setCurrent] = useState(0);
 
-	const onSatValPickerChange = useCallback(({ sat, val }) => {
-		setHSV((prevState) => ({
-			...prevState,
-			sat: sat,
-			val: val
-		}));
-	}, []);
-
-	const onHuePickerChange = useCallback((hue) => {
-		setHSV((prevState) => ({
-			...prevState,
-			hue: hue
-		}));
-	}, []);
-
 	// useEffect
 	useEffect(() => {
 		if (joinTeamError) setMode('joinError');
@@ -211,7 +196,11 @@ export function ModalInput({
 						{!loadingJoin && (
 							<>
 								<CloseButton closeBtn={onPressCloseButton} />
-
+								{/* <Sequence
+										color={inThemeColor}
+										currentNumber={currentNumber}
+										mode={sequence}
+									/> */}
 								{!loadingJoin && mode === 'makeError' && (
 									<>
 										<View style={styles.errorView}>
@@ -265,7 +254,7 @@ export function ModalInput({
 												style={[styles.textInput, { color: Colors.black }]}
 												value={code}
 												onChangeText={(code) => setCode((text) => code)}
-												placeholder="Enter your Code"
+												placeholder="3515fcaa-004f-497c-bb10-2700604b5de4"
 												placeholderTextColor={Colors.grey600}
 												autoFocus={true}
 											/>
@@ -391,7 +380,7 @@ export function ModalInput({
 								)}
 							</>
 						)}
-						{mode === 'time' && (
+						{mode === 'time' && name !== '' && (
 							<>
 								<Text style={styles.titleText}>모임 시간을 입력해 주세요</Text>
 								<View style={styles.blankView} />
@@ -408,6 +397,7 @@ export function ModalInput({
 											placeholder="09"
 											placeholderTextColor={Colors.grey600}
 											autoFocus={true}
+											keyboardType="number-pad"
 										/>
 									</View>
 								</View>
@@ -421,6 +411,7 @@ export function ModalInput({
 											onChangeText={(hour) => setEndTime((text) => hour)}
 											placeholder="22"
 											placeholderTextColor={Colors.grey600}
+											keyboardType="number-pad"
 										/>
 									</View>
 								</View>
@@ -434,6 +425,28 @@ export function ModalInput({
 									secondOnPressWithParam={() => onPressNext('color')}
 									pressParam="initial"
 									secondParam="color"
+								/>
+							</>
+						)}
+						{mode === 'time' && name === '' && (
+							<>
+								<View style={styles.errorView}>
+									<Material
+										name={'error-outline'}
+										size={23}
+										style={{ alignSelf: 'center' }}
+										color={Colors.red300}
+									/>
+									<Text style={styles.errorText}>
+										모임명은 비워둘 수 없습니다
+									</Text>
+								</View>
+								<View style={styles.blankView} />
+								<View style={styles.buttonOverLine} />
+								<Button
+									buttonNumber={1}
+									buttonText="확인"
+									onPressFunction={onCloseError}
 								/>
 							</>
 						)}
@@ -514,7 +527,6 @@ export function ModalInput({
 					</View>
 				</View>
 			</KeyboardAvoidingView>
-			{/* <View style={[{ marginBottom: Platform.select({ ios: 50 }) }]} /> */}
 		</Modal>
 	);
 }
