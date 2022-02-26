@@ -2,20 +2,13 @@ import { each, filter, map, pipe, reject, take, toArray } from '@fxts/core';
 import { Colors } from 'react-native-paper';
 import { Individual } from '../../interface';
 import type { Login } from '../../interface/login';
-import * as _ from 'fxjs';
-import * as L from 'fxjs/Lazy';
-export function changeTeamInfo(
-	state: Login,
-	data: any,
-	isConfirmProve: boolean
-) {
+export function changeTeamInfo(state: Login, data: any) {
 	state.name = data.name;
 	state.uri = data.uri;
 	state.color = data.color;
 	state.peopleCount = data.people_count;
 	state.startHour = data.starting_hours;
 	state.endHour = data.end_hours;
-	state.isConfirmProve = isConfirmProve ? true : false;
 }
 
 export const loginInitialState: Login = {
