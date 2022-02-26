@@ -26,7 +26,7 @@ import { RootState } from '../store';
 import { initialError, setModalMode } from '../store/team';
 import { ModalInput, Spinner } from '../components';
 import { NavigationHeader } from '../theme';
-import { findTeam, getUserMe } from '../store/login';
+import { checkIsConfirmTeam, findTeam, getUserMe } from '../store/login';
 import { Colors } from 'react-native-paper';
 import {
 	makeInitialOverlap,
@@ -259,9 +259,10 @@ export default function TeamList() {
 		({ id, name, uri }: goTeam) => {
 			if (modalMode === 'join')
 				uri && dispatch(findTeam({ data: uri, use: 'uri' }));
-			else if (modalMode === 'normal')
+			else if (modalMode === 'normal') {
 				id && dispatch(findTeam({ data: id, use: 'id' }));
-			else if (modalMode === 'make') name && setMake(name);
+				id && dispatch(checkIsConfirmTeam(Number(id)));
+			} else if (modalMode === 'make') name && setMake(name);
 			setMode('next');
 			dispatch(initialError());
 		},
