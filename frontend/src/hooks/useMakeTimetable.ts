@@ -1,6 +1,6 @@
 import { Colors } from 'react-native-paper';
 import type { state_time, timeWith60 } from '../interface';
-
+import { map, pipe, range, reduce, toArray } from '@fxts/core';
 export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 	const times: timeWith60 = {};
 	const timesText: Array<string> = [];
@@ -17,7 +17,7 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 						minute: j,
 						borderBottom: false,
 						borderTop: true,
-						borderWidth: 0.3,
+						borderWidth: 0.3
 					});
 				} else {
 					times[i].push({
@@ -26,7 +26,7 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 						minute: j,
 						borderBottom: false,
 						borderTop: false,
-						borderWidth: 0.3,
+						borderWidth: 0.3
 					});
 				}
 			}
@@ -64,51 +64,35 @@ export function useMakeTimeTableWith60(startHour: number, endHour: number) {
 		{ day: 'wed', times: times, timeBackColor: timeBackColor },
 		{ day: 'thu', times: times, timeBackColor: timeBackColor },
 		{ day: 'fri', times: times, timeBackColor: timeBackColor },
-		{ day: 'sat', times: times, timeBackColor: timeBackColor },
+		{ day: 'sat', times: times, timeBackColor: timeBackColor }
 	];
 	return { defaultDatesWith60, timesText };
 }
 
-export function useMakeTimetable() {
-	const times: Array<state_time> = [];
-	const timesText: Array<string> = [];
-
-	for (let i = 0; i <= 24; i += 1) {
-		times.push({
-			time: i,
-			color: Colors.white,
-			isPicked: false,
-			endPercent: 100,
-			startPercent: 100,
+export function makeTimetableWithStartEnd(startHour: number, endHour: number) {
+	const makeColor = pipe(
+		range(startHour, endHour),
+		map((_) => '#fff'),
+		toArray
+	);
+	const makeTime = pipe(
+		range(startHour, endHour),
+		map((k) => ({ [k]: makeMinute })),
+		reduce(Object.assign)
+	);
+	const makeMinute = pipe(
+		range(6),
+		map((m) => makeMinuteData(m * 10)),
+		toArray
+	);
+	const makeMinuteData = (minute: number) => {
+		return {
+			color: '#fff',
 			mode: 'normal',
-			isEveryTime: false,
-			isFullTime: false,
-		});
-		if (i <= 12) {
-			if (i % 2 === 0) {
-				if (i === 0) timesText.push('12 AM');
-				else timesText.push(`${i} AM`);
-			}
-		} else if (i > 24) {
-			if (i % 2 === 0) {
-				timesText.push(`${i - 24} AM`);
-			}
-		} else {
-			if (i % 2 === 0) {
-				timesText.push(`${i - 12} PM`);
-			}
-		}
-	}
-
-	const defaultDates = [
-		{ day: 'sun', times: times },
-		{ day: 'mon', times: times },
-		{ day: 'tue', times: times },
-		{ day: 'wed', times: times },
-		{ day: 'thu', times: times },
-		{ day: 'fri', times: times },
-		{ day: 'sat', times: times },
-	];
-
-	return { defaultDates, timesText };
+			minute,
+			borderBottom: false,
+			borderTop: minute == 0 ? true : false,
+			borderWidth: 0.3
+		};
+	};
 }
